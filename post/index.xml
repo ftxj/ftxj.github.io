@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="utf-8" standalone="yes"?>
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
-    <title>Posts on -- ftxj -- </title>
+    <title>Posts on ftxj&#39;s blog</title>
     <link>http://ftxj.github.io/post/</link>
-    <description>Recent content in Posts on -- ftxj -- </description>
+    <description>Recent content in Posts on ftxj&#39;s blog</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>zh-cn</language>
     <lastBuildDate>Sat, 22 Aug 2020 13:49:06 +0800</lastBuildDate>
@@ -17,7 +17,7 @@
       <pubDate>Sat, 22 Aug 2020 13:49:06 +0800</pubDate>
       
       <guid>http://ftxj.github.io/post/latex%E5%85%AC%E5%BC%8F%E6%B5%8B%E8%AF%95/</guid>
-      <description>显示位置测试 行间公式测试 行间公式测试\[\int_{0}^{10}x^{2} \mapsto \frac{100}{3}]\ 行间公式测试\[\int_{0}^{10}x^{2} \mapsto \frac{100}{3}]\ 行间</description>
+      <description>{{ partial &amp;ldquo;mathjax.html&amp;rdquo; . }} 显示位置测试 行间公式测试 行间公式测试\[\int_{0}^{10}x^{2} \mapsto \frac{100}{3}]\ 行间公式测试\[\int_{0}^{10}x^{2</description>
     </item>
     
     <item>
