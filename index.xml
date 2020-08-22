@@ -12,6 +12,17 @@
     
     
     <item>
+      <title>cv</title>
+      <link>http://ftxj.github.io/cv/</link>
+      <pubDate>Sat, 22 Aug 2020 13:03:08 +0800</pubDate>
+      
+      <guid>http://ftxj.github.io/cv/</guid>
+      <description>Hugo is a static site engine written in Go.
+It makes use of a variety of open source projects including:
+ Cobra Viper J Walter Weatherman Cast  Learn more and contribute on GitHub.</description>
+    </item>
+    
+    <item>
       <title>20200822 12 53</title>
       <link>http://ftxj.github.io/post/20200822-12-53/</link>
       <pubDate>Sat, 22 Aug 2020 12:53:33 +0800</pubDate>
