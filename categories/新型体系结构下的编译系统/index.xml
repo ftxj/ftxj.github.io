@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>“新型体系结构下的编译系统” on ftxj&#39;s blog</title>
+    <link>http://ftxj.github.io/categories/%E6%96%B0%E5%9E%8B%E4%BD%93%E7%B3%BB%E7%BB%93%E6%9E%84%E4%B8%8B%E7%9A%84%E7%BC%96%E8%AF%91%E7%B3%BB%E7%BB%9F/</link>
+    <description>Recent content in “新型体系结构下的编译系统” on ftxj&#39;s blog</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>zh-cn</language>
+    <lastBuildDate>Sat, 22 Aug 2020 19:08:41 +0800</lastBuildDate>
+    
+	<atom:link href="http://ftxj.github.io/categories/%E6%96%B0%E5%9E%8B%E4%BD%93%E7%B3%BB%E7%BB%93%E6%9E%84%E4%B8%8B%E7%9A%84%E7%BC%96%E8%AF%91%E7%B3%BB%E7%BB%9F/index.xml" rel="self" type="application/rss+xml" />
+    
+    
+    <item>
+      <title>论文HyperAP阅读</title>
+      <link>http://ftxj.github.io/post/%E8%AE%BA%E6%96%87hyperap%E9%98%85%E8%AF%BB/</link>
+      <pubDate>Sat, 22 Aug 2020 19:08:41 +0800</pubDate>
+      
+      <guid>http://ftxj.github.io/post/%E8%AE%BA%E6%96%87hyperap%E9%98%85%E8%AF%BB/</guid>
+      <description>论文名称：Hyper-AP: Enhancing Associative Processing Through A Full-Stack Optimization 相关项目信息：https://li.seas.upenn.edu/publication/zha-</description>
+    </item>
+    
+  </channel>
+</rss>

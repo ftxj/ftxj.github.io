@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
-  <title> - ftxj&#39;s blog</title>
+  <title>论文HyperAP阅读 - ftxj&#39;s blog</title>
   <meta name="renderer" content="webkit" />
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
 
@@ -16,7 +16,7 @@
 <meta name="apple-mobile-web-app-status-bar-style" content="#f8f5ec">
 
 
-<meta name="author" content="ftxj" /><meta name="description" content="title: &amp;ldquo;论文HyperAP阅读&amp;rdquo; date: 2020-08-22T19:08:41&#43;08:00 author: &amp;ldquo;ftxj&amp;rdquo; draft: true description: &amp;quot;&amp;rdquo; tags: [“论文阅读”, “ISCA”, &amp;ldquo;CIM/PIM&amp;rdquo;, &amp;ldquo;Associative processing&amp;rdquo;, &amp;ldquo;Compilation&amp;rdquo;, &amp;ldquo;new Hardware&amp;rdquo;] categories: [“新型体系结构下的编译系" /><meta name="keywords" content="CIM, PIM, Compiler" />
+<meta name="author" content="ftxj" /><meta name="description" content="论文名称：Hyper-AP: Enhancing Associative Processing Through A Full-Stack Optimization 相关项目信息：https://li.seas.upenn.edu/publication/zha-" /><meta name="keywords" content="CIM, PIM, Compiler" />
 
 
 
@@ -39,22 +39,24 @@
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@3.1.20/dist/jquery.fancybox.min.css" integrity="sha256-7TyXnr2YU040zfSP+rEcz29ggW4j56/ujTPwjMzyqFY=" crossorigin="anonymous">
 
 
-<meta property="og:title" content="" />
-<meta property="og:description" content="title: &ldquo;论文HyperAP阅读&rdquo; date: 2020-08-22T19:08:41&#43;08:00 author: &ldquo;ftxj&rdquo; draft: true description: &quot;&rdquo; tags: [“论文阅读”, “ISCA”, &ldquo;CIM/PIM&rdquo;, &ldquo;Associative processing&rdquo;, &ldquo;Compilation&rdquo;, &ldquo;new Hardware&rdquo;] categories: [“新型体系结构下的编译系" />
+<meta property="og:title" content="论文HyperAP阅读" />
+<meta property="og:description" content="论文名称：Hyper-AP: Enhancing Associative Processing Through A Full-Stack Optimization 相关项目信息：https://li.seas.upenn.edu/publication/zha-" />
 <meta property="og:type" content="article" />
 <meta property="og:url" content="http://ftxj.github.io/post/%E8%AE%BA%E6%96%87hyperap%E9%98%85%E8%AF%BB/" />
+<meta property="article:published_time" content="2020-08-22T19:08:41+08:00" />
+<meta property="article:modified_time" content="2020-08-22T19:08:41+08:00" />
+<meta itemprop="name" content="论文HyperAP阅读">
+<meta itemprop="description" content="论文名称：Hyper-AP: Enhancing Associative Processing Through A Full-Stack Optimization 相关项目信息：https://li.seas.upenn.edu/publication/zha-">
+<meta itemprop="datePublished" content="2020-08-22T19:08:41+08:00" />
+<meta itemprop="dateModified" content="2020-08-22T19:08:41+08:00" />
+<meta itemprop="wordCount" content="2353">
 
-<meta itemprop="name" content="">
-<meta itemprop="description" content="title: &ldquo;论文HyperAP阅读&rdquo; date: 2020-08-22T19:08:41&#43;08:00 author: &ldquo;ftxj&rdquo; draft: true description: &quot;&rdquo; tags: [“论文阅读”, “ISCA”, &ldquo;CIM/PIM&rdquo;, &ldquo;Associative processing&rdquo;, &ldquo;Compilation&rdquo;, &ldquo;new Hardware&rdquo;] categories: [“新型体系结构下的编译系">
-
-<meta itemprop="wordCount" content="2428">
 
 
-
-<meta itemprop="keywords" content="" />
+<meta itemprop="keywords" content="“论文阅读”,“ISCA”,CIM/PIM,Associative processing,Compilation,new Hardware," />
 <meta name="twitter:card" content="summary"/>
-<meta name="twitter:title" content=""/>
-<meta name="twitter:description" content="title: &ldquo;论文HyperAP阅读&rdquo; date: 2020-08-22T19:08:41&#43;08:00 author: &ldquo;ftxj&rdquo; draft: true description: &quot;&rdquo; tags: [“论文阅读”, “ISCA”, &ldquo;CIM/PIM&rdquo;, &ldquo;Associative processing&rdquo;, &ldquo;Compilation&rdquo;, &ldquo;new Hardware&rdquo;] categories: [“新型体系结构下的编译系"/>
+<meta name="twitter:title" content="论文HyperAP阅读"/>
+<meta name="twitter:description" content="论文名称：Hyper-AP: Enhancing Associative Processing Through A Full-Stack Optimization 相关项目信息：https://li.seas.upenn.edu/publication/zha-"/>
 
 <!--[if lte IE 9]>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/classlist/1.1.20170427/classList.min.js"></script>
@@ -124,11 +126,13 @@
           <article class="post">
     
     <header class="post-header">
-      <h1 class="post-title"></h1>
+      <h1 class="post-title">论文HyperAP阅读</h1>
 
       <div class="post-meta">
-        <span class="post-time"> 0001-01-01 </span>
-        
+        <span class="post-time"> 2020-08-22 </span>
+        <div class="post-category">
+            <a href="/categories/%E6%96%B0%E5%9E%8B%E4%BD%93%E7%B3%BB%E7%BB%93%E6%9E%84%E4%B8%8B%E7%9A%84%E7%BC%96%E8%AF%91%E7%B3%BB%E7%BB%9F/"> “新型体系结构下的编译系统” </a>
+            </div>
         
       </div>
     </header>
@@ -140,15 +144,7 @@
   </div>
 </div>
     <div class="post-content">
-      <p>title: &ldquo;论文HyperAP阅读&rdquo;
-date: 2020-08-22T19:08:41+08:00
-author: &ldquo;ftxj&rdquo;
-draft: true</p>
-<p>description: &quot;&rdquo;
-tags: [“论文阅读”, “ISCA”, &ldquo;CIM/PIM&rdquo;, &ldquo;Associative processing&rdquo;, &ldquo;Compilation&rdquo;, &ldquo;new Hardware&rdquo;]
-categories: [“新型体系结构下的编译系统”]
-keywords: []</p>
-<p>论文名称：Hyper-AP: Enhancing Associative Processing Through A Full-Stack Optimization</p>
+      <p>论文名称：Hyper-AP: Enhancing Associative Processing Through A Full-Stack Optimization</p>
 <p>相关项目信息：https://li.seas.upenn.edu/publication/zha-2020-hyper-ap/</p>
 <p>作者：Yue Zha, University of Pennsylvania,  Computational Intelligence Lab</p>
 <p>背景知识简介：</p>
@@ -889,7 +885,7 @@ keywords: []</p>
   <p class="copyright-item">
     <span class="item-title">上次更新</span>
     <span class="item-content">
-        0001-01-01
+        2020-08-22
         
     </span>
   </p>
@@ -897,14 +893,21 @@ keywords: []</p>
   
 </div>
 <footer class="post-footer">
-      
+      <div class="post-tags">
+          <a href="/tags/%E8%AE%BA%E6%96%87%E9%98%85%E8%AF%BB/">“论文阅读”</a>
+          <a href="/tags/isca/">“ISCA”</a>
+          <a href="/tags/cim/pim/">CIM/PIM</a>
+          <a href="/tags/associative-processing/">Associative processing</a>
+          <a href="/tags/compilation/">Compilation</a>
+          <a href="/tags/new-hardware/">new Hardware</a>
+          </div>
       <nav class="post-nav">
-        <a class="prev" href="/post/20200822-00-51/">
-            <i class="iconfont icon-left"></i>
-            <span class="prev-text nav-default">20200822 00 51</span>
-            <span class="prev-text nav-mobile"> </span>
-          </a>
         
+        <a class="next" href="/post/latex%E5%85%AC%E5%BC%8F%E6%B5%8B%E8%AF%95/">
+            <span class="next-text nav-default">Latex公式测试</span>
+            <span class="next-text nav-mobile"> </span>
+            <i class="iconfont icon-right"></i>
+          </a>
       </nav>
     </footer>
   </article>

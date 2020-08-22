@@ -6,7 +6,7 @@
     <description>Recent content on ftxj&#39;s blog</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>zh-cn</language>
-    <lastBuildDate>Sat, 22 Aug 2020 13:49:06 +0800</lastBuildDate>
+    <lastBuildDate>Sat, 22 Aug 2020 19:08:41 +0800</lastBuildDate>
     
 	<atom:link href="http://ftxj.github.io/index.xml" rel="self" type="application/rss+xml" />
     
@@ -20,6 +20,15 @@
       <description>Hugo is a static site engine written in Go.
 It makes use of a variety of open source projects including:
  Cobra Viper J Walter Weatherman Cast  Learn more and contribute on GitHub.</description>
+    </item>
+    
+    <item>
+      <title>论文HyperAP阅读</title>
+      <link>http://ftxj.github.io/post/%E8%AE%BA%E6%96%87hyperap%E9%98%85%E8%AF%BB/</link>
+      <pubDate>Sat, 22 Aug 2020 19:08:41 +0800</pubDate>
+      
+      <guid>http://ftxj.github.io/post/%E8%AE%BA%E6%96%87hyperap%E9%98%85%E8%AF%BB/</guid>
+      <description>论文名称：Hyper-AP: Enhancing Associative Processing Through A Full-Stack Optimization 相关项目信息：https://li.seas.upenn.edu/publication/zha-</description>
     </item>
     
     <item>
@@ -56,15 +65,6 @@ It makes use of a variety of open source projects including:
       
       <guid>http://ftxj.github.io/post/20200822-00-51/</guid>
       <description>$$ f(x) = \sin(x) $$ $$ f(x) = \cos(x) $$ $$ f(x) = \tan(x) $$ $$ f(x) = \f(f(x)) $$ $$ f(x) = \g(x) $$ 随便写点 随便写点随便写点随便写点随便写点随便写点随便写点随便写点 随便写点随便写点随便写点随</description>
-    </item>
-    
-    <item>
-      <title></title>
-      <link>http://ftxj.github.io/post/%E8%AE%BA%E6%96%87hyperap%E9%98%85%E8%AF%BB/</link>
-      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
-      
-      <guid>http://ftxj.github.io/post/%E8%AE%BA%E6%96%87hyperap%E9%98%85%E8%AF%BB/</guid>
-      <description>title: &amp;ldquo;论文HyperAP阅读&amp;rdquo; date: 2020-08-22T19:08:41+08:00 author: &amp;ldquo;ftxj&amp;rdquo; draft: true description: &amp;quot;&amp;rdquo; tags: [“论文阅读”, “ISCA”, &amp;ldquo;CIM/PIM&amp;rdquo;, &amp;ldquo;Associative processing&amp;rdquo;, &amp;ldquo;Compilation&amp;rdquo;, &amp;ldquo;new Hardware&amp;rdquo;] categories: [“新型体系结构下的编译系</description>
     </item>
     
   </channel>
