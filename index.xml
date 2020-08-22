@@ -6,9 +6,19 @@
     <description>Recent content on -- ftxj -- </description>
     <generator>Hugo -- gohugo.io</generator>
     <language>zh-cn</language>
+    <lastBuildDate>Sat, 22 Aug 2020 00:51:14 +0800</lastBuildDate>
     
 	<atom:link href="http://ftxj.github.io/index.xml" rel="self" type="application/rss+xml" />
     
+    
+    <item>
+      <title>20200822 00 51</title>
+      <link>http://ftxj.github.io/post/20200822-00-51/</link>
+      <pubDate>Sat, 22 Aug 2020 00:51:14 +0800</pubDate>
+      
+      <guid>http://ftxj.github.io/post/20200822-00-51/</guid>
+      <description>$$ f(x) = \sin(x) $$</description>
+    </item>
     
   </channel>
 </rss>
