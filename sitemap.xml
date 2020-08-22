@@ -23,6 +23,20 @@
   </url>
   
   <url>
+    <loc>http://ftxj.github.io/tags/</loc>
+    <lastmod>2020-08-22T00:54:04+08:00</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.5</priority>
+  </url>
+  
+  <url>
+    <loc>http://ftxj.github.io/tags/%E7%BD%91%E7%AB%99%E6%B5%8B%E8%AF%95/</loc>
+    <lastmod>2020-08-22T00:54:04+08:00</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.5</priority>
+  </url>
+  
+  <url>
     <loc>http://ftxj.github.io/post/20200822-00-51/</loc>
     <lastmod>2020-08-22T00:51:14+08:00</lastmod>
     <changefreq>weekly</changefreq>
@@ -31,12 +45,6 @@
   
   <url>
     <loc>http://ftxj.github.io/categories/</loc>
-    <changefreq>weekly</changefreq>
-    <priority>0.5</priority>
-  </url>
-  
-  <url>
-    <loc>http://ftxj.github.io/tags/</loc>
     <changefreq>weekly</changefreq>
     <priority>0.5</priority>
   </url>
