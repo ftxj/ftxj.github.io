@@ -9,40 +9,31 @@
 
 <meta http-equiv="Cache-Control" content="no-transform" />
 <meta http-equiv="Cache-Control" content="no-siteapp" />
-<script type="text/javascript"
-        async
-        src="https://cdn.bootcss.com/mathjax/2.7.3/MathJax.js?config=TeX-AMS-MML_HTMLorMML">
-MathJax.Hub.Config({
-  tex2jax: {
-    inlineMath: [['$','$'], ['\\(','\\)']],
-    displayMath: [['$$','$$'], ['\[\[','\]\]']],
-    processEscapes: true,
-    processEnvironments: true,
-    skipTags: ['script', 'noscript', 'style', 'textarea', 'pre'],
-    TeX: { equationNumbers: { autoNumber: "AMS" },
-         extensions: ["AMSmath.js", "AMSsymbols.js"] }
-  }
-});
+<script type="text/javascript" async
+    src="https://cdn.bootcss.com/mathjax/2.7.6/MathJax.js?config=TeX-AMS-MML_HTMLorMML">
+        MathJax.Hub.Config({
+            "HTML-CSS": {preferredFont: "TeX", availableFonts: ["STIX", "TeX"], linebreaks: { automatic: true }, EqnChunk: (MathJax.Hub.Browser.isMobile ? 10 : 50) },
+            tex2jax: {inlineMath: [["$", "$"], ["\\(", "\\)"]], processEscapes: true, ignoreClass: "tex2jax_ignore|dno", skipTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code'] },
+            TeX: {noUndefined: { attributes: { mathcolor: "red", mathbackground: "#FFEEEE", mathsize: "90%"} }, Macros: { href: "{}" } },
+            messageStyle: "none"
+        });
 
-MathJax.Hub.Queue(function() {
-    
-    
-    
-    var all = MathJax.Hub.getAllJax(), i;
-    for(i = 0; i < all.length; i += 1) {
-        all[i].SourceElement().parentNode.className += ' has-jax';
-    }
-});
-</script>
+        MathJax.Hub.Queue(function () {
+            var all = MathJax.Hub.getAllJax(), i;
+            for (i = 0; i < all.length; i += 1) {
+                all[i].SourceElement().parentNode.className += 'has-jax';
+            }
+        });
+    </script>
 
 <style>
-code.has-jax {
-    font: inherit;
-    font-size: 100%;
-    background: inherit;
-    border: inherit;
-    color: #515151;
-}
+    code.has-jax {
+        font: inherit;
+        font-size: 100%;
+        background: inherit;
+        border: inherit;
+        color: #515151;
+    }
 </style><meta name="theme-color" content="#f8f5ec" />
 <meta name="msapplication-navbutton-color" content="#f8f5ec">
 <meta name="apple-mobile-web-app-capable" content="yes">
@@ -94,6 +85,32 @@ code.has-jax {
   <script src="https://cdn.jsdelivr.net/npm/respond.js@1.4.2/dest/respond.min.js"></script>
 <![endif]-->
 
+  <script type="text/javascript" async
+    src="https://cdn.bootcss.com/mathjax/2.7.6/MathJax.js?config=TeX-AMS-MML_HTMLorMML">
+        MathJax.Hub.Config({
+            "HTML-CSS": {preferredFont: "TeX", availableFonts: ["STIX", "TeX"], linebreaks: { automatic: true }, EqnChunk: (MathJax.Hub.Browser.isMobile ? 10 : 50) },
+            tex2jax: {inlineMath: [["$", "$"], ["\\(", "\\)"]], processEscapes: true, ignoreClass: "tex2jax_ignore|dno", skipTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code'] },
+            TeX: {noUndefined: { attributes: { mathcolor: "red", mathbackground: "#FFEEEE", mathsize: "90%"} }, Macros: { href: "{}" } },
+            messageStyle: "none"
+        });
+
+        MathJax.Hub.Queue(function () {
+            var all = MathJax.Hub.getAllJax(), i;
+            for (i = 0; i < all.length; i += 1) {
+                all[i].SourceElement().parentNode.className += 'has-jax';
+            }
+        });
+    </script>
+
+<style>
+    code.has-jax {
+        font: inherit;
+        font-size: 100%;
+        background: inherit;
+        border: inherit;
+        color: #515151;
+    }
+</style>
 </head>
 <body>
   
