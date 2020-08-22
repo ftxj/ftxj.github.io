@@ -1,0 +1,981 @@
+<!DOCTYPE html>
+<html lang="zh-cn">
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+  <title> - ftxj&#39;s blog</title>
+  <meta name="renderer" content="webkit" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+<meta name="theme-color" content="#f8f5ec" />
+<meta name="msapplication-navbutton-color" content="#f8f5ec">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="#f8f5ec">
+
+
+<meta name="author" content="ftxj" /><meta name="description" content="title: &amp;ldquo;论文HyperAP阅读&amp;rdquo; date: 2020-08-22T19:08:41&#43;08:00 author: &amp;ldquo;ftxj&amp;rdquo; draft: true description: &amp;quot;&amp;rdquo; tags: [“论文阅读”, “ISCA”, &amp;ldquo;CIM/PIM&amp;rdquo;, &amp;ldquo;Associative processing&amp;rdquo;, &amp;ldquo;Compilation&amp;rdquo;, &amp;ldquo;new Hardware&amp;rdquo;] categories: [“新型体系结构下的编译系" /><meta name="keywords" content="CIM, PIM, Compiler" />
+
+
+
+
+
+
+<meta name="generator" content="Hugo 0.74.3 with theme even" />
+
+
+<link rel="canonical" href="http://ftxj.github.io/post/%E8%AE%BA%E6%96%87hyperap%E9%98%85%E8%AF%BB/" />
+<link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+<link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+<link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
+<link rel="manifest" href="/manifest.json">
+<link rel="mask-icon" href="/safari-pinned-tab.svg" color="#5bbad5">
+
+
+
+<link href="/sass/main.min.651e6917abb0239242daa570c2bec9867267bbcd83646da5a850afe573347b44.css" rel="stylesheet">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@3.1.20/dist/jquery.fancybox.min.css" integrity="sha256-7TyXnr2YU040zfSP+rEcz29ggW4j56/ujTPwjMzyqFY=" crossorigin="anonymous">
+
+
+<meta property="og:title" content="" />
+<meta property="og:description" content="title: &ldquo;论文HyperAP阅读&rdquo; date: 2020-08-22T19:08:41&#43;08:00 author: &ldquo;ftxj&rdquo; draft: true description: &quot;&rdquo; tags: [“论文阅读”, “ISCA”, &ldquo;CIM/PIM&rdquo;, &ldquo;Associative processing&rdquo;, &ldquo;Compilation&rdquo;, &ldquo;new Hardware&rdquo;] categories: [“新型体系结构下的编译系" />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="http://ftxj.github.io/post/%E8%AE%BA%E6%96%87hyperap%E9%98%85%E8%AF%BB/" />
+
+<meta itemprop="name" content="">
+<meta itemprop="description" content="title: &ldquo;论文HyperAP阅读&rdquo; date: 2020-08-22T19:08:41&#43;08:00 author: &ldquo;ftxj&rdquo; draft: true description: &quot;&rdquo; tags: [“论文阅读”, “ISCA”, &ldquo;CIM/PIM&rdquo;, &ldquo;Associative processing&rdquo;, &ldquo;Compilation&rdquo;, &ldquo;new Hardware&rdquo;] categories: [“新型体系结构下的编译系">
+
+<meta itemprop="wordCount" content="2428">
+
+
+
+<meta itemprop="keywords" content="" />
+<meta name="twitter:card" content="summary"/>
+<meta name="twitter:title" content=""/>
+<meta name="twitter:description" content="title: &ldquo;论文HyperAP阅读&rdquo; date: 2020-08-22T19:08:41&#43;08:00 author: &ldquo;ftxj&rdquo; draft: true description: &quot;&rdquo; tags: [“论文阅读”, “ISCA”, &ldquo;CIM/PIM&rdquo;, &ldquo;Associative processing&rdquo;, &ldquo;Compilation&rdquo;, &ldquo;new Hardware&rdquo;] categories: [“新型体系结构下的编译系"/>
+
+<!--[if lte IE 9]>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/classlist/1.1.20170427/classList.min.js"></script>
+<![endif]-->
+
+<!--[if lt IE 9]>
+  <script src="https://cdn.jsdelivr.net/npm/html5shiv@3.7.3/dist/html5shiv.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/respond.js@1.4.2/dest/respond.min.js"></script>
+<![endif]-->
+
+  
+</head>
+<body>
+  
+  <div id="mobile-navbar" class="mobile-navbar">
+  <div class="mobile-header-logo">
+    <a href="/" class="logo">FTXJ</a>
+  </div>
+  <div class="mobile-navbar-icon">
+    <span></span>
+    <span></span>
+    <span></span>
+  </div>
+</div>
+
+<nav id="mobile-menu" class="mobile-menu slideout-menu">
+  <ul class="mobile-menu-list">
+    <a href="/">
+        <li class="mobile-menu-item">主页</li>
+      </a><a href="/post/">
+        <li class="mobile-menu-item">合集</li>
+      </a><a href="/tags/">
+        <li class="mobile-menu-item">标签</li>
+      </a><a href="/categories/">
+        <li class="mobile-menu-item">分类</li>
+      </a><a href="/cv/">
+        <li class="mobile-menu-item">cv</li>
+      </a>
+  </ul>
+</nav>
+  <div class="container" id="mobile-panel">
+    <header id="header" class="header">
+        <div class="logo-wrapper">
+  <a href="/" class="logo">FTXJ</a>
+</div>
+
+<nav class="site-navbar">
+  <ul id="menu" class="menu">
+    <li class="menu-item">
+        <a class="menu-item-link" href="/">主页</a>
+      </li><li class="menu-item">
+        <a class="menu-item-link" href="/post/">合集</a>
+      </li><li class="menu-item">
+        <a class="menu-item-link" href="/tags/">标签</a>
+      </li><li class="menu-item">
+        <a class="menu-item-link" href="/categories/">分类</a>
+      </li><li class="menu-item">
+        <a class="menu-item-link" href="/cv/">cv</a>
+      </li>
+  </ul>
+</nav>
+    </header>
+
+    <main id="main" class="main">
+      <div class="content-wrapper">
+        <div id="content" class="content">
+          <article class="post">
+    
+    <header class="post-header">
+      <h1 class="post-title"></h1>
+
+      <div class="post-meta">
+        <span class="post-time"> 0001-01-01 </span>
+        
+        
+      </div>
+    </header>
+ 
+    <div class="post-toc" id="post-toc">
+  <h2 class="post-toc-title">文章目录</h2>
+  <div class="post-toc-content always-active">
+    <nav id="TableOfContents"></nav>
+  </div>
+</div>
+    <div class="post-content">
+      <p>title: &ldquo;论文HyperAP阅读&rdquo;
+date: 2020-08-22T19:08:41+08:00
+author: &ldquo;ftxj&rdquo;
+draft: true</p>
+<p>description: &quot;&rdquo;
+tags: [“论文阅读”, “ISCA”, &ldquo;CIM/PIM&rdquo;, &ldquo;Associative processing&rdquo;, &ldquo;Compilation&rdquo;, &ldquo;new Hardware&rdquo;]
+categories: [“新型体系结构下的编译系统”]
+keywords: []</p>
+<p>论文名称：Hyper-AP: Enhancing Associative Processing Through A Full-Stack Optimization</p>
+<p>相关项目信息：https://li.seas.upenn.edu/publication/zha-2020-hyper-ap/</p>
+<p>作者：Yue Zha, University of Pennsylvania,  Computational Intelligence Lab</p>
+<p>背景知识简介：</p>
+<p>AP 简介：</p>
+<p>AP 是一种不同于冯诺依曼体系结构的计算模型，它可以看作内存计算的一种架构，指令流向内存，内存根据指令执行不同的操作。</p>
+<p>在AP模型中，内存按行存放需要处理的数据，将处理后的数据再写回内存中。下图 ^[1] 就是，指令过来对A和B存放数据的地方进行操作，将得到的结果写入内存中C的位置。在整个操作的执行中，没有数据的移动，只有指令的流动。而且他是固有的Data parallel的，同时处理着内存上存放的所有数据。</p>
+<p><img src="论文HyperAP阅读.assets/image-20200822213937795.png" alt="image-20200822213937795" style="zoom:50%;" /></p>
+<p>具体的，AP模型需要内存支持两个操作，search与write。这是什么意思呢，我们可以这么理解，计算的本质就是根据一定的输入符号，得到操作对应的输入符号。对于一个给定的计算操作来说（例如加法、减法），输入和输出构成一个对应关系，且对于指定的输入，只会有一个输入。那么我们就可以构建一个输入与输出对应关系的表（就是真值表），这样子，对于一个输入，我们看表中哪一个是和他完全匹配的，匹配的一项的结果就是这个计算的结果。然后把结果存储就ok了。我们的AP模型就是在这样的概念下产生的，需要计算的输入全部在存储中，当一个操作到来时，用这个操作对应的真值表一项一项去查找内存，看有没有相对应的项（search操作），如果有，就把结果写入到想写入的区域中（write），完成这次计算。下图（b）是对search操作的描述，key存储的是我们要进行匹配的表，mask可以标记内存中的有效列，CAM就是一个数据存储区域，Tag得到匹配的结果。在这个例子中，要对10-1-（-表示无所谓）的输入进行匹配，那么就把key区域置为它，然后看内存中被mask标记为有效的区域（蓝色区域）中哪些行匹配到了，就把tag里面的结果改为1.</p>
+<p>write操作可以看图（c）中的例子，key里面存储要写入的值，mask表示哪些列有效（蓝色部分），tag表示哪些行有效（匹配到的才写）。</p>
+<p><img src="%E8%AE%BA%E6%96%87HyperAP%E9%98%85%E8%AF%BB.assets/image-20200822214342318.png" alt="image-20200822214342318"></p>
+<p>RRAM内存原件下的TCAM结构AP模型：</p>
+<p>上文的描述只是一个模型，并没有说内存要怎么支持search和write操作，传统的方法是通过给内存中增加计算资源来实现（这方面知识不清楚），复杂且低效。而ReRAM支持一个内存单元中存放多个状态，利用它可以实现TCAM（T代表Ternary三元的，即一个内存状态中不仅仅可以存放0，1，还可以存放第三个状态‘X’，代表01皆可，don&rsquo;t care）。</p>
+<p>RRAM是一种电阻可以改变的器件，所以他就用电阻值表示状态（忆阻器），高阻代表0，低阻代表1这种。高阻和低阻之间的切换需要在原件两端加一个比较大的电压（&gt;阈值电压）。RRAM一般组织为cross bar的形式，如下图A。</p>
+<p>TCAM利用两个RRAM单元表示一个状态，（高阻，高阻）代表X，（高阻，低阻）代表0，（低阻，高阻）代表1，（低阻，低阻）未使用。这样的话，下图（b）中的第一行就是存储了X00，第二行存储了0X1。当支持search操作时，就把输入也进行编码，（高电压，高电压）表示don&rsquo;t care，（高电压，低电压）表示1，（低电压，高电压）表示0。由于cross bar的右端给的也是一个高电压，所以输入端的高电压其实是小的电压差，低电压才是大的电压差。然后在右端得到输出电流，大电流表示这一行匹配失败，小电流表示这一行匹配成功。为什么这样呢？考虑下表组合</p>
+<table>
+<thead>
+<tr>
+<th align="center">输入</th>
+<th align="center">（高电压， 低电压）1</th>
+<th align="center">（高电压，高电压）-</th>
+<th align="center">（低电压，高电压）0</th>
+<th align="center">（低电压，低电压）N</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td align="center"></td>
+<td align="center">（L，H）1</td>
+<td align="center">（L，L）-</td>
+<td align="center">（H，L）0</td>
+<td align="center">（H，H）N</td>
+</tr>
+<tr>
+<td align="center">N（L，L）</td>
+<td align="center">（0，大）❌</td>
+<td align="center">（0，0）⭕</td>
+<td align="center">（大，0）❌</td>
+<td align="center">（大，大）❌</td>
+</tr>
+<tr>
+<td align="center">1（L，H）</td>
+<td align="center">（0，小）✔</td>
+<td align="center">（0，0）✔</td>
+<td align="center">（大，0）❌</td>
+<td align="center">（大，小）❌</td>
+</tr>
+<tr>
+<td align="center">0（H，L）</td>
+<td align="center">（0，大）❌</td>
+<td align="center">（0，0）✔</td>
+<td align="center">（小，0）✔</td>
+<td align="center">（小，大）❌</td>
+</tr>
+<tr>
+<td align="center">X（H，H）</td>
+<td align="center">（0，小）✔</td>
+<td align="center">（0，0）✔</td>
+<td align="center">（小，0）✔</td>
+<td align="center">（小，小）⭕</td>
+</tr>
+</tbody>
+</table>
+<p><img src="%E8%AE%BA%E6%96%87HyperAP%E9%98%85%E8%AF%BB.assets/image-20200822221221048.png" alt="image-20200822221221048"></p>
+<p>全新编码方式：</p>
+<p>9 * 9 = 81个有效结果，175个无效结果。</p>
+<p>编码目标：</p>
+<p>一个search可以匹配多个内存组合；</p>
+<p>至少有四个 1 对 1 的search；</p>
+<p>只有四种存储是有效的；</p>
+<p>对于任意一个存储，必须有1个1对1，2个1对2，3个1对3的search，一个1对4的 search key</p>
+<table>
+<thead>
+<tr>
+<th align="center">输入</th>
+<th></th>
+<th></th>
+<th align="center"></th>
+<th align="center"></th>
+<th align="center"></th>
+<th align="center"></th>
+<th></th>
+<th></th>
+<th></th>
+<th></th>
+<th></th>
+<th></th>
+<th></th>
+<th></th>
+<th></th>
+<th></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td align="center"></td>
+<td>(L,L,L,L)</td>
+<td>(L, L, L, H)</td>
+<td align="center">(L, L, H, L)</td>
+<td align="center">(L, L, H, H)</td>
+<td align="center">(L, H, L, L)</td>
+<td align="center">(L, H, L, H)</td>
+<td>(L, H, H, L)</td>
+<td>(L, H, H, H)</td>
+<td>(H, L, L, L)</td>
+<td>(H, L, L, H)</td>
+<td>(H, L, H, L)</td>
+<td>(H, L, H, H)</td>
+<td>(H, H, L, L)</td>
+<td>(H, H, L, H)</td>
+<td>(H, H, H, L)</td>
+<td>(H, H, H, H)</td>
+</tr>
+<tr>
+<td align="center">(L, L, L, L)</td>
+<td>(0,0,0,0)</td>
+<td></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td align="center">(L, L, L, H)</td>
+<td>(0,0,0,0)</td>
+<td>(0,0,0,L)</td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td align="center">(L, L, H, L)</td>
+<td>(0,0,0,0)</td>
+<td></td>
+<td align="center">(0,0,L,0)</td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td align="center">(L, L, H, H)</td>
+<td>(0,0,0,0)</td>
+<td>(0,0,0,L)</td>
+<td align="center">(0,0,L,0)</td>
+<td align="center">(0,0,L,L)</td>
+<td align="center"></td>
+<td align="center"></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td align="center">(L, H, L, L)</td>
+<td>(0,0,0,0)</td>
+<td></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center">(0,L,0,0)</td>
+<td align="center"></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td align="center">(L, H, L, H)</td>
+<td>(0,0,0,0)</td>
+<td>(0,0,0,L)</td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center">(0,L,0,0)</td>
+<td align="center">(0,L,0,L)</td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td align="center">(L, H, H, L)</td>
+<td>(0,0,0,0)</td>
+<td></td>
+<td align="center">(0,0,L,0)</td>
+<td align="center"></td>
+<td align="center">(0,L,0,0)</td>
+<td align="center"></td>
+<td>(0,L,L,0)</td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td align="center">(L, H, H, H)</td>
+<td>(0,0,0,0)</td>
+<td>(0,0,0,L)</td>
+<td align="center">(0,0,L,0)</td>
+<td align="center">(0,0,L,L)</td>
+<td align="center">(0,L,0,0)</td>
+<td align="center">(0,L,0,L)</td>
+<td>(0,L,L,0)</td>
+<td>(0,L,L,L)</td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td align="center">(H, L, L, L)</td>
+<td>(0,0,0,0)</td>
+<td></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td></td>
+<td></td>
+<td>(L,0,0,0)</td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td align="center">(H, L, L, H)</td>
+<td>(0,0,0,0)</td>
+<td>(0,0,0,L)</td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td></td>
+<td></td>
+<td>(L,0,0,0)</td>
+<td>(L,0,0,L)</td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td align="center">(H, L, H, L)</td>
+<td>(0,0,0,0)</td>
+<td></td>
+<td align="center">(0,0,L,0)</td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td></td>
+<td></td>
+<td>(L,0,0,0)</td>
+<td></td>
+<td>(L,0,L, 0)</td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td align="center">(H, L, H, H)</td>
+<td>(0,0,0,0)</td>
+<td>(0,0,0,L)</td>
+<td align="center">(0,0,L,0)</td>
+<td align="center">(0,0,L,L)</td>
+<td align="center"></td>
+<td align="center"></td>
+<td></td>
+<td></td>
+<td>(L,0,0,0)</td>
+<td>(L,0,0,L)</td>
+<td>(L,0,L, 0)</td>
+<td>(L,0,L, L)</td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td align="center">(H, H, L, L)</td>
+<td>(0,0,0,0)</td>
+<td></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center">(0,L,0,0)</td>
+<td align="center"></td>
+<td></td>
+<td></td>
+<td>(L,0,0,0)</td>
+<td></td>
+<td></td>
+<td></td>
+<td>(L,L,0, 0)</td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td align="center">(H, H, L, H)</td>
+<td>(0,0,0,0)</td>
+<td>(0,0,0,L)</td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center">(0,L,0,0)</td>
+<td align="center">(0,L,0,L)</td>
+<td></td>
+<td></td>
+<td>(L,0,0,0)</td>
+<td>(L,0,0,L)</td>
+<td></td>
+<td></td>
+<td>(L,L,0, 0)</td>
+<td>(L,L,0, L)</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td align="center">(H, H, H, L)</td>
+<td>(0,0,0,0)</td>
+<td></td>
+<td align="center">(0,0,L,0)</td>
+<td align="center"></td>
+<td align="center">(0,L,0,0)</td>
+<td align="center"></td>
+<td>(0,L,L,0)</td>
+<td></td>
+<td>(L,0,0,0)</td>
+<td></td>
+<td>(L,0,L, 0)</td>
+<td></td>
+<td>(L,L,0, 0)</td>
+<td></td>
+<td>(L,L,L, L)</td>
+<td></td>
+</tr>
+<tr>
+<td align="center">(H, H, H, H)</td>
+<td>(0,0,0,0)</td>
+<td>(0,0,0,L)</td>
+<td align="center">(0,0,L,0)</td>
+<td align="center">(0,0,L,L)</td>
+<td align="center">(0,L,0,0)</td>
+<td align="center">(0,L,0,L)</td>
+<td>(0,L,L,0)</td>
+<td>(0,L,L,L)</td>
+<td>(L,0,0,0)</td>
+<td>(L,0,0,L)</td>
+<td>(L,0,L, 0)</td>
+<td>(L,0,L, L)</td>
+<td>(L,L,0, 0)</td>
+<td>(L,L,0, L)</td>
+<td>(L,L,L, 0)</td>
+<td>(L,L,L, L)</td>
+</tr>
+</tbody>
+</table>
+<p>根据这些条件化简这个表：</p>
+<p>进行分组：</p>
+<table>
+<thead>
+<tr>
+<th align="center">输入</th>
+<th></th>
+<th></th>
+<th align="center"></th>
+<th align="center"></th>
+<th align="center"></th>
+<th align="center"></th>
+<th></th>
+<th></th>
+<th></th>
+<th></th>
+<th></th>
+<th></th>
+<th></th>
+<th></th>
+<th></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td align="center"></td>
+<td>(L,L,L,L)</td>
+<td>(L, L, L, H)</td>
+<td align="center">(L, L, H, L)</td>
+<td align="center">(L, L, H, H)</td>
+<td align="center">(L, H, L, L)</td>
+<td align="center">(L, H, L, H)</td>
+<td>(L, H, H, L)</td>
+<td>(L, H, H, H)</td>
+<td>(H, L, L, L)</td>
+<td>(H, L, L, H)</td>
+<td>(H, L, H, L)</td>
+<td>(H, L, H, H)</td>
+<td>(H, H, L, L)</td>
+<td>(H, H, L, H)</td>
+<td>(H, H, H, L)</td>
+</tr>
+<tr>
+<td align="center">(L, H, H, H)</td>
+<td>(0,0,0,0)</td>
+<td>(0,0,0,L)</td>
+<td align="center">(0,0,L,0)</td>
+<td align="center">(0,0,L,L)</td>
+<td align="center">(0,L,0,0)</td>
+<td align="center">(0,L,0,L)</td>
+<td>(0,L,L,0)</td>
+<td>(0,L,L,L)</td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td align="center">(H, L, H, H)</td>
+<td>(0,0,0,0)</td>
+<td>(0,0,0,L)</td>
+<td align="center">(0,0,L,0)</td>
+<td align="center">(0,0,L,L)</td>
+<td align="center"></td>
+<td align="center"></td>
+<td></td>
+<td></td>
+<td>(L,0,0,0)</td>
+<td>(L,0,0,L)</td>
+<td>(L,0,L, 0)</td>
+<td>(L,0,L, L)</td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td align="center">(H, H, L, H)</td>
+<td>(0,0,0,0)</td>
+<td>(0,0,0,L)</td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center">(0,L,0,0)</td>
+<td align="center">(0,L,0,L)</td>
+<td></td>
+<td></td>
+<td>(L,0,0,0)</td>
+<td>(L,0,0,L)</td>
+<td></td>
+<td></td>
+<td>(L,L,0, 0)</td>
+<td>(L,L,0, L)</td>
+<td></td>
+</tr>
+<tr>
+<td align="center">(H, H, H, L)</td>
+<td>(0,0,0,0)</td>
+<td></td>
+<td align="center">(0,0,L,0)</td>
+<td align="center"></td>
+<td align="center">(0,L,0,0)</td>
+<td align="center"></td>
+<td>(0,L,L,0)</td>
+<td></td>
+<td>(L,0,0,0)</td>
+<td></td>
+<td>(L,0,L, 0)</td>
+<td></td>
+<td>(L,L,0, 0)</td>
+<td></td>
+<td>(L,L,L, L)</td>
+</tr>
+</tbody>
+</table>
+<p>进行分组：</p>
+<p>1 v 1 任意赋值一个编码</p>
+<table>
+<thead>
+<tr>
+<th align="center"></th>
+<th align="center">(L, H, H, H) 1Z</th>
+<th align="center">(H, L, H, H) 0Z</th>
+<th align="center">(H, H, L, H) Z1</th>
+<th align="center">(H, H, H, L) Z0</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td align="center">1X (L, H, H, H) 11</td>
+<td align="center">✔</td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+</tr>
+<tr>
+<td align="center">0X (H, L, H, H) 10</td>
+<td align="center"></td>
+<td align="center">✔</td>
+<td align="center"></td>
+<td align="center"></td>
+</tr>
+<tr>
+<td align="center">X1 (H, H, L, H) 01</td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center">✔</td>
+<td align="center"></td>
+</tr>
+<tr>
+<td align="center">X0 (H, H, H, L) 00</td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center">✔</td>
+</tr>
+</tbody>
+</table>
+<p>1 v 2</p>
+<table>
+<thead>
+<tr>
+<th align="center"></th>
+<th align="center">(L, L, H, H) -Z</th>
+<th align="center">(L, H, L, H)</th>
+<th align="center">(L, H, H, L)10</th>
+<th align="center">(H, L, L, H)</th>
+<th align="center">(H, L, H, L)</th>
+<th>(H, H, L, L)Z-</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td align="center">1X(L, H, H, H) 11</td>
+<td align="center">✔</td>
+<td align="center">✔</td>
+<td align="center">✔</td>
+<td align="center"></td>
+<td align="center"></td>
+<td></td>
+</tr>
+<tr>
+<td align="center">0X(H, L, H, H) 10</td>
+<td align="center">✔</td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center">✔</td>
+<td align="center">✔</td>
+<td></td>
+</tr>
+<tr>
+<td align="center">X1(H, H, L, H) 01</td>
+<td align="center"></td>
+<td align="center">✔</td>
+<td align="center"></td>
+<td align="center">✔</td>
+<td align="center"></td>
+<td>✔</td>
+</tr>
+<tr>
+<td align="center">X0(H, H, H, L) 00</td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center">✔</td>
+<td align="center"></td>
+<td align="center">✔</td>
+<td>✔</td>
+</tr>
+</tbody>
+</table>
+<p>1 v 3</p>
+<table>
+<thead>
+<tr>
+<th align="center"></th>
+<th align="center">(L, L, L, H)</th>
+<th align="center">(L, L, H, L)</th>
+<th align="center">(L, H, L, L)</th>
+<th align="center">(H, L, L, L)</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td align="center">(L, H, H, H) 01</td>
+<td align="center">✔</td>
+<td align="center">✔</td>
+<td align="center">✔</td>
+<td align="center"></td>
+</tr>
+<tr>
+<td align="center">(H, L, H, H) 10</td>
+<td align="center">✔</td>
+<td align="center">✔</td>
+<td align="center"></td>
+<td align="center">✔</td>
+</tr>
+<tr>
+<td align="center">(H, H, L, H) 11</td>
+<td align="center">✔</td>
+<td align="center"></td>
+<td align="center">✔</td>
+<td align="center">✔</td>
+</tr>
+<tr>
+<td align="center">(H, H, H, L) 00</td>
+<td align="center"></td>
+<td align="center">✔</td>
+<td align="center">✔</td>
+<td align="center">✔</td>
+</tr>
+</tbody>
+</table>
+<p>1 v 4</p>
+<table>
+<thead>
+<tr>
+<th align="center"></th>
+<th align="center">(L,L,L,L)</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td align="center">(L, H, H, H) 01</td>
+<td align="center">✔</td>
+</tr>
+<tr>
+<td align="center">(H, L, H, H) 10</td>
+<td align="center">✔</td>
+</tr>
+<tr>
+<td align="center">(H, H, L, H) 11</td>
+<td align="center">✔</td>
+</tr>
+<tr>
+<td align="center">(H, H, H, L) 00</td>
+<td align="center">✔</td>
+</tr>
+</tbody>
+</table>
+<table>
+<thead>
+<tr>
+<th align="center">X</th>
+<th align="center">Y</th>
+<th align="center">Z</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td align="center">0</td>
+<td align="center">0</td>
+<td align="center">1</td>
+</tr>
+<tr>
+<td align="center">1</td>
+<td align="center">1</td>
+<td align="center">1</td>
+</tr>
+<tr>
+<td align="center">0</td>
+<td align="center">1</td>
+<td align="center">1</td>
+</tr>
+<tr>
+<td align="center">1</td>
+<td align="center">0</td>
+<td align="center">0</td>
+</tr>
+</tbody>
+</table>
+
+    </div>
+
+    <div class="post-copyright">
+  <p class="copyright-item">
+    <span class="item-title">文章作者</span>
+    <span class="item-content">ftxj</span>
+  </p>
+  <p class="copyright-item">
+    <span class="item-title">上次更新</span>
+    <span class="item-content">
+        0001-01-01
+        
+    </span>
+  </p>
+  
+  
+</div>
+<footer class="post-footer">
+      
+      <nav class="post-nav">
+        <a class="prev" href="/post/20200822-00-51/">
+            <i class="iconfont icon-left"></i>
+            <span class="prev-text nav-default">20200822 00 51</span>
+            <span class="prev-text nav-mobile"> </span>
+          </a>
+        
+      </nav>
+    </footer>
+  </article>
+        </div>
+        
+
+  
+
+  
+
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="social-links">
+      <a href="mailto:ftxjgoodboy@gmail.com" class="iconfont icon-email" title="email"></a>
+      <a href="http://www.github.com/ftxj" class="iconfont icon-github" title="github"></a>
+  <a href="http://ftxj.github.io/index.xml" type="application/rss+xml" class="iconfont icon-rss" title="rss"></a>
+</div>
+
+<div class="copyright">
+  <span class="power-by">
+    Powered by <a class="hexo-link" href="https://gohugo.io">Hugo</a>
+  </span>
+  <span class="division">|</span>
+  <span class="theme-info">
+     with  - 
+    <a class="theme-link" href="https://github.com/olOwOlo/hugo-theme-even">Even</a>
+  </span>
+
+  
+
+  <span class="copyright-year">
+    &copy; 
+    2020
+    <span class="heart">
+      <i class="iconfont icon-heart"></i>
+    </span>
+    <span class="author">ftxj</span>
+  </span>
+</div>
+    </footer>
+
+    <div class="back-to-top" id="back-to-top">
+      <i class="iconfont icon-up"></i>
+    </div>
+  </div>
+  
+  <script src="https://cdn.jsdelivr.net/npm/jquery@3.2.1/dist/jquery.min.js" integrity="sha256-hwg4gsxgFZhOsEEamdOYGBf13FyQuiTwlAQgxVSNgt4=" crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/slideout@1.0.1/dist/slideout.min.js" integrity="sha256-t+zJ/g8/KXIJMjSVQdnibt4dlaDxc9zXr/9oNPeWqdg=" crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@3.1.20/dist/jquery.fancybox.min.js" integrity="sha256-XVLffZaxoWfGUEbdzuLi7pwaUJv1cecsQJQqGLe7axY=" crossorigin="anonymous"></script>
+
+
+
+<script type="text/javascript" src="/js/main.min.d7b7ada643c9c1a983026e177f141f7363b4640d619caf01d8831a6718cd44ea.js"></script>
+  <script type="text/javascript">
+    window.MathJax = {
+      tex2jax: {inlineMath: [['$','$'], ['\\(','\\)']]},
+      TeX: {equationNumbers: {autoNumber: "AMS"}},
+      showProcessingMessages: false,
+      messageStyle: 'none'
+    };
+  </script>
+  <script async src="https://cdn.jsdelivr.net/npm/mathjax@2.7.5/MathJax.js?config=TeX-MML-AM_CHTML"  integrity="sha256-nvJJv9wWKEm88qvoQl9ekL2J+k/RWIsaSScxxlsrv8k=" crossorigin="anonymous"></script>
+
+
+
+
+
+
+
+
+</body>
+</html>
