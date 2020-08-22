@@ -17,7 +17,11 @@
       <pubDate>Sat, 22 Aug 2020 00:51:14 +0800</pubDate>
       
       <guid>http://ftxj.github.io/post/20200822-00-51/</guid>
-      <description>$$ f(x) = \sin(x) $$</description>
+      <description>$$ f(x) = \sin(x) $$
+$$ f(x) = \cos(x) $$
+$$ f(x) = \tan(x) $$
+$$ f(x) = \f(f(x)) $$
+$$ f(x) = \g(x) $$</description>
     </item>
     
   </channel>
