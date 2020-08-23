@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
-  <title>论文HyperAP阅读 - ftxj&#39;s blog</title>
+  <title>ISCA2020论文HyperAP阅读讲解（一） - ftxj&#39;s blog</title>
   <meta name="renderer" content="webkit" />
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
 
@@ -39,23 +39,23 @@
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@3.1.20/dist/jquery.fancybox.min.css" integrity="sha256-7TyXnr2YU040zfSP+rEcz29ggW4j56/ujTPwjMzyqFY=" crossorigin="anonymous">
 
 
-<meta property="og:title" content="论文HyperAP阅读" />
+<meta property="og:title" content="ISCA2020论文HyperAP阅读讲解（一）" />
 <meta property="og:description" content="论文名称：Hyper-AP: Enhancing Associative Processing Through A Full-Stack Optimization 相关项目信息：https://li.seas.upenn.edu/publication/zha-" />
 <meta property="og:type" content="article" />
 <meta property="og:url" content="http://ftxj.github.io/post/%E8%AE%BA%E6%96%87hyperap%E9%98%85%E8%AF%BB/" />
 <meta property="article:published_time" content="2020-08-22T19:08:41+08:00" />
 <meta property="article:modified_time" content="2020-08-22T19:08:41+08:00" />
-<meta itemprop="name" content="论文HyperAP阅读">
+<meta itemprop="name" content="ISCA2020论文HyperAP阅读讲解（一）">
 <meta itemprop="description" content="论文名称：Hyper-AP: Enhancing Associative Processing Through A Full-Stack Optimization 相关项目信息：https://li.seas.upenn.edu/publication/zha-">
 <meta itemprop="datePublished" content="2020-08-22T19:08:41+08:00" />
 <meta itemprop="dateModified" content="2020-08-22T19:08:41+08:00" />
-<meta itemprop="wordCount" content="2353">
+<meta itemprop="wordCount" content="4865">
 
 
 
 <meta itemprop="keywords" content="“论文阅读”,“ISCA”,CIM/PIM,Associative processing,Compilation,new Hardware," />
 <meta name="twitter:card" content="summary"/>
-<meta name="twitter:title" content="论文HyperAP阅读"/>
+<meta name="twitter:title" content="ISCA2020论文HyperAP阅读讲解（一）"/>
 <meta name="twitter:description" content="论文名称：Hyper-AP: Enhancing Associative Processing Through A Full-Stack Optimization 相关项目信息：https://li.seas.upenn.edu/publication/zha-"/>
 
 <!--[if lte IE 9]>
@@ -126,12 +126,12 @@
           <article class="post">
     
     <header class="post-header">
-      <h1 class="post-title">论文HyperAP阅读</h1>
+      <h1 class="post-title">ISCA2020论文HyperAP阅读讲解（一）</h1>
 
       <div class="post-meta">
         <span class="post-time"> 2020-08-22 </span>
         <div class="post-category">
-            <a href="/categories/%E6%96%B0%E5%9E%8B%E4%BD%93%E7%B3%BB%E7%BB%93%E6%9E%84%E4%B8%8B%E7%9A%84%E7%BC%96%E8%AF%91%E7%B3%BB%E7%BB%9F/"> “新型体系结构下的编译系统” </a>
+            <a href="/categories/%E6%96%B0%E5%9E%8B%E4%BD%93%E7%B3%BB%E7%BB%93%E6%9E%84%E4%BB%A5%E5%8F%8A%E5%AF%B9%E5%BA%94%E7%9A%84%E7%BC%96%E8%AF%91%E7%B3%BB%E7%BB%9F/"> “新型体系结构以及对应的编译系统” </a>
             </div>
         
       </div>
@@ -140,29 +140,90 @@
     <div class="post-toc" id="post-toc">
   <h2 class="post-toc-title">文章目录</h2>
   <div class="post-toc-content always-active">
-    <nav id="TableOfContents"></nav>
+    <nav id="TableOfContents">
+  <ul>
+    <li><a href="#一背景知识">一、背景知识：</a>
+      <ul>
+        <li><a href="#1-ap-associate-processing简介">1. AP: Associate Processing简介</a>
+          <ul>
+            <li><a href="#11-内存计算">1.1 内存计算</a></li>
+            <li><a href="#22-基于查找表的计算">2.2 基于查找表的计算</a></li>
+            <li><a href="#22--传统-ap-架构">2.2  传统 AP 架构</a></li>
+            <li><a href="#23-传统ap架构执行程序例子">2.3 传统AP架构执行程序例子</a></li>
+          </ul>
+        </li>
+        <li><a href="#23-rram内存器件组织成的tcam内存结构的新型ap模型">2.3 RRAM内存器件组织成的TCAM内存结构的新型AP模型</a>
+          <ul>
+            <li></li>
+          </ul>
+        </li>
+      </ul>
+    </li>
+    <li><a href="#二编码支撑一个search支持多个pattern">二、编码支撑：一个search支持多个Pattern</a>
+      <ul>
+        <li><a href="#1-两个rram表示一个值的时候">1. 两个RRAM表示一个值的时候</a></li>
+        <li><a href="#2-四个rram表示两个值的时候">2. 四个RRAM表示两个值的时候</a></li>
+      </ul>
+    </li>
+  </ul>
+</nav>
   </div>
 </div>
     <div class="post-content">
       <p>论文名称：Hyper-AP: Enhancing Associative Processing Through A Full-Stack Optimization</p>
 <p>相关项目信息：https://li.seas.upenn.edu/publication/zha-2020-hyper-ap/</p>
 <p>作者：Yue Zha, University of Pennsylvania,  Computational Intelligence Lab</p>
-<p>背景知识简介：</p>
-<p>AP 简介：</p>
-<p>AP 是一种不同于冯诺依曼体系结构的计算模型，它可以看作内存计算的一种架构，指令流向内存，内存根据指令执行不同的操作。</p>
-<p>在AP模型中，内存按行存放需要处理的数据，将处理后的数据再写回内存中。下图 ^[1] 就是，指令过来对A和B存放数据的地方进行操作，将得到的结果写入内存中C的位置。在整个操作的执行中，没有数据的移动，只有指令的流动。而且他是固有的Data parallel的，同时处理着内存上存放的所有数据。</p>
+<h1 id="一背景知识">一、背景知识：</h1>
+<h2 id="1-ap-associate-processing简介">1. AP: Associate Processing简介</h2>
+<h3 id="11-内存计算">1.1 内存计算</h3>
+<p><font size=6>&quot;AP&quot;</font> 是一种不同于冯诺依曼体系结构的计算模型，是一种<strong>内存计算</strong>的架构——内存不仅具有存储的能力，还具有计算的能力。所以先了解一些内存计算的基本知识。这种架构中没有CPU，只有内存，内存以一种特殊的方式执行计算。具体到下图的例子，内存中存放了A数组和B数组，一个指令流过来，告诉内存要进行计算A+B，内存就可以直接算出结果，把结果写入C。（在冯诺依曼结构中，这个过程的完成需要按需将A数组和B数组中每个元素load到CPU寄存器，然后将结果store到内存中）。</p>
+<p>可以看到，内存计算架构和冯诺依曼架构相比，不需要数据的load， store过程（即<strong>不需要数据移动</strong>），并且内存计算的<strong>并行能力</strong>很强（同时对A数组和B数组的多个下标进行操作）。而作为代价，内存计算架构需要内存具有一定的计算能力，计算能力表现为是否支持进行加法、减法、乘法还是说只能支持加法这种（<strong>计算原语多样性</strong>）；也表现为是否是任意两个内存块都可以同时进行计算一个加法（乘法等），还是说你只有满足特定排列顺序的数据才可以参与内存计算中（<strong>计算条件约束</strong>）。这几方面的问题一般与实现内存计算的方法、内存材料、电路特性有关。在内存计算体系结构上执行应用时，需要考虑到这个应用是否适合这一个内存计算所支持的计算原语，以及在计算条件约束下这个应用如何能发挥不需要数据移动所带来的效率提升，如何发挥并行性。</p>
 <p><img src="论文HyperAP阅读.assets/image-20200822213937795.png" alt="image-20200822213937795" style="zoom:50%;" /></p>
-<p>具体的，AP模型需要内存支持两个操作，search与write。这是什么意思呢，我们可以这么理解，计算的本质就是根据一定的输入符号，得到操作对应的输入符号。对于一个给定的计算操作来说（例如加法、减法），输入和输出构成一个对应关系，且对于指定的输入，只会有一个输入。那么我们就可以构建一个输入与输出对应关系的表（就是真值表），这样子，对于一个输入，我们看表中哪一个是和他完全匹配的，匹配的一项的结果就是这个计算的结果。然后把结果存储就ok了。我们的AP模型就是在这样的概念下产生的，需要计算的输入全部在存储中，当一个操作到来时，用这个操作对应的真值表一项一项去查找内存，看有没有相对应的项（search操作），如果有，就把结果写入到想写入的区域中（write），完成这次计算。下图（b）是对search操作的描述，key存储的是我们要进行匹配的表，mask可以标记内存中的有效列，CAM就是一个数据存储区域，Tag得到匹配的结果。在这个例子中，要对10-1-（-表示无所谓）的输入进行匹配，那么就把key区域置为它，然后看内存中被mask标记为有效的区域（蓝色区域）中哪些行匹配到了，就把tag里面的结果改为1.</p>
-<p>write操作可以看图（c）中的例子，key里面存储要写入的值，mask表示哪些列有效（蓝色部分），tag表示哪些行有效（匹配到的才写）。</p>
+<h3 id="22-基于查找表的计算">2.2 基于查找表的计算</h3>
+<p>计算的本质在输入数据上执行一个函数，得到输出（这个理解也许有点片面，也许我需要熟悉下$\lambda$演算和函数式编程才能给一个更加准确的定义）。对于一个给定的计算操作来说（例如加法、减法），输入和输出构成一个对应关系，且对于指定的输入，只会有一种输出。那么我们就可以构建一个输入与输出对应关系的函数，由于输入的都是离散的有限的值，因此可以将对应关系组织为一个表，也就是真值表。这样子，对于一个输入，我们看表中哪一个是和他完全匹配的，匹配的一项的结果就是这个计算的结果。</p>
+<p>基于这种查找表的概念，我们就完全可以实现程序的执行了。假设现在的程序是计算a &amp; b | c，那么首先构造&amp;操作的真值表，再构造|操作的真值表，并把这两个表存放在内存中。当程序执行时，假设a=1，b=0，c=1，输入计算机，然后内存就根据ab的组合，在存放&amp;操作真值表的地方，搜索表中是10的项，将结果拿出，然后再和c组合查找或表，这样子就完成了这次计算。</p>
+<p>基于查找表的方式可以完成计算，根据我的认知，这个概念下的计算产品有FPGA。</p>
+<h3 id="22--传统-ap-架构">2.2  传统 AP 架构</h3>
+<p>上文中查找表计算的概念是这样的，内存中存放了一个真值表，然后要计算的数据到真值表中寻找匹配的一项。如果将这个过程反过来看，内存中存放要处理的数据，然后将真值表中的每一项都拿来匹配这些数据（<strong>search</strong>操作），如果匹配成功了，那就把这个真值表项对应的结果写入结果区域（<strong>write</strong>操作）。这样子，如果一个内存支持<strong>search</strong>与<strong>write</strong>两种操作，那么就可以构建AP体系结构。</p>
+<p>下图（a）是一个AP处理结构，CAM是存放数据的内存，它按行存储，N行存储了N个word。Mask标记了内存中哪些列是有效的，然后Key就是你search的源操作数，Tag存放search的结果。Reduction Tree做一些统计操作（为了效率而添加的优化结构）。</p>
+<p>下图（b）是对search操作的描述，key存储要查找的数据，例子里面是10110，Mask标记了内存中有效区域（蓝色），然后匹配到的行（存储的内容和Key相同），就把Tag置为0。</p>
+<p>下图（C）是对write操作可以看图（c）中的例子，key里面存储要写入的值，mask表示内存有效区域（蓝色部分），tag表示哪些行有效。然后把有效内存区域的行列写成key所设置的。</p>
 <p><img src="%E8%AE%BA%E6%96%87HyperAP%E9%98%85%E8%AF%BB.assets/image-20200822214342318.png" alt="image-20200822214342318"></p>
-<p>RRAM内存原件下的TCAM结构AP模型：</p>
-<p>上文的描述只是一个模型，并没有说内存要怎么支持search和write操作，传统的方法是通过给内存中增加计算资源来实现（这方面知识不清楚），复杂且低效。而ReRAM支持一个内存单元中存放多个状态，利用它可以实现TCAM（T代表Ternary三元的，即一个内存状态中不仅仅可以存放0，1，还可以存放第三个状态‘X’，代表01皆可，don&rsquo;t care）。</p>
-<p>RRAM是一种电阻可以改变的器件，所以他就用电阻值表示状态（忆阻器），高阻代表0，低阻代表1这种。高阻和低阻之间的切换需要在原件两端加一个比较大的电压（&gt;阈值电压）。RRAM一般组织为cross bar的形式，如下图A。</p>
-<p>TCAM利用两个RRAM单元表示一个状态，（高阻，高阻）代表X，（高阻，低阻）代表0，（低阻，高阻）代表1，（低阻，低阻）未使用。这样的话，下图（b）中的第一行就是存储了X00，第二行存储了0X1。当支持search操作时，就把输入也进行编码，（高电压，高电压）表示don&rsquo;t care，（高电压，低电压）表示1，（低电压，高电压）表示0。由于cross bar的右端给的也是一个高电压，所以输入端的高电压其实是小的电压差，低电压才是大的电压差。然后在右端得到输出电流，大电流表示这一行匹配失败，小电流表示这一行匹配成功。为什么这样呢？考虑下表组合</p>
+<h3 id="23-传统ap架构执行程序例子">2.3 传统AP架构执行程序例子</h3>
+<p>图中是一个AP架构执行1bit进位加法的例子，构建的真值表可以看图（b）。第5、6、7行省略的输入代表那个值01均可。然后输出部分圣烈count代表对应count为0，省略sum代表对应sum为0。图（c）是对这个程序的执行，首先对真值表中100进行查找，如果说第一行A1，B1，Cin1刚好对应100，那么这一行的Tag就变成了1，然后write操作将Sum=1写入到第一行的Sum位置。接着查找真值表第二项010，同样写入结果。当查找到真值表第五项，由于Cin是0还是1，真值表结果不变，因此前两个匹配到了就OK（从这里可以观察到，真值表的编码化简影响了程序执行）。最终，14条指令完成这一操作。</p>
+<p>通过观察不难发现，100，010，001，111的四种输入要求的都是写入Sum=1，所以说如果有一个search可以同时发现这两个pattern，然后写入，那么也不会影响正确性，还能提高效率，这就需要一个新的组织方式了，这种叫做<strong>多个pattern一个search</strong>。或者说，你还是一个个执行，不过你先标记满足100的tag，然后不清除这个tag，再把010的tag标记了，这样子，最后只要一次写就ok了。不需要每条search都跟着一个write操作，这叫做<strong>多个search一个write</strong>。传统的这个架构没有突破这两点。</p>
+<p><img src="论文HyperAP阅读.assets/image-20200823202858337.png" alt="image-20200823202858337"  /></p>
+<h2 id="23-rram内存器件组织成的tcam内存结构的新型ap模型">2.3 RRAM内存器件组织成的TCAM内存结构的新型AP模型</h2>
+<p>上面描述只是一个模型，你还不知道内存要怎么支持<strong>search</strong>和<strong>write</strong>操作，传统的方法是通过给内存中增加计算资源来实现（这方面知识不清楚），复杂且低效。</p>
+<p>RRAM是一种电阻可以改变的器件，它使用电阻值表示状态（忆阻器），高阻状态代表0，低阻状态代表1这种。高阻和低阻之间的切换需要在原件两端加一个很大的电压（超过阈值电压）。利用RRAM和Diode组合在一块的形式实现存储介质（不熟，略过详细解释）。然后将这种存储介质组织为cross bar，即交叉阵列。如下图（a），交叉阵列就是这样，取M+N根导线；考虑在一个二维平面XY上，先把导线按照与Y平行的方向摆一根，然后在同样的高度下沿着X轴继续摆M-1根；然后在和X轴平行方向上，在之前摆好的导线上覆盖一根，接着沿着Y轴方向摆剩下的N-1根，并且保证沿Y轴摆的导线都要和沿着X轴摆的交叉。这样子，每个交叉点上，一个是横着摆的，一个是竖着摆的，把RRAM单元一端连到横着摆的上面，一端连到竖着摆的上面，这样子，每个交叉点都这么做，就组成交叉阵列了。（啰嗦了一大堆，想给个严格定义真难）。</p>
+<p>TCAM中T代表三元的含义，就是说一个逻辑存储可以有三个值：0，1，X（don&rsquo;t care，表示0和1）。用两个RRAM单元来表示一个TCAM状态：表示对应关系如下表（高阻，高阻）代表X，（高阻，低阻）代表0，（低阻，高阻）代表1，（低阻，低阻）这个状态没使用。</p>
 <table>
 <thead>
 <tr>
-<th align="center">输入</th>
+<th align="center">2个RRAM的状态</th>
+<th align="center">（高阻，高阻）</th>
+<th align="center">（高阻，低阻）</th>
+<th align="center">（低阻，高阻）</th>
+<th align="center">（低阻，低阻）</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td align="center">TCAM对应</td>
+<td align="center">X</td>
+<td align="center">0</td>
+<td align="center">1</td>
+<td align="center">无效，不可能存在这个状态</td>
+</tr>
+</tbody>
+</table>
+<p>这样的话，下图（b）中的第一行就是存储了X00（高阻高阻，高阻低阻，低阻高阻），第二行存储了0X1。</p>
+<h4 id="231-search操作支持">2.3.1 Search操作支持</h4>
+<p>先考虑一个简单的例子，如果只有一个TCAM单元（即两个RRAM单元），那么以什么方法来进行匹配里面的值？在电路层面，这种结构的输入只可能是给一个电压，输出就只可能是一个电流。我们的目标是，给不同的输入组合，看匹配成功与否。所以输入组合就是电压组合，输出就是电流，以大电流作为匹配失败，小电流作为匹配成功。做出下面的表格，第二行代表了RRAM器件两端的电压L（Low）还是H（High），第一列说的是RRAM存储的状态L（低阻），H（高阻），旁边标注了对应的实际值。然后表内对号表示说代表匹配成功，错号表示说匹配失败。用（L，H）的电压差表示1，就满足遇到1和X时候成功，其他情况失败，（L，L）电压差表示这个单元失效，就满足了失效是全部匹配成功的另一种看法，（H，L）的电压差代表0，满足遇到0和X成功，而（H，H）代表专门匹配X。这样，一个search操作的设计就出来了。由于cross bar上方的输入电压和电压差是反的，所以第一行代表的是上方输入电压。</p>
+<table>
+<thead>
+<tr>
+<th align="center">输入电压</th>
 <th align="center">（高电压， 低电压）1</th>
 <th align="center">（高电压，高电压）-</th>
 <th align="center">（低电压，高电压）0</th>
@@ -171,8 +232,8 @@
 </thead>
 <tbody>
 <tr>
-<td align="center"></td>
-<td align="center">（L，H）1</td>
+<td align="center">存储状态</td>
+<td align="center">（L，H）电压差值</td>
 <td align="center">（L，L）-</td>
 <td align="center">（H，L）0</td>
 <td align="center">（H，H）N</td>
@@ -180,7 +241,7 @@
 <tr>
 <td align="center">N（L，L）</td>
 <td align="center">（0，大）❌</td>
-<td align="center">（0，0）⭕</td>
+<td align="center">（0，0）✔</td>
 <td align="center">（大，0）❌</td>
 <td align="center">（大，大）❌</td>
 </tr>
@@ -203,373 +264,90 @@
 <td align="center">（0，小）✔</td>
 <td align="center">（0，0）✔</td>
 <td align="center">（小，0）✔</td>
-<td align="center">（小，小）⭕</td>
+<td align="center">（小，小）✔</td>
 </tr>
 </tbody>
 </table>
+<p>图（b）是一个search支持的例子，可以对应着看一下。</p>
 <p><img src="%E8%AE%BA%E6%96%87HyperAP%E9%98%85%E8%AF%BB.assets/image-20200822221221048.png" alt="image-20200822221221048"></p>
-<p>全新编码方式：</p>
-<p>9 * 9 = 81个有效结果，175个无效结果。</p>
-<p>编码目标：</p>
-<p>一个search可以匹配多个内存组合；</p>
-<p>至少有四个 1 对 1 的search；</p>
-<p>只有四种存储是有效的；</p>
-<p>对于任意一个存储，必须有1个1对1，2个1对2，3个1对3的search，一个1对4的 search key</p>
+<h1 id="二编码支撑一个search支持多个pattern">二、编码支撑：一个search支持多个Pattern</h1>
+<h2 id="1-两个rram表示一个值的时候">1. 两个RRAM表示一个值的时候</h2>
+<p>抽象一下问题，我们对于一个真值表，希望尽可能的把一些输出结果相同的Pattern可以同时发现，就需要一个Search操作支持找到多种Pattern，那么，就需要丰富的search key的数量。已知，两个存储单元表示一个值，那么对于这一个值，可以供选择的search key就有四种。可以这么设计：search key只匹配0，search key只匹配1，search key两个都可以匹配，search key两个都不能匹配。</p>
+<p>这样就得到了对于一个存储单元，一个search支持多pattern的表示形式了。</p>
 <table>
 <thead>
 <tr>
-<th align="center">输入</th>
-<th></th>
-<th></th>
 <th align="center"></th>
-<th align="center"></th>
-<th align="center"></th>
-<th align="center"></th>
-<th></th>
-<th></th>
-<th></th>
-<th></th>
-<th></th>
-<th></th>
-<th></th>
-<th></th>
-<th></th>
-<th></th>
+<th align="center">（H，H）</th>
+<th align="center">（L，H）</th>
+<th align="center">（H，L）</th>
+<th align="center">（L，L）</th>
 </tr>
 </thead>
 <tbody>
 <tr>
-<td align="center"></td>
-<td>(L,L,L,L)</td>
-<td>(L, L, L, H)</td>
-<td align="center">(L, L, H, L)</td>
-<td align="center">(L, L, H, H)</td>
-<td align="center">(L, H, L, L)</td>
-<td align="center">(L, H, L, H)</td>
-<td>(L, H, H, L)</td>
-<td>(L, H, H, H)</td>
-<td>(H, L, L, L)</td>
-<td>(H, L, L, H)</td>
-<td>(H, L, H, L)</td>
-<td>(H, L, H, H)</td>
-<td>(H, H, L, L)</td>
-<td>(H, H, L, H)</td>
-<td>(H, H, H, L)</td>
-<td>(H, H, H, H)</td>
+<td align="center">(高阻，高阻)</td>
+<td align="center">❌</td>
+<td align="center">✔</td>
+<td align="center">❌</td>
+<td align="center">❌</td>
 </tr>
 <tr>
-<td align="center">(L, L, L, L)</td>
-<td>(0,0,0,0)</td>
-<td></td>
-<td align="center"></td>
-<td align="center"></td>
-<td align="center"></td>
-<td align="center"></td>
-<td></td>
-<td></td>
-<td></td>
-<td></td>
-<td></td>
-<td></td>
-<td></td>
-<td></td>
-<td></td>
-<td></td>
+<td align="center">(低阻，高阻) 表示0</td>
+<td align="center">✔</td>
+<td align="center">✔</td>
+<td align="center">❌</td>
+<td align="center">❌</td>
 </tr>
 <tr>
-<td align="center">(L, L, L, H)</td>
-<td>(0,0,0,0)</td>
-<td>(0,0,0,L)</td>
-<td align="center"></td>
-<td align="center"></td>
-<td align="center"></td>
-<td align="center"></td>
-<td></td>
-<td></td>
-<td></td>
-<td></td>
-<td></td>
-<td></td>
-<td></td>
-<td></td>
-<td></td>
-<td></td>
+<td align="center">(高阻，低阻) 表示1</td>
+<td align="center">❌</td>
+<td align="center">✔</td>
+<td align="center">✔</td>
+<td align="center">❌</td>
 </tr>
 <tr>
-<td align="center">(L, L, H, L)</td>
-<td>(0,0,0,0)</td>
-<td></td>
-<td align="center">(0,0,L,0)</td>
-<td align="center"></td>
-<td align="center"></td>
-<td align="center"></td>
-<td></td>
-<td></td>
-<td></td>
-<td></td>
-<td></td>
-<td></td>
-<td></td>
-<td></td>
-<td></td>
-<td></td>
+<td align="center">(低阻，低阻)</td>
+<td align="center">✔</td>
+<td align="center">✔</td>
+<td align="center">✔</td>
+<td align="center">✔</td>
 </tr>
 <tr>
-<td align="center">(L, L, H, H)</td>
-<td>(0,0,0,0)</td>
-<td>(0,0,0,L)</td>
-<td align="center">(0,0,L,0)</td>
-<td align="center">(0,0,L,L)</td>
 <td align="center"></td>
-<td align="center"></td>
-<td></td>
-<td></td>
-<td></td>
-<td></td>
-<td></td>
-<td></td>
-<td></td>
-<td></td>
-<td></td>
-<td></td>
-</tr>
-<tr>
-<td align="center">(L, H, L, L)</td>
-<td>(0,0,0,0)</td>
-<td></td>
-<td align="center"></td>
-<td align="center"></td>
-<td align="center">(0,L,0,0)</td>
-<td align="center"></td>
-<td></td>
-<td></td>
-<td></td>
-<td></td>
-<td></td>
-<td></td>
-<td></td>
-<td></td>
-<td></td>
-<td></td>
-</tr>
-<tr>
-<td align="center">(L, H, L, H)</td>
-<td>(0,0,0,0)</td>
-<td>(0,0,0,L)</td>
-<td align="center"></td>
-<td align="center"></td>
-<td align="center">(0,L,0,0)</td>
-<td align="center">(0,L,0,L)</td>
-<td></td>
-<td></td>
-<td></td>
-<td></td>
-<td></td>
-<td></td>
-<td></td>
-<td></td>
-<td></td>
-<td></td>
-</tr>
-<tr>
-<td align="center">(L, H, H, L)</td>
-<td>(0,0,0,0)</td>
-<td></td>
-<td align="center">(0,0,L,0)</td>
-<td align="center"></td>
-<td align="center">(0,L,0,0)</td>
-<td align="center"></td>
-<td>(0,L,L,0)</td>
-<td></td>
-<td></td>
-<td></td>
-<td></td>
-<td></td>
-<td></td>
-<td></td>
-<td></td>
-<td></td>
-</tr>
-<tr>
-<td align="center">(L, H, H, H)</td>
-<td>(0,0,0,0)</td>
-<td>(0,0,0,L)</td>
-<td align="center">(0,0,L,0)</td>
-<td align="center">(0,0,L,L)</td>
-<td align="center">(0,L,0,0)</td>
-<td align="center">(0,L,0,L)</td>
-<td>(0,L,L,0)</td>
-<td>(0,L,L,L)</td>
-<td></td>
-<td></td>
-<td></td>
-<td></td>
-<td></td>
-<td></td>
-<td></td>
-<td></td>
-</tr>
-<tr>
-<td align="center">(H, L, L, L)</td>
-<td>(0,0,0,0)</td>
-<td></td>
-<td align="center"></td>
-<td align="center"></td>
-<td align="center"></td>
-<td align="center"></td>
-<td></td>
-<td></td>
-<td>(L,0,0,0)</td>
-<td></td>
-<td></td>
-<td></td>
-<td></td>
-<td></td>
-<td></td>
-<td></td>
-</tr>
-<tr>
-<td align="center">(H, L, L, H)</td>
-<td>(0,0,0,0)</td>
-<td>(0,0,0,L)</td>
-<td align="center"></td>
-<td align="center"></td>
-<td align="center"></td>
-<td align="center"></td>
-<td></td>
-<td></td>
-<td>(L,0,0,0)</td>
-<td>(L,0,0,L)</td>
-<td></td>
-<td></td>
-<td></td>
-<td></td>
-<td></td>
-<td></td>
-</tr>
-<tr>
-<td align="center">(H, L, H, L)</td>
-<td>(0,0,0,0)</td>
-<td></td>
-<td align="center">(0,0,L,0)</td>
-<td align="center"></td>
-<td align="center"></td>
-<td align="center"></td>
-<td></td>
-<td></td>
-<td>(L,0,0,0)</td>
-<td></td>
-<td>(L,0,L, 0)</td>
-<td></td>
-<td></td>
-<td></td>
-<td></td>
-<td></td>
-</tr>
-<tr>
-<td align="center">(H, L, H, H)</td>
-<td>(0,0,0,0)</td>
-<td>(0,0,0,L)</td>
-<td align="center">(0,0,L,0)</td>
-<td align="center">(0,0,L,L)</td>
-<td align="center"></td>
-<td align="center"></td>
-<td></td>
-<td></td>
-<td>(L,0,0,0)</td>
-<td>(L,0,0,L)</td>
-<td>(L,0,L, 0)</td>
-<td>(L,0,L, L)</td>
-<td></td>
-<td></td>
-<td></td>
-<td></td>
-</tr>
-<tr>
-<td align="center">(H, H, L, L)</td>
-<td>(0,0,0,0)</td>
-<td></td>
-<td align="center"></td>
-<td align="center"></td>
-<td align="center">(0,L,0,0)</td>
-<td align="center"></td>
-<td></td>
-<td></td>
-<td>(L,0,0,0)</td>
-<td></td>
-<td></td>
-<td></td>
-<td>(L,L,0, 0)</td>
-<td></td>
-<td></td>
-<td></td>
-</tr>
-<tr>
-<td align="center">(H, H, L, H)</td>
-<td>(0,0,0,0)</td>
-<td>(0,0,0,L)</td>
-<td align="center"></td>
-<td align="center"></td>
-<td align="center">(0,L,0,0)</td>
-<td align="center">(0,L,0,L)</td>
-<td></td>
-<td></td>
-<td>(L,0,0,0)</td>
-<td>(L,0,0,L)</td>
-<td></td>
-<td></td>
-<td>(L,L,0, 0)</td>
-<td>(L,L,0, L)</td>
-<td></td>
-<td></td>
-</tr>
-<tr>
-<td align="center">(H, H, H, L)</td>
-<td>(0,0,0,0)</td>
-<td></td>
-<td align="center">(0,0,L,0)</td>
-<td align="center"></td>
-<td align="center">(0,L,0,0)</td>
-<td align="center"></td>
-<td>(0,L,L,0)</td>
-<td></td>
-<td>(L,0,0,0)</td>
-<td></td>
-<td>(L,0,L, 0)</td>
-<td></td>
-<td>(L,L,0, 0)</td>
-<td></td>
-<td>(L,L,L, L)</td>
-<td></td>
-</tr>
-<tr>
-<td align="center">(H, H, H, H)</td>
-<td>(0,0,0,0)</td>
-<td>(0,0,0,L)</td>
-<td align="center">(0,0,L,0)</td>
-<td align="center">(0,0,L,L)</td>
-<td align="center">(0,L,0,0)</td>
-<td align="center">(0,L,0,L)</td>
-<td>(0,L,L,0)</td>
-<td>(0,L,L,L)</td>
-<td>(L,0,0,0)</td>
-<td>(L,0,0,L)</td>
-<td>(L,0,L, 0)</td>
-<td>(L,0,L, L)</td>
-<td>(L,L,0, 0)</td>
-<td>(L,L,0, L)</td>
-<td>(L,L,L, 0)</td>
-<td>(L,L,L, L)</td>
+<td align="center">匹配0</td>
+<td align="center">两个都匹配</td>
+<td align="center">匹配1</td>
+<td align="center">都不匹配</td>
 </tr>
 </tbody>
 </table>
-<p>根据这些条件化简这个表：</p>
-<p>进行分组：</p>
+<h2 id="2-四个rram表示两个值的时候">2. 四个RRAM表示两个值的时候</h2>
+<p>四个RRAM表示两个值和两个RRAM表示一个值有什么区别呢？比方说两个RRAM表示一个值，你编码了01表示1，10表示0；那么你表示10就只能是0110。而用四个表示两个值，就是说，10可以用1001表示，但是11可以用1101表示，分为两组看可以不用一一对应（两个两个看没办法还原原来的值）。这样就带来了更多的便理。</p>
+<p>提出我们的编码目标：</p>
+<ol>
+<li>
+<p>一个search可以匹配多个内存组合</p>
+</li>
+<li>
+<p>有四个search key，有一个唯一匹配；</p>
+</li>
+<li>
+<p>对于一个key可以匹配到三个状态的search key，最好有四个（保证每个状态的均衡）；</p>
+</li>
+<li>
+<p>需要有一个search key匹配所有值；</p>
+</li>
+<li>
+<p>这样子总结，对于一个存储的pair 值，最少有5个search key可以匹配成功；</p>
+</li>
+</ol>
+<p>根据这些条件得到满足的表，第二行写的数输出组合，第一列写的数存储组合，这里将所有组合中满足一个存储至少有5个对应输入的摘录了下来。</p>
 <table>
 <thead>
 <tr>
-<th align="center">输入</th>
-<th></th>
+<th align="center"></th>
+<th>电压值</th>
 <th></th>
 <th align="center"></th>
 <th align="center"></th>
@@ -588,7 +366,7 @@
 </thead>
 <tbody>
 <tr>
-<td align="center"></td>
+<td align="center">存储状态</td>
 <td>(L,L,L,L)</td>
 <td>(L, L, L, H)</td>
 <td align="center">(L, L, H, L)</td>
@@ -680,7 +458,7 @@
 </tbody>
 </table>
 <p>进行分组：</p>
-<p>1 v 1 任意赋值一个编码</p>
+<p>1 v 1 任意赋值一个编码，以11，10，01，00的顺序给给四个状态，就得到了和论文中一样的结果。</p>
 <table>
 <thead>
 <tr>
@@ -722,7 +500,7 @@
 </tr>
 </tbody>
 </table>
-<p>1 v 2</p>
+<p>1 v 2，论文中删去了两个1v2的search key，我猜是因为交换律的关系。</p>
 <table>
 <thead>
 <tr>
@@ -843,37 +621,8 @@
 </tr>
 </tbody>
 </table>
-<table>
-<thead>
-<tr>
-<th align="center">X</th>
-<th align="center">Y</th>
-<th align="center">Z</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td align="center">0</td>
-<td align="center">0</td>
-<td align="center">1</td>
-</tr>
-<tr>
-<td align="center">1</td>
-<td align="center">1</td>
-<td align="center">1</td>
-</tr>
-<tr>
-<td align="center">0</td>
-<td align="center">1</td>
-<td align="center">1</td>
-</tr>
-<tr>
-<td align="center">1</td>
-<td align="center">0</td>
-<td align="center">0</td>
-</tr>
-</tbody>
-</table>
+<p>这样，就得到了和论文一样的编码方式。这样子，再次执行上面的程序，就发现6个周期就跑完了。就是因为支持了一个search key匹配多种存储。</p>
+<p><img src="论文HyperAP阅读.assets/image-20200823214324528.png" alt="image-20200823214324528" style="zoom:67%;" /></p>
 
     </div>
 
