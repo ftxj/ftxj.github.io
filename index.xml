@@ -67,5 +67,14 @@ It makes use of a variety of open source projects including:
       <description>$$ f(x) = \sin(x) $$ $$ f(x) = \cos(x) $$ $$ f(x) = \tan(x) $$ $$ f(x) = \f(f(x)) $$ $$ f(x) = \g(x) $$ 随便写点 随便写点随便写点随便写点随便写点随便写点随便写点随便写点 随便写点随便写点随便写点随</description>
     </item>
     
+    <item>
+      <title></title>
+      <link>http://ftxj.github.io/post/%E6%9C%AA%E5%BD%92%E6%A1%A3/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      
+      <guid>http://ftxj.github.io/post/%E6%9C%AA%E5%BD%92%E6%A1%A3/</guid>
+      <description>Program Domain Parallel Model Granularity Working Set Data Sharing Data Exchange IMP blacksholes 金融分析 data-parallel coarse small low low IMP Canneal 工程学 unstructured medium medium high medium IMP Fluidanimate 动画 data-parallel fine large low medium IMP Streamcluster 数据挖掘 data-parallel medium medium low medium bodytrack CV data-parallel medium medium high medium facesim 动画 data-parallel coarse large low medium freqmine 数据</description>
+    </item>
+    
   </channel>
 </rss>

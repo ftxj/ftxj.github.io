@@ -1,0 +1,395 @@
+<!DOCTYPE html>
+<html lang="zh-cn">
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+  <title> - ftxj&#39;s blog</title>
+  <meta name="renderer" content="webkit" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+<meta name="theme-color" content="#f8f5ec" />
+<meta name="msapplication-navbutton-color" content="#f8f5ec">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="#f8f5ec">
+
+
+<meta name="author" content="ftxj" /><meta name="description" content="Program Domain Parallel Model Granularity Working Set Data Sharing Data Exchange IMP blacksholes 金融分析 data-parallel coarse small low low IMP Canneal 工程学 unstructured medium medium high medium IMP Fluidanimate 动画 data-parallel fine large low medium IMP Streamcluster 数据挖掘 data-parallel medium medium low medium bodytrack CV data-parallel medium medium high medium facesim 动画 data-parallel coarse large low medium freqmine 数据" /><meta name="keywords" content="CIM, PIM, Compiler" />
+
+
+
+
+
+
+<meta name="generator" content="Hugo 0.74.3 with theme even" />
+
+
+<link rel="canonical" href="http://ftxj.github.io/post/%E6%9C%AA%E5%BD%92%E6%A1%A3/" />
+<link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+<link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+<link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
+<link rel="manifest" href="/manifest.json">
+<link rel="mask-icon" href="/safari-pinned-tab.svg" color="#5bbad5">
+
+
+
+<link href="/sass/main.min.651e6917abb0239242daa570c2bec9867267bbcd83646da5a850afe573347b44.css" rel="stylesheet">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@3.1.20/dist/jquery.fancybox.min.css" integrity="sha256-7TyXnr2YU040zfSP+rEcz29ggW4j56/ujTPwjMzyqFY=" crossorigin="anonymous">
+
+
+<meta property="og:title" content="" />
+<meta property="og:description" content="Program Domain Parallel Model Granularity Working Set Data Sharing Data Exchange IMP blacksholes 金融分析 data-parallel coarse small low low IMP Canneal 工程学 unstructured medium medium high medium IMP Fluidanimate 动画 data-parallel fine large low medium IMP Streamcluster 数据挖掘 data-parallel medium medium low medium bodytrack CV data-parallel medium medium high medium facesim 动画 data-parallel coarse large low medium freqmine 数据" />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="http://ftxj.github.io/post/%E6%9C%AA%E5%BD%92%E6%A1%A3/" />
+
+<meta itemprop="name" content="">
+<meta itemprop="description" content="Program Domain Parallel Model Granularity Working Set Data Sharing Data Exchange IMP blacksholes 金融分析 data-parallel coarse small low low IMP Canneal 工程学 unstructured medium medium high medium IMP Fluidanimate 动画 data-parallel fine large low medium IMP Streamcluster 数据挖掘 data-parallel medium medium low medium bodytrack CV data-parallel medium medium high medium facesim 动画 data-parallel coarse large low medium freqmine 数据">
+
+<meta itemprop="wordCount" content="207">
+
+
+
+<meta itemprop="keywords" content="" />
+<meta name="twitter:card" content="summary"/>
+<meta name="twitter:title" content=""/>
+<meta name="twitter:description" content="Program Domain Parallel Model Granularity Working Set Data Sharing Data Exchange IMP blacksholes 金融分析 data-parallel coarse small low low IMP Canneal 工程学 unstructured medium medium high medium IMP Fluidanimate 动画 data-parallel fine large low medium IMP Streamcluster 数据挖掘 data-parallel medium medium low medium bodytrack CV data-parallel medium medium high medium facesim 动画 data-parallel coarse large low medium freqmine 数据"/>
+
+<!--[if lte IE 9]>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/classlist/1.1.20170427/classList.min.js"></script>
+<![endif]-->
+
+<!--[if lt IE 9]>
+  <script src="https://cdn.jsdelivr.net/npm/html5shiv@3.7.3/dist/html5shiv.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/respond.js@1.4.2/dest/respond.min.js"></script>
+<![endif]-->
+
+  
+</head>
+<body>
+  
+  <div id="mobile-navbar" class="mobile-navbar">
+  <div class="mobile-header-logo">
+    <a href="/" class="logo">FTXJ</a>
+  </div>
+  <div class="mobile-navbar-icon">
+    <span></span>
+    <span></span>
+    <span></span>
+  </div>
+</div>
+
+<nav id="mobile-menu" class="mobile-menu slideout-menu">
+  <ul class="mobile-menu-list">
+    <a href="/">
+        <li class="mobile-menu-item">主页</li>
+      </a><a href="/post/">
+        <li class="mobile-menu-item">合集</li>
+      </a><a href="/tags/">
+        <li class="mobile-menu-item">标签</li>
+      </a><a href="/categories/">
+        <li class="mobile-menu-item">分类</li>
+      </a><a href="/cv/">
+        <li class="mobile-menu-item">cv</li>
+      </a>
+  </ul>
+</nav>
+  <div class="container" id="mobile-panel">
+    <header id="header" class="header">
+        <div class="logo-wrapper">
+  <a href="/" class="logo">FTXJ</a>
+</div>
+
+<nav class="site-navbar">
+  <ul id="menu" class="menu">
+    <li class="menu-item">
+        <a class="menu-item-link" href="/">主页</a>
+      </li><li class="menu-item">
+        <a class="menu-item-link" href="/post/">合集</a>
+      </li><li class="menu-item">
+        <a class="menu-item-link" href="/tags/">标签</a>
+      </li><li class="menu-item">
+        <a class="menu-item-link" href="/categories/">分类</a>
+      </li><li class="menu-item">
+        <a class="menu-item-link" href="/cv/">cv</a>
+      </li>
+  </ul>
+</nav>
+    </header>
+
+    <main id="main" class="main">
+      <div class="content-wrapper">
+        <div id="content" class="content">
+          <article class="post">
+    
+    <header class="post-header">
+      <h1 class="post-title"></h1>
+
+      <div class="post-meta">
+        <span class="post-time"> 0001-01-01 </span>
+        
+        <span class="meta__text post-word-count"> 207 words</span>
+        
+      </div>
+    </header>
+ 
+    <div class="post-toc" id="post-toc">
+  <h2 class="post-toc-title">文章目录</h2>
+  <div class="post-toc-content always-active">
+    <nav id="TableOfContents"></nav>
+  </div>
+</div>
+    <div class="post-content">
+      <table>
+<thead>
+<tr>
+<th></th>
+<th align="center">Program</th>
+<th align="center">Domain</th>
+<th align="center">Parallel Model</th>
+<th align="center">Granularity</th>
+<th align="center">Working Set</th>
+<th align="center">Data Sharing</th>
+<th align="center">Data Exchange</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>IMP</td>
+<td align="center">blacksholes</td>
+<td align="center">金融分析</td>
+<td align="center">data-parallel</td>
+<td align="center">coarse</td>
+<td align="center">small</td>
+<td align="center">low</td>
+<td align="center">low</td>
+</tr>
+<tr>
+<td>IMP</td>
+<td align="center">Canneal</td>
+<td align="center">工程学</td>
+<td align="center">unstructured</td>
+<td align="center">medium</td>
+<td align="center">medium</td>
+<td align="center">high</td>
+<td align="center">medium</td>
+</tr>
+<tr>
+<td>IMP</td>
+<td align="center">Fluidanimate</td>
+<td align="center">动画</td>
+<td align="center">data-parallel</td>
+<td align="center">fine</td>
+<td align="center">large</td>
+<td align="center">low</td>
+<td align="center">medium</td>
+</tr>
+<tr>
+<td>IMP</td>
+<td align="center">Streamcluster</td>
+<td align="center">数据挖掘</td>
+<td align="center">data-parallel</td>
+<td align="center">medium</td>
+<td align="center">medium</td>
+<td align="center">low</td>
+<td align="center">medium</td>
+</tr>
+<tr>
+<td></td>
+<td align="center">bodytrack</td>
+<td align="center">CV</td>
+<td align="center">data-parallel</td>
+<td align="center">medium</td>
+<td align="center">medium</td>
+<td align="center">high</td>
+<td align="center">medium</td>
+</tr>
+<tr>
+<td></td>
+<td align="center">facesim</td>
+<td align="center">动画</td>
+<td align="center">data-parallel</td>
+<td align="center">coarse</td>
+<td align="center">large</td>
+<td align="center">low</td>
+<td align="center">medium</td>
+</tr>
+<tr>
+<td></td>
+<td align="center">freqmine</td>
+<td align="center">数据挖掘</td>
+<td align="center">data-parallel</td>
+<td align="center">medium</td>
+<td align="center">unbounded</td>
+<td align="center">high</td>
+<td align="center">medium</td>
+</tr>
+<tr>
+<td></td>
+<td align="center">raytrace</td>
+<td align="center">渲染</td>
+<td align="center">data-parallel</td>
+<td align="center">medium</td>
+<td align="center">unbounded</td>
+<td align="center">high</td>
+<td align="center">low</td>
+</tr>
+<tr>
+<td></td>
+<td align="center">swaptions</td>
+<td align="center">金融分析</td>
+<td align="center">data-parallel</td>
+<td align="center">coarse</td>
+<td align="center">medium</td>
+<td align="center">low</td>
+<td align="center">low</td>
+</tr>
+<tr>
+<td></td>
+<td align="center">vips</td>
+<td align="center">媒体处理</td>
+<td align="center">data-parallel</td>
+<td align="center">coarse</td>
+<td align="center">medium</td>
+<td align="center">low</td>
+<td align="center">medium</td>
+</tr>
+<tr>
+<td></td>
+<td align="center">dedup</td>
+<td align="center">Enterprise Storage</td>
+<td align="center">pipeline</td>
+<td align="center">medium</td>
+<td align="center">unbounded</td>
+<td align="center">high</td>
+<td align="center">high</td>
+</tr>
+<tr>
+<td></td>
+<td align="center">ferret</td>
+<td align="center">相似查找</td>
+<td align="center">pipeline</td>
+<td align="center">medium</td>
+<td align="center">unbounded</td>
+<td align="center">high</td>
+<td align="center">high</td>
+</tr>
+<tr>
+<td></td>
+<td align="center">x264</td>
+<td align="center">媒体处理</td>
+<td align="center">pipeline</td>
+<td align="center">coarse</td>
+<td align="center">medium</td>
+<td align="center">high</td>
+<td align="center">high</td>
+</tr>
+</tbody>
+</table>
+<p>SRM 算法：</p>
+<p>initRegions: 	对于一张输入的图片，初始化average，count，regionIndex数组</p>
+<p>initNeighbors:</p>
+<p>​	1			2			3			4			5				6			7				8			9</p>
+<p>2 	3	4 	5	6		7	8	9	10	11	12	13	14	15	16	17	18	19</p>
+
+    </div>
+
+    <div class="post-copyright">
+  <p class="copyright-item">
+    <span class="item-title">文章作者</span>
+    <span class="item-content">ftxj</span>
+  </p>
+  <p class="copyright-item">
+    <span class="item-title">上次更新</span>
+    <span class="item-content">
+        0001-01-01
+        
+    </span>
+  </p>
+  
+  
+</div>
+<footer class="post-footer">
+      
+      <nav class="post-nav">
+        <a class="prev" href="/post/20200822-00-51/">
+            <i class="iconfont icon-left"></i>
+            <span class="prev-text nav-default">20200822 00 51</span>
+            <span class="prev-text nav-mobile"> </span>
+          </a>
+        
+      </nav>
+    </footer>
+  </article>
+        </div>
+        
+
+  
+
+  
+
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="social-links">
+      <a href="mailto:ftxjgoodboy@gmail.com" class="iconfont icon-email" title="email"></a>
+      <a href="http://www.github.com/ftxj" class="iconfont icon-github" title="github"></a>
+  <a href="http://ftxj.github.io/index.xml" type="application/rss+xml" class="iconfont icon-rss" title="rss"></a>
+</div>
+
+<div class="copyright">
+  <span class="power-by">
+    Powered by <a class="hexo-link" href="https://gohugo.io">Hugo</a>
+  </span>
+  <span class="division">|</span>
+  <span class="theme-info">
+     with  - 
+    <a class="theme-link" href="https://github.com/olOwOlo/hugo-theme-even">Even</a>
+  </span>
+
+  
+
+  <span class="copyright-year">
+    &copy; 
+    2020
+    <span class="heart">
+      <i class="iconfont icon-heart"></i>
+    </span>
+    <span class="author">ftxj</span>
+  </span>
+</div>
+    </footer>
+
+    <div class="back-to-top" id="back-to-top">
+      <i class="iconfont icon-up"></i>
+    </div>
+  </div>
+  
+  <script src="https://cdn.jsdelivr.net/npm/jquery@3.2.1/dist/jquery.min.js" integrity="sha256-hwg4gsxgFZhOsEEamdOYGBf13FyQuiTwlAQgxVSNgt4=" crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/slideout@1.0.1/dist/slideout.min.js" integrity="sha256-t+zJ/g8/KXIJMjSVQdnibt4dlaDxc9zXr/9oNPeWqdg=" crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@3.1.20/dist/jquery.fancybox.min.js" integrity="sha256-XVLffZaxoWfGUEbdzuLi7pwaUJv1cecsQJQqGLe7axY=" crossorigin="anonymous"></script>
+
+
+
+<script type="text/javascript" src="/js/main.min.d7b7ada643c9c1a983026e177f141f7363b4640d619caf01d8831a6718cd44ea.js"></script>
+  <script type="text/javascript">
+    window.MathJax = {
+      tex2jax: {inlineMath: [['$','$'], ['\\(','\\)']]},
+      TeX: {equationNumbers: {autoNumber: "AMS"}},
+      showProcessingMessages: false,
+      messageStyle: 'none'
+    };
+  </script>
+  <script async src="https://cdn.jsdelivr.net/npm/mathjax@2.7.5/MathJax.js?config=TeX-MML-AM_CHTML"  integrity="sha256-nvJJv9wWKEm88qvoQl9ekL2J+k/RWIsaSScxxlsrv8k=" crossorigin="anonymous"></script>
+
+
+
+
+
+
+
+
+</body>
+</html>
