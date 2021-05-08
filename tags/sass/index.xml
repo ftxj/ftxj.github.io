@@ -17,7 +17,7 @@
       <pubDate>Sat, 08 May 2021 19:53:37 +0800</pubDate>
       
       <guid>http://ftxj.github.io/post/v100%E6%8C%87%E4%BB%A4%E9%9B%86%E6%9E%B6%E6%9E%84%E6%8E%A2%E7%A9%B6/</guid>
-      <description>一、GPU体系结构：</description>
+      <description>最近在做GPU上关于SpMM操作的优化，使用的是V100的GPU平台。为此，对V100内存架构，指令集等都做了一些了解。在这里做一下总结，一</description>
     </item>
     
   </channel>
