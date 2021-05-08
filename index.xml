@@ -12,14 +12,13 @@
     
     
     <item>
-      <title>cv</title>
+      <title>CV</title>
       <link>http://ftxj.github.io/cv/</link>
       <pubDate>Sat, 22 Aug 2020 13:03:08 +0800</pubDate>
       
       <guid>http://ftxj.github.io/cv/</guid>
-      <description>Hugo is a static site engine written in Go.
-It makes use of a variety of open source projects including:
- Cobra Viper J Walter Weatherman Cast  Learn more and contribute on GitHub.</description>
+      <description>Biography Now, I am a second-year master student from Huazhong University of Science and Technology, China. I am interesetd in Domain-Specific Accelerator and Domain-Specific Compiler Optimization &amp;amp; Language.
+Email: cs.xinjie@gmail.com</description>
     </item>
     
     <item>
