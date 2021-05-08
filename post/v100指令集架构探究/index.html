@@ -49,7 +49,7 @@
 <meta itemprop="description" content="最近在做GPU上关于SpMM操作的优化，使用的是V100的GPU平台。为此，对V100内存架构，指令集等都做了一些了解。在这里做一下总结，一">
 <meta itemprop="datePublished" content="2021-05-08T19:53:37+08:00" />
 <meta itemprop="dateModified" content="2021-05-08T19:53:37+08:00" />
-<meta itemprop="wordCount" content="191">
+<meta itemprop="wordCount" content="267">
 
 
 
@@ -125,7 +125,7 @@
         <div class="post-category">
             <a href="/categories/gpu/"> GPU </a>
             </div>
-        <span class="meta__text post-word-count"> 191 words</span>
+        <span class="meta__text post-word-count"> 267 words</span>
         
       </div>
     </header>
@@ -140,11 +140,7 @@
         <li><a href="#参考资料">参考资料：</a></li>
       </ul>
     </li>
-    <li><a href="#一gpucuda基础知识">一、GPU/CUDA基础知识：</a>
-      <ul>
-        <li><a href="#gpu硬件架构">GPU硬件架构</a></li>
-      </ul>
-    </li>
+    <li><a href="#一v100内存结构">一、V100内存结构</a></li>
   </ul>
 </nav>
   </div>
@@ -161,8 +157,9 @@
 <li>[5] <a href="">Automatic Kernel Generation for Volta Tensor Cores</a></li>
 <li>[6] <a href="https://www.zhihu.com/people/xiaoguiren">知乎用户：cloudcore</a></li>
 </ul>
-<h1 id="一gpucuda基础知识">一、GPU/CUDA基础知识：</h1>
-<h2 id="gpu硬件架构">GPU硬件架构</h2>
+<h1 id="一v100内存结构">一、V100内存结构</h1>
+<p>内存带宽，内存的访问延迟 是很多应用的瓶颈。因此，了解GPU的内存架构可以写出更好的访存友好代码。具体包括内存层次、每个层次存储的容量大小、带宽大小、访问延迟。</p>
+<p><a href="/V100/v100%E5%86%85%E5%AD%98.png">V100 内存架构^[1]</a></p>
 
     </div>
 
