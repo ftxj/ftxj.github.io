@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
-  <title>归档 - ftxj&#39;s blog</title>
+  <title>V100指令集架构探究 - ftxj&#39;s blog</title>
   <meta name="renderer" content="webkit" />
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
 
@@ -16,7 +16,7 @@
 <meta name="apple-mobile-web-app-status-bar-style" content="#f8f5ec">
 
 
-<meta name="author" content="ftxj" /><meta name="description" content="Enjoy life, enjoy technology, enjoy research." /><meta name="keywords" content="CIM, PIM, Compiler" />
+<meta name="author" content="ftxj" /><meta name="description" content="一、GPU体系结构：" /><meta name="keywords" content="CIM, PIM, Compiler" />
 
 
 
@@ -26,9 +26,7 @@
 <meta name="generator" content="Hugo 0.74.3 with theme even" />
 
 
-<link rel="canonical" href="http://ftxj.github.io/post/" />
-  <link href="http://ftxj.github.io/post/index.xml" rel="alternate" type="application/rss+xml" title="ftxj&#39;s blog" />
-  <link href="http://ftxj.github.io/post/index.xml" rel="feed" type="application/rss+xml" title="ftxj&#39;s blog" />
+<link rel="canonical" href="http://ftxj.github.io/post/v100%E6%8C%87%E4%BB%A4%E9%9B%86%E6%9E%B6%E6%9E%84%E6%8E%A2%E7%A9%B6/" />
 <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
 <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
 <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
@@ -41,16 +39,24 @@
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@3.1.20/dist/jquery.fancybox.min.css" integrity="sha256-7TyXnr2YU040zfSP+rEcz29ggW4j56/ujTPwjMzyqFY=" crossorigin="anonymous">
 
 
-<meta property="og:title" content="Posts" />
-<meta property="og:description" content="Enjoy life, enjoy technology, enjoy research." />
-<meta property="og:type" content="website" />
-<meta property="og:url" content="http://ftxj.github.io/post/" />
-<meta property="og:updated_time" content="2021-05-08T19:53:37+08:00" />
-<meta itemprop="name" content="Posts">
-<meta itemprop="description" content="Enjoy life, enjoy technology, enjoy research.">
+<meta property="og:title" content="V100指令集架构探究" />
+<meta property="og:description" content="一、GPU体系结构：" />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="http://ftxj.github.io/post/v100%E6%8C%87%E4%BB%A4%E9%9B%86%E6%9E%B6%E6%9E%84%E6%8E%A2%E7%A9%B6/" />
+<meta property="article:published_time" content="2021-05-08T19:53:37+08:00" />
+<meta property="article:modified_time" content="2021-05-08T19:53:37+08:00" />
+<meta itemprop="name" content="V100指令集架构探究">
+<meta itemprop="description" content="一、GPU体系结构：">
+<meta itemprop="datePublished" content="2021-05-08T19:53:37+08:00" />
+<meta itemprop="dateModified" content="2021-05-08T19:53:37+08:00" />
+<meta itemprop="wordCount" content="10">
+
+
+
+<meta itemprop="keywords" content="GPU,SASS," />
 <meta name="twitter:card" content="summary"/>
-<meta name="twitter:title" content="Posts"/>
-<meta name="twitter:description" content="Enjoy life, enjoy technology, enjoy research."/>
+<meta name="twitter:title" content="V100指令集架构探究"/>
+<meta name="twitter:description" content="一、GPU体系结构："/>
 
 <!--[if lte IE 9]>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/classlist/1.1.20170427/classList.min.js"></script>
@@ -117,101 +123,72 @@
     <main id="main" class="main">
       <div class="content-wrapper">
         <div id="content" class="content">
-          
-<section id="archive" class="archive">
-      <div class="collection-title">
-        <h2 class="archive-year">2021</h2>
+          <article class="post">
+    
+    <header class="post-header">
+      <h1 class="post-title">V100指令集架构探究</h1>
+
+      <div class="post-meta">
+        <span class="post-time"> 2021-05-08 </span>
+        <div class="post-category">
+            <a href="/categories/gpu/"> GPU </a>
+            </div>
+        <span class="meta__text post-word-count"> 10 words</span>
+        
       </div>
-
-    <div class="archive-post">
-      <span class="archive-post-time">
-        05-08
-      </span>
-      <span class="archive-post-title">
-        <a href="/post/v100%E6%8C%87%E4%BB%A4%E9%9B%86%E6%9E%B6%E6%9E%84%E6%8E%A2%E7%A9%B6/" class="archive-post-link">
-          V100指令集架构探究
-        </a>
-      </span>
-    </div>
-      <div class="collection-title">
-        <h2 class="archive-year">2020</h2>
-      </div>
-
-    <div class="archive-post">
-      <span class="archive-post-time">
-        08-22
-      </span>
-      <span class="archive-post-title">
-        <a href="/post/%E8%AE%BA%E6%96%87hyperap%E9%98%85%E8%AF%BB/" class="archive-post-link">
-          ISCA2020论文HyperAP阅读讲解（一）
-        </a>
-      </span>
-    </div>
-
-    <div class="archive-post">
-      <span class="archive-post-time">
-        08-22
-      </span>
-      <span class="archive-post-title">
-        <a href="/post/latex%E5%85%AC%E5%BC%8F%E6%B5%8B%E8%AF%95/" class="archive-post-link">
-          Latex公式测试
-        </a>
-      </span>
-    </div>
-
-    <div class="archive-post">
-      <span class="archive-post-time">
-        08-22
-      </span>
-      <span class="archive-post-title">
-        <a href="/post/20200822-12-53/" class="archive-post-link">
-          20200822 12 53
-        </a>
-      </span>
-    </div>
-
-    <div class="archive-post">
-      <span class="archive-post-time">
-        08-22
-      </span>
-      <span class="archive-post-title">
-        <a href="/post/20200822-00-54/" class="archive-post-link">
-          20200822 00 54
-        </a>
-      </span>
-    </div>
-
-    <div class="archive-post">
-      <span class="archive-post-time">
-        08-22
-      </span>
-      <span class="archive-post-title">
-        <a href="/post/20200822-00-51/" class="archive-post-link">
-          20200822 00 51
-        </a>
-      </span>
-    </div>
-      <div class="collection-title">
-        <h2 class="archive-year">0001</h2>
-      </div>
-
-    <div class="archive-post">
-      <span class="archive-post-time">
-        01-01
-      </span>
-      <span class="archive-post-title">
-        <a href="/post/%E6%9C%AA%E5%BD%92%E6%A1%A3/" class="archive-post-link">
-          
-        </a>
-      </span>
-    </div></section>
-
-<nav class="pagination">
-  
-  
+    </header>
+ 
+    <div class="post-toc" id="post-toc">
+  <h2 class="post-toc-title">文章目录</h2>
+  <div class="post-toc-content always-active">
+    <nav id="TableOfContents">
+  <ul>
+    <li><a href="#一gpu体系结构">一、GPU体系结构：</a></li>
+  </ul>
 </nav>
+  </div>
+</div>
+    <div class="post-content">
+      <h1 id="一gpu体系结构">一、GPU体系结构：</h1>
+
+    </div>
+
+    <div class="post-copyright">
+  <p class="copyright-item">
+    <span class="item-title">文章作者</span>
+    <span class="item-content">ftxj</span>
+  </p>
+  <p class="copyright-item">
+    <span class="item-title">上次更新</span>
+    <span class="item-content">
+        2021-05-08
+        
+    </span>
+  </p>
+  
+  
+</div>
+<footer class="post-footer">
+      <div class="post-tags">
+          <a href="/tags/gpu/">GPU</a>
+          <a href="/tags/sass/">SASS</a>
+          </div>
+      <nav class="post-nav">
+        
+        <a class="next" href="/post/%E8%AE%BA%E6%96%87hyperap%E9%98%85%E8%AF%BB/">
+            <span class="next-text nav-default">ISCA2020论文HyperAP阅读讲解（一）</span>
+            <span class="next-text nav-mobile"> </span>
+            <i class="iconfont icon-right"></i>
+          </a>
+      </nav>
+    </footer>
+  </article>
         </div>
         
+
+  
+
+  
 
       </div>
     </main>
@@ -259,6 +236,15 @@
 
 
 <script type="text/javascript" src="/js/main.min.d7b7ada643c9c1a983026e177f141f7363b4640d619caf01d8831a6718cd44ea.js"></script>
+  <script type="text/javascript">
+    window.MathJax = {
+      tex2jax: {inlineMath: [['$','$'], ['\\(','\\)']]},
+      TeX: {equationNumbers: {autoNumber: "AMS"}},
+      showProcessingMessages: false,
+      messageStyle: 'none'
+    };
+  </script>
+  <script async src="https://cdn.jsdelivr.net/npm/mathjax@2.7.5/MathJax.js?config=TeX-MML-AM_CHTML"  integrity="sha256-nvJJv9wWKEm88qvoQl9ekL2J+k/RWIsaSScxxlsrv8k=" crossorigin="anonymous"></script>
 
 
 

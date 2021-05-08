@@ -6,7 +6,7 @@
     <description>Recent content on ftxj&#39;s blog</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>zh-cn</language>
-    <lastBuildDate>Sat, 22 Aug 2020 19:08:41 +0800</lastBuildDate>
+    <lastBuildDate>Sat, 08 May 2021 19:53:37 +0800</lastBuildDate>
     
 	<atom:link href="http://ftxj.github.io/index.xml" rel="self" type="application/rss+xml" />
     
@@ -20,6 +20,15 @@
       <description>Hugo is a static site engine written in Go.
 It makes use of a variety of open source projects including:
  Cobra Viper J Walter Weatherman Cast  Learn more and contribute on GitHub.</description>
+    </item>
+    
+    <item>
+      <title>V100指令集架构探究</title>
+      <link>http://ftxj.github.io/post/v100%E6%8C%87%E4%BB%A4%E9%9B%86%E6%9E%B6%E6%9E%84%E6%8E%A2%E7%A9%B6/</link>
+      <pubDate>Sat, 08 May 2021 19:53:37 +0800</pubDate>
+      
+      <guid>http://ftxj.github.io/post/v100%E6%8C%87%E4%BB%A4%E9%9B%86%E6%9E%B6%E6%9E%84%E6%8E%A2%E7%A9%B6/</guid>
+      <description>一、GPU体系结构：</description>
     </item>
     
     <item>
