@@ -40,41 +40,5 @@ It makes use of a variety of open source projects including:
       <description>论文名称：Hyper-AP: Enhancing Associative Processing Through A Full-Stack Optimization 相关项目信息：https://li.seas.upenn.edu/publication/zha-</description>
     </item>
     
-    <item>
-      <title>Latex公式测试</title>
-      <link>http://ftxj.github.io/post/latex%E5%85%AC%E5%BC%8F%E6%B5%8B%E8%AF%95/</link>
-      <pubDate>Sat, 22 Aug 2020 13:49:06 +0800</pubDate>
-      
-      <guid>http://ftxj.github.io/post/latex%E5%85%AC%E5%BC%8F%E6%B5%8B%E8%AF%95/</guid>
-      <description>显示位置测试 1 2 3 4 5 6 7 行内公式测试 行内公式测试$\int_{0}^{10}x^{2} \mapsto \frac{100}{3}$，当 \(x)\ 行内公式测试$i</description>
-    </item>
-    
-    <item>
-      <title>20200822 12 53</title>
-      <link>http://ftxj.github.io/post/20200822-12-53/</link>
-      <pubDate>Sat, 22 Aug 2020 12:53:33 +0800</pubDate>
-      
-      <guid>http://ftxj.github.io/post/20200822-12-53/</guid>
-      <description>模板测试 模板测试 模板测试 模板测试 模板测试 模板测试 模板测试 模板测试 模板测试 模板测试 模板测试 模板测试 模板测试 模板测试 模板测试 模板测试 模板测试 模板</description>
-    </item>
-    
-    <item>
-      <title>20200822 00 54</title>
-      <link>http://ftxj.github.io/post/20200822-00-54/</link>
-      <pubDate>Sat, 22 Aug 2020 00:54:04 +0800</pubDate>
-      
-      <guid>http://ftxj.github.io/post/20200822-00-54/</guid>
-      <description>占位符 占位符 占位符 占位符 占位符 占位符 占位符 占位符 占位符 占位符 占位符 占位符 占位符 占位符 占位符 占位符 占位符 占位符 占位符 占位符 占位符 占位符 占位符 占</description>
-    </item>
-    
-    <item>
-      <title></title>
-      <link>http://ftxj.github.io/post/%E6%9C%AA%E5%BD%92%E6%A1%A3/</link>
-      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
-      
-      <guid>http://ftxj.github.io/post/%E6%9C%AA%E5%BD%92%E6%A1%A3/</guid>
-      <description>Program Domain Parallel Model Granularity Working Set Data Sharing Data Exchange IMP blacksholes 金融分析 data-parallel coarse small low low IMP Canneal 工程学 unstructured medium medium high medium IMP Fluidanimate 动画 data-parallel fine large low medium IMP Streamcluster 数据挖掘 data-parallel medium medium low medium bodytrack CV data-parallel medium medium high medium facesim 动画 data-parallel coarse large low medium freqmine 数据</description>
-    </item>
-    
   </channel>
 </rss>
