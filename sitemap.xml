@@ -16,8 +16,64 @@
   </url>
   
   <url>
+    <loc>http://ftxj.github.io/tags/acclerator/</loc>
+    <lastmod>2021-05-09T12:38:35+08:00</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.5</priority>
+  </url>
+  
+  <url>
+    <loc>http://ftxj.github.io/post/2021asplos_diag/</loc>
+    <lastmod>2021-05-09T12:38:35+08:00</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.5</priority>
+  </url>
+  
+  <url>
     <loc>http://ftxj.github.io/categories/</loc>
-    <lastmod>2021-05-08T19:53:37+08:00</lastmod>
+    <lastmod>2021-05-09T12:38:35+08:00</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.5</priority>
+  </url>
+  
+  <url>
+    <loc>http://ftxj.github.io/tags/computer-architecture/</loc>
+    <lastmod>2021-05-09T12:38:35+08:00</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.5</priority>
+  </url>
+  
+  <url>
+    <loc>http://ftxj.github.io/categories/computer-architecture/</loc>
+    <lastmod>2021-05-09T12:38:35+08:00</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.5</priority>
+  </url>
+  
+  <url>
+    <loc>http://ftxj.github.io/tags/dataflow/</loc>
+    <lastmod>2021-05-09T12:38:35+08:00</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.5</priority>
+  </url>
+  
+  <url>
+    <loc>http://ftxj.github.io/</loc>
+    <lastmod>2021-05-09T12:38:35+08:00</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.5</priority>
+  </url>
+  
+  <url>
+    <loc>http://ftxj.github.io/post/</loc>
+    <lastmod>2021-05-09T12:38:35+08:00</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.5</priority>
+  </url>
+  
+  <url>
+    <loc>http://ftxj.github.io/tags/</loc>
+    <lastmod>2021-05-09T12:38:35+08:00</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.5</priority>
   </url>
@@ -37,28 +93,7 @@
   </url>
   
   <url>
-    <loc>http://ftxj.github.io/</loc>
-    <lastmod>2021-05-08T19:53:37+08:00</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.5</priority>
-  </url>
-  
-  <url>
-    <loc>http://ftxj.github.io/post/</loc>
-    <lastmod>2021-05-08T19:53:37+08:00</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.5</priority>
-  </url>
-  
-  <url>
     <loc>http://ftxj.github.io/tags/sass/</loc>
-    <lastmod>2021-05-08T19:53:37+08:00</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.5</priority>
-  </url>
-  
-  <url>
-    <loc>http://ftxj.github.io/tags/</loc>
     <lastmod>2021-05-08T19:53:37+08:00</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.5</priority>

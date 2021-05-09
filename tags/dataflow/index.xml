@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Dataflow on Jie Xin</title>
+    <link>http://ftxj.github.io/tags/dataflow/</link>
+    <description>Recent content in Dataflow on Jie Xin</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>zh-cn</language>
+    <lastBuildDate>Sun, 09 May 2021 12:38:35 +0800</lastBuildDate>
+    
+	<atom:link href="http://ftxj.github.io/tags/dataflow/index.xml" rel="self" type="application/rss+xml" />
+    
+    
+    <item>
+      <title>ASPLOS&#39;21 文章：DiAG: A Dataflow-Inspired Architecture for General-Purpose Processors分享</title>
+      <link>http://ftxj.github.io/post/2021asplos_diag/</link>
+      <pubDate>Sun, 09 May 2021 12:38:35 +0800</pubDate>
+      
+      <guid>http://ftxj.github.io/post/2021asplos_diag/</guid>
+      <description>论文题目：DiAG: A Dataflow-Inspired Architecture for General-Purpose Processors 作者信息： Dong Kai Wang, Ph.D in UICU, MS/BS in UICU. 主要研究近似体系结构，体系结构与编译融合 Nam Sung Kim, 体系结构方向大佬，冷静文的GPUW</description>
+    </item>
+    
+  </channel>
+</rss>

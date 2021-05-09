@@ -6,10 +6,19 @@
     <description>Recent content in Categories on Jie Xin</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>zh-cn</language>
-    <lastBuildDate>Sat, 08 May 2021 19:53:37 +0800</lastBuildDate>
+    <lastBuildDate>Sun, 09 May 2021 12:38:35 +0800</lastBuildDate>
     
 	<atom:link href="http://ftxj.github.io/categories/index.xml" rel="self" type="application/rss+xml" />
     
+    
+    <item>
+      <title>Computer Architecture</title>
+      <link>http://ftxj.github.io/categories/computer-architecture/</link>
+      <pubDate>Sun, 09 May 2021 12:38:35 +0800</pubDate>
+      
+      <guid>http://ftxj.github.io/categories/computer-architecture/</guid>
+      <description></description>
+    </item>
     
     <item>
       <title>GPU</title>

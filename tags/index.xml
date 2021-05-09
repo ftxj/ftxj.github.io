@@ -6,10 +6,37 @@
     <description>Recent content in Tags on Jie Xin</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>zh-cn</language>
-    <lastBuildDate>Sat, 08 May 2021 19:53:37 +0800</lastBuildDate>
+    <lastBuildDate>Sun, 09 May 2021 12:38:35 +0800</lastBuildDate>
     
 	<atom:link href="http://ftxj.github.io/tags/index.xml" rel="self" type="application/rss+xml" />
     
+    
+    <item>
+      <title>Acclerator</title>
+      <link>http://ftxj.github.io/tags/acclerator/</link>
+      <pubDate>Sun, 09 May 2021 12:38:35 +0800</pubDate>
+      
+      <guid>http://ftxj.github.io/tags/acclerator/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>Computer Architecture</title>
+      <link>http://ftxj.github.io/tags/computer-architecture/</link>
+      <pubDate>Sun, 09 May 2021 12:38:35 +0800</pubDate>
+      
+      <guid>http://ftxj.github.io/tags/computer-architecture/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>Dataflow</title>
+      <link>http://ftxj.github.io/tags/dataflow/</link>
+      <pubDate>Sun, 09 May 2021 12:38:35 +0800</pubDate>
+      
+      <guid>http://ftxj.github.io/tags/dataflow/</guid>
+      <description></description>
+    </item>
     
     <item>
       <title>GPU</title>

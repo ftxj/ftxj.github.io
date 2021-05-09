@@ -1,0 +1,356 @@
+<!DOCTYPE html>
+<html lang="zh-cn">
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+  <title>ASPLOS&#39;21 文章：DiAG: A Dataflow-Inspired Architecture for General-Purpose Processors分享 - Jie Xin</title>
+  <meta name="renderer" content="webkit" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+<meta name="theme-color" content="#f8f5ec" />
+<meta name="msapplication-navbutton-color" content="#f8f5ec">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="#f8f5ec">
+
+
+<meta name="author" content="ftxj" /><meta name="description" content="论文题目：DiAG: A Dataflow-Inspired Architecture for General-Purpose Processors 作者信息： Dong Kai Wang, Ph.D in UICU, MS/BS in UICU. 主要研究近似体系结构，体系结构与编译融合 Nam Sung Kim, 体系结构方向大佬，冷静文的GPUW" /><meta name="keywords" content="CIM, PIM, Compiler" />
+
+
+
+
+
+
+<meta name="generator" content="Hugo 0.74.3 with theme even" />
+
+
+<link rel="canonical" href="http://ftxj.github.io/post/2021asplos_diag/" />
+<link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+<link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+<link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
+<link rel="manifest" href="/manifest.json">
+<link rel="mask-icon" href="/safari-pinned-tab.svg" color="#5bbad5">
+
+
+
+<link href="/sass/main.min.651e6917abb0239242daa570c2bec9867267bbcd83646da5a850afe573347b44.css" rel="stylesheet">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@3.1.20/dist/jquery.fancybox.min.css" integrity="sha256-7TyXnr2YU040zfSP+rEcz29ggW4j56/ujTPwjMzyqFY=" crossorigin="anonymous">
+
+
+<meta property="og:title" content="ASPLOS&#39;21 文章：DiAG: A Dataflow-Inspired Architecture for General-Purpose Processors分享" />
+<meta property="og:description" content="论文题目：DiAG: A Dataflow-Inspired Architecture for General-Purpose Processors 作者信息： Dong Kai Wang, Ph.D in UICU, MS/BS in UICU. 主要研究近似体系结构，体系结构与编译融合 Nam Sung Kim, 体系结构方向大佬，冷静文的GPUW" />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="http://ftxj.github.io/post/2021asplos_diag/" />
+<meta property="article:published_time" content="2021-05-09T12:38:35+08:00" />
+<meta property="article:modified_time" content="2021-05-09T12:38:35+08:00" />
+<meta itemprop="name" content="ASPLOS&#39;21 文章：DiAG: A Dataflow-Inspired Architecture for General-Purpose Processors分享">
+<meta itemprop="description" content="论文题目：DiAG: A Dataflow-Inspired Architecture for General-Purpose Processors 作者信息： Dong Kai Wang, Ph.D in UICU, MS/BS in UICU. 主要研究近似体系结构，体系结构与编译融合 Nam Sung Kim, 体系结构方向大佬，冷静文的GPUW">
+<meta itemprop="datePublished" content="2021-05-09T12:38:35+08:00" />
+<meta itemprop="dateModified" content="2021-05-09T12:38:35+08:00" />
+<meta itemprop="wordCount" content="1824">
+
+
+
+<meta itemprop="keywords" content="Dataflow,Acclerator,Computer Architecture," />
+<meta name="twitter:card" content="summary"/>
+<meta name="twitter:title" content="ASPLOS&#39;21 文章：DiAG: A Dataflow-Inspired Architecture for General-Purpose Processors分享"/>
+<meta name="twitter:description" content="论文题目：DiAG: A Dataflow-Inspired Architecture for General-Purpose Processors 作者信息： Dong Kai Wang, Ph.D in UICU, MS/BS in UICU. 主要研究近似体系结构，体系结构与编译融合 Nam Sung Kim, 体系结构方向大佬，冷静文的GPUW"/>
+
+<!--[if lte IE 9]>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/classlist/1.1.20170427/classList.min.js"></script>
+<![endif]-->
+
+<!--[if lt IE 9]>
+  <script src="https://cdn.jsdelivr.net/npm/html5shiv@3.7.3/dist/html5shiv.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/respond.js@1.4.2/dest/respond.min.js"></script>
+<![endif]-->
+
+  
+</head>
+<body>
+  
+  <div id="mobile-navbar" class="mobile-navbar">
+  <div class="mobile-header-logo">
+    <a href="/" class="logo">FTXJ</a>
+  </div>
+  <div class="mobile-navbar-icon">
+    <span></span>
+    <span></span>
+    <span></span>
+  </div>
+</div>
+
+<nav id="mobile-menu" class="mobile-menu slideout-menu">
+  <ul class="mobile-menu-list">
+    <a href="/post/">
+        <li class="mobile-menu-item">博客</li>
+      </a><a href="/home/">
+        <li class="mobile-menu-item">HOME</li>
+      </a><a href="/publication/">
+        <li class="mobile-menu-item">Publication</li>
+      </a>
+  </ul>
+</nav>
+  <div class="container" id="mobile-panel">
+    <header id="header" class="header">
+        <div class="logo-wrapper">
+  <a href="/" class="logo">FTXJ</a>
+</div>
+
+<nav class="site-navbar">
+  <ul id="menu" class="menu">
+    <li class="menu-item">
+        <a class="menu-item-link" href="/post/">博客</a>
+      </li><li class="menu-item">
+        <a class="menu-item-link" href="/home/">HOME</a>
+      </li><li class="menu-item">
+        <a class="menu-item-link" href="/publication/">Publication</a>
+      </li>
+  </ul>
+</nav>
+    </header>
+
+    <main id="main" class="main">
+      <div class="content-wrapper">
+        <div id="content" class="content">
+          <article class="post">
+    
+    <header class="post-header">
+      <h1 class="post-title">ASPLOS&#39;21 文章：DiAG: A Dataflow-Inspired Architecture for General-Purpose Processors分享</h1>
+
+      <div class="post-meta">
+        <span class="post-time"> 2021-05-09 </span>
+        <div class="post-category">
+            <a href="/categories/computer-architecture/"> Computer Architecture </a>
+            </div>
+        <span class="meta__text post-word-count"> 1824 words</span>
+        
+      </div>
+    </header>
+ 
+    <div class="post-toc" id="post-toc">
+  <h2 class="post-toc-title">文章目录</h2>
+  <div class="post-toc-content always-active">
+    <nav id="TableOfContents">
+  <ul>
+    <li><a href="#1-选题背景">1. 选题背景</a></li>
+    <li><a href="#2-加速器为社么可以加速">2. 加速器为社么可以“加速”</a></li>
+    <li><a href="#3-启发式设计">3. 启发式设计</a></li>
+    <li><a href="#4-背景介绍">4. 背景介绍</a>
+      <ul>
+        <li><a href="#41-数据流架构">4.1 数据流架构</a></li>
+        <li><a href="#42-数据流架构与传统架构的混合">4.2 数据流架构与传统架构的混合</a></li>
+        <li><a href="#43-乱序执行cpu">4.3 乱序执行CPU</a></li>
+        <li><a href="#44-超标量技术">4.4 超标量技术</a></li>
+      </ul>
+    </li>
+    <li><a href="#5-具体设计">5. 具体设计</a>
+      <ul>
+        <li><a href="#51-用-wire-来代替-register">5.1 用 wire 来代替 register</a></li>
+        <li><a href="#52-数据冲突">5.2 数据冲突</a></li>
+        <li><a href="#53-控制冲突">5.3 控制冲突</a></li>
+        <li><a href="#54-并行">5.4 并行</a></li>
+      </ul>
+    </li>
+    <li><a href="#6-主要收获">6. 主要收获</a></li>
+    <li><a href="#6-缺陷">6. 缺陷</a></li>
+  </ul>
+</nav>
+  </div>
+</div>
+    <div class="post-content">
+      <p>论文题目：DiAG: A Dataflow-Inspired Architecture for General-Purpose Processors</p>
+<p>作者信息：</p>
+<ul>
+<li><a href="https://wdongkai.github.io/">Dong Kai Wang</a>, Ph.D in UICU, MS/BS in UICU. 主要研究近似体系结构，体系结构与编译融合</li>
+<li><a href="http://fast.ece.illinois.edu/index.html">Nam Sung Kim</a>, 体系结构方向大佬，冷静文的GPUWattch与他有过合作。</li>
+</ul>
+<h1 id="1-选题背景">1. 选题背景</h1>
+<p>近些年体系结构的发展：</p>
+<table>
+<thead>
+<tr>
+<th></th>
+<th>通用计算</th>
+<th>专用计算</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>性能</td>
+<td>难以提升</td>
+<td>逐年发展</td>
+</tr>
+<tr>
+<td>通用性</td>
+<td>强</td>
+<td>弱</td>
+</tr>
+</tbody>
+</table>
+<p>通用计算芯片仍然是最主流的计算平台，但是最近体系结构的发展大多在专用加速器方面。在专用加速器方面提出了很多优化性能的手段。能否将专用加速器的性能优化手段用在通用计算芯片的设计中呢？这就是一个问题。</p>
+<p>一个理想的体系结构：</p>
+<ul>
+<li>低延迟（instruction level parallel）；</li>
+<li>高吞吐（data level parallel）;</li>
+<li>通用性强（具有完备的计算功能）；</li>
+<li>容易兼容到现有软件环境中(支持现有指令集)；</li>
+</ul>
+<p>DiAG就是用设计加速器的思路达到高性能的同时，达到以上四点。由于ILP和DLP经常是冲突的，所以可以进行两种配置，ILP优先／DLP优先。</p>
+<h1 id="2-加速器为社么可以加速">2. 加速器为社么可以“加速”</h1>
+<p>最佳的算法执行，应该所有的处理时间都在执行“计算”操作上。算法需要计算多少次，那么处理器就执行多少次操作。但是实际的处理器上，有大量的能耗、面积开销在“取指”，“译码”，“乱序执行”，“寄存器重命名”上面。这是由于要执行代码的不确定性，为了保证通用性的同时保证性能，所以必须设计其他的结构来加速。</p>
+<p>front-end &ndash; execution (前端就很耗时)</p>
+<p>加速器的设计不太一样。专用任务意味着比较确定的要执行的指令。因此，加速器上指令译码相关的逻辑可以做的很简单，或者干脆没有（完全确定的数据通路）。通用处理器上其实也可以，将重复使用的指令只进行一次译码，达到指令重用。</p>
+<p>列出三个加速器性能有提升的主要的点：</p>
+<ul>
+<li>指令重用：通过确定的数据通路，消除“指令”概念</li>
+<li>DLP：pipeline的设计，多流水等</li>
+<li>数据移动优化：</li>
+</ul>
+<h1 id="3-启发式设计">3. 启发式设计</h1>
+<ul>
+<li>指令重用：第一次执行到某些指令的时候构建确定的数据通路；后面再遇到直接在构建好的数据通路里面执行，取消后面这些指令的“译码，取指”等的开销。</li>
+<li>DLP：与加速器中的一样</li>
+</ul>
+<h1 id="4-背景介绍">4. 背景介绍</h1>
+<h2 id="41-数据流架构">4.1 数据流架构</h2>
+<p>程序可以表示未<a href="https://en.wikipedia.org/wiki/Data-flow_analysis">DFG</a>的格式，这是一个数据依赖图。图上的每一个节点可以被抽象为一条指令，只有当这条指令的数据准备好的时候，这条指令才去执行。</p>
+<p>数据流架构需要一个很大的寄存器文件，来标识：每条指令的入口数据(src)、出口数据(dst)、以及出口数据需要进入到哪些入口数据。当一个node计算完成后，需要把这个node得到的结果写到有标识的lane中，然后后面的node看到这个lane中有元素后就去执行。</p>
+<p>更多知识可以看参考文献 [1] [2]</p>
+<h2 id="42-数据流架构与传统架构的混合">4.2 数据流架构与传统架构的混合</h2>
+<h2 id="43-乱序执行cpu">4.3 乱序执行CPU</h2>
+<h2 id="44-超标量技术">4.4 超标量技术</h2>
+<p>参考文献：</p>
+<ul>
+<li>[1] <a href="https://dl.acm.org/doi/abs/10.1145/642089.642111">MIT Dataflow Arch</a>: MIT在80年代提出的数据流架构</li>
+<li>[2] <a href="https://course.ece.cmu.edu/~ece740/f13/lib/exe/fetch.php?media=onur-740-fall13-module5.2.1-dataflow-part1.pdf">CMU Slides</a>: CMU关于数据流架构的课程PPt</li>
+<li>[3] <a href="http://www.cs.cmu.edu/~phoenix/papers/asplos06.pdf">Tartan</a>: CMU 数据流与CPU的异构混合架构</li>
+<li>[4] <a href="https://iis-people.ee.ethz.ch/~gmichi/asocd/addinfo/Out-of-Order_execution.pdf">Slides</a>: 乱序执行介绍</li>
+</ul>
+<h1 id="5-具体设计">5. 具体设计</h1>
+<h2 id="51-用-wire-来代替-register">5.1 用 wire 来代替 register</h2>
+<p>传统数据流架构，一个node计算完成后，将结果写入到需要用到这个值的指令相关的的寄存器中。</p>
+<p>在DiAG的设计中，一个node计算完成后，将结果输出到wire上，需要这个wire的结果的node会自己将这个值加载进去进行计算。</p>
+<p>用 可配置的 wire 级别的 router 来代替原来的寄存器级别的 router。</p>
+<p>因此，node之间要 1 维得排列，因为如果二维排列的话，两个node之间的通信需要经过多个router来完成，没办法完全用 wire 来完成。</p>
+<p>但是这种会造成问题，比方两个node都是接受同样的数据（R0，R1），但是node1计算的快，结果写回了R0，那么node2这个时候检测到R0更新，他会怎么办呢？（Write after read 问题）</p>
+<h2 id="52-数据冲突">5.2 数据冲突</h2>
+<p>WAR冲突解决办法：</p>
+<p>因为node按照指令顺序排列，所以，只改变后面的 wire 的值不会影响前面已经读到的值。</p>
+<p>但是循环怎么做？</p>
+<h2 id="53-控制冲突">5.3 控制冲突</h2>
+<p>个人感觉，他通过一个 PC lane，强行让各个 PE 顺序执行，然后每个PE看给他的PC是不是和他自己一样来决定是否执行。（不能确定是否是这样的）</p>
+<h2 id="54-并行">5.4 并行</h2>
+<h1 id="6-主要收获">6. 主要收获</h1>
+<p>将加速器设计思想与通用计算相结合可以得到更好的通用计算平台。通用性主要考虑分支语句的实现。</p>
+<h1 id="6-缺陷">6. 缺陷</h1>
+<p>基本只考虑了 register reuse在加速器设计里面的加速作用，访存优化，原子操作优化等等在加速器性能提升中占据很大比重的部分还是难以与通用计算相集成。访存导致的流水线停滞，在通用计算领域貌似是一个无解的问题。这些导致他最终与CPU相比的一个加速效果其实并不明显。</p>
+<p>同时，DiAG的方案导致较大的芯片面积开销。能否通过资源共享来减少是一个问题。另外，DiAG的PE资源利用率也比较低。</p>
+
+    </div>
+
+    <div class="post-copyright">
+  <p class="copyright-item">
+    <span class="item-title">文章作者</span>
+    <span class="item-content">ftxj</span>
+  </p>
+  <p class="copyright-item">
+    <span class="item-title">上次更新</span>
+    <span class="item-content">
+        2021-05-09
+        
+    </span>
+  </p>
+  
+  
+</div>
+<footer class="post-footer">
+      <div class="post-tags">
+          <a href="/tags/dataflow/">Dataflow</a>
+          <a href="/tags/acclerator/">Acclerator</a>
+          <a href="/tags/computer-architecture/">Computer Architecture</a>
+          </div>
+      <nav class="post-nav">
+        
+        <a class="next" href="/post/v100%E6%8C%87%E4%BB%A4%E9%9B%86%E6%9E%B6%E6%9E%84%E6%8E%A2%E7%A9%B6/">
+            <span class="next-text nav-default">V100指令集架构探究</span>
+            <span class="next-text nav-mobile"> </span>
+            <i class="iconfont icon-right"></i>
+          </a>
+      </nav>
+    </footer>
+  </article>
+        </div>
+        
+
+  
+
+  
+
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="social-links">
+      <a href="mailto:cs.xinjie@gmail.com" class="iconfont icon-email" title="email"></a>
+      <a href="http://www.github.com/ftxj" class="iconfont icon-github" title="github"></a>
+  <a href="http://ftxj.github.io/index.xml" type="application/rss+xml" class="iconfont icon-rss" title="rss"></a>
+</div>
+
+<div class="copyright">
+  <span class="power-by">
+    Powered by <a class="hexo-link" href="https://gohugo.io">Hugo</a>
+  </span>
+  <span class="division">|</span>
+  <span class="theme-info">
+     with  - 
+    <a class="theme-link" href="https://github.com/olOwOlo/hugo-theme-even">Even</a>
+  </span>
+
+  
+
+  <span class="copyright-year">
+    &copy; 
+    2020 - 
+    2021
+    <span class="heart">
+      <i class="iconfont icon-heart"></i>
+    </span>
+    <span class="author">ftxj</span>
+  </span>
+</div>
+    </footer>
+
+    <div class="back-to-top" id="back-to-top">
+      <i class="iconfont icon-up"></i>
+    </div>
+  </div>
+  
+  <script src="https://cdn.jsdelivr.net/npm/jquery@3.2.1/dist/jquery.min.js" integrity="sha256-hwg4gsxgFZhOsEEamdOYGBf13FyQuiTwlAQgxVSNgt4=" crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/slideout@1.0.1/dist/slideout.min.js" integrity="sha256-t+zJ/g8/KXIJMjSVQdnibt4dlaDxc9zXr/9oNPeWqdg=" crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@3.1.20/dist/jquery.fancybox.min.js" integrity="sha256-XVLffZaxoWfGUEbdzuLi7pwaUJv1cecsQJQqGLe7axY=" crossorigin="anonymous"></script>
+
+
+
+<script type="text/javascript" src="/js/main.min.d7b7ada643c9c1a983026e177f141f7363b4640d619caf01d8831a6718cd44ea.js"></script>
+  <script type="text/javascript">
+    window.MathJax = {
+      tex2jax: {inlineMath: [['$','$'], ['\\(','\\)']]},
+      TeX: {equationNumbers: {autoNumber: "AMS"}},
+      showProcessingMessages: false,
+      messageStyle: 'none'
+    };
+  </script>
+  <script async src="https://cdn.jsdelivr.net/npm/mathjax@2.7.5/MathJax.js?config=TeX-MML-AM_CHTML"  integrity="sha256-nvJJv9wWKEm88qvoQl9ekL2J+k/RWIsaSScxxlsrv8k=" crossorigin="anonymous"></script>
+
+
+
+
+
+
+
+
+</body>
+</html>
