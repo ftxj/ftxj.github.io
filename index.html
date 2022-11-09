@@ -175,6 +175,197 @@
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2022/11/09/Taichi-with-Colab/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="ftxj">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="ftxj's website">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/2022/11/09/Taichi-with-Colab/" class="post-title-link" itemprop="url">在 Colab 上运行 TaiChi 图形应用</a>
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+              
+
+              <time title="创建时间：2022-11-09 21:09:45 / 修改时间：21:18:58" itemprop="dateCreated datePublished" datetime="2022-11-09T21:09:45+08:00">2022-11-09</time>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <p>最近由于一些个人兴趣，想研究一下taichi系统。由于自己想要将一部分代码通过Colab共享出去，因此有了这篇探索。</p>
+<p>主要的坑点在于，Colab 不能直接支持 taichi 的 GUI 系统。我自己并不像折腾什么 x11 forwaring 等技术，等有成熟的技术直接拿来用比较好。</p>
+<p>因此，在没有 GUI 系统的前提下， taichi的运行结果直接保存为视频和gif，使用接口如下：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">result_dir = &quot;./&quot;</span><br><span class="line">video_manager = ti.tools.VideoManager(output_dir=result_dir, framerate=24, automatic_build=False)</span><br><span class="line">for i in range(500):</span><br><span class="line">    paint()</span><br><span class="line">    pixels_img = pixels.to_numpy()</span><br><span class="line">    video_manager.write_frame(pixels_img)</span><br><span class="line">    print(f&#x27;\rFrame &#123;i+1&#125;/50 is recorded&#x27;, end=&#x27;&#x27;)</span><br></pre></td></tr></table></figure>
+
+<p>相对于的Cobal链接：<a target="_blank" rel="noopener" href="https://colab.research.google.com/drive/1FZ9w8O0CGFiV4TNUP5OeNcurJg4zFjsC?usp=share_link">https://colab.research.google.com/drive/1FZ9w8O0CGFiV4TNUP5OeNcurJg4zFjsC?usp=share_link</a></p>
+<p>希望后续taichi社区可以一键导出GUI APP或者修复Colab上的GUI系统把。</p>
+
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2022/11/09/Background-of-Fluid-Mathmatics/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="ftxj">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="ftxj's website">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/2022/11/09/Background-of-Fluid-Mathmatics/" class="post-title-link" itemprop="url">Background of Fluid Mathmatics</a>
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+              
+
+              <time title="创建时间：2022-11-09 13:15:25 / 修改时间：13:32:43" itemprop="dateCreated datePublished" datetime="2022-11-09T13:15:25+08:00">2022-11-09</time>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <h1 id="散度"><a href="#散度" class="headerlink" title="散度"></a>散度</h1><p>一个游泳池，一边放水一边加水。那么通过这个游泳池的水的变化量我们可以得到。那么游泳池内单位体积的变化是什么呢？就用散度来衡量。散度，衡量了被计算点的单位体积内的场的流入和流出的变化量。</p>
+<h1 id="旋度"><a href="#旋度" class="headerlink" title="旋度"></a>旋度</h1><p>一条河流，其中会有很多漩涡。在这些漩涡上，水流不是向前流或者向后流，而是旋转流动。我们可以计算到这个旋转的力的合力是多少，从而知道漩涡上物理的运动，那么一个点这个合理的单位强度，就是旋度。</p>
+<h1 id="拉普拉斯算子"><a href="#拉普拉斯算子" class="headerlink" title="拉普拉斯算子"></a>拉普拉斯算子</h1><p>梯度的散度。描述了标量场中，某一点附近的平均值，与这个点函数值的差。</p>
+<p>拉普拉斯算子可以找到变化很突然的事件。（图像处理）</p>
+<p>对一个标量场求梯度，可以得到这个场的空间变化率，再在变化率场上求散度，就可以看到“源”的分布。</p>
+
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2022/11/09/The-Equations-of-Fluids/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="ftxj">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="ftxj's website">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/2022/11/09/The-Equations-of-Fluids/" class="post-title-link" itemprop="url">流体力学方程（For Computer Graphic）</a>
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+              
+
+              <time title="创建时间：2022-11-09 11:08:43 / 修改时间：13:15:27" itemprop="dateCreated datePublished" datetime="2022-11-09T11:08:43+08:00">2022-11-09</time>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <h1 id="Introduction-amp-Motivation"><a href="#Introduction-amp-Motivation" class="headerlink" title="Introduction &amp; Motivation"></a>Introduction &amp; Motivation</h1><p>我们总是希望可以用计算机来模拟现实世界。现实世界则充斥着各种各样的“流体”，从我们呼吸所需要的空气，到生命的起源水。如何用计算机仿真这些物体呢？或者说，如何用计算机来把流体上的各种运动、现象模拟出来？例如河流流动，浪花四溅，烟雾扩散，火焰抖动。这些现象想一想就觉得非常美丽。这篇文章描述基本的流体力学方程，即模拟这一切现象所需要的基础知识。</p>
+<p>我并不是图形学、流体力学的从业者、研究人员，只是一个业余爱好者。所参考的资料来自于 “Fluid Simulation for Computer Graphics”，这篇文章主要覆盖第一章的内容。有错误的地方希望可以指出。</p>
+<p>对于计算机模拟仿真这一领域来说，可以简单抽象为对要仿真的物体&#x2F;现象的建模以及求解。对于渲染，我们的建模是渲染方程，一个积分方程，然后用数值方法去求解这个积分方程；对于仿真，如流体，我们的建模其实是一个微分方程。接下来介绍，在流体力学仿真中，我们如何建立数学模型。</p>
+<h1 id="物理抽象与简化"><a href="#物理抽象与简化" class="headerlink" title="物理抽象与简化"></a>物理抽象与简化</h1><p>计算机只需要仿真出视觉效果即可。我们的视觉关注的是颜色、位置以及快慢这些信息。思考一下我们日常生活中的流体现象。我们先仿真速度和位置这两者。现在我们想象一个水流在重力作用下下落或者平抛。</p>
+<p>可以观察到这几点：水流内部，每个水滴都精密相邻，一个水滴被周围水滴挤压着向着一定方向移动，水流整体呈现出一个统一的自由落体趋势；水流边界，边界的水滴类似包围着内部的水滴，让水滴不会到处泄露。</p>
+
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
     <link itemprop="mainEntityOfPage" href="http://example.com/2022/11/09/Paper-Reading-Hyper-AP-Enhancing-Associative-Processing-Through-a-Full-Stack-Optimization/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -369,7 +560,7 @@
       <div class="site-state-item site-state-posts">
           <a href="/archives/">
         
-          <span class="site-state-item-count">2</span>
+          <span class="site-state-item-count">5</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>
@@ -452,6 +643,8 @@
 
 
 
+
+  
 
   
 
