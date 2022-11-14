@@ -175,6 +175,70 @@
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2022/11/10/Hardware-Basic/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="ftxj">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="ftxj's website">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/2022/11/10/Hardware-Basic/" class="post-title-link" itemprop="url">Hardware Basic</a>
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2022-11-10 17:54:07" itemprop="dateCreated datePublished" datetime="2022-11-10T17:54:07+08:00">2022-11-10</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2022-11-14 11:11:48" itemprop="dateModified" datetime="2022-11-14T11:11:48+08:00">2022-11-14</time>
+              </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <h1 id="架构探索，基于tracing的方式，增大L2-size之类的，看看如何得到更好的架构"><a href="#架构探索，基于tracing的方式，增大L2-size之类的，看看如何得到更好的架构" class="headerlink" title="架构探索，基于tracing的方式，增大L2 size之类的，看看如何得到更好的架构"></a>架构探索，基于tracing的方式，增大L2 size之类的，看看如何得到更好的架构</h1><h1 id="C"><a href="#C" class="headerlink" title="C++"></a>C++</h1>
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
     <link itemprop="mainEntityOfPage" href="http://example.com/2022/11/09/Taichi-with-Colab/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -326,10 +390,16 @@
                 <i class="far fa-calendar"></i>
               </span>
               <span class="post-meta-item-text">发表于</span>
-              
 
-              <time title="创建时间：2022-11-09 11:08:43 / 修改时间：21:21:12" itemprop="dateCreated datePublished" datetime="2022-11-09T11:08:43+08:00">2022-11-09</time>
+              <time title="创建时间：2022-11-09 11:08:43" itemprop="dateCreated datePublished" datetime="2022-11-09T11:08:43+08:00">2022-11-09</time>
             </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2022-11-10 17:53:09" itemprop="dateModified" datetime="2022-11-10T17:53:09+08:00">2022-11-10</time>
+              </span>
 
           
 
@@ -343,9 +413,28 @@
 
       
           <h1 id="Introduction-amp-Motivation"><a href="#Introduction-amp-Motivation" class="headerlink" title="Introduction &amp; Motivation"></a>Introduction &amp; Motivation</h1><p>我们总是希望可以用计算机来模拟现实世界。现实世界则充斥着各种各样的“流体”，从我们呼吸所需要的空气，到生命的起源水。如何用计算机仿真这些物体呢？或者说，如何用计算机来把流体上的各种运动、现象模拟出来？例如河流流动，浪花四溅，烟雾扩散，火焰抖动。这些现象想一想就觉得非常美丽。这篇文章描述基本的流体力学方程，即模拟这一切现象所需要的基础知识。</p>
+<p>流体和固体的区别：固体内部可以有压力、拉力以及剪切力。而对于流体，它可以有压力，但你不能期望说像拉一个绳子一样拉流体，所以流体内部没有拉力；而且实验也证明，静止的流体内部没有剪切力。</p>
+<p>当流体流动的时候，就存在剪切力，例如水沿着水管流动，水管对水会有阻力。剪切力就是流体的黏性。除此之外，流体表面还存在着表面张力。</p>
 <p>我并不是图形学、流体力学的从业者、研究人员，只是一个业余爱好者。所参考的资料来自于 “Fluid Simulation for Computer Graphics”，这篇文章主要覆盖第一章的内容。有错误的地方希望可以指出。</p>
 <p>对于计算机模拟仿真这一领域来说，可以简单抽象为对要仿真的物体&#x2F;现象的建模以及求解。对于渲染，我们的建模是渲染方程，一个积分方程，然后用数值方法去求解这个积分方程；对于仿真，如流体，我们的建模其实是一个微分方程。接下来介绍，在流体力学仿真中，我们如何建立数学模型。</p>
-<h1 id="物理抽象与简化"><a href="#物理抽象与简化" class="headerlink" title="物理抽象与简化"></a>物理抽象与简化</h1><p>计算机只需要仿真出视觉效果即可。我们的视觉关注的是颜色、位置以及快慢这些信息。思考一下我们日常生活中的流体现象。我们先仿真速度和位置这两者。现在我们想象一个水流在重力作用下下落或者平抛。</p>
+<h1 id="物理抽象与简化"><a href="#物理抽象与简化" class="headerlink" title="物理抽象与简化"></a>物理抽象与简化</h1><h2 id="流体力学特点"><a href="#流体力学特点" class="headerlink" title="流体力学特点"></a>流体力学特点</h2><ul>
+<li>流体通过形变的管道时，流体会有较大的形变</li>
+</ul>
+<p>对于固体来说，收到外力发生剪切变形，固体内部会产生剪切力，阻止变形。剪切力的大小遵守胡克定律。</p>
+<p>对于流体来说，受到外力也会发生剪切变形，但由于流体内部无法产生平衡外力的剪切力，因此会不断变形，形成了流动。流体产生的剪切力的大小与相对运动的外壁的速度成正比。</p>
+<p>总结：<br>力与变形（运动）的关系不同<br>固体：应变与应力成正比 （静力分析）<br>流体：应力与应变率成正比 （动力学问题）</p>
+<ul>
+<li>解决问题的着眼点不同</li>
+</ul>
+<p>抛物体运动：研究的是运动的物体（拉格朗日方法）</p>
+<p>气流通过机翼的流动：研究着眼于空间，而不是流体本身（欧拉方法）</p>
+<p>理解了流动的原理是非常重要的，对于流体力学的数值模拟非常重要。</p>
+<h1 id="粘性的本质"><a href="#粘性的本质" class="headerlink" title="粘性的本质"></a>粘性的本质</h1><p>沥青滴落实验：</p>
+<p>沥青滴落的时候，相当于沥青被拉长，被拉长的物体内部就会有剪切力。</p>
+<p>粘性就是阻碍流体流动的特性，这是因为流体在持续剪切变形时，在内部会产生剪切力。可以类比动摩擦力</p>
+<p>粘性力是流体流动的时候才有的力，在静止的时候，没有剪切变形，因此没有粘性力。 </p>
+<p>一个问题，小水滴可以静止得悬浮在玻璃表面上，分析受力：<br>简单看一下，似乎是水珠和玻璃上有“摩擦力”（剪切力），但实际上不是，流体静止的时候没有剪切力。<br>这个其实是吸附力，而表面张力保持小水珠存在。表面张力静止时候也存在，“吸力”导致他在玻璃壁上了。  </p>
+<p>计算机只需要仿真出视觉效果即可。我们的视觉关注的是颜色、位置以及快慢这些信息。思考一下我们日常生活中的流体现象。我们先仿真速度和位置这两者。现在我们想象一个水流在重力作用下下落或者平抛。</p>
 <p>可以观察到这几点：水流内部，每个水滴都精密相邻，一个水滴被周围水滴挤压着向着一定方向移动，水流整体呈现出一个统一的自由落体趋势；水流边界，边界的水滴类似包围着内部的水滴，让水滴不会到处泄露。</p>
 
       
@@ -560,7 +649,7 @@
       <div class="site-state-item site-state-posts">
           <a href="/archives/">
         
-          <span class="site-state-item-count">5</span>
+          <span class="site-state-item-count">6</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>
