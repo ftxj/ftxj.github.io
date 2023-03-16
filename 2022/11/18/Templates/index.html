@@ -20,15 +20,19 @@
     var CONFIG = {"hostname":"example.com","root":"/","scheme":"Gemini","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}}};
   </script>
 
-  <meta property="og:type" content="website">
-<meta property="og:title" content="ftxj&#39;s website">
-<meta property="og:url" content="http://example.com/archives/index.html">
+  <meta name="description" content="知识点：函数模板，类模板，变长模板，非类型模板，成员函数模板，变量模板，template template，typenamesizeof…, flod expressions, Motivation：为什么需要 template？针对不同类型，实现同样的功能，可以用template实现。其他方法：针对 Object* 来实现template？不行，type checking 实现：common_t">
+<meta property="og:type" content="article">
+<meta property="og:title" content="C++ Templates Basic">
+<meta property="og:url" content="http://example.com/2022/11/18/Templates/index.html">
 <meta property="og:site_name" content="ftxj&#39;s website">
+<meta property="og:description" content="知识点：函数模板，类模板，变长模板，非类型模板，成员函数模板，变量模板，template template，typenamesizeof…, flod expressions, Motivation：为什么需要 template？针对不同类型，实现同样的功能，可以用template实现。其他方法：针对 Object* 来实现template？不行，type checking 实现：common_t">
 <meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2022-11-18T03:24:47.000Z">
+<meta property="article:modified_time" content="2022-11-19T08:29:45.040Z">
 <meta property="article:author" content="ftxj">
 <meta name="twitter:card" content="summary">
 
-<link rel="canonical" href="http://example.com/archives/">
+<link rel="canonical" href="http://example.com/2022/11/18/Templates/">
 
 
 <script id="page-configurations">
@@ -36,12 +40,12 @@
   CONFIG.page = {
     sidebar: "",
     isHome : false,
-    isPost : false,
+    isPost : true,
     lang   : 'zh-CN'
   };
 </script>
 
-  <title>归档 | ftxj's website</title>
+  <title>C++ Templates Basic | ftxj's website</title>
   
 
 
@@ -169,190 +173,102 @@
         <div class="content-wrap">
           
 
-          <div class="content archive">
+          <div class="content post posts-expand">
             
 
+    
   
   
-  
-  <div class="post-block">
-    <div class="posts-collapse">
-      <div class="collection-title">
-        <span class="collection-header">嗯..! 目前共计 8 篇日志。 继续努力。</span>
-      </div>
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2022/11/18/Templates/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="ftxj">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="ftxj's website">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          C++ Templates Basic
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2022-11-18 11:24:47" itemprop="dateCreated datePublished" datetime="2022-11-18T11:24:47+08:00">2022-11-18</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2022-11-19 16:29:45" itemprop="dateModified" datetime="2022-11-19T16:29:45+08:00">2022-11-19</time>
+              </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
 
       
-    <div class="collection-year">
-      <span class="collection-header">2022</span>
-    </div>
-
-  <article itemscope itemtype="http://schema.org/Article">
-    <header class="post-header">
-
-      <div class="post-meta">
-        <time itemprop="dateCreated"
-              datetime="2022-11-18T11:24:47+08:00"
-              content="2022-11-18">
-          11-18
-        </time>
-      </div>
-
-      <div class="post-title">
-          <a class="post-title-link" href="/2022/11/18/Templates/" itemprop="url">
-            <span itemprop="name">C++ Templates Basic</span>
-          </a>
-      </div>
-
-    </header>
-  </article>
-
-  <article itemscope itemtype="http://schema.org/Article">
-    <header class="post-header">
-
-      <div class="post-meta">
-        <time itemprop="dateCreated"
-              datetime="2022-11-14T19:17:43+08:00"
-              content="2022-11-14">
-          11-14
-        </time>
-      </div>
-
-      <div class="post-title">
-          <a class="post-title-link" href="/2022/11/14/cpp-debugging-tech/" itemprop="url">
-            <span itemprop="name">CPP 中的调试技术</span>
-          </a>
-      </div>
-
-    </header>
-  </article>
-
-  <article itemscope itemtype="http://schema.org/Article">
-    <header class="post-header">
-
-      <div class="post-meta">
-        <time itemprop="dateCreated"
-              datetime="2022-11-10T17:54:07+08:00"
-              content="2022-11-10">
-          11-10
-        </time>
-      </div>
-
-      <div class="post-title">
-          <a class="post-title-link" href="/2022/11/10/Hardware-Basic/" itemprop="url">
-            <span itemprop="name">Hardware Basic</span>
-          </a>
-      </div>
-
-    </header>
-  </article>
-
-  <article itemscope itemtype="http://schema.org/Article">
-    <header class="post-header">
-
-      <div class="post-meta">
-        <time itemprop="dateCreated"
-              datetime="2022-11-09T21:09:45+08:00"
-              content="2022-11-09">
-          11-09
-        </time>
-      </div>
-
-      <div class="post-title">
-          <a class="post-title-link" href="/2022/11/09/Taichi-with-Colab/" itemprop="url">
-            <span itemprop="name">在 Colab 上运行 TaiChi 图形应用</span>
-          </a>
-      </div>
-
-    </header>
-  </article>
-
-  <article itemscope itemtype="http://schema.org/Article">
-    <header class="post-header">
-
-      <div class="post-meta">
-        <time itemprop="dateCreated"
-              datetime="2022-11-09T13:15:25+08:00"
-              content="2022-11-09">
-          11-09
-        </time>
-      </div>
-
-      <div class="post-title">
-          <a class="post-title-link" href="/2022/11/09/Background-of-Fluid-Mathmatics/" itemprop="url">
-            <span itemprop="name">Background of Fluid Mathmatics</span>
-          </a>
-      </div>
-
-    </header>
-  </article>
-
-  <article itemscope itemtype="http://schema.org/Article">
-    <header class="post-header">
-
-      <div class="post-meta">
-        <time itemprop="dateCreated"
-              datetime="2022-11-09T11:08:43+08:00"
-              content="2022-11-09">
-          11-09
-        </time>
-      </div>
-
-      <div class="post-title">
-          <a class="post-title-link" href="/2022/11/09/The-Equations-of-Fluids/" itemprop="url">
-            <span itemprop="name">流体力学方程（For Computer Graphic）</span>
-          </a>
-      </div>
-
-    </header>
-  </article>
-
-  <article itemscope itemtype="http://schema.org/Article">
-    <header class="post-header">
-
-      <div class="post-meta">
-        <time itemprop="dateCreated"
-              datetime="2022-11-09T00:31:33+08:00"
-              content="2022-11-09">
-          11-09
-        </time>
-      </div>
-
-      <div class="post-title">
-          <a class="post-title-link" href="/2022/11/09/Paper-Reading-Hyper-AP-Enhancing-Associative-Processing-Through-a-Full-Stack-Optimization/" itemprop="url">
-            <span itemprop="name">[Paper Reading] Hyper-AP:Enhancing Associative Processing Through a Full-Stack Optimization</span>
-          </a>
-      </div>
-
-    </header>
-  </article>
-
-  <article itemscope itemtype="http://schema.org/Article">
-    <header class="post-header">
-
-      <div class="post-meta">
-        <time itemprop="dateCreated"
-              datetime="2022-11-09T00:00:57+08:00"
-              content="2022-11-09">
-          11-09
-        </time>
-      </div>
-
-      <div class="post-title">
-          <a class="post-title-link" href="/2022/11/09/hello-world/" itemprop="url">
-            <span itemprop="name">Hello World</span>
-          </a>
-      </div>
-
-    </header>
-  </article>
-
+        <p>知识点：函数模板，类模板，变长模板，非类型模板，成员函数模板，变量模板，template template，typename<br>sizeof…, flod expressions,</p>
+<h1 id="Motivation：为什么需要-template？"><a href="#Motivation：为什么需要-template？" class="headerlink" title="Motivation：为什么需要 template？"></a>Motivation：为什么需要 template？</h1><p>针对不同类型，实现同样的功能，可以用template实现。<br>其他方法：针对 Object* 来实现template？不行，type checking</p>
+<p>实现：common_type&lt;&gt;, decay&lt;&gt;, decltype</p>
 
     </div>
-  </div>
-  
-  
-  
 
+    
+    
+    
+        
+
+<div>
+<ul class="post-copyright">
+  <li class="post-copyright-author">
+    <strong>本文作者： </strong>ftxj
+  </li>
+  <li class="post-copyright-link">
+    <strong>本文链接：</strong>
+    <a href="http://example.com/2022/11/18/Templates/" title="C++ Templates Basic">http://example.com/2022/11/18/Templates/</a>
+  </li>
+  <li class="post-copyright-license">
+    <strong>版权声明： </strong>本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" rel="noopener" target="_blank"><i class="fab fa-fw fa-creative-commons"></i>BY-NC-SA</a> 许可协议。转载请注明出处！
+  </li>
+</ul>
+</div>
+
+
+      <footer class="post-footer">
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2022/11/14/cpp-debugging-tech/" rel="prev" title="CPP 中的调试技术">
+      <i class="fa fa-chevron-left"></i> CPP 中的调试技术
+    </a></div>
+      <div class="post-nav-item"></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
   
 
 
@@ -405,6 +321,7 @@
 
       <!--noindex-->
       <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#Motivation%EF%BC%9A%E4%B8%BA%E4%BB%80%E4%B9%88%E9%9C%80%E8%A6%81-template%EF%BC%9F"><span class="nav-number">1.</span> <span class="nav-text">Motivation：为什么需要 template？</span></a></li></ol></div>
       </div>
       <!--/noindex-->
 
