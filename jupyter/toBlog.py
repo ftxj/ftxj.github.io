@@ -35,6 +35,8 @@ tags: {2}
 
 
 def write_meta_info():
+    if(not os.path.exists(args.path)):
+        return
     with open(args.path, "r+") as f:
         old = f.read()
         lines = old.splitlines()
@@ -47,10 +49,16 @@ def write_meta_info():
 
 def post_this_md():
     original_path = args.path
+    if(not os.path.exists(args.path)):
+        os.system(
+            "cd ..; git add .; git commit -m 'add {0}'; git push; cd ..;".format("update script"))
+        return
     new_path = "../_posts/" + get_file_name(args.path) + ".md"
-    os.system("cp {0} {1}".format(original_path, new_path))
-    os.system(
-        "cd ..; git add .; git commit -m 'add {0}'; git push".format(get_file_name))
+    if(not os.path.exists(new_path)):
+        os.system("cp {0} {1}".format(original_path, new_path))
+        os.system(
+            "cd ..; git add .; git commit -m 'add {0}'; git push; cd ..;".format(get_file_name()))
+        return
 
 
 write_meta_info()
