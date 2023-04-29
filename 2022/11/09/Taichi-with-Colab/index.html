@@ -17,13 +17,13 @@
 
 <script id="hexo-configurations">
     var NexT = window.NexT || {};
-    var CONFIG = {"hostname":"example.com","root":"/","scheme":"Gemini","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}}};
+    var CONFIG = {"hostname":"ftxj.github.io.com","root":"/","scheme":"Gemini","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}}};
   </script>
 
   <meta name="description" content="最近由于一些个人兴趣，想研究一下taichi系统。由于自己想要将一部分代码通过Colab共享出去，因此有了这篇探索。 主要的坑点在于，Colab 不能直接支持 taichi 的 GUI 系统。我自己并不像折腾什么 x11 forwaring 等技术，等有成熟的技术直接拿来用比较好。 因此，在没有 GUI 系统的前提下， taichi的运行结果直接保存为视频和gif，使用接口如下： 1234567r">
 <meta property="og:type" content="article">
 <meta property="og:title" content="在 Colab 上运行 TaiChi 图形应用">
-<meta property="og:url" content="http://example.com/2022/11/09/Taichi-with-Colab/index.html">
+<meta property="og:url" content="http://ftxj.github.io.com/2022/11/09/Taichi-with-Colab/index.html">
 <meta property="og:site_name" content="ftxj&#39;s website">
 <meta property="og:description" content="最近由于一些个人兴趣，想研究一下taichi系统。由于自己想要将一部分代码通过Colab共享出去，因此有了这篇探索。 主要的坑点在于，Colab 不能直接支持 taichi 的 GUI 系统。我自己并不像折腾什么 x11 forwaring 等技术，等有成熟的技术直接拿来用比较好。 因此，在没有 GUI 系统的前提下， taichi的运行结果直接保存为视频和gif，使用接口如下： 1234567r">
 <meta property="og:locale" content="zh_CN">
@@ -33,7 +33,7 @@
 <meta property="article:tag" content="环境搭建">
 <meta name="twitter:card" content="summary">
 
-<link rel="canonical" href="http://example.com/2022/11/09/Taichi-with-Colab/">
+<link rel="canonical" href="http://ftxj.github.io.com/2022/11/09/Taichi-with-Colab/">
 
 
 <script id="page-configurations">
@@ -143,6 +143,11 @@
     <a href="/schedule/" rel="section"><i class="fa fa-calendar fa-fw"></i>日程表</a>
 
   </li>
+        <li class="menu-item menu-item-resume">
+
+    <a href="/html/resume.html" rel="section"><i class="fa fa-html fa-fw"></i>resume</a>
+
+  </li>
   </ul>
 </nav>
 
@@ -171,7 +176,7 @@
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="http://example.com/2022/11/09/Taichi-with-Colab/">
+    <link itemprop="mainEntityOfPage" href="http://ftxj.github.io.com/2022/11/09/Taichi-with-Colab/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="image" content="/images/avatar.gif">
@@ -231,7 +236,7 @@
   </li>
   <li class="post-copyright-link">
     <strong>本文链接：</strong>
-    <a href="http://example.com/2022/11/09/Taichi-with-Colab/" title="在 Colab 上运行 TaiChi 图形应用">http://example.com/2022/11/09/Taichi-with-Colab/</a>
+    <a href="http://ftxj.github.io.com/2022/11/09/Taichi-with-Colab/" title="在 Colab 上运行 TaiChi 图形应用">http://ftxj.github.io.com/2022/11/09/Taichi-with-Colab/</a>
   </li>
   <li class="post-copyright-license">
     <strong>版权声明： </strong>本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" rel="noopener" target="_blank"><i class="fab fa-fw fa-creative-commons"></i>BY-NC-SA</a> 许可协议。转载请注明出处！
