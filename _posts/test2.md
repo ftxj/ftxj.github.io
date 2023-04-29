@@ -1,4 +1,3 @@
-<!-- toBlog..runed -->
 ---
 layout:
   - post
