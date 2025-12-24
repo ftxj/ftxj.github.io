@@ -1,0 +1,10 @@
+/* Custom styles to show list bullets */
+.content ul {
+    list-style: disc !important;
+    padding-left: 2rem !important;
+}
+
+.content ul li {
+    display: list-item !important;
+}
+

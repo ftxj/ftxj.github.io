@@ -1,0 +1,18 @@
+# Hugo Source Files
+
+# Hugo build output
+/public/
+/resources/_gen/
+
+# macOS
+.DS_Store
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# Temporary files
+*~
+

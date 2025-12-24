@@ -1,0 +1,47 @@
+baseURL = "https://ftxj.github.io/"
+title = "JXIN's Home"
+theme = "hugo-coder"
+languageCode = "en"
+defaultContentLanguage = "en"
+enableEmoji = true
+
+[pagination]
+pagerSize = 20
+
+[params]
+author = "Jie Xin"
+description = "Jie's personal website"
+keywords = "blog,developer,personal"
+info = ["Senior NVIDIA Compute Architect"]
+avatarURL = "images/transformer.png"
+dateFormat = "January 2, 2006"
+since = 2019
+colorScheme = "auto"
+hideColorSchemeToggle = false
+
+[[params.social]]
+name = "Github"
+icon = "fa-brands fa-github"
+weight = 1
+url = "https://github.com/ftxj/"
+
+[[params.social]]
+name = "Email"
+icon = "fa-solid fa-envelope"
+weight = 2
+url = "mailto:jiexin@nvidia.com"
+
+[languages.en]
+languageName = ":uk:"
+
+[[languages.en.menu.main]]
+name = "About"
+weight = 1
+url = "about/"
+
+[markup.highlight]
+style = "github-dark"
+noClasses = false
+
+[markup.goldmark.renderer]
+unsafe = true
