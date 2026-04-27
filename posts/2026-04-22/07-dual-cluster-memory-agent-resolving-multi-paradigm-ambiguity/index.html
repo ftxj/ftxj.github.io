@@ -1,0 +1,373 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <title>
+  Dual-Cluster Memory Agent: Resolving Multi-Paradigm Ambiguity in Optimization Problem Solving · JXIN&#39;s Home
+</title>
+  <meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="color-scheme" content="light dark">
+
+
+
+
+<meta name="author" content="Jie Xin">
+<meta name="description" content="arXiv: 2604.20183 · PDF
+Authors: Xinyu Zhang, Yuchen Wan, Boxuan Zhang, Zesheng Yang, Lingling Zhang, Bifan Wei, Jun Liu
+Primary category: cs.CL · all: cs.CL
+Matched keywords: large language model, llm, agent, rag, reasoning, inference
+
+TL;DR
+DCM-Agent is a training-free framework that resolves structural ambiguity in LLM-based optimization problem solving by maintaining dual clusters of historical solutions (modeling &#43; coding), distilled into Approach/Checklist/Pitfall knowledge, and using them for memory-augmented inference.
+Key Ideas
+
+Optimization problems suffer from multi-paradigm ambiguity that confuses LLMs.
+Split memory into two clusters: modeling and coding.
+Distill each cluster into three structured knowledge types: Approach, Checklist, Pitfall.
+Use memory at inference for path navigation, error repair, and adaptive switching.
+Observed &ldquo;knowledge inheritance&rdquo;: memory from larger models lifts smaller models.
+
+Approach
+The Dual-Cluster Memory Construction step routes prior solutions into modeling vs. coding clusters, then distills generalizable guidance into structured Approach / Checklist / Pitfall entries. At inference, the agent retrieves relevant memory to pick a reasoning path, detects and repairs errors, and adaptively switches paradigms. The entire pipeline is training-free, relying on prompting plus a structured memory bank.">
+<meta name="keywords" content="blog,developer,personal">
+
+
+
+  <meta name="twitter:card" content="summary">
+  <meta name="twitter:title" content="Dual-Cluster Memory Agent: Resolving Multi-Paradigm Ambiguity in Optimization Problem Solving">
+  <meta name="twitter:description" content="arXiv: 2604.20183 · PDF
+Authors: Xinyu Zhang, Yuchen Wan, Boxuan Zhang, Zesheng Yang, Lingling Zhang, Bifan Wei, Jun Liu
+Primary category: cs.CL · all: cs.CL
+Matched keywords: large language model, llm, agent, rag, reasoning, inference
+TL;DR DCM-Agent is a training-free framework that resolves structural ambiguity in LLM-based optimization problem solving by maintaining dual clusters of historical solutions (modeling &#43; coding), distilled into Approach/Checklist/Pitfall knowledge, and using them for memory-augmented inference.
+Key Ideas Optimization problems suffer from multi-paradigm ambiguity that confuses LLMs. Split memory into two clusters: modeling and coding. Distill each cluster into three structured knowledge types: Approach, Checklist, Pitfall. Use memory at inference for path navigation, error repair, and adaptive switching. Observed “knowledge inheritance”: memory from larger models lifts smaller models. Approach The Dual-Cluster Memory Construction step routes prior solutions into modeling vs. coding clusters, then distills generalizable guidance into structured Approach / Checklist / Pitfall entries. At inference, the agent retrieves relevant memory to pick a reasoning path, detects and repairs errors, and adaptively switches paradigms. The entire pipeline is training-free, relying on prompting plus a structured memory bank.">
+
+<meta property="og:url" content="https://ftxj.github.io/posts/2026-04-22/07-dual-cluster-memory-agent-resolving-multi-paradigm-ambiguity/">
+  <meta property="og:site_name" content="JXIN&#39;s Home">
+  <meta property="og:title" content="Dual-Cluster Memory Agent: Resolving Multi-Paradigm Ambiguity in Optimization Problem Solving">
+  <meta property="og:description" content="arXiv: 2604.20183 · PDF
+Authors: Xinyu Zhang, Yuchen Wan, Boxuan Zhang, Zesheng Yang, Lingling Zhang, Bifan Wei, Jun Liu
+Primary category: cs.CL · all: cs.CL
+Matched keywords: large language model, llm, agent, rag, reasoning, inference
+TL;DR DCM-Agent is a training-free framework that resolves structural ambiguity in LLM-based optimization problem solving by maintaining dual clusters of historical solutions (modeling &#43; coding), distilled into Approach/Checklist/Pitfall knowledge, and using them for memory-augmented inference.
+Key Ideas Optimization problems suffer from multi-paradigm ambiguity that confuses LLMs. Split memory into two clusters: modeling and coding. Distill each cluster into three structured knowledge types: Approach, Checklist, Pitfall. Use memory at inference for path navigation, error repair, and adaptive switching. Observed “knowledge inheritance”: memory from larger models lifts smaller models. Approach The Dual-Cluster Memory Construction step routes prior solutions into modeling vs. coding clusters, then distills generalizable guidance into structured Approach / Checklist / Pitfall entries. At inference, the agent retrieves relevant memory to pick a reasoning path, detects and repairs errors, and adaptively switches paradigms. The entire pipeline is training-free, relying on prompting plus a structured memory bank.">
+  <meta property="og:locale" content="en">
+  <meta property="og:type" content="article">
+    <meta property="article:section" content="posts">
+    <meta property="article:published_time" content="2026-04-27T05:14:56+00:00">
+    <meta property="article:modified_time" content="2026-04-27T05:14:56+00:00">
+
+
+
+
+<link rel="canonical" href="https://ftxj.github.io/posts/2026-04-22/07-dual-cluster-memory-agent-resolving-multi-paradigm-ambiguity/">
+
+
+<link rel="preload" href="/fonts/fa-brands-400.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="/fonts/fa-regular-400.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="/fonts/fa-solid-900.woff2" as="font" type="font/woff2" crossorigin>
+
+
+  
+  
+  <link rel="stylesheet" href="/css/coder.min.5e94c1acf7aa2066035cf2764ae3e4fe39db101d68b870f919966100d51fb861.css" integrity="sha256-XpTBrPeqIGYDXPJ2SuPk/jnbEB1ouHD5GZZhANUfuGE=" crossorigin="anonymous" media="screen" />
+
+
+
+
+
+
+  
+    
+    
+    <link rel="stylesheet" href="/css/coder-dark.min.a00e6364bacbc8266ad1cc81230774a1397198f8cfb7bcba29b7d6fcb54ce57f.css" integrity="sha256-oA5jZLrLyCZq0cyBIwd0oTlxmPjPt7y6KbfW/LVM5X8=" crossorigin="anonymous" media="screen" />
+  
+
+
+
+ 
+
+
+
+
+<link rel="icon" type="image/svg+xml" href="/images/favicon.svg" sizes="any">
+<link rel="icon" type="image/png" href="/images/favicon-32x32.png" sizes="32x32">
+<link rel="icon" type="image/png" href="/images/favicon-16x16.png" sizes="16x16">
+
+<link rel="apple-touch-icon" href="/images/apple-touch-icon.png">
+<link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon.png">
+
+<link rel="manifest" href="/site.webmanifest">
+<link rel="mask-icon" href="/images/safari-pinned-tab.svg" color="#5bbad5">
+
+
+
+
+
+
+<style>
+.content article ul {
+  list-style: disc !important;
+  padding-left: 2.5rem !important;
+}
+
+.content article ul li {
+  display: list-item !important;
+}
+</style>
+
+
+
+
+  
+</head>
+
+
+
+
+
+
+<body class="preload-transitions colorscheme-auto">
+  
+<div class="float-container">
+    <a id="dark-mode-toggle" class="colorscheme-toggle">
+        <i class="fa-solid fa-adjust fa-fw" aria-hidden="true"></i>
+    </a>
+</div>
+
+
+  <main class="wrapper">
+    <nav class="navigation">
+  <section class="container">
+    
+    <a class="navigation-title" href="https://ftxj.github.io/">
+      JXIN&#39;s Home
+    </a>
+    
+    
+      <input type="checkbox" id="menu-toggle" />
+      <label class="menu-button float-right" for="menu-toggle">
+        <i class="fa-solid fa-bars fa-fw" aria-hidden="true"></i>
+      </label>
+      <ul class="navigation-list">
+        
+          
+            <li class="navigation-item">
+              <a class="navigation-link " href="/about/">About</a>
+            </li>
+          
+            <li class="navigation-item">
+              <a class="navigation-link " href="/travel/">Travel</a>
+            </li>
+          
+            <li class="navigation-item">
+              <a class="navigation-link " href="/posts/">Blog</a>
+            </li>
+          
+            <li class="navigation-item">
+              <a class="navigation-link " href="https://ftxj.github.io/cv/cv.pdf">CV</a>
+            </li>
+          
+        
+        
+          
+          
+          
+            
+              
+                <li class="navigation-item menu-separator">
+                  <span>|</span>
+                </li>
+                
+              
+              <li class="navigation-item">
+                <a href="/zh/posts/2026-04-22/07-dual-cluster-memory-agent-resolving-multi-paradigm-ambiguity/">中文</a>
+              </li>
+            
+          
+        
+      </ul>
+    
+  </section>
+</nav>
+
+
+    <div class="content">
+      
+  <section class="container post">
+    <article>
+      <header>
+        <div class="post-title">
+          <h1 class="title">
+            <a class="title-link" href="https://ftxj.github.io/posts/2026-04-22/07-dual-cluster-memory-agent-resolving-multi-paradigm-ambiguity/">
+              Dual-Cluster Memory Agent: Resolving Multi-Paradigm Ambiguity in Optimization Problem Solving
+            </a>
+          </h1>
+        </div>
+        <div class="post-meta">
+          <div class="date">
+            <span class="posted-on">
+              <i class="fa-solid fa-calendar" aria-hidden="true"></i>
+              <time datetime="2026-04-27T05:14:56Z">
+                April 27, 2026
+              </time>
+            </span>
+            <span class="reading-time">
+              <i class="fa-solid fa-clock" aria-hidden="true"></i>
+              3-minute read
+            </span>
+          </div>
+          
+          <div class="categories">
+  <i class="fa-solid fa-folder" aria-hidden="true"></i>
+    <a href="/categories/paper-digest/">Paper-Digest</a>
+      <span class="separator">•</span>
+    <a href="/categories/2026-04-22/">2026-04-22</a></div>
+
+          
+        </div>
+      </header>
+
+      
+
+
+      <div class="post-content">
+        
+        <p><strong>arXiv:</strong> <a href="https://arxiv.org/abs/2604.20183v1">2604.20183</a> · <a href="https://arxiv.org/pdf/2604.20183v1">PDF</a></p>
+<p><strong>Authors:</strong> Xinyu Zhang, Yuchen Wan, Boxuan Zhang, Zesheng Yang, Lingling Zhang, Bifan Wei, Jun Liu</p>
+<p><strong>Primary category:</strong> <code>cs.CL</code> · all: cs.CL</p>
+<p><strong>Matched keywords:</strong> large language model, llm, agent, rag, reasoning, inference</p>
+<hr>
+<h2 id="tldr">TL;DR</h2>
+<p>DCM-Agent is a training-free framework that resolves structural ambiguity in LLM-based optimization problem solving by maintaining dual clusters of historical solutions (modeling + coding), distilled into Approach/Checklist/Pitfall knowledge, and using them for memory-augmented inference.</p>
+<h2 id="key-ideas">Key Ideas</h2>
+<ul>
+<li>Optimization problems suffer from multi-paradigm ambiguity that confuses LLMs.</li>
+<li>Split memory into two clusters: modeling and coding.</li>
+<li>Distill each cluster into three structured knowledge types: Approach, Checklist, Pitfall.</li>
+<li>Use memory at inference for path navigation, error repair, and adaptive switching.</li>
+<li>Observed &ldquo;knowledge inheritance&rdquo;: memory from larger models lifts smaller models.</li>
+</ul>
+<h2 id="approach">Approach</h2>
+<p>The Dual-Cluster Memory Construction step routes prior solutions into modeling vs. coding clusters, then distills generalizable guidance into structured Approach / Checklist / Pitfall entries. At inference, the agent retrieves relevant memory to pick a reasoning path, detects and repairs errors, and adaptively switches paradigms. The entire pipeline is training-free, relying on prompting plus a structured memory bank.</p>
+<h2 id="experiments">Experiments</h2>
+<p>Evaluated across seven optimization benchmarks (specific names not listed in abstract) against presumably standard LLM agent baselines. Metric is solution performance/accuracy on optimization tasks. Also ablates cross-model memory transfer (large-model memory used by smaller models).</p>
+<h2 id="results">Results</h2>
+<p>Reports an average improvement of 11%–21% across the seven benchmarks. Highlights a knowledge inheritance effect where memory built by larger models boosts smaller models&rsquo; performance. Abstract does not give per-benchmark numbers or baseline identities, so magnitude claims cannot be fully verified from the abstract alone.</p>
+<h2 id="why-it-matters">Why It Matters</h2>
+<p>Gives agent/LLM practitioners a training-free recipe for handling structurally ambiguous tasks where multiple valid modeling paradigms compete (e.g., OR, MILP, convex formulations). The dual-cluster + structured-distillation pattern is reusable for any domain with a model/code split, and the inheritance effect hints at cheap deployment: build memory once with a strong model, reuse with cheaper ones.</p>
+<h2 id="connections-to-prior-work">Connections to Prior Work</h2>
+<ul>
+<li>Memory-augmented LLM agents (MemGPT, Reflexion, Generative Agents).</li>
+<li>Retrieval-augmented generation and case-based reasoning for code/math.</li>
+<li>LLMs for operations research / optimization modeling (Chain-of-Experts, OptiMUS).</li>
+<li>Self-refine / self-debug loops for error repair.</li>
+<li>Knowledge distillation and weak-to-strong / strong-to-weak transfer.</li>
+</ul>
+<h2 id="open-questions">Open Questions</h2>
+<ul>
+<li>Which benchmarks and baselines exactly, and how do per-task gains distribute?</li>
+<li>How is cluster assignment done, and how robust is it to noisy/incorrect history?</li>
+<li>Memory growth, retrieval latency, and scalability to very large corpora?</li>
+<li>Does inheritance hold across architectures/families, or only within one family?</li>
+<li>Generalization beyond optimization to other multi-paradigm domains (proofs, SQL, planning)?</li>
+</ul>
+<hr>
+<h2 id="figures">Figures</h2>
+<p><strong>Figure 1:</strong> Page 2 (rendered)</p>
+<p><img alt="Figure 1" src="/images/papers/2604.20183/page1.png"></p>
+<p><strong>Figure 2:</strong> Page 3 (rendered)</p>
+<p><img alt="Figure 2" src="/images/papers/2604.20183/page2.png"></p>
+<p><strong>Figure 3:</strong> Page 4 (rendered)</p>
+<p><img alt="Figure 3" src="/images/papers/2604.20183/page3.png"></p>
+<hr>
+<h2 id="original-abstract">Original abstract</h2>
+<p>Large Language Models (LLMs) often struggle with structural ambiguity in optimization problems, where a single problem admits multiple related but conflicting modeling paradigms, hindering effective solution generation. To address this, we propose Dual-Cluster Memory Agent (DCM-Agent) to enhance performance by leveraging historical solutions in a training-free manner. Central to this is Dual-Cluster Memory Construction. This agent assigns historical solutions to modeling and coding clusters, then distills each cluster&rsquo;s content into three structured types: Approach, Checklist, and Pitfall. This process derives generalizable guidance knowledge. Furthermore, this agent introduces Memory-augmented Inference to dynamically navigate solution paths, detect and repair errors, and adaptively switch reasoning paths with structured knowledge. The experiments across seven optimization benchmarks demonstrate that DCM-Agent achieves an average performance improvement of 11%- 21%. Notably, our analysis reveals a ``knowledge inheritance&rsquo;&rsquo; phenomenon: memory constructed by larger models can guide smaller models toward superior performance, highlighting the framework&rsquo;s scalability and efficiency.</p>
+
+      </div>
+
+
+      <footer>
+        
+
+
+        
+        
+        
+        
+        
+        
+        
+      </footer>
+    </article>
+
+    
+  </section>
+
+    </div>
+
+    <footer class="footer">
+  <section class="container">
+    ©
+    
+      2019 -
+    
+    2026
+     Jie Xin 
+    ·
+    
+    Powered by <a href="https://gohugo.io/" target="_blank" rel="noopener">Hugo</a> & <a href="https://github.com/luizdepra/hugo-coder/" target="_blank" rel="noopener">Coder</a>.
+    
+  </section>
+</footer>
+
+  </main>
+
+  
+
+  
+  
+  <script src="/js/coder.min.6ae284be93d2d19dad1f02b0039508d9aab3180a12a06dcc71b0b0ef7825a317.js" integrity="sha256-auKEvpPS0Z2tHwKwA5UI2aqzGAoSoG3McbCw73gloxc="></script>
+  
+
+  
+
+  
+
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+</body>
+</html>

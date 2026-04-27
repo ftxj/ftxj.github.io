@@ -1,0 +1,398 @@
+<!DOCTYPE html>
+<html lang="zh">
+
+<head>
+  <title>
+  HybridGen: Efficient LLM Generative Inference via CPU-GPU Hybrid Computing · JXIN&#39;s Home
+</title>
+  <meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="color-scheme" content="light dark">
+
+
+
+
+<meta name="author" content="Jie Xin">
+<meta name="description" content="arXiv: 2604.18529 · PDF
+作者: Mao Lin, Xi Wang, Guilherme Cox, Dong Li, Hyeran Jeon
+主分类: cs.PF · 全部: cs.DC, cs.PF
+命中关键词: llm, rag, inference, kv cache, parallelism, attention, gpu, scheduler
+
+TL;DR
+HybridGen 提出 CPU-GPU 协同 attention 框架，配合 CXL 扩展内存，针对长上下文 LLM 推理在六种 KV cache 管理基线上平均加速 1.41×–3.2×。
+核心观点
+
+现有 KV cache pruning/offloading 只用单侧算力，CPU 本地内存也未充分利用。
+在 CXL 分层内存系统上，CPU 与 GPU 可协同完成 attention 计算。
+需要同时解决多维依赖、长序列负载失衡、NUMA 惩罚三大难题。
+
+方法
+
+Attention logit parallelism：拆分 attention 计算维度，允许 CPU-GPU 并行处理不同 logit 片段，打破多维依赖瓶颈。
+Feedback-driven scheduler：动态根据运行时负载在 CPU 与 GPU 之间再分配任务，缓解长序列场景的失衡。
+Semantic-aware KV cache mapping：按语义将 KV cache 映射到分层内存（本地 DRAM 与 CXL 扩展内存），降低 NUMA 访问代价。
+
+实验
+
+模型：3 种 LLM，11 种不同参数规模。
+平台：3 种 GPU 系统，配备 CXL 扩展内存。
+基线：6 种 SOTA KV cache 管理方法（pruning、offloading 系列）。
+指标：推理吞吐/延迟加速比 &#43; 精度。
+
+结果
+
+相对 6 个基线平均加速 1.41×–3.2×。
+精度保持优于或不逊于现有方法。
+具体每个模型/平台的拆分数字摘要未给出。
+
+为什么重要
+对长上下文 LLM 推理基础设施团队，它展示了 CXL 分层内存 &#43; CPU-GPU 协同 attention 的可行路径，避免单纯 offload 造成的带宽闲置，为百 GB 级 KV cache 部署提供新思路。">
+<meta name="keywords" content="blog,developer,personal">
+
+
+
+  <meta name="twitter:card" content="summary">
+  <meta name="twitter:title" content="HybridGen: Efficient LLM Generative Inference via CPU-GPU Hybrid Computing">
+  <meta name="twitter:description" content="arXiv: 2604.18529 · PDF
+作者: Mao Lin, Xi Wang, Guilherme Cox, Dong Li, Hyeran Jeon
+主分类: cs.PF · 全部: cs.DC, cs.PF
+命中关键词: llm, rag, inference, kv cache, parallelism, attention, gpu, scheduler
+TL;DR HybridGen 提出 CPU-GPU 协同 attention 框架，配合 CXL 扩展内存，针对长上下文 LLM 推理在六种 KV cache 管理基线上平均加速 1.41×–3.2×。
+核心观点 现有 KV cache pruning/offloading 只用单侧算力，CPU 本地内存也未充分利用。 在 CXL 分层内存系统上，CPU 与 GPU 可协同完成 attention 计算。 需要同时解决多维依赖、长序列负载失衡、NUMA 惩罚三大难题。 方法 Attention logit parallelism：拆分 attention 计算维度，允许 CPU-GPU 并行处理不同 logit 片段，打破多维依赖瓶颈。 Feedback-driven scheduler：动态根据运行时负载在 CPU 与 GPU 之间再分配任务，缓解长序列场景的失衡。 Semantic-aware KV cache mapping：按语义将 KV cache 映射到分层内存（本地 DRAM 与 CXL 扩展内存），降低 NUMA 访问代价。 实验 模型：3 种 LLM，11 种不同参数规模。 平台：3 种 GPU 系统，配备 CXL 扩展内存。 基线：6 种 SOTA KV cache 管理方法（pruning、offloading 系列）。 指标：推理吞吐/延迟加速比 &#43; 精度。 结果 相对 6 个基线平均加速 1.41×–3.2×。 精度保持优于或不逊于现有方法。 具体每个模型/平台的拆分数字摘要未给出。 为什么重要 对长上下文 LLM 推理基础设施团队，它展示了 CXL 分层内存 &#43; CPU-GPU 协同 attention 的可行路径，避免单纯 offload 造成的带宽闲置，为百 GB 级 KV cache 部署提供新思路。">
+
+<meta property="og:url" content="https://ftxj.github.io/zh/posts/2026-04-20/06-hybridgen-efficient-llm-generative-inference-via-cpu-gpu-hyb/">
+  <meta property="og:site_name" content="JXIN&#39;s Home">
+  <meta property="og:title" content="HybridGen: Efficient LLM Generative Inference via CPU-GPU Hybrid Computing">
+  <meta property="og:description" content="arXiv: 2604.18529 · PDF
+作者: Mao Lin, Xi Wang, Guilherme Cox, Dong Li, Hyeran Jeon
+主分类: cs.PF · 全部: cs.DC, cs.PF
+命中关键词: llm, rag, inference, kv cache, parallelism, attention, gpu, scheduler
+TL;DR HybridGen 提出 CPU-GPU 协同 attention 框架，配合 CXL 扩展内存，针对长上下文 LLM 推理在六种 KV cache 管理基线上平均加速 1.41×–3.2×。
+核心观点 现有 KV cache pruning/offloading 只用单侧算力，CPU 本地内存也未充分利用。 在 CXL 分层内存系统上，CPU 与 GPU 可协同完成 attention 计算。 需要同时解决多维依赖、长序列负载失衡、NUMA 惩罚三大难题。 方法 Attention logit parallelism：拆分 attention 计算维度，允许 CPU-GPU 并行处理不同 logit 片段，打破多维依赖瓶颈。 Feedback-driven scheduler：动态根据运行时负载在 CPU 与 GPU 之间再分配任务，缓解长序列场景的失衡。 Semantic-aware KV cache mapping：按语义将 KV cache 映射到分层内存（本地 DRAM 与 CXL 扩展内存），降低 NUMA 访问代价。 实验 模型：3 种 LLM，11 种不同参数规模。 平台：3 种 GPU 系统，配备 CXL 扩展内存。 基线：6 种 SOTA KV cache 管理方法（pruning、offloading 系列）。 指标：推理吞吐/延迟加速比 &#43; 精度。 结果 相对 6 个基线平均加速 1.41×–3.2×。 精度保持优于或不逊于现有方法。 具体每个模型/平台的拆分数字摘要未给出。 为什么重要 对长上下文 LLM 推理基础设施团队，它展示了 CXL 分层内存 &#43; CPU-GPU 协同 attention 的可行路径，避免单纯 offload 造成的带宽闲置，为百 GB 级 KV cache 部署提供新思路。">
+  <meta property="og:locale" content="zh">
+  <meta property="og:type" content="article">
+    <meta property="article:section" content="posts">
+    <meta property="article:published_time" content="2026-04-27T05:26:38+00:00">
+    <meta property="article:modified_time" content="2026-04-27T05:26:38+00:00">
+
+
+
+
+<link rel="canonical" href="https://ftxj.github.io/zh/posts/2026-04-20/06-hybridgen-efficient-llm-generative-inference-via-cpu-gpu-hyb/">
+
+
+<link rel="preload" href="/fonts/fa-brands-400.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="/fonts/fa-regular-400.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="/fonts/fa-solid-900.woff2" as="font" type="font/woff2" crossorigin>
+
+
+  
+  
+  <link rel="stylesheet" href="/css/coder.min.5e94c1acf7aa2066035cf2764ae3e4fe39db101d68b870f919966100d51fb861.css" integrity="sha256-XpTBrPeqIGYDXPJ2SuPk/jnbEB1ouHD5GZZhANUfuGE=" crossorigin="anonymous" media="screen" />
+
+
+
+
+
+
+  
+    
+    
+    <link rel="stylesheet" href="/css/coder-dark.min.a00e6364bacbc8266ad1cc81230774a1397198f8cfb7bcba29b7d6fcb54ce57f.css" integrity="sha256-oA5jZLrLyCZq0cyBIwd0oTlxmPjPt7y6KbfW/LVM5X8=" crossorigin="anonymous" media="screen" />
+  
+
+
+
+ 
+
+
+
+
+<link rel="icon" type="image/svg+xml" href="/images/favicon.svg" sizes="any">
+<link rel="icon" type="image/png" href="/images/favicon-32x32.png" sizes="32x32">
+<link rel="icon" type="image/png" href="/images/favicon-16x16.png" sizes="16x16">
+
+<link rel="apple-touch-icon" href="/images/apple-touch-icon.png">
+<link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon.png">
+
+<link rel="manifest" href="/site.webmanifest">
+<link rel="mask-icon" href="/images/safari-pinned-tab.svg" color="#5bbad5">
+
+
+
+
+
+
+<style>
+.content article ul {
+  list-style: disc !important;
+  padding-left: 2.5rem !important;
+}
+
+.content article ul li {
+  display: list-item !important;
+}
+</style>
+
+
+
+
+  
+</head>
+
+
+
+
+
+
+<body class="preload-transitions colorscheme-auto">
+  
+<div class="float-container">
+    <a id="dark-mode-toggle" class="colorscheme-toggle">
+        <i class="fa-solid fa-adjust fa-fw" aria-hidden="true"></i>
+    </a>
+</div>
+
+
+  <main class="wrapper">
+    <nav class="navigation">
+  <section class="container">
+    
+    <a class="navigation-title" href="https://ftxj.github.io/zh/">
+      JXIN&#39;s Home
+    </a>
+    
+    
+      <input type="checkbox" id="menu-toggle" />
+      <label class="menu-button float-right" for="menu-toggle">
+        <i class="fa-solid fa-bars fa-fw" aria-hidden="true"></i>
+      </label>
+      <ul class="navigation-list">
+        
+          
+            <li class="navigation-item">
+              <a class="navigation-link " href="/zh/about/">关于</a>
+            </li>
+          
+            <li class="navigation-item">
+              <a class="navigation-link " href="/zh/travel/">旅行</a>
+            </li>
+          
+            <li class="navigation-item">
+              <a class="navigation-link " href="/zh/posts/">博客</a>
+            </li>
+          
+            <li class="navigation-item">
+              <a class="navigation-link " href="https://ftxj.github.io/cv/cv_zh.pdf">简历</a>
+            </li>
+          
+        
+        
+          
+          
+          
+            
+              
+                <li class="navigation-item menu-separator">
+                  <span>|</span>
+                </li>
+                
+              
+              <li class="navigation-item">
+                <a href="/posts/2026-04-20/06-hybridgen-efficient-llm-generative-inference-via-cpu-gpu-hyb/">EN</a>
+              </li>
+            
+          
+        
+      </ul>
+    
+  </section>
+</nav>
+
+
+    <div class="content">
+      
+  <section class="container post">
+    <article>
+      <header>
+        <div class="post-title">
+          <h1 class="title">
+            <a class="title-link" href="https://ftxj.github.io/zh/posts/2026-04-20/06-hybridgen-efficient-llm-generative-inference-via-cpu-gpu-hyb/">
+              HybridGen: Efficient LLM Generative Inference via CPU-GPU Hybrid Computing
+            </a>
+          </h1>
+        </div>
+        <div class="post-meta">
+          <div class="date">
+            <span class="posted-on">
+              <i class="fa-solid fa-calendar" aria-hidden="true"></i>
+              <time datetime="2026-04-27T05:26:38Z">
+                四月 27, 2026
+              </time>
+            </span>
+            <span class="reading-time">
+              <i class="fa-solid fa-clock" aria-hidden="true"></i>
+              2-minute read
+            </span>
+          </div>
+          
+          <div class="categories">
+  <i class="fa-solid fa-folder" aria-hidden="true"></i>
+    <a href="/zh/categories/paper-digest/">Paper-Digest</a>
+      <span class="separator">•</span>
+    <a href="/zh/categories/2026-04-20/">2026-04-20</a></div>
+
+          
+        </div>
+      </header>
+
+      
+
+
+      <div class="post-content">
+        
+        <p><strong>arXiv:</strong> <a href="https://arxiv.org/abs/2604.18529v1">2604.18529</a> · <a href="https://arxiv.org/pdf/2604.18529v1">PDF</a></p>
+<p><strong>作者:</strong> Mao Lin, Xi Wang, Guilherme Cox, Dong Li, Hyeran Jeon</p>
+<p><strong>主分类:</strong> <code>cs.PF</code> · 全部: cs.DC, cs.PF</p>
+<p><strong>命中关键词:</strong> llm, rag, inference, kv cache, parallelism, attention, gpu, scheduler</p>
+<hr>
+<h2 id="tldr">TL;DR</h2>
+<p>HybridGen 提出 CPU-GPU 协同 attention 框架，配合 CXL 扩展内存，针对长上下文 LLM 推理在六种 KV cache 管理基线上平均加速 1.41×–3.2×。</p>
+<h2 id="核心观点">核心观点</h2>
+<ul>
+<li>现有 KV cache pruning/offloading 只用单侧算力，CPU 本地内存也未充分利用。</li>
+<li>在 CXL 分层内存系统上，CPU 与 GPU 可协同完成 attention 计算。</li>
+<li>需要同时解决多维依赖、长序列负载失衡、NUMA 惩罚三大难题。</li>
+</ul>
+<h2 id="方法">方法</h2>
+<ul>
+<li><strong>Attention logit parallelism</strong>：拆分 attention 计算维度，允许 CPU-GPU 并行处理不同 logit 片段，打破多维依赖瓶颈。</li>
+<li><strong>Feedback-driven scheduler</strong>：动态根据运行时负载在 CPU 与 GPU 之间再分配任务，缓解长序列场景的失衡。</li>
+<li><strong>Semantic-aware KV cache mapping</strong>：按语义将 KV cache 映射到分层内存（本地 DRAM 与 CXL 扩展内存），降低 NUMA 访问代价。</li>
+</ul>
+<h2 id="实验">实验</h2>
+<ul>
+<li>模型：3 种 LLM，11 种不同参数规模。</li>
+<li>平台：3 种 GPU 系统，配备 CXL 扩展内存。</li>
+<li>基线：6 种 SOTA KV cache 管理方法（pruning、offloading 系列）。</li>
+<li>指标：推理吞吐/延迟加速比 + 精度。</li>
+</ul>
+<h2 id="结果">结果</h2>
+<ul>
+<li>相对 6 个基线平均加速 1.41×–3.2×。</li>
+<li>精度保持优于或不逊于现有方法。</li>
+<li>具体每个模型/平台的拆分数字摘要未给出。</li>
+</ul>
+<h2 id="为什么重要">为什么重要</h2>
+<p>对长上下文 LLM 推理基础设施团队，它展示了 CXL 分层内存 + CPU-GPU 协同 attention 的可行路径，避免单纯 offload 造成的带宽闲置，为百 GB 级 KV cache 部署提供新思路。</p>
+<h2 id="与已有工作的关系">与已有工作的关系</h2>
+<ul>
+<li>KV cache 压缩/淘汰：H2O、StreamingLLM、SnapKV 等 pruning 方法。</li>
+<li>Offload 方向：FlexGen、DeepSpeed-Inference、PowerInfer 等 CPU-GPU 混合推理。</li>
+<li>内存扩展：围绕 CXL 分层内存的系统研究。HybridGen 把三条线合并成统一的 hybrid attention 框架。</li>
+</ul>
+<h2 id="尚未回答的问题">尚未回答的问题</h2>
+<ul>
+<li>在无 CXL 的普通 NUMA/PCIe 平台上收益如何？</li>
+<li>Scheduler 对突发请求与多租户的适应性未知。</li>
+<li>与 speculative decoding、MoE 等其他推理优化的叠加效果。</li>
+<li>能耗/TCO 层面是否同样划算未评估。</li>
+</ul>
+<hr>
+<h2 id="论文图表">论文图表</h2>
+<p><strong>图 1:</strong> Page 2 (rendered)</p>
+<p><img alt="图 1" src="/images/papers/2604.18529/page1.png"></p>
+<p><strong>图 2:</strong> Page 3 (rendered)</p>
+<p><img alt="图 2" src="/images/papers/2604.18529/page2.png"></p>
+<p><strong>图 3:</strong> Page 4 (rendered)</p>
+<p><img alt="图 3" src="/images/papers/2604.18529/page3.png"></p>
+<hr>
+<h2 id="原始摘要">原始摘要</h2>
+<p>As modern LLMs support thousands to millions of tokens, KV caches grow to hundreds of gigabytes, stressing memory capacity and bandwidth. Existing solutions, such as KV cache pruning and offloading, alleviate these but underutilize hardware by relying solely on either GPU or CPU for attention computing, and considering yet limited CPU local memory for KV cache storage. We propose HybridGen, an efficient hybrid attention framework for long-context LLM inference. HybridGen enables CPU-GPU collaborative attention on systems with expanded tiered memory (e.g., CXL memory), addressing three key challenges: (1) multi-dimensional attention dependencies, (2) intensifying CPU-GPU load imbalance with longer sequences, and (3) NUMA penalty of tiered memories. HybridGen tackles these by introducing attention logit parallelism, a feedback-driven scheduler, and semantic-aware KV cache mapping. Experiments with three LLM models with eleven different sizes on three GPU platforms with a CXL-expanded memory show that HybridGen outperforms six state-of-the-art KV cache management methods by 1.41x&ndash;3.2x on average while maintaining superior accuracy.</p>
+
+      </div>
+
+
+      <footer>
+        
+
+
+        
+        
+        
+        
+        
+        
+        
+      </footer>
+    </article>
+
+    
+  </section>
+
+    </div>
+
+    <footer class="footer">
+  <section class="container">
+    ©
+    
+      2019 -
+    
+    2026
+     Jie Xin 
+    ·
+    
+    Powered by <a href="https://gohugo.io/" target="_blank" rel="noopener">Hugo</a> & <a href="https://github.com/luizdepra/hugo-coder/" target="_blank" rel="noopener">Coder</a>.
+    
+  </section>
+</footer>
+
+  </main>
+
+  
+
+  
+  
+  <script src="/js/coder.min.6ae284be93d2d19dad1f02b0039508d9aab3180a12a06dcc71b0b0ef7825a317.js" integrity="sha256-auKEvpPS0Z2tHwKwA5UI2aqzGAoSoG3McbCw73gloxc="></script>
+  
+
+  
+
+  
+
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+</body>
+</html>

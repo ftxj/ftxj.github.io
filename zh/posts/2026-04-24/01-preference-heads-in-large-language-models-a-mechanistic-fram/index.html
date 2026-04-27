@@ -1,0 +1,372 @@
+<!DOCTYPE html>
+<html lang="zh">
+
+<head>
+  <title>
+  Preference Heads in Large Language Models: A Mechanistic Framework for Interpretable Personalization · JXIN&#39;s Home
+</title>
+  <meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="color-scheme" content="light dark">
+
+
+
+
+<meta name="author" content="Jie Xin">
+<meta name="description" content="arXiv: 2604.22345 · PDF
+作者: Weixu Zhang, Ye Yuan, Changjiang Han, Yuxing Tian, Zipeng Sun, Linfeng Du, Jikun Kang, Hong Kang, Xue Liu, Haolun Wu
+主分类: cs.CL · 全部: cs.CL
+命中关键词: large language model, llm, rag, inference, serving, attention, transformer
+
+TL;DR
+论文提出 Preference Heads 假设：LLM 中少量 attention head 因果性地编码用户偏好，并据此设计训练-free 的 Differential Preference Steering (DPS) 实现可解释个性化。
+核心观点
+
+假设存在稀疏的 Preference Heads，负责编码用户风格与话题偏好。
+通过因果掩码分析 (causal masking) 定位这些 heads，并用 Preference Contribution Score (PCS) 量化其影响。
+提出 DPS：推理时对比&quot;启用/禁用 Preference Heads&quot;的 logits 差异，放大偏好对齐方向。
+无需训练，兼具可解释性、低开销与可控性。
+
+方法
+">
+<meta name="keywords" content="blog,developer,personal">
+
+
+
+  <meta name="twitter:card" content="summary">
+  <meta name="twitter:title" content="Preference Heads in Large Language Models: A Mechanistic Framework for Interpretable Personalization">
+  <meta name="twitter:description" content="arXiv: 2604.22345 · PDF
+作者: Weixu Zhang, Ye Yuan, Changjiang Han, Yuxing Tian, Zipeng Sun, Linfeng Du, Jikun Kang, Hong Kang, Xue Liu, Haolun Wu
+主分类: cs.CL · 全部: cs.CL
+命中关键词: large language model, llm, rag, inference, serving, attention, transformer
+TL;DR 论文提出 Preference Heads 假设：LLM 中少量 attention head 因果性地编码用户偏好，并据此设计训练-free 的 Differential Preference Steering (DPS) 实现可解释个性化。
+核心观点 假设存在稀疏的 Preference Heads，负责编码用户风格与话题偏好。 通过因果掩码分析 (causal masking) 定位这些 heads，并用 Preference Contribution Score (PCS) 量化其影响。 提出 DPS：推理时对比&#34;启用/禁用 Preference Heads&#34;的 logits 差异，放大偏好对齐方向。 无需训练，兼具可解释性、低开销与可控性。 方法">
+
+<meta property="og:url" content="https://ftxj.github.io/zh/posts/2026-04-24/01-preference-heads-in-large-language-models-a-mechanistic-fram/">
+  <meta property="og:site_name" content="JXIN&#39;s Home">
+  <meta property="og:title" content="Preference Heads in Large Language Models: A Mechanistic Framework for Interpretable Personalization">
+  <meta property="og:description" content="arXiv: 2604.22345 · PDF
+作者: Weixu Zhang, Ye Yuan, Changjiang Han, Yuxing Tian, Zipeng Sun, Linfeng Du, Jikun Kang, Hong Kang, Xue Liu, Haolun Wu
+主分类: cs.CL · 全部: cs.CL
+命中关键词: large language model, llm, rag, inference, serving, attention, transformer
+TL;DR 论文提出 Preference Heads 假设：LLM 中少量 attention head 因果性地编码用户偏好，并据此设计训练-free 的 Differential Preference Steering (DPS) 实现可解释个性化。
+核心观点 假设存在稀疏的 Preference Heads，负责编码用户风格与话题偏好。 通过因果掩码分析 (causal masking) 定位这些 heads，并用 Preference Contribution Score (PCS) 量化其影响。 提出 DPS：推理时对比&#34;启用/禁用 Preference Heads&#34;的 logits 差异，放大偏好对齐方向。 无需训练，兼具可解释性、低开销与可控性。 方法">
+  <meta property="og:locale" content="zh">
+  <meta property="og:type" content="article">
+    <meta property="article:section" content="posts">
+    <meta property="article:published_time" content="2026-04-27T07:55:51+00:00">
+    <meta property="article:modified_time" content="2026-04-27T07:55:51+00:00">
+
+
+
+
+<link rel="canonical" href="https://ftxj.github.io/zh/posts/2026-04-24/01-preference-heads-in-large-language-models-a-mechanistic-fram/">
+
+
+<link rel="preload" href="/fonts/fa-brands-400.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="/fonts/fa-regular-400.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="/fonts/fa-solid-900.woff2" as="font" type="font/woff2" crossorigin>
+
+
+  
+  
+  <link rel="stylesheet" href="/css/coder.min.5e94c1acf7aa2066035cf2764ae3e4fe39db101d68b870f919966100d51fb861.css" integrity="sha256-XpTBrPeqIGYDXPJ2SuPk/jnbEB1ouHD5GZZhANUfuGE=" crossorigin="anonymous" media="screen" />
+
+
+
+
+
+
+  
+    
+    
+    <link rel="stylesheet" href="/css/coder-dark.min.a00e6364bacbc8266ad1cc81230774a1397198f8cfb7bcba29b7d6fcb54ce57f.css" integrity="sha256-oA5jZLrLyCZq0cyBIwd0oTlxmPjPt7y6KbfW/LVM5X8=" crossorigin="anonymous" media="screen" />
+  
+
+
+
+ 
+
+
+
+
+<link rel="icon" type="image/svg+xml" href="/images/favicon.svg" sizes="any">
+<link rel="icon" type="image/png" href="/images/favicon-32x32.png" sizes="32x32">
+<link rel="icon" type="image/png" href="/images/favicon-16x16.png" sizes="16x16">
+
+<link rel="apple-touch-icon" href="/images/apple-touch-icon.png">
+<link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon.png">
+
+<link rel="manifest" href="/site.webmanifest">
+<link rel="mask-icon" href="/images/safari-pinned-tab.svg" color="#5bbad5">
+
+
+
+
+
+
+<style>
+.content article ul {
+  list-style: disc !important;
+  padding-left: 2.5rem !important;
+}
+
+.content article ul li {
+  display: list-item !important;
+}
+</style>
+
+
+
+
+  
+</head>
+
+
+
+
+
+
+<body class="preload-transitions colorscheme-auto">
+  
+<div class="float-container">
+    <a id="dark-mode-toggle" class="colorscheme-toggle">
+        <i class="fa-solid fa-adjust fa-fw" aria-hidden="true"></i>
+    </a>
+</div>
+
+
+  <main class="wrapper">
+    <nav class="navigation">
+  <section class="container">
+    
+    <a class="navigation-title" href="https://ftxj.github.io/zh/">
+      JXIN&#39;s Home
+    </a>
+    
+    
+      <input type="checkbox" id="menu-toggle" />
+      <label class="menu-button float-right" for="menu-toggle">
+        <i class="fa-solid fa-bars fa-fw" aria-hidden="true"></i>
+      </label>
+      <ul class="navigation-list">
+        
+          
+            <li class="navigation-item">
+              <a class="navigation-link " href="/zh/about/">关于</a>
+            </li>
+          
+            <li class="navigation-item">
+              <a class="navigation-link " href="/zh/travel/">旅行</a>
+            </li>
+          
+            <li class="navigation-item">
+              <a class="navigation-link " href="/zh/posts/">博客</a>
+            </li>
+          
+            <li class="navigation-item">
+              <a class="navigation-link " href="https://ftxj.github.io/cv/cv_zh.pdf">简历</a>
+            </li>
+          
+        
+        
+          
+          
+          
+            
+              
+                <li class="navigation-item menu-separator">
+                  <span>|</span>
+                </li>
+                
+              
+              <li class="navigation-item">
+                <a href="/posts/2026-04-24/01-preference-heads-in-large-language-models-a-mechanistic-fram/">EN</a>
+              </li>
+            
+          
+        
+      </ul>
+    
+  </section>
+</nav>
+
+
+    <div class="content">
+      
+  <section class="container post">
+    <article>
+      <header>
+        <div class="post-title">
+          <h1 class="title">
+            <a class="title-link" href="https://ftxj.github.io/zh/posts/2026-04-24/01-preference-heads-in-large-language-models-a-mechanistic-fram/">
+              Preference Heads in Large Language Models: A Mechanistic Framework for Interpretable Personalization
+            </a>
+          </h1>
+        </div>
+        <div class="post-meta">
+          <div class="date">
+            <span class="posted-on">
+              <i class="fa-solid fa-calendar" aria-hidden="true"></i>
+              <time datetime="2026-04-27T07:55:51Z">
+                四月 27, 2026
+              </time>
+            </span>
+            <span class="reading-time">
+              <i class="fa-solid fa-clock" aria-hidden="true"></i>
+              2-minute read
+            </span>
+          </div>
+          
+          <div class="categories">
+  <i class="fa-solid fa-folder" aria-hidden="true"></i>
+    <a href="/zh/categories/paper-digest/">Paper-Digest</a>
+      <span class="separator">•</span>
+    <a href="/zh/categories/2026-04-24/">2026-04-24</a></div>
+
+          
+        </div>
+      </header>
+
+      
+
+
+      <div class="post-content">
+        
+        <p><strong>arXiv:</strong> <a href="https://arxiv.org/abs/2604.22345v1">2604.22345</a> · <a href="https://arxiv.org/pdf/2604.22345v1">PDF</a></p>
+<p><strong>作者:</strong> Weixu Zhang, Ye Yuan, Changjiang Han, Yuxing Tian, Zipeng Sun, Linfeng Du, Jikun Kang, Hong Kang, Xue Liu, Haolun Wu</p>
+<p><strong>主分类:</strong> <code>cs.CL</code> · 全部: cs.CL</p>
+<p><strong>命中关键词:</strong> large language model, llm, rag, inference, serving, attention, transformer</p>
+<hr>
+<h2 id="tldr">TL;DR</h2>
+<p>论文提出 Preference Heads 假设：LLM 中少量 attention head 因果性地编码用户偏好，并据此设计训练-free 的 Differential Preference Steering (DPS) 实现可解释个性化。</p>
+<h2 id="核心观点">核心观点</h2>
+<ul>
+<li>假设存在稀疏的 Preference Heads，负责编码用户风格与话题偏好。</li>
+<li>通过因果掩码分析 (causal masking) 定位这些 heads，并用 Preference Contribution Score (PCS) 量化其影响。</li>
+<li>提出 DPS：推理时对比&quot;启用/禁用 Preference Heads&quot;的 logits 差异，放大偏好对齐方向。</li>
+<li>无需训练，兼具可解释性、低开销与可控性。</li>
+</ul>
+<h2 id="方法">方法</h2>
+<p><img alt="图 1" src="/images/papers/2604.22345/fig1.png"></p>
+<p>DPS 分两步：</p>
+<ol>
+<li><strong>识别</strong>：对每个 attention head 施加因果掩码，测量其在用户对齐输出上的贡献，计算 PCS，挑选得分最高者作为 Preference Heads。</li>
+<li><strong>引导</strong>：解码阶段分别用完整模型和&quot;屏蔽 Preference Heads&quot;模型各得一套 logits，取差值作为个性化信号，加权放大后融合回生成分布，从而 selectively 强化偏好对齐续写。</li>
+</ol>
+<p><img alt="图 2" src="/images/papers/2604.22345/fig2.png"></p>
+<h2 id="实验">实验</h2>
+<p>在多种常用个性化 benchmark 上、跨多个 LLM 做评测；比较对象包括 prompt-based 基线与 fine-tuning 方法；指标覆盖个性化 fidelity、内容 coherence 与计算开销。摘要未披露具体模型规模与数据集名称。</p>
+<p><img alt="图 3" src="/images/papers/2604.22345/fig3.png"></p>
+<h2 id="结果">结果</h2>
+<p>报告&quot;在不同 LLM 上一致提升个性化 fidelity，同时保持内容连贯性，额外开销低&quot;。摘要未给出具体数值，因此绝对增益与对比强弱暂无法判断；主张依赖原文表格支撑。</p>
+<h2 id="为什么重要">为什么重要</h2>
+<ul>
+<li>对 agent/LLM 工程师：提供一种无需微调、插拔式的个性化方案，推理期即可部署，适合多用户服务。</li>
+<li>对 interpretability：把&quot;个性化&quot;落实到具体 head 层面，给出 where/how 的机制解释。</li>
+<li>对基础设施：低额外成本、可控强度，便于与现有 decoding pipeline（如 contrastive decoding）集成。</li>
+</ul>
+<h2 id="与已有工作的关系">与已有工作的关系</h2>
+<ul>
+<li>延续 mechanistic interpretability 脉络（induction heads、function vectors、activation patching）。</li>
+<li>方法形式上属 contrastive / steering decoding 家族（CAD、DoLa、representation engineering）。</li>
+<li>与传统 personalization 路线（RLHF、LoRA fine-tune、prompt-tuning、retrieval-based persona）形成互补，强调训练-free 与可解释性。</li>
+</ul>
+<h2 id="尚未回答的问题">尚未回答的问题</h2>
+<ul>
+<li>Preference Heads 在不同模型家族、规模间是否稳定迁移？</li>
+<li>PCS 对用户样本数量与噪声的鲁棒性如何？</li>
+<li>与 CAD/DoLa 等 contrastive decoding 方法的正交性与叠加收益？</li>
+<li>是否存在多维偏好（风格 vs 话题）间的 head 解耦？长上下文与多轮对话下表现？</li>
+<li>安全性：能否被用来放大不良偏好或绕过对齐约束？</li>
+</ul>
+<hr>
+<h2 id="原始摘要">原始摘要</h2>
+<p>Large Language Models (LLMs) exhibit strong implicit personalization ability, yet most existing approaches treat this behavior as a black box, relying on prompt engineering or fine tuning on user data. In this work, we adopt a mechanistic interpretability perspective and hypothesize the existence of a sparse set of Preference Heads, attention heads that encode user specific stylistic and topical preferences and exert a causal influence on generation. We introduce Differential Preference Steering (DPS), a training free framework that (1) identifies Preference Heads through causal masking analysis and (2) leverages them for controllable and interpretable personalization at inference time. DPS computes a Preference Contribution Score (PCS) for each attention head, directly measuring its causal impact on user aligned outputs. During decoding, we contrast model predictions with and without Preference Heads, amplifying the difference between personalized and generic logits to selectively strengthen preference aligned continuations. Experiments on widely used personalization benchmarks across multiple LLMs demonstrate consistent gains in personalization fidelity while preserving content coherence and low computational overhead. Beyond empirical improvements, DPS provides a mechanistic explanation of where and how personalization emerges within transformer architectures. Our implementation is publicly available.</p>
+
+      </div>
+
+
+      <footer>
+        
+
+
+        
+        
+        
+        
+        
+        
+        
+      </footer>
+    </article>
+
+    
+  </section>
+
+    </div>
+
+    <footer class="footer">
+  <section class="container">
+    ©
+    
+      2019 -
+    
+    2026
+     Jie Xin 
+    ·
+    
+    Powered by <a href="https://gohugo.io/" target="_blank" rel="noopener">Hugo</a> & <a href="https://github.com/luizdepra/hugo-coder/" target="_blank" rel="noopener">Coder</a>.
+    
+  </section>
+</footer>
+
+  </main>
+
+  
+
+  
+  
+  <script src="/js/coder.min.6ae284be93d2d19dad1f02b0039508d9aab3180a12a06dcc71b0b0ef7825a317.js" integrity="sha256-auKEvpPS0Z2tHwKwA5UI2aqzGAoSoG3McbCw73gloxc="></script>
+  
+
+  
+
+  
+
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+</body>
+</html>

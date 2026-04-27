@@ -1,0 +1,393 @@
+<!DOCTYPE html>
+<html lang="zh">
+
+<head>
+  <title>
+  LayerBoost: Layer-Aware Attention Reduction for Efficient LLMs · JXIN&#39;s Home
+</title>
+  <meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="color-scheme" content="light dark">
+
+
+
+
+<meta name="author" content="Jie Xin">
+<meta name="description" content="arXiv: 2604.22050 · PDF
+作者: Mohamed Ali Souibgui, Jan Fostier, Rodrigo Abadía-Heredia, Bohdan Denysenko, Christian Marschke, Igor Peric
+单位: Openchip &amp; Softwares Technologies
+主分类: cs.LG · 全部: cs.CL, cs.LG
+命中关键词: llm, inference, serving, attention, transformer, throughput, latency
+
+TL;DR
+LayerBoost 基于逐层敏感度分析，对 Transformer 不同层分别保留 softmax、替换为线性滑窗或直接移除 attention，再用 10M token 轻量蒸馏恢复性能，高并发下吞吐提升最多 68%。
+核心观点
+
+不同 Transformer 层对 attention 的敏感度差异显著，应当分层处理而非统一替换。
+提出三档策略：高敏感层保留 softmax、中敏感层换为 linear sliding window attention、低敏感层直接移除 attention。
+仅需 10M token 的蒸馏式 &ldquo;healing&rdquo; 阶段即可恢复性能。
+在高并发推理场景下吞吐最高提升 68%,显著优于现有 attention 线性化方法。
+
+方法
+
+敏感度分析：在预训练模型上系统性评估移除每层 attention 带来的基准性能下降,按 Eq.3 定义敏感度。
+分层改造：依据敏感度将层划为三类,分别施加 softmax 保留 / linear sliding window attention 替换 / attention 移除。
+Healing 阶段：轻量蒸馏微调,仅用 10M 额外训练 token 恢复模型质量。
+
+实验
+
+基线:原始预训练模型、state-of-the-art attention linearization 方法。
+场景:单 A10 24GB GPU,固定 batch size 16,变化 decoding 长度;并在 concurrency 50/100/200 下评测 serving throughput (TPS) 与基准精度。
+指标:benchmark accuracy、解码延迟、GPU 显存、吞吐。
+
+结果
+
+高并发下推理延迟下降、吞吐最多提升 68%。
+多个 benchmark 上与 base model 持平,少数有轻微下降。
+显著优于已有 attention 线性化 SOTA。
+
+
+
+">
+<meta name="keywords" content="blog,developer,personal">
+
+
+
+  <meta name="twitter:card" content="summary">
+  <meta name="twitter:title" content="LayerBoost: Layer-Aware Attention Reduction for Efficient LLMs">
+  <meta name="twitter:description" content="arXiv: 2604.22050 · PDF
+作者: Mohamed Ali Souibgui, Jan Fostier, Rodrigo Abadía-Heredia, Bohdan Denysenko, Christian Marschke, Igor Peric
+单位: Openchip &amp; Softwares Technologies
+主分类: cs.LG · 全部: cs.CL, cs.LG
+命中关键词: llm, inference, serving, attention, transformer, throughput, latency
+TL;DR LayerBoost 基于逐层敏感度分析，对 Transformer 不同层分别保留 softmax、替换为线性滑窗或直接移除 attention，再用 10M token 轻量蒸馏恢复性能，高并发下吞吐提升最多 68%。
+核心观点 不同 Transformer 层对 attention 的敏感度差异显著，应当分层处理而非统一替换。 提出三档策略：高敏感层保留 softmax、中敏感层换为 linear sliding window attention、低敏感层直接移除 attention。 仅需 10M token 的蒸馏式 “healing” 阶段即可恢复性能。 在高并发推理场景下吞吐最高提升 68%,显著优于现有 attention 线性化方法。 方法 敏感度分析：在预训练模型上系统性评估移除每层 attention 带来的基准性能下降,按 Eq.3 定义敏感度。 分层改造：依据敏感度将层划为三类,分别施加 softmax 保留 / linear sliding window attention 替换 / attention 移除。 Healing 阶段：轻量蒸馏微调,仅用 10M 额外训练 token 恢复模型质量。 实验 基线:原始预训练模型、state-of-the-art attention linearization 方法。 场景:单 A10 24GB GPU,固定 batch size 16,变化 decoding 长度;并在 concurrency 50/100/200 下评测 serving throughput (TPS) 与基准精度。 指标:benchmark accuracy、解码延迟、GPU 显存、吞吐。 结果 高并发下推理延迟下降、吞吐最多提升 68%。 多个 benchmark 上与 base model 持平,少数有轻微下降。 显著优于已有 attention 线性化 SOTA。">
+
+<meta property="og:url" content="https://ftxj.github.io/zh/posts/2026-04-27/09-layerboost-layer-aware-attention-reduction-for-efficient-llm/">
+  <meta property="og:site_name" content="JXIN&#39;s Home">
+  <meta property="og:title" content="LayerBoost: Layer-Aware Attention Reduction for Efficient LLMs">
+  <meta property="og:description" content="arXiv: 2604.22050 · PDF
+作者: Mohamed Ali Souibgui, Jan Fostier, Rodrigo Abadía-Heredia, Bohdan Denysenko, Christian Marschke, Igor Peric
+单位: Openchip &amp; Softwares Technologies
+主分类: cs.LG · 全部: cs.CL, cs.LG
+命中关键词: llm, inference, serving, attention, transformer, throughput, latency
+TL;DR LayerBoost 基于逐层敏感度分析，对 Transformer 不同层分别保留 softmax、替换为线性滑窗或直接移除 attention，再用 10M token 轻量蒸馏恢复性能，高并发下吞吐提升最多 68%。
+核心观点 不同 Transformer 层对 attention 的敏感度差异显著，应当分层处理而非统一替换。 提出三档策略：高敏感层保留 softmax、中敏感层换为 linear sliding window attention、低敏感层直接移除 attention。 仅需 10M token 的蒸馏式 “healing” 阶段即可恢复性能。 在高并发推理场景下吞吐最高提升 68%,显著优于现有 attention 线性化方法。 方法 敏感度分析：在预训练模型上系统性评估移除每层 attention 带来的基准性能下降,按 Eq.3 定义敏感度。 分层改造：依据敏感度将层划为三类,分别施加 softmax 保留 / linear sliding window attention 替换 / attention 移除。 Healing 阶段：轻量蒸馏微调,仅用 10M 额外训练 token 恢复模型质量。 实验 基线:原始预训练模型、state-of-the-art attention linearization 方法。 场景:单 A10 24GB GPU,固定 batch size 16,变化 decoding 长度;并在 concurrency 50/100/200 下评测 serving throughput (TPS) 与基准精度。 指标:benchmark accuracy、解码延迟、GPU 显存、吞吐。 结果 高并发下推理延迟下降、吞吐最多提升 68%。 多个 benchmark 上与 base model 持平,少数有轻微下降。 显著优于已有 attention 线性化 SOTA。">
+  <meta property="og:locale" content="zh">
+  <meta property="og:type" content="article">
+    <meta property="article:section" content="posts">
+    <meta property="article:published_time" content="2026-04-27T09:39:13+00:00">
+    <meta property="article:modified_time" content="2026-04-27T09:39:13+00:00">
+
+
+
+
+<link rel="canonical" href="https://ftxj.github.io/zh/posts/2026-04-27/09-layerboost-layer-aware-attention-reduction-for-efficient-llm/">
+
+
+<link rel="preload" href="/fonts/fa-brands-400.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="/fonts/fa-regular-400.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="/fonts/fa-solid-900.woff2" as="font" type="font/woff2" crossorigin>
+
+
+  
+  
+  <link rel="stylesheet" href="/css/coder.min.5e94c1acf7aa2066035cf2764ae3e4fe39db101d68b870f919966100d51fb861.css" integrity="sha256-XpTBrPeqIGYDXPJ2SuPk/jnbEB1ouHD5GZZhANUfuGE=" crossorigin="anonymous" media="screen" />
+
+
+
+
+
+
+  
+    
+    
+    <link rel="stylesheet" href="/css/coder-dark.min.a00e6364bacbc8266ad1cc81230774a1397198f8cfb7bcba29b7d6fcb54ce57f.css" integrity="sha256-oA5jZLrLyCZq0cyBIwd0oTlxmPjPt7y6KbfW/LVM5X8=" crossorigin="anonymous" media="screen" />
+  
+
+
+
+ 
+
+
+
+
+<link rel="icon" type="image/svg+xml" href="/images/favicon.svg" sizes="any">
+<link rel="icon" type="image/png" href="/images/favicon-32x32.png" sizes="32x32">
+<link rel="icon" type="image/png" href="/images/favicon-16x16.png" sizes="16x16">
+
+<link rel="apple-touch-icon" href="/images/apple-touch-icon.png">
+<link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon.png">
+
+<link rel="manifest" href="/site.webmanifest">
+<link rel="mask-icon" href="/images/safari-pinned-tab.svg" color="#5bbad5">
+
+
+
+
+
+
+<style>
+.content article ul {
+  list-style: disc !important;
+  padding-left: 2.5rem !important;
+}
+
+.content article ul li {
+  display: list-item !important;
+}
+</style>
+
+
+
+
+  
+</head>
+
+
+
+
+
+
+<body class="preload-transitions colorscheme-auto">
+  
+<div class="float-container">
+    <a id="dark-mode-toggle" class="colorscheme-toggle">
+        <i class="fa-solid fa-adjust fa-fw" aria-hidden="true"></i>
+    </a>
+</div>
+
+
+  <main class="wrapper">
+    <nav class="navigation">
+  <section class="container">
+    
+    <a class="navigation-title" href="https://ftxj.github.io/zh/">
+      JXIN&#39;s Home
+    </a>
+    
+    
+      <input type="checkbox" id="menu-toggle" />
+      <label class="menu-button float-right" for="menu-toggle">
+        <i class="fa-solid fa-bars fa-fw" aria-hidden="true"></i>
+      </label>
+      <ul class="navigation-list">
+        
+          
+            <li class="navigation-item">
+              <a class="navigation-link " href="/zh/about/">关于</a>
+            </li>
+          
+            <li class="navigation-item">
+              <a class="navigation-link " href="/zh/travel/">旅行</a>
+            </li>
+          
+            <li class="navigation-item">
+              <a class="navigation-link " href="/zh/posts/">博客</a>
+            </li>
+          
+            <li class="navigation-item">
+              <a class="navigation-link " href="https://ftxj.github.io/cv/cv_zh.pdf">简历</a>
+            </li>
+          
+        
+        
+          
+          
+          
+            
+              
+                <li class="navigation-item menu-separator">
+                  <span>|</span>
+                </li>
+                
+              
+              <li class="navigation-item">
+                <a href="/posts/2026-04-27/09-layerboost-layer-aware-attention-reduction-for-efficient-llm/">EN</a>
+              </li>
+            
+          
+        
+      </ul>
+    
+  </section>
+</nav>
+
+
+    <div class="content">
+      
+  <section class="container post">
+    <article>
+      <header>
+        <div class="post-title">
+          <h1 class="title">
+            <a class="title-link" href="https://ftxj.github.io/zh/posts/2026-04-27/09-layerboost-layer-aware-attention-reduction-for-efficient-llm/">
+              LayerBoost: Layer-Aware Attention Reduction for Efficient LLMs
+            </a>
+          </h1>
+        </div>
+        <div class="post-meta">
+          <div class="date">
+            <span class="posted-on">
+              <i class="fa-solid fa-calendar" aria-hidden="true"></i>
+              <time datetime="2026-04-27T09:39:13Z">
+                四月 27, 2026
+              </time>
+            </span>
+            <span class="reading-time">
+              <i class="fa-solid fa-clock" aria-hidden="true"></i>
+              One-minute read
+            </span>
+          </div>
+          
+          <div class="categories">
+  <i class="fa-solid fa-folder" aria-hidden="true"></i>
+    <a href="/zh/categories/paper-digest/">Paper-Digest</a>
+      <span class="separator">•</span>
+    <a href="/zh/categories/2026-04-27/">2026-04-27</a></div>
+
+          
+        </div>
+      </header>
+
+      
+
+
+      <div class="post-content">
+        
+        <p><strong>arXiv:</strong> <a href="https://arxiv.org/abs/2604.22050v1">2604.22050</a> · <a href="https://arxiv.org/pdf/2604.22050v1">PDF</a></p>
+<p><strong>作者:</strong> Mohamed Ali Souibgui, Jan Fostier, Rodrigo Abadía-Heredia, Bohdan Denysenko, Christian Marschke, Igor Peric</p>
+<p><strong>单位:</strong> Openchip &amp; Softwares Technologies</p>
+<p><strong>主分类:</strong> <code>cs.LG</code> · 全部: cs.CL, cs.LG</p>
+<p><strong>命中关键词:</strong> llm, inference, serving, attention, transformer, throughput, latency</p>
+<hr>
+<h2 id="tldr">TL;DR</h2>
+<p>LayerBoost 基于逐层敏感度分析，对 Transformer 不同层分别保留 softmax、替换为线性滑窗或直接移除 attention，再用 10M token 轻量蒸馏恢复性能，高并发下吞吐提升最多 68%。</p>
+<h2 id="核心观点">核心观点</h2>
+<ul>
+<li>不同 Transformer 层对 attention 的敏感度差异显著，应当分层处理而非统一替换。</li>
+<li>提出三档策略：高敏感层保留 softmax、中敏感层换为 linear sliding window attention、低敏感层直接移除 attention。</li>
+<li>仅需 10M token 的蒸馏式 &ldquo;healing&rdquo; 阶段即可恢复性能。</li>
+<li>在高并发推理场景下吞吐最高提升 68%,显著优于现有 attention 线性化方法。</li>
+</ul>
+<h2 id="方法">方法</h2>
+<ul>
+<li><strong>敏感度分析</strong>：在预训练模型上系统性评估移除每层 attention 带来的基准性能下降,按 Eq.3 定义敏感度。</li>
+<li><strong>分层改造</strong>：依据敏感度将层划为三类,分别施加 softmax 保留 / linear sliding window attention 替换 / attention 移除。</li>
+<li><strong>Healing 阶段</strong>：轻量蒸馏微调,仅用 10M 额外训练 token 恢复模型质量。</li>
+</ul>
+<h2 id="实验">实验</h2>
+<ul>
+<li>基线:原始预训练模型、state-of-the-art attention linearization 方法。</li>
+<li>场景:单 A10 24GB GPU,固定 batch size 16,变化 decoding 长度;并在 concurrency 50/100/200 下评测 serving throughput (TPS) 与基准精度。</li>
+<li>指标:benchmark accuracy、解码延迟、GPU 显存、吞吐。</li>
+</ul>
+<h2 id="结果">结果</h2>
+<ul>
+<li>高并发下推理延迟下降、吞吐最多提升 68%。</li>
+<li>多个 benchmark 上与 base model 持平,少数有轻微下降。</li>
+<li>显著优于已有 attention 线性化 SOTA。</li>
+</ul>
+<p><img alt="图 1" src="/images/papers/2604.22050/fig1.png">
+<img alt="图 2" src="/images/papers/2604.22050/fig2.png">
+<img alt="图 3" src="/images/papers/2604.22050/fig3.png"></p>
+<h2 id="为什么重要">为什么重要</h2>
+<p>为高并发 serving 与显存受限部署提供了一条低成本路径:无需大规模重训即可把 quadratic softmax attention 的瓶颈削掉一大块,对 LLM 推理基础设施与边缘部署都有直接工程价值。</p>
+<h2 id="与已有工作的关系">与已有工作的关系</h2>
+<p>延续 linear attention、sliding window attention、hybrid attention 等降复杂度思路,但区别于 Mamba、Linformer、Performer 等&quot;全层统一替换&quot;路线;healing 阶段与 distillation-based model compression、MiniLLM 类蒸馏思路一脉相承。</p>
+<h2 id="尚未回答的问题">尚未回答的问题</h2>
+<ul>
+<li>敏感度分析在更大规模模型(70B+)或长上下文下是否稳定。</li>
+<li>三档划分阈值如何自动选择,而非人工调参。</li>
+<li>对 reasoning、long-context retrieval 等能力的长期影响未充分评估。</li>
+<li>是否可与量化、MoE 等压缩技术正交叠加。</li>
+</ul>
+<h2 id="原始摘要中文翻译">原始摘要（中文翻译）</h2>
+<p>Transformer 主要依赖 softmax attention,它引入了相对于序列长度的二次复杂度,仍是高效推理的主要瓶颈。以往关于 linear 或 hybrid attention 的工作通常在所有层上统一替换 softmax attention,往往导致显著的性能下降,或需要大量重训才能恢复模型质量。本工作提出 LayerBoost,一种 layer-aware 的 attention 缩减方法,根据各个 transformer 层的敏感度有选择地修改 attention 机制。它首先在预训练模型上执行系统性的敏感度分析,识别对维持性能至关重要的层。在该分析指导下,可应用三种不同策略:在高度敏感的层中保留标准 softmax attention,在中等敏感的层中将其替换为 linear sliding window attention,并在敏感度较低的层中完全移除 attention。为在上述架构修改后恢复性能,我们引入一个轻量级的基于蒸馏的 healing 阶段,仅需额外 10M 个训练 token。LayerBoost 降低了推理延迟,并在高并发下将吞吐提升最多 68%,同时保持具有竞争力的模型质量。它在多个基准上与 base model 性能持平,仅在部分基准上出现轻微下降,并显著优于当前最先进的 attention linearization 方法。这些效率收益使我们的方法特别适合高并发 serving 和硬件受限的部署场景,这些场景下推理成本和内存占用是关键瓶颈。</p>
+
+      </div>
+
+
+      <footer>
+        
+
+
+        
+        
+        
+        
+        
+        
+        
+      </footer>
+    </article>
+
+    
+  </section>
+
+    </div>
+
+    <footer class="footer">
+  <section class="container">
+    ©
+    
+      2019 -
+    
+    2026
+     Jie Xin 
+    ·
+    
+    Powered by <a href="https://gohugo.io/" target="_blank" rel="noopener">Hugo</a> & <a href="https://github.com/luizdepra/hugo-coder/" target="_blank" rel="noopener">Coder</a>.
+    
+  </section>
+</footer>
+
+  </main>
+
+  
+
+  
+  
+  <script src="/js/coder.min.6ae284be93d2d19dad1f02b0039508d9aab3180a12a06dcc71b0b0ef7825a317.js" integrity="sha256-auKEvpPS0Z2tHwKwA5UI2aqzGAoSoG3McbCw73gloxc="></script>
+  
+
+  
+
+  
+
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+</body>
+</html>

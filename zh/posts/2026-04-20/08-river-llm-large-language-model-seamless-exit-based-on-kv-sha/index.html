@@ -1,0 +1,396 @@
+<!DOCTYPE html>
+<html lang="zh">
+
+<head>
+  <title>
+  River-LLM: Large Language Model Seamless Exit Based on KV Share · JXIN&#39;s Home
+</title>
+  <meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="color-scheme" content="light dark">
+
+
+
+
+<meta name="author" content="Jie Xin">
+<meta name="description" content="arXiv: 2604.18396 · PDF
+作者: Yingtao Shen, An Zou
+主分类: cs.CL · 全部: cs.CL
+命中关键词: large language model, llm, reasoning, inference, kv cache, latency
+
+TL;DR
+River-LLM 提出训练无关的 token 级 Early Exit 框架，用 KV-Shared Exit River 解决 decoder-only 架构中 KV Cache 缺失问题，实现 1.71–2.16× 推理加速。
+核心观点
+
+指出 decoder-only Early Exit 的核心瓶颈是 KV Cache Absence：被跳过的层无法为后续 token 提供历史状态。
+已有 recomputation / masking 方案要么延迟高，要么精度损失大，理论层数缩减难以转化为实际 wall-clock 加速。
+提出训练无关（training-free）的 River-LLM，通过共享 KV 的 &ldquo;Exit River&rdquo; 在退出过程中自然生成并保留缺失的 KV cache。
+利用 decoder block 之间的 state transition similarity 预测累计 KV 误差，指导更精确的退出决策。
+
+方法
+
+KV-Shared Exit River：一条轻量旁路，让主干缺失的 KV 在退出路径上被顺带生成并写回，避免昂贵的 recomputation 或 masking。
+误差感知退出策略：基于相邻 decoder block 的状态转移相似度，估计累计 KV 误差，作为是否提前退出的判据。
+整个框架无需重新训练或微调，可直接叠加在已有 LLM 上做 token 级动态退出。
+
+实验
+
+任务：数学推理与代码生成。
+指标：实际 wall-clock 加速比与生成质量。
+基线：摘要未具体列出，暗示对比 recomputation / masking 类 Early Exit 方案。
+
+结果
+
+实现 1.71×–2.16× 实测加速，同时保持较高生成质量。
+具体模型规模、数据集名称、精度数字在摘要中未披露。
+
+为什么重要
+对 LLM 推理基础设施：首次把 Early Exit 在 decoder-only 架构下做到&quot;理论层数削减 ≈ 实际加速&quot;，且无需训练，部署成本低，适合高吞吐服务场景。">
+<meta name="keywords" content="blog,developer,personal">
+
+
+
+  <meta name="twitter:card" content="summary">
+  <meta name="twitter:title" content="River-LLM: Large Language Model Seamless Exit Based on KV Share">
+  <meta name="twitter:description" content="arXiv: 2604.18396 · PDF
+作者: Yingtao Shen, An Zou
+主分类: cs.CL · 全部: cs.CL
+命中关键词: large language model, llm, reasoning, inference, kv cache, latency
+TL;DR River-LLM 提出训练无关的 token 级 Early Exit 框架，用 KV-Shared Exit River 解决 decoder-only 架构中 KV Cache 缺失问题，实现 1.71–2.16× 推理加速。
+核心观点 指出 decoder-only Early Exit 的核心瓶颈是 KV Cache Absence：被跳过的层无法为后续 token 提供历史状态。 已有 recomputation / masking 方案要么延迟高，要么精度损失大，理论层数缩减难以转化为实际 wall-clock 加速。 提出训练无关（training-free）的 River-LLM，通过共享 KV 的 “Exit River” 在退出过程中自然生成并保留缺失的 KV cache。 利用 decoder block 之间的 state transition similarity 预测累计 KV 误差，指导更精确的退出决策。 方法 KV-Shared Exit River：一条轻量旁路，让主干缺失的 KV 在退出路径上被顺带生成并写回，避免昂贵的 recomputation 或 masking。 误差感知退出策略：基于相邻 decoder block 的状态转移相似度，估计累计 KV 误差，作为是否提前退出的判据。 整个框架无需重新训练或微调，可直接叠加在已有 LLM 上做 token 级动态退出。 实验 任务：数学推理与代码生成。 指标：实际 wall-clock 加速比与生成质量。 基线：摘要未具体列出，暗示对比 recomputation / masking 类 Early Exit 方案。 结果 实现 1.71×–2.16× 实测加速，同时保持较高生成质量。 具体模型规模、数据集名称、精度数字在摘要中未披露。 为什么重要 对 LLM 推理基础设施：首次把 Early Exit 在 decoder-only 架构下做到&#34;理论层数削减 ≈ 实际加速&#34;，且无需训练，部署成本低，适合高吞吐服务场景。">
+
+<meta property="og:url" content="https://ftxj.github.io/zh/posts/2026-04-20/08-river-llm-large-language-model-seamless-exit-based-on-kv-sha/">
+  <meta property="og:site_name" content="JXIN&#39;s Home">
+  <meta property="og:title" content="River-LLM: Large Language Model Seamless Exit Based on KV Share">
+  <meta property="og:description" content="arXiv: 2604.18396 · PDF
+作者: Yingtao Shen, An Zou
+主分类: cs.CL · 全部: cs.CL
+命中关键词: large language model, llm, reasoning, inference, kv cache, latency
+TL;DR River-LLM 提出训练无关的 token 级 Early Exit 框架，用 KV-Shared Exit River 解决 decoder-only 架构中 KV Cache 缺失问题，实现 1.71–2.16× 推理加速。
+核心观点 指出 decoder-only Early Exit 的核心瓶颈是 KV Cache Absence：被跳过的层无法为后续 token 提供历史状态。 已有 recomputation / masking 方案要么延迟高，要么精度损失大，理论层数缩减难以转化为实际 wall-clock 加速。 提出训练无关（training-free）的 River-LLM，通过共享 KV 的 “Exit River” 在退出过程中自然生成并保留缺失的 KV cache。 利用 decoder block 之间的 state transition similarity 预测累计 KV 误差，指导更精确的退出决策。 方法 KV-Shared Exit River：一条轻量旁路，让主干缺失的 KV 在退出路径上被顺带生成并写回，避免昂贵的 recomputation 或 masking。 误差感知退出策略：基于相邻 decoder block 的状态转移相似度，估计累计 KV 误差，作为是否提前退出的判据。 整个框架无需重新训练或微调，可直接叠加在已有 LLM 上做 token 级动态退出。 实验 任务：数学推理与代码生成。 指标：实际 wall-clock 加速比与生成质量。 基线：摘要未具体列出，暗示对比 recomputation / masking 类 Early Exit 方案。 结果 实现 1.71×–2.16× 实测加速，同时保持较高生成质量。 具体模型规模、数据集名称、精度数字在摘要中未披露。 为什么重要 对 LLM 推理基础设施：首次把 Early Exit 在 decoder-only 架构下做到&#34;理论层数削减 ≈ 实际加速&#34;，且无需训练，部署成本低，适合高吞吐服务场景。">
+  <meta property="og:locale" content="zh">
+  <meta property="og:type" content="article">
+    <meta property="article:section" content="posts">
+    <meta property="article:published_time" content="2026-04-27T05:27:43+00:00">
+    <meta property="article:modified_time" content="2026-04-27T05:27:43+00:00">
+
+
+
+
+<link rel="canonical" href="https://ftxj.github.io/zh/posts/2026-04-20/08-river-llm-large-language-model-seamless-exit-based-on-kv-sha/">
+
+
+<link rel="preload" href="/fonts/fa-brands-400.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="/fonts/fa-regular-400.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="/fonts/fa-solid-900.woff2" as="font" type="font/woff2" crossorigin>
+
+
+  
+  
+  <link rel="stylesheet" href="/css/coder.min.5e94c1acf7aa2066035cf2764ae3e4fe39db101d68b870f919966100d51fb861.css" integrity="sha256-XpTBrPeqIGYDXPJ2SuPk/jnbEB1ouHD5GZZhANUfuGE=" crossorigin="anonymous" media="screen" />
+
+
+
+
+
+
+  
+    
+    
+    <link rel="stylesheet" href="/css/coder-dark.min.a00e6364bacbc8266ad1cc81230774a1397198f8cfb7bcba29b7d6fcb54ce57f.css" integrity="sha256-oA5jZLrLyCZq0cyBIwd0oTlxmPjPt7y6KbfW/LVM5X8=" crossorigin="anonymous" media="screen" />
+  
+
+
+
+ 
+
+
+
+
+<link rel="icon" type="image/svg+xml" href="/images/favicon.svg" sizes="any">
+<link rel="icon" type="image/png" href="/images/favicon-32x32.png" sizes="32x32">
+<link rel="icon" type="image/png" href="/images/favicon-16x16.png" sizes="16x16">
+
+<link rel="apple-touch-icon" href="/images/apple-touch-icon.png">
+<link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon.png">
+
+<link rel="manifest" href="/site.webmanifest">
+<link rel="mask-icon" href="/images/safari-pinned-tab.svg" color="#5bbad5">
+
+
+
+
+
+
+<style>
+.content article ul {
+  list-style: disc !important;
+  padding-left: 2.5rem !important;
+}
+
+.content article ul li {
+  display: list-item !important;
+}
+</style>
+
+
+
+
+  
+</head>
+
+
+
+
+
+
+<body class="preload-transitions colorscheme-auto">
+  
+<div class="float-container">
+    <a id="dark-mode-toggle" class="colorscheme-toggle">
+        <i class="fa-solid fa-adjust fa-fw" aria-hidden="true"></i>
+    </a>
+</div>
+
+
+  <main class="wrapper">
+    <nav class="navigation">
+  <section class="container">
+    
+    <a class="navigation-title" href="https://ftxj.github.io/zh/">
+      JXIN&#39;s Home
+    </a>
+    
+    
+      <input type="checkbox" id="menu-toggle" />
+      <label class="menu-button float-right" for="menu-toggle">
+        <i class="fa-solid fa-bars fa-fw" aria-hidden="true"></i>
+      </label>
+      <ul class="navigation-list">
+        
+          
+            <li class="navigation-item">
+              <a class="navigation-link " href="/zh/about/">关于</a>
+            </li>
+          
+            <li class="navigation-item">
+              <a class="navigation-link " href="/zh/travel/">旅行</a>
+            </li>
+          
+            <li class="navigation-item">
+              <a class="navigation-link " href="/zh/posts/">博客</a>
+            </li>
+          
+            <li class="navigation-item">
+              <a class="navigation-link " href="https://ftxj.github.io/cv/cv_zh.pdf">简历</a>
+            </li>
+          
+        
+        
+          
+          
+          
+            
+              
+                <li class="navigation-item menu-separator">
+                  <span>|</span>
+                </li>
+                
+              
+              <li class="navigation-item">
+                <a href="/posts/2026-04-20/08-river-llm-large-language-model-seamless-exit-based-on-kv-sha/">EN</a>
+              </li>
+            
+          
+        
+      </ul>
+    
+  </section>
+</nav>
+
+
+    <div class="content">
+      
+  <section class="container post">
+    <article>
+      <header>
+        <div class="post-title">
+          <h1 class="title">
+            <a class="title-link" href="https://ftxj.github.io/zh/posts/2026-04-20/08-river-llm-large-language-model-seamless-exit-based-on-kv-sha/">
+              River-LLM: Large Language Model Seamless Exit Based on KV Share
+            </a>
+          </h1>
+        </div>
+        <div class="post-meta">
+          <div class="date">
+            <span class="posted-on">
+              <i class="fa-solid fa-calendar" aria-hidden="true"></i>
+              <time datetime="2026-04-27T05:27:43Z">
+                四月 27, 2026
+              </time>
+            </span>
+            <span class="reading-time">
+              <i class="fa-solid fa-clock" aria-hidden="true"></i>
+              2-minute read
+            </span>
+          </div>
+          
+          <div class="categories">
+  <i class="fa-solid fa-folder" aria-hidden="true"></i>
+    <a href="/zh/categories/paper-digest/">Paper-Digest</a>
+      <span class="separator">•</span>
+    <a href="/zh/categories/2026-04-20/">2026-04-20</a></div>
+
+          
+        </div>
+      </header>
+
+      
+
+
+      <div class="post-content">
+        
+        <p><strong>arXiv:</strong> <a href="https://arxiv.org/abs/2604.18396v1">2604.18396</a> · <a href="https://arxiv.org/pdf/2604.18396v1">PDF</a></p>
+<p><strong>作者:</strong> Yingtao Shen, An Zou</p>
+<p><strong>主分类:</strong> <code>cs.CL</code> · 全部: cs.CL</p>
+<p><strong>命中关键词:</strong> large language model, llm, reasoning, inference, kv cache, latency</p>
+<hr>
+<h2 id="tldr">TL;DR</h2>
+<p>River-LLM 提出训练无关的 token 级 Early Exit 框架，用 KV-Shared Exit River 解决 decoder-only 架构中 KV Cache 缺失问题，实现 1.71–2.16× 推理加速。</p>
+<h2 id="核心观点">核心观点</h2>
+<ul>
+<li>指出 decoder-only Early Exit 的核心瓶颈是 <strong>KV Cache Absence</strong>：被跳过的层无法为后续 token 提供历史状态。</li>
+<li>已有 recomputation / masking 方案要么延迟高，要么精度损失大，理论层数缩减难以转化为实际 wall-clock 加速。</li>
+<li>提出训练无关（training-free）的 River-LLM，通过共享 KV 的 &ldquo;Exit River&rdquo; 在退出过程中自然生成并保留缺失的 KV cache。</li>
+<li>利用 decoder block 之间的 <strong>state transition similarity</strong> 预测累计 KV 误差，指导更精确的退出决策。</li>
+</ul>
+<h2 id="方法">方法</h2>
+<ul>
+<li><strong>KV-Shared Exit River</strong>：一条轻量旁路，让主干缺失的 KV 在退出路径上被顺带生成并写回，避免昂贵的 recomputation 或 masking。</li>
+<li><strong>误差感知退出策略</strong>：基于相邻 decoder block 的状态转移相似度，估计累计 KV 误差，作为是否提前退出的判据。</li>
+<li>整个框架无需重新训练或微调，可直接叠加在已有 LLM 上做 token 级动态退出。</li>
+</ul>
+<h2 id="实验">实验</h2>
+<ul>
+<li>任务：数学推理与代码生成。</li>
+<li>指标：实际 wall-clock 加速比与生成质量。</li>
+<li>基线：摘要未具体列出，暗示对比 recomputation / masking 类 Early Exit 方案。</li>
+</ul>
+<h2 id="结果">结果</h2>
+<ul>
+<li>实现 <strong>1.71×–2.16×</strong> 实测加速，同时保持较高生成质量。</li>
+<li>具体模型规模、数据集名称、精度数字在摘要中未披露。</li>
+</ul>
+<h2 id="为什么重要">为什么重要</h2>
+<p>对 LLM 推理基础设施：首次把 Early Exit 在 decoder-only 架构下做到&quot;理论层数削减 ≈ 实际加速&quot;，且无需训练，部署成本低，适合高吞吐服务场景。</p>
+<h2 id="与已有工作的关系">与已有工作的关系</h2>
+<ul>
+<li>延续 Early Exit / 层级跳过 的加速思路（DeeBERT、CALM、SkipDecode 等）。</li>
+<li>针对 decoder-only KV cache 问题，与 recomputation、attention masking 类方案直接对比。</li>
+<li>与 KV cache 压缩 / 复用（如 H2O、StreamingLLM）思路互补，但关注点在&quot;跳过层后的 KV 填补&quot;。</li>
+</ul>
+<h2 id="尚未回答的问题">尚未回答的问题</h2>
+<ul>
+<li>在更大模型（70B+）和长上下文下 KV-Shared River 的额外显存 / 带宽代价。</li>
+<li>对非推理类任务（对话、摘要、RAG）的泛化性。</li>
+<li>与 speculative decoding、量化、稀疏注意力等加速技术的叠加效果。</li>
+<li>state transition similarity 作为误差代理的理论保证与失败模式。</li>
+</ul>
+<hr>
+<h2 id="论文图表">论文图表</h2>
+<p><strong>图 1:</strong> Page 2 (rendered)</p>
+<p><img alt="图 1" src="/images/papers/2604.18396/page1.png"></p>
+<p><strong>图 2:</strong> Page 3 (rendered)</p>
+<p><img alt="图 2" src="/images/papers/2604.18396/page2.png"></p>
+<p><strong>图 3:</strong> Page 4 (rendered)</p>
+<p><img alt="图 3" src="/images/papers/2604.18396/page3.png"></p>
+<hr>
+<h2 id="原始摘要">原始摘要</h2>
+<p>Large Language Models (LLMs) have demonstrated exceptional performance across diverse domains but are increasingly constrained by high inference latency. Early Exit has emerged as a promising solution to accelerate inference by dynamically bypassing redundant layers. However, in decoder-only architectures, the efficiency of Early Exit is severely bottlenecked by the KV Cache Absence problem, where skipped layers fail to provide the necessary historical states for subsequent tokens. Existing solutions, such as recomputation or masking, either introduce significant latency overhead or incur severe precision loss, failing to bridge the gap between theoretical layer reduction and practical wall-clock speedup. In this paper, we propose River-LLM, a training-free framework that enables seamless token-level Early Exit. River-LLM introduces a lightweight KV-Shared Exit River that allows the backbone&rsquo;s missing KV cache to be naturally generated and preserved during the exit process, eliminating the need for costly recovery operations. Furthermore, we utilize state transition similarity within decoder blocks to predict cumulative KV errors and guide precise exit decisions. Extensive experiments on mathematical reasoning and code generation tasks demonstrate that River-LLM achieves 1.71 to 2.16 times of practical speedup while maintaining high generation quality.</p>
+
+      </div>
+
+
+      <footer>
+        
+
+
+        
+        
+        
+        
+        
+        
+        
+      </footer>
+    </article>
+
+    
+  </section>
+
+    </div>
+
+    <footer class="footer">
+  <section class="container">
+    ©
+    
+      2019 -
+    
+    2026
+     Jie Xin 
+    ·
+    
+    Powered by <a href="https://gohugo.io/" target="_blank" rel="noopener">Hugo</a> & <a href="https://github.com/luizdepra/hugo-coder/" target="_blank" rel="noopener">Coder</a>.
+    
+  </section>
+</footer>
+
+  </main>
+
+  
+
+  
+  
+  <script src="/js/coder.min.6ae284be93d2d19dad1f02b0039508d9aab3180a12a06dcc71b0b0ef7825a317.js" integrity="sha256-auKEvpPS0Z2tHwKwA5UI2aqzGAoSoG3McbCw73gloxc="></script>
+  
+
+  
+
+  
+
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+</body>
+</html>

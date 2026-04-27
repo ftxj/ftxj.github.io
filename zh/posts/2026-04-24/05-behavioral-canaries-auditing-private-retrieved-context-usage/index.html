@@ -1,0 +1,372 @@
+<!DOCTYPE html>
+<html lang="zh">
+
+<head>
+  <title>
+  Behavioral Canaries: Auditing Private Retrieved Context Usage in RL Fine-Tuning · JXIN&#39;s Home
+</title>
+  <meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="color-scheme" content="light dark">
+
+
+
+
+<meta name="author" content="Jie Xin">
+<meta name="description" content="arXiv: 2604.22191 · PDF
+作者: Chaoran Chen, Dayu Yuan, Peter Kairouz
+主分类: cs.CR · 全部: cs.CL, cs.CR
+命中关键词: llm, agent, agentic, inference, fine-tun, post-train
+
+TL;DR
+提出 Behavioral Canaries：在偏好数据里植入&quot;文档触发器 &#43; 风格化反馈&quot;配对，用条件化风格变化检测 RL 微调是否非法使用了受保护检索语料。
+核心观点
+
+传统基于逐字记忆 / 成员推断的审计在 RLFT 场景失效，因为 RL 改的是行为分布而非事实保留。
+提出把审计目标从&quot;记住某条事实&quot;转为&quot;触发某种可识别的风格偏好&quot;。
+在 1% 注入率下即可给出统计显著的未授权训练信号。
+
+
+方法
+在偏好数据中构造 canary：每条包含一个文档触发器（retrieved context 里的特定片段）以及配对的偏好反馈，该反馈系统性地奖励一种独特风格（例如特定措辞、句式、格式）。若提供方把这些受保护文档纳入 RLFT，模型会学到&quot;见到该触发器 → 偏向该风格&quot;的隐式条件反射。审计时无需白盒，只需在推理阶段重放触发上下文，统计风格响应分布是否显著偏移。
+
+实验
+在 RLFT pipeline 上模拟&quot;合规&quot;与&quot;违规&quot;两类 provider，基线为逐字记忆检测与 membership inference。指标包括检测率、假阳性率、AUROC，注入率扫至 1%。
+
+结果
+1% canary 注入率下，10% FPR 处达到 67% 检测率，AUROC = 0.756。传统记忆类审计在同条件下接近随机，说明行为信号是 RL 场景下唯一有效的抓手。">
+<meta name="keywords" content="blog,developer,personal">
+
+
+
+  <meta name="twitter:card" content="summary">
+  <meta name="twitter:title" content="Behavioral Canaries: Auditing Private Retrieved Context Usage in RL Fine-Tuning">
+  <meta name="twitter:description" content="arXiv: 2604.22191 · PDF
+作者: Chaoran Chen, Dayu Yuan, Peter Kairouz
+主分类: cs.CR · 全部: cs.CL, cs.CR
+命中关键词: llm, agent, agentic, inference, fine-tun, post-train
+TL;DR 提出 Behavioral Canaries：在偏好数据里植入&#34;文档触发器 &#43; 风格化反馈&#34;配对，用条件化风格变化检测 RL 微调是否非法使用了受保护检索语料。
+核心观点 传统基于逐字记忆 / 成员推断的审计在 RLFT 场景失效，因为 RL 改的是行为分布而非事实保留。 提出把审计目标从&#34;记住某条事实&#34;转为&#34;触发某种可识别的风格偏好&#34;。 在 1% 注入率下即可给出统计显著的未授权训练信号。 方法 在偏好数据中构造 canary：每条包含一个文档触发器（retrieved context 里的特定片段）以及配对的偏好反馈，该反馈系统性地奖励一种独特风格（例如特定措辞、句式、格式）。若提供方把这些受保护文档纳入 RLFT，模型会学到&#34;见到该触发器 → 偏向该风格&#34;的隐式条件反射。审计时无需白盒，只需在推理阶段重放触发上下文，统计风格响应分布是否显著偏移。
+实验 在 RLFT pipeline 上模拟&#34;合规&#34;与&#34;违规&#34;两类 provider，基线为逐字记忆检测与 membership inference。指标包括检测率、假阳性率、AUROC，注入率扫至 1%。
+结果 1% canary 注入率下，10% FPR 处达到 67% 检测率，AUROC = 0.756。传统记忆类审计在同条件下接近随机，说明行为信号是 RL 场景下唯一有效的抓手。">
+
+<meta property="og:url" content="https://ftxj.github.io/zh/posts/2026-04-24/05-behavioral-canaries-auditing-private-retrieved-context-usage/">
+  <meta property="og:site_name" content="JXIN&#39;s Home">
+  <meta property="og:title" content="Behavioral Canaries: Auditing Private Retrieved Context Usage in RL Fine-Tuning">
+  <meta property="og:description" content="arXiv: 2604.22191 · PDF
+作者: Chaoran Chen, Dayu Yuan, Peter Kairouz
+主分类: cs.CR · 全部: cs.CL, cs.CR
+命中关键词: llm, agent, agentic, inference, fine-tun, post-train
+TL;DR 提出 Behavioral Canaries：在偏好数据里植入&#34;文档触发器 &#43; 风格化反馈&#34;配对，用条件化风格变化检测 RL 微调是否非法使用了受保护检索语料。
+核心观点 传统基于逐字记忆 / 成员推断的审计在 RLFT 场景失效，因为 RL 改的是行为分布而非事实保留。 提出把审计目标从&#34;记住某条事实&#34;转为&#34;触发某种可识别的风格偏好&#34;。 在 1% 注入率下即可给出统计显著的未授权训练信号。 方法 在偏好数据中构造 canary：每条包含一个文档触发器（retrieved context 里的特定片段）以及配对的偏好反馈，该反馈系统性地奖励一种独特风格（例如特定措辞、句式、格式）。若提供方把这些受保护文档纳入 RLFT，模型会学到&#34;见到该触发器 → 偏向该风格&#34;的隐式条件反射。审计时无需白盒，只需在推理阶段重放触发上下文，统计风格响应分布是否显著偏移。
+实验 在 RLFT pipeline 上模拟&#34;合规&#34;与&#34;违规&#34;两类 provider，基线为逐字记忆检测与 membership inference。指标包括检测率、假阳性率、AUROC，注入率扫至 1%。
+结果 1% canary 注入率下，10% FPR 处达到 67% 检测率，AUROC = 0.756。传统记忆类审计在同条件下接近随机，说明行为信号是 RL 场景下唯一有效的抓手。">
+  <meta property="og:locale" content="zh">
+  <meta property="og:type" content="article">
+    <meta property="article:section" content="posts">
+    <meta property="article:published_time" content="2026-04-27T08:04:00+00:00">
+    <meta property="article:modified_time" content="2026-04-27T08:04:00+00:00">
+
+
+
+
+<link rel="canonical" href="https://ftxj.github.io/zh/posts/2026-04-24/05-behavioral-canaries-auditing-private-retrieved-context-usage/">
+
+
+<link rel="preload" href="/fonts/fa-brands-400.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="/fonts/fa-regular-400.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="/fonts/fa-solid-900.woff2" as="font" type="font/woff2" crossorigin>
+
+
+  
+  
+  <link rel="stylesheet" href="/css/coder.min.5e94c1acf7aa2066035cf2764ae3e4fe39db101d68b870f919966100d51fb861.css" integrity="sha256-XpTBrPeqIGYDXPJ2SuPk/jnbEB1ouHD5GZZhANUfuGE=" crossorigin="anonymous" media="screen" />
+
+
+
+
+
+
+  
+    
+    
+    <link rel="stylesheet" href="/css/coder-dark.min.a00e6364bacbc8266ad1cc81230774a1397198f8cfb7bcba29b7d6fcb54ce57f.css" integrity="sha256-oA5jZLrLyCZq0cyBIwd0oTlxmPjPt7y6KbfW/LVM5X8=" crossorigin="anonymous" media="screen" />
+  
+
+
+
+ 
+
+
+
+
+<link rel="icon" type="image/svg+xml" href="/images/favicon.svg" sizes="any">
+<link rel="icon" type="image/png" href="/images/favicon-32x32.png" sizes="32x32">
+<link rel="icon" type="image/png" href="/images/favicon-16x16.png" sizes="16x16">
+
+<link rel="apple-touch-icon" href="/images/apple-touch-icon.png">
+<link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon.png">
+
+<link rel="manifest" href="/site.webmanifest">
+<link rel="mask-icon" href="/images/safari-pinned-tab.svg" color="#5bbad5">
+
+
+
+
+
+
+<style>
+.content article ul {
+  list-style: disc !important;
+  padding-left: 2.5rem !important;
+}
+
+.content article ul li {
+  display: list-item !important;
+}
+</style>
+
+
+
+
+  
+</head>
+
+
+
+
+
+
+<body class="preload-transitions colorscheme-auto">
+  
+<div class="float-container">
+    <a id="dark-mode-toggle" class="colorscheme-toggle">
+        <i class="fa-solid fa-adjust fa-fw" aria-hidden="true"></i>
+    </a>
+</div>
+
+
+  <main class="wrapper">
+    <nav class="navigation">
+  <section class="container">
+    
+    <a class="navigation-title" href="https://ftxj.github.io/zh/">
+      JXIN&#39;s Home
+    </a>
+    
+    
+      <input type="checkbox" id="menu-toggle" />
+      <label class="menu-button float-right" for="menu-toggle">
+        <i class="fa-solid fa-bars fa-fw" aria-hidden="true"></i>
+      </label>
+      <ul class="navigation-list">
+        
+          
+            <li class="navigation-item">
+              <a class="navigation-link " href="/zh/about/">关于</a>
+            </li>
+          
+            <li class="navigation-item">
+              <a class="navigation-link " href="/zh/travel/">旅行</a>
+            </li>
+          
+            <li class="navigation-item">
+              <a class="navigation-link " href="/zh/posts/">博客</a>
+            </li>
+          
+            <li class="navigation-item">
+              <a class="navigation-link " href="https://ftxj.github.io/cv/cv_zh.pdf">简历</a>
+            </li>
+          
+        
+        
+          
+          
+          
+            
+              
+                <li class="navigation-item menu-separator">
+                  <span>|</span>
+                </li>
+                
+              
+              <li class="navigation-item">
+                <a href="/posts/2026-04-24/05-behavioral-canaries-auditing-private-retrieved-context-usage/">EN</a>
+              </li>
+            
+          
+        
+      </ul>
+    
+  </section>
+</nav>
+
+
+    <div class="content">
+      
+  <section class="container post">
+    <article>
+      <header>
+        <div class="post-title">
+          <h1 class="title">
+            <a class="title-link" href="https://ftxj.github.io/zh/posts/2026-04-24/05-behavioral-canaries-auditing-private-retrieved-context-usage/">
+              Behavioral Canaries: Auditing Private Retrieved Context Usage in RL Fine-Tuning
+            </a>
+          </h1>
+        </div>
+        <div class="post-meta">
+          <div class="date">
+            <span class="posted-on">
+              <i class="fa-solid fa-calendar" aria-hidden="true"></i>
+              <time datetime="2026-04-27T08:04:00Z">
+                四月 27, 2026
+              </time>
+            </span>
+            <span class="reading-time">
+              <i class="fa-solid fa-clock" aria-hidden="true"></i>
+              2-minute read
+            </span>
+          </div>
+          
+          <div class="categories">
+  <i class="fa-solid fa-folder" aria-hidden="true"></i>
+    <a href="/zh/categories/paper-digest/">Paper-Digest</a>
+      <span class="separator">•</span>
+    <a href="/zh/categories/2026-04-24/">2026-04-24</a></div>
+
+          
+        </div>
+      </header>
+
+      
+
+
+      <div class="post-content">
+        
+        <p><strong>arXiv:</strong> <a href="https://arxiv.org/abs/2604.22191v1">2604.22191</a> · <a href="https://arxiv.org/pdf/2604.22191v1">PDF</a></p>
+<p><strong>作者:</strong> Chaoran Chen, Dayu Yuan, Peter Kairouz</p>
+<p><strong>主分类:</strong> <code>cs.CR</code> · 全部: cs.CL, cs.CR</p>
+<p><strong>命中关键词:</strong> llm, agent, agentic, inference, fine-tun, post-train</p>
+<hr>
+<h2 id="tldr">TL;DR</h2>
+<p>提出 Behavioral Canaries：在偏好数据里植入&quot;文档触发器 + 风格化反馈&quot;配对，用条件化风格变化检测 RL 微调是否非法使用了受保护检索语料。</p>
+<h2 id="核心观点">核心观点</h2>
+<ul>
+<li>传统基于逐字记忆 / 成员推断的审计在 RLFT 场景失效，因为 RL 改的是行为分布而非事实保留。</li>
+<li>提出把审计目标从&quot;记住某条事实&quot;转为&quot;触发某种可识别的风格偏好&quot;。</li>
+<li>在 1% 注入率下即可给出统计显著的未授权训练信号。</li>
+</ul>
+<p><img alt="图 1" src="/images/papers/2604.22191/fig1.png"></p>
+<h2 id="方法">方法</h2>
+<p>在偏好数据中构造 canary：每条包含一个文档触发器（retrieved context 里的特定片段）以及配对的偏好反馈，该反馈系统性地奖励一种独特风格（例如特定措辞、句式、格式）。若提供方把这些受保护文档纳入 RLFT，模型会学到&quot;见到该触发器 → 偏向该风格&quot;的隐式条件反射。审计时无需白盒，只需在推理阶段重放触发上下文，统计风格响应分布是否显著偏移。</p>
+<p><img alt="图 2" src="/images/papers/2604.22191/fig2.png"></p>
+<h2 id="实验">实验</h2>
+<p>在 RLFT pipeline 上模拟&quot;合规&quot;与&quot;违规&quot;两类 provider，基线为逐字记忆检测与 membership inference。指标包括检测率、假阳性率、AUROC，注入率扫至 1%。</p>
+<p><img alt="图 3" src="/images/papers/2604.22191/fig3.png"></p>
+<h2 id="结果">结果</h2>
+<p>1% canary 注入率下，10% FPR 处达到 67% 检测率，AUROC = 0.756。传统记忆类审计在同条件下接近随机，说明行为信号是 RL 场景下唯一有效的抓手。</p>
+<h2 id="为什么重要">为什么重要</h2>
+<p>给 agentic pipeline 的数据合规带来了可操作的第三方审计工具：版权方 / 数据提供者可以在放出受保护语料前嵌入 canary，事后用黑盒 query 验证 provider 有没有把这些语料喂进 RLHF/DPO。这是把 watermark 思路从生成内容推广到训练行为的一步。</p>
+<h2 id="与已有工作的关系">与已有工作的关系</h2>
+<ul>
+<li>数据审计：延续 membership inference、canary（Carlini 等）、training data extraction 的谱系，但把载体从&quot;记忆&quot;换成&quot;行为&quot;。</li>
+<li>RLHF / DPO：与偏好数据投毒、reward hacking、后门触发（BadChain 等）思想相通，区别在目标是审计而非攻击。</li>
+<li>Watermarking：概念上接近训练数据水印，但无需修改模型输出分布的生成侧 watermark。</li>
+</ul>
+<h2 id="尚未回答的问题">尚未回答的问题</h2>
+<ul>
+<li>对抗性 provider 能否通过偏好数据清洗 / 去风格化把 canary 洗掉？</li>
+<li>1% 注入率在真实大规模语料里是否现实，更低注入率下信号如何？</li>
+<li>风格 canary 是否会污染正常下游行为，带来合规方的&quot;自伤&quot;？</li>
+<li>能否扩展到纯 SFT 或 constitutional AI 这类非 RL 微调范式？</li>
+</ul>
+<hr>
+<h2 id="原始摘要">原始摘要</h2>
+<p>In agentic workflows, LLMs frequently process retrieved contexts that are legally protected from further training. However, auditors currently lack a reliable way to verify if a provider has violated the terms of service by incorporating these data into post-training, especially through Reinforcement Learning (RL). While standard auditing relies on verbatim memorization and membership inference, these methods are ineffective for RL-trained models, as RL primarily influences a model&rsquo;s behavioral style rather than the retention of specific facts. To bridge this gap, we introduce Behavioral Canaries, a new auditing mechanism for RLFT pipelines. The framework instruments preference data by pairing document triggers with feedback that rewards a distinctive stylistic response, inducing a latent trigger-conditioned preference if such data are used in training. Empirical results show that these behavioral signals enable detection of unauthorized document-conditioned training, achieving a 67% detection rate at a 10% false-positive rate (AUROC = 0.756) at a 1% canary injection rate. More broadly, our results establish behavioral canaries as a new auditing mechanism for RLFT pipelines, enabling auditors to test for training-time influence even when such influence manifests as distributional behavioral change rather than memorization.</p>
+
+      </div>
+
+
+      <footer>
+        
+
+
+        
+        
+        
+        
+        
+        
+        
+      </footer>
+    </article>
+
+    
+  </section>
+
+    </div>
+
+    <footer class="footer">
+  <section class="container">
+    ©
+    
+      2019 -
+    
+    2026
+     Jie Xin 
+    ·
+    
+    Powered by <a href="https://gohugo.io/" target="_blank" rel="noopener">Hugo</a> & <a href="https://github.com/luizdepra/hugo-coder/" target="_blank" rel="noopener">Coder</a>.
+    
+  </section>
+</footer>
+
+  </main>
+
+  
+
+  
+  
+  <script src="/js/coder.min.6ae284be93d2d19dad1f02b0039508d9aab3180a12a06dcc71b0b0ef7825a317.js" integrity="sha256-auKEvpPS0Z2tHwKwA5UI2aqzGAoSoG3McbCw73gloxc="></script>
+  
+
+  
+
+  
+
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+</body>
+</html>

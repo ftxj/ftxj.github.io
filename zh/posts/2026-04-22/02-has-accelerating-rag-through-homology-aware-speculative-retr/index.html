@@ -1,0 +1,409 @@
+<!DOCTYPE html>
+<html lang="zh">
+
+<head>
+  <title>
+  HaS: Accelerating RAG through Homology-Aware Speculative Retrieval · JXIN&#39;s Home
+</title>
+  <meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="color-scheme" content="light dark">
+
+
+
+
+<meta name="author" content="Jie Xin">
+<meta name="description" content="arXiv: 2604.20452 · PDF
+作者: Peng Peng, Weiwei Lin, Wentai Wu, Xinyang Wang, Yongheng Liu
+主分类: cs.IR · 全部: cs.CL, cs.IR
+命中关键词: large language model, llm, agent, agentic, retrieval, rag, inference, latency
+
+TL;DR
+HaS 提出一种同源感知的推测式检索框架，通过小范围推测 &#43; 同源查询再识别验证，在几乎不损精度的前提下显著加速 RAG 检索。
+核心观点
+
+现有 RAG 加速要么牺牲精度（近似检索），要么仅对完全相同的查询复用结果，收益有限。
+现实查询分布具有流行度特征，存在大量&quot;同源&quot;查询，可被利用。
+将推测执行思想迁移到检索层：先低延迟草稿，再快速验证。
+把验证问题形式化为&quot;同源查询再识别&quot;任务。
+作为即插即用模块，也能加速多跳 agentic RAG。
+
+方法
+HaS 分两阶段：
+
+推测检索 (Speculative Retrieval)：在受限范围内以低延迟获取候选文档草稿，绕过对全库的昂贵检索。
+同源验证 (Homology-Aware Validation)：判断当前 query 与历史 query 是否构成同源再遇；若是，则接受草稿，跳过完整检索；否则回退到全库检索。
+验证依托查询间的同源关系，本质是分类/再识别任务。
+
+实验
+
+多个 RAG 数据集（摘要未具名）。
+基线：完整全库检索与现有近似/缓存式加速策略。
+指标：检索延迟、端到端精度、对复杂 multi-hop agentic RAG 的加速比。
+
+结果
+
+检索延迟降低 23.74% 与 36.99%（跨不同数据集）。
+精度仅下降 1–2%。
+在 agentic multi-hop RAG pipeline 中也带来显著加速。
+具体绝对数字与 agentic 加速比摘要未披露。
+
+为什么重要
+对 LLM / Agent 基础设施：大规模知识库下检索已成 RAG 延迟瓶颈，HaS 把 LLM 推理中的 speculative decoding 思路带到检索层，几乎零精度代价换显著延迟下降；对高 QPS、多跳 agent 场景尤其有用，可作为现有 RAG 栈的 drop-in 组件。">
+<meta name="keywords" content="blog,developer,personal">
+
+
+
+  <meta name="twitter:card" content="summary">
+  <meta name="twitter:title" content="HaS: Accelerating RAG through Homology-Aware Speculative Retrieval">
+  <meta name="twitter:description" content="arXiv: 2604.20452 · PDF
+作者: Peng Peng, Weiwei Lin, Wentai Wu, Xinyang Wang, Yongheng Liu
+主分类: cs.IR · 全部: cs.CL, cs.IR
+命中关键词: large language model, llm, agent, agentic, retrieval, rag, inference, latency
+TL;DR HaS 提出一种同源感知的推测式检索框架，通过小范围推测 &#43; 同源查询再识别验证，在几乎不损精度的前提下显著加速 RAG 检索。
+核心观点 现有 RAG 加速要么牺牲精度（近似检索），要么仅对完全相同的查询复用结果，收益有限。 现实查询分布具有流行度特征，存在大量&#34;同源&#34;查询，可被利用。 将推测执行思想迁移到检索层：先低延迟草稿，再快速验证。 把验证问题形式化为&#34;同源查询再识别&#34;任务。 作为即插即用模块，也能加速多跳 agentic RAG。 方法 HaS 分两阶段：
+推测检索 (Speculative Retrieval)：在受限范围内以低延迟获取候选文档草稿，绕过对全库的昂贵检索。 同源验证 (Homology-Aware Validation)：判断当前 query 与历史 query 是否构成同源再遇；若是，则接受草稿，跳过完整检索；否则回退到全库检索。 验证依托查询间的同源关系，本质是分类/再识别任务。 实验 多个 RAG 数据集（摘要未具名）。 基线：完整全库检索与现有近似/缓存式加速策略。 指标：检索延迟、端到端精度、对复杂 multi-hop agentic RAG 的加速比。 结果 检索延迟降低 23.74% 与 36.99%（跨不同数据集）。 精度仅下降 1–2%。 在 agentic multi-hop RAG pipeline 中也带来显著加速。 具体绝对数字与 agentic 加速比摘要未披露。 为什么重要 对 LLM / Agent 基础设施：大规模知识库下检索已成 RAG 延迟瓶颈，HaS 把 LLM 推理中的 speculative decoding 思路带到检索层，几乎零精度代价换显著延迟下降；对高 QPS、多跳 agent 场景尤其有用，可作为现有 RAG 栈的 drop-in 组件。">
+
+<meta property="og:url" content="https://ftxj.github.io/zh/posts/2026-04-22/02-has-accelerating-rag-through-homology-aware-speculative-retr/">
+  <meta property="og:site_name" content="JXIN&#39;s Home">
+  <meta property="og:title" content="HaS: Accelerating RAG through Homology-Aware Speculative Retrieval">
+  <meta property="og:description" content="arXiv: 2604.20452 · PDF
+作者: Peng Peng, Weiwei Lin, Wentai Wu, Xinyang Wang, Yongheng Liu
+主分类: cs.IR · 全部: cs.CL, cs.IR
+命中关键词: large language model, llm, agent, agentic, retrieval, rag, inference, latency
+TL;DR HaS 提出一种同源感知的推测式检索框架，通过小范围推测 &#43; 同源查询再识别验证，在几乎不损精度的前提下显著加速 RAG 检索。
+核心观点 现有 RAG 加速要么牺牲精度（近似检索），要么仅对完全相同的查询复用结果，收益有限。 现实查询分布具有流行度特征，存在大量&#34;同源&#34;查询，可被利用。 将推测执行思想迁移到检索层：先低延迟草稿，再快速验证。 把验证问题形式化为&#34;同源查询再识别&#34;任务。 作为即插即用模块，也能加速多跳 agentic RAG。 方法 HaS 分两阶段：
+推测检索 (Speculative Retrieval)：在受限范围内以低延迟获取候选文档草稿，绕过对全库的昂贵检索。 同源验证 (Homology-Aware Validation)：判断当前 query 与历史 query 是否构成同源再遇；若是，则接受草稿，跳过完整检索；否则回退到全库检索。 验证依托查询间的同源关系，本质是分类/再识别任务。 实验 多个 RAG 数据集（摘要未具名）。 基线：完整全库检索与现有近似/缓存式加速策略。 指标：检索延迟、端到端精度、对复杂 multi-hop agentic RAG 的加速比。 结果 检索延迟降低 23.74% 与 36.99%（跨不同数据集）。 精度仅下降 1–2%。 在 agentic multi-hop RAG pipeline 中也带来显著加速。 具体绝对数字与 agentic 加速比摘要未披露。 为什么重要 对 LLM / Agent 基础设施：大规模知识库下检索已成 RAG 延迟瓶颈，HaS 把 LLM 推理中的 speculative decoding 思路带到检索层，几乎零精度代价换显著延迟下降；对高 QPS、多跳 agent 场景尤其有用，可作为现有 RAG 栈的 drop-in 组件。">
+  <meta property="og:locale" content="zh">
+  <meta property="og:type" content="article">
+    <meta property="article:section" content="posts">
+    <meta property="article:published_time" content="2026-04-27T05:12:23+00:00">
+    <meta property="article:modified_time" content="2026-04-27T05:12:23+00:00">
+
+
+
+
+<link rel="canonical" href="https://ftxj.github.io/zh/posts/2026-04-22/02-has-accelerating-rag-through-homology-aware-speculative-retr/">
+
+
+<link rel="preload" href="/fonts/fa-brands-400.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="/fonts/fa-regular-400.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="/fonts/fa-solid-900.woff2" as="font" type="font/woff2" crossorigin>
+
+
+  
+  
+  <link rel="stylesheet" href="/css/coder.min.5e94c1acf7aa2066035cf2764ae3e4fe39db101d68b870f919966100d51fb861.css" integrity="sha256-XpTBrPeqIGYDXPJ2SuPk/jnbEB1ouHD5GZZhANUfuGE=" crossorigin="anonymous" media="screen" />
+
+
+
+
+
+
+  
+    
+    
+    <link rel="stylesheet" href="/css/coder-dark.min.a00e6364bacbc8266ad1cc81230774a1397198f8cfb7bcba29b7d6fcb54ce57f.css" integrity="sha256-oA5jZLrLyCZq0cyBIwd0oTlxmPjPt7y6KbfW/LVM5X8=" crossorigin="anonymous" media="screen" />
+  
+
+
+
+ 
+
+
+
+
+<link rel="icon" type="image/svg+xml" href="/images/favicon.svg" sizes="any">
+<link rel="icon" type="image/png" href="/images/favicon-32x32.png" sizes="32x32">
+<link rel="icon" type="image/png" href="/images/favicon-16x16.png" sizes="16x16">
+
+<link rel="apple-touch-icon" href="/images/apple-touch-icon.png">
+<link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon.png">
+
+<link rel="manifest" href="/site.webmanifest">
+<link rel="mask-icon" href="/images/safari-pinned-tab.svg" color="#5bbad5">
+
+
+
+
+
+
+<style>
+.content article ul {
+  list-style: disc !important;
+  padding-left: 2.5rem !important;
+}
+
+.content article ul li {
+  display: list-item !important;
+}
+</style>
+
+
+
+
+  
+</head>
+
+
+
+
+
+
+<body class="preload-transitions colorscheme-auto">
+  
+<div class="float-container">
+    <a id="dark-mode-toggle" class="colorscheme-toggle">
+        <i class="fa-solid fa-adjust fa-fw" aria-hidden="true"></i>
+    </a>
+</div>
+
+
+  <main class="wrapper">
+    <nav class="navigation">
+  <section class="container">
+    
+    <a class="navigation-title" href="https://ftxj.github.io/zh/">
+      JXIN&#39;s Home
+    </a>
+    
+    
+      <input type="checkbox" id="menu-toggle" />
+      <label class="menu-button float-right" for="menu-toggle">
+        <i class="fa-solid fa-bars fa-fw" aria-hidden="true"></i>
+      </label>
+      <ul class="navigation-list">
+        
+          
+            <li class="navigation-item">
+              <a class="navigation-link " href="/zh/about/">关于</a>
+            </li>
+          
+            <li class="navigation-item">
+              <a class="navigation-link " href="/zh/travel/">旅行</a>
+            </li>
+          
+            <li class="navigation-item">
+              <a class="navigation-link " href="/zh/posts/">博客</a>
+            </li>
+          
+            <li class="navigation-item">
+              <a class="navigation-link " href="https://ftxj.github.io/cv/cv_zh.pdf">简历</a>
+            </li>
+          
+        
+        
+          
+          
+          
+            
+              
+                <li class="navigation-item menu-separator">
+                  <span>|</span>
+                </li>
+                
+              
+              <li class="navigation-item">
+                <a href="/posts/2026-04-22/02-has-accelerating-rag-through-homology-aware-speculative-retr/">EN</a>
+              </li>
+            
+          
+        
+      </ul>
+    
+  </section>
+</nav>
+
+
+    <div class="content">
+      
+  <section class="container post">
+    <article>
+      <header>
+        <div class="post-title">
+          <h1 class="title">
+            <a class="title-link" href="https://ftxj.github.io/zh/posts/2026-04-22/02-has-accelerating-rag-through-homology-aware-speculative-retr/">
+              HaS: Accelerating RAG through Homology-Aware Speculative Retrieval
+            </a>
+          </h1>
+        </div>
+        <div class="post-meta">
+          <div class="date">
+            <span class="posted-on">
+              <i class="fa-solid fa-calendar" aria-hidden="true"></i>
+              <time datetime="2026-04-27T05:12:23Z">
+                四月 27, 2026
+              </time>
+            </span>
+            <span class="reading-time">
+              <i class="fa-solid fa-clock" aria-hidden="true"></i>
+              2-minute read
+            </span>
+          </div>
+          
+          <div class="categories">
+  <i class="fa-solid fa-folder" aria-hidden="true"></i>
+    <a href="/zh/categories/paper-digest/">Paper-Digest</a>
+      <span class="separator">•</span>
+    <a href="/zh/categories/2026-04-22/">2026-04-22</a></div>
+
+          
+        </div>
+      </header>
+
+      
+
+
+      <div class="post-content">
+        
+        <p><strong>arXiv:</strong> <a href="https://arxiv.org/abs/2604.20452v1">2604.20452</a> · <a href="https://arxiv.org/pdf/2604.20452v1">PDF</a></p>
+<p><strong>作者:</strong> Peng Peng, Weiwei Lin, Wentai Wu, Xinyang Wang, Yongheng Liu</p>
+<p><strong>主分类:</strong> <code>cs.IR</code> · 全部: cs.CL, cs.IR</p>
+<p><strong>命中关键词:</strong> large language model, llm, agent, agentic, retrieval, rag, inference, latency</p>
+<hr>
+<h2 id="tldr">TL;DR</h2>
+<p>HaS 提出一种同源感知的推测式检索框架，通过小范围推测 + 同源查询再识别验证，在几乎不损精度的前提下显著加速 RAG 检索。</p>
+<h2 id="核心观点">核心观点</h2>
+<ul>
+<li>现有 RAG 加速要么牺牲精度（近似检索），要么仅对完全相同的查询复用结果，收益有限。</li>
+<li>现实查询分布具有流行度特征，存在大量&quot;同源&quot;查询，可被利用。</li>
+<li>将推测执行思想迁移到检索层：先低延迟草稿，再快速验证。</li>
+<li>把验证问题形式化为&quot;同源查询再识别&quot;任务。</li>
+<li>作为即插即用模块，也能加速多跳 agentic RAG。</li>
+</ul>
+<h2 id="方法">方法</h2>
+<p>HaS 分两阶段：</p>
+<ol>
+<li><strong>推测检索 (Speculative Retrieval)</strong>：在受限范围内以低延迟获取候选文档草稿，绕过对全库的昂贵检索。</li>
+<li><strong>同源验证 (Homology-Aware Validation)</strong>：判断当前 query 与历史 query 是否构成同源再遇；若是，则接受草稿，跳过完整检索；否则回退到全库检索。
+验证依托查询间的同源关系，本质是分类/再识别任务。</li>
+</ol>
+<h2 id="实验">实验</h2>
+<ul>
+<li>多个 RAG 数据集（摘要未具名）。</li>
+<li>基线：完整全库检索与现有近似/缓存式加速策略。</li>
+<li>指标：检索延迟、端到端精度、对复杂 multi-hop agentic RAG 的加速比。</li>
+</ul>
+<h2 id="结果">结果</h2>
+<ul>
+<li>检索延迟降低 <strong>23.74% 与 36.99%</strong>（跨不同数据集）。</li>
+<li>精度仅下降 <strong>1–2%</strong>。</li>
+<li>在 agentic multi-hop RAG pipeline 中也带来显著加速。</li>
+<li>具体绝对数字与 agentic 加速比摘要未披露。</li>
+</ul>
+<h2 id="为什么重要">为什么重要</h2>
+<p>对 LLM / Agent 基础设施：大规模知识库下检索已成 RAG 延迟瓶颈，HaS 把 LLM 推理中的 speculative decoding 思路带到检索层，几乎零精度代价换显著延迟下降；对高 QPS、多跳 agent 场景尤其有用，可作为现有 RAG 栈的 drop-in 组件。</p>
+<h2 id="与已有工作的关系">与已有工作的关系</h2>
+<ul>
+<li><strong>RAG 与 agentic RAG</strong>：扩展 vanilla RAG、Self-RAG、multi-hop agent 检索。</li>
+<li><strong>近似最近邻检索</strong>：区别于 HNSW / IVF-PQ 等以精度换速度的方案。</li>
+<li><strong>缓存式检索复用</strong>：比只命中完全相同 query 的缓存更泛化。</li>
+<li><strong>Speculative decoding</strong>：把 draft-then-verify 思想从 token 生成迁移到 document 检索层。</li>
+</ul>
+<h2 id="尚未回答的问题">尚未回答的问题</h2>
+<ul>
+<li>同源判定器的具体实现与误判代价？对抗性或长尾 query 下是否失效。</li>
+<li>&ldquo;受限范围&quot;如何选取？是否依赖历史日志、冷启动表现如何。</li>
+<li>在知识库频繁更新或高度动态 corpus 下稳定性未知。</li>
+<li>相比 ANN（HNSW、ScaNN）及 learned index 的正面对比缺失。</li>
+<li>1–2% 精度下降在高精度要求场景（医疗/法律 RAG）是否可接受。</li>
+<li>多跳 agentic RAG 中同源关系是否仍成立的分析不足。</li>
+</ul>
+<hr>
+<h2 id="论文图表">论文图表</h2>
+<p><strong>图 1:</strong> Figure 1 (extracted from PDF)</p>
+<p><img alt="图 1" src="/images/papers/2604.20452/fig1.png"></p>
+<p><strong>图 2:</strong> Figure 2 (extracted from PDF)</p>
+<p><img alt="图 2" src="/images/papers/2604.20452/fig2.png"></p>
+<p><strong>图 3:</strong> Figure 3 (extracted from PDF)</p>
+<p><img alt="图 3" src="/images/papers/2604.20452/fig3.png"></p>
+<hr>
+<h2 id="原始摘要">原始摘要</h2>
+<p>Retrieval-Augmented Generation (RAG) expands the knowledge boundary of large language models (LLMs) at inference by retrieving external documents as context. However, retrieval becomes increasingly time-consuming as the knowledge databases grow in size. Existing acceleration strategies either compromise accuracy through approximate retrieval, or achieve marginal gains by reusing results of strictly identical queries. We propose HaS, a homology-aware speculative retrieval framework that performs low-latency speculative retrieval over restricted scopes to obtain candidate documents, followed by validating whether they contain the required knowledge. The validation, grounded in the homology relation between queries, is formulated as a homologous query re-identification task: once a previously observed query is identified as a homologous re-encounter of the incoming query, the draft is deemed acceptable, allowing the system to bypass slow full-database retrieval. Benefiting from the prevalence of homologous queries under real-world popularity patterns, HaS achieves substantial efficiency gains. Extensive experiments demonstrate that HaS reduces retrieval latency by 23.74% and 36.99% across datasets with only a 1-2% marginal accuracy drop. As a plug-and-play solution, HaS also significantly accelerates complex multi-hop queries in modern agentic RAG pipelines. Source code is available at: <a href="https://github.com/ErrEqualsNil/HaS">https://github.com/ErrEqualsNil/HaS</a>.</p>
+
+      </div>
+
+
+      <footer>
+        
+
+
+        
+        
+        
+        
+        
+        
+        
+      </footer>
+    </article>
+
+    
+  </section>
+
+    </div>
+
+    <footer class="footer">
+  <section class="container">
+    ©
+    
+      2019 -
+    
+    2026
+     Jie Xin 
+    ·
+    
+    Powered by <a href="https://gohugo.io/" target="_blank" rel="noopener">Hugo</a> & <a href="https://github.com/luizdepra/hugo-coder/" target="_blank" rel="noopener">Coder</a>.
+    
+  </section>
+</footer>
+
+  </main>
+
+  
+
+  
+  
+  <script src="/js/coder.min.6ae284be93d2d19dad1f02b0039508d9aab3180a12a06dcc71b0b0ef7825a317.js" integrity="sha256-auKEvpPS0Z2tHwKwA5UI2aqzGAoSoG3McbCw73gloxc="></script>
+  
+
+  
+
+  
+
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+</body>
+</html>

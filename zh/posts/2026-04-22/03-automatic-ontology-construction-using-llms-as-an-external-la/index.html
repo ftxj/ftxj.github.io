@@ -1,0 +1,424 @@
+<!DOCTYPE html>
+<html lang="zh">
+
+<head>
+  <title>
+  Automatic Ontology Construction Using LLMs as an External Layer of Memory, Verification, and Planning for Hybrid Intelligent Systems · JXIN&#39;s Home
+</title>
+  <meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="color-scheme" content="light dark">
+
+
+
+
+<meta name="author" content="Jie Xin">
+<meta name="description" content="arXiv: 2604.20795 · PDF
+作者: Pavel Salovskii, Iuliia Gorshkova
+主分类: cs.AI · 全部: cs.AI
+命中关键词: large language model, llm, agent, retrieval, rag, reasoning, inference
+
+TL;DR
+论文提出一种混合架构，用自动构建的 RDF/OWL 本体作为 LLM 的外部记忆层，结合 RAG 与图推理，提升多步规划的可验证性与可靠性。
+核心观点
+
+LLM 的参数化知识 &#43; 向量 RAG 不足以支撑长期记忆、结构化理解与严格推理。
+引入 RDF/OWL 本体作为外部记忆层，可提供持久化、可验证、语义 grounded 的推理基础。
+构建一套&quot;生成—验证—修正&quot;pipeline，把 LLM 输出纳入形式化校验闭环。
+架构面向 agent、机器人、企业 AI 等需要可解释与可靠决策的场景。
+
+方法
+
+自动化本体构建 pipeline，数据源覆盖文档、API、对话日志。
+流程：实体识别 → 关系抽取 → 归一化 → 三元组生成 → SHACL/OWL 约束校验 → 持续图更新。
+推理阶段 LLM 在&quot;向量检索 &#43; 图推理 &#43; 外部工具调用&quot;的组合上下文中工作。
+用本体层对生成结果做形式化校验，失败则进入修正循环。
+
+实验
+
+规划类任务为主，点名 Tower of Hanoi 作为 benchmark。
+基线为纯 LLM 系统（未加本体增强）。
+摘要未披露数据集规模、具体指标数值与评估细节。
+
+结果
+
+作者称在多步推理场景下，ontology 增强优于基线 LLM。
+本体层使输出可被形式化校验，系统具备生成—验证—修正能力。
+摘要仅给出定性结论，未提供具体数字，主张的强度受限。
+
+为什么重要
+
+给 LLM agent 提供一条&quot;非 RAG&quot;的长期记忆路线：结构化、可校验、可累积。
+SHACL/OWL 约束把幻觉问题从&quot;检测&quot;推向&quot;拒绝 &#43; 修正&quot;，对企业级与安全敏感应用更友好。
+对 robotics 与多步规划 agent，提供了一个显式世界模型接入点。
+
+与已有工作的关系
+
+承接 Retrieval-Augmented Generation (RAG) 思路，但用 knowledge graph 取代/补充向量库。
+延续 neuro-symbolic 与 KG-augmented LLM 方向（如 GraphRAG、KG-RAG 类工作）。
+形式化校验部分借鉴 Semantic Web 栈（RDF、OWL、SHACL）。
+规划评测沿用经典 Tower of Hanoi 一类 symbolic planning benchmark。
+
+尚未回答的问题
+
+自动抽取的本体质量如何量化？抽取错误如何影响下游推理？
+相对 GraphRAG、纯符号 planner、以及 LLM &#43; tools 的公平对比缺失。
+本体构建与校验的延迟、成本、可扩展性在大规模语料下是否可行。
+本体漂移、冲突消解、版本管理等长期维护问题未讨论。
+除 Tower of Hanoi 外，在真实 agent / 机器人任务上的泛化性尚待验证。
+
+
+论文图表
+图 1: Figure 1 (extracted from PDF)">
+<meta name="keywords" content="blog,developer,personal">
+
+
+
+  <meta name="twitter:card" content="summary">
+  <meta name="twitter:title" content="Automatic Ontology Construction Using LLMs as an External Layer of Memory, Verification, and Planning for Hybrid Intelligent Systems">
+  <meta name="twitter:description" content="arXiv: 2604.20795 · PDF
+作者: Pavel Salovskii, Iuliia Gorshkova
+主分类: cs.AI · 全部: cs.AI
+命中关键词: large language model, llm, agent, retrieval, rag, reasoning, inference
+TL;DR 论文提出一种混合架构，用自动构建的 RDF/OWL 本体作为 LLM 的外部记忆层，结合 RAG 与图推理，提升多步规划的可验证性与可靠性。
+核心观点 LLM 的参数化知识 &#43; 向量 RAG 不足以支撑长期记忆、结构化理解与严格推理。 引入 RDF/OWL 本体作为外部记忆层，可提供持久化、可验证、语义 grounded 的推理基础。 构建一套&#34;生成—验证—修正&#34;pipeline，把 LLM 输出纳入形式化校验闭环。 架构面向 agent、机器人、企业 AI 等需要可解释与可靠决策的场景。 方法 自动化本体构建 pipeline，数据源覆盖文档、API、对话日志。 流程：实体识别 → 关系抽取 → 归一化 → 三元组生成 → SHACL/OWL 约束校验 → 持续图更新。 推理阶段 LLM 在&#34;向量检索 &#43; 图推理 &#43; 外部工具调用&#34;的组合上下文中工作。 用本体层对生成结果做形式化校验，失败则进入修正循环。 实验 规划类任务为主，点名 Tower of Hanoi 作为 benchmark。 基线为纯 LLM 系统（未加本体增强）。 摘要未披露数据集规模、具体指标数值与评估细节。 结果 作者称在多步推理场景下，ontology 增强优于基线 LLM。 本体层使输出可被形式化校验，系统具备生成—验证—修正能力。 摘要仅给出定性结论，未提供具体数字，主张的强度受限。 为什么重要 给 LLM agent 提供一条&#34;非 RAG&#34;的长期记忆路线：结构化、可校验、可累积。 SHACL/OWL 约束把幻觉问题从&#34;检测&#34;推向&#34;拒绝 &#43; 修正&#34;，对企业级与安全敏感应用更友好。 对 robotics 与多步规划 agent，提供了一个显式世界模型接入点。 与已有工作的关系 承接 Retrieval-Augmented Generation (RAG) 思路，但用 knowledge graph 取代/补充向量库。 延续 neuro-symbolic 与 KG-augmented LLM 方向（如 GraphRAG、KG-RAG 类工作）。 形式化校验部分借鉴 Semantic Web 栈（RDF、OWL、SHACL）。 规划评测沿用经典 Tower of Hanoi 一类 symbolic planning benchmark。 尚未回答的问题 自动抽取的本体质量如何量化？抽取错误如何影响下游推理？ 相对 GraphRAG、纯符号 planner、以及 LLM &#43; tools 的公平对比缺失。 本体构建与校验的延迟、成本、可扩展性在大规模语料下是否可行。 本体漂移、冲突消解、版本管理等长期维护问题未讨论。 除 Tower of Hanoi 外，在真实 agent / 机器人任务上的泛化性尚待验证。 论文图表 图 1: Figure 1 (extracted from PDF)">
+
+<meta property="og:url" content="https://ftxj.github.io/zh/posts/2026-04-22/03-automatic-ontology-construction-using-llms-as-an-external-la/">
+  <meta property="og:site_name" content="JXIN&#39;s Home">
+  <meta property="og:title" content="Automatic Ontology Construction Using LLMs as an External Layer of Memory, Verification, and Planning for Hybrid Intelligent Systems">
+  <meta property="og:description" content="arXiv: 2604.20795 · PDF
+作者: Pavel Salovskii, Iuliia Gorshkova
+主分类: cs.AI · 全部: cs.AI
+命中关键词: large language model, llm, agent, retrieval, rag, reasoning, inference
+TL;DR 论文提出一种混合架构，用自动构建的 RDF/OWL 本体作为 LLM 的外部记忆层，结合 RAG 与图推理，提升多步规划的可验证性与可靠性。
+核心观点 LLM 的参数化知识 &#43; 向量 RAG 不足以支撑长期记忆、结构化理解与严格推理。 引入 RDF/OWL 本体作为外部记忆层，可提供持久化、可验证、语义 grounded 的推理基础。 构建一套&#34;生成—验证—修正&#34;pipeline，把 LLM 输出纳入形式化校验闭环。 架构面向 agent、机器人、企业 AI 等需要可解释与可靠决策的场景。 方法 自动化本体构建 pipeline，数据源覆盖文档、API、对话日志。 流程：实体识别 → 关系抽取 → 归一化 → 三元组生成 → SHACL/OWL 约束校验 → 持续图更新。 推理阶段 LLM 在&#34;向量检索 &#43; 图推理 &#43; 外部工具调用&#34;的组合上下文中工作。 用本体层对生成结果做形式化校验，失败则进入修正循环。 实验 规划类任务为主，点名 Tower of Hanoi 作为 benchmark。 基线为纯 LLM 系统（未加本体增强）。 摘要未披露数据集规模、具体指标数值与评估细节。 结果 作者称在多步推理场景下，ontology 增强优于基线 LLM。 本体层使输出可被形式化校验，系统具备生成—验证—修正能力。 摘要仅给出定性结论，未提供具体数字，主张的强度受限。 为什么重要 给 LLM agent 提供一条&#34;非 RAG&#34;的长期记忆路线：结构化、可校验、可累积。 SHACL/OWL 约束把幻觉问题从&#34;检测&#34;推向&#34;拒绝 &#43; 修正&#34;，对企业级与安全敏感应用更友好。 对 robotics 与多步规划 agent，提供了一个显式世界模型接入点。 与已有工作的关系 承接 Retrieval-Augmented Generation (RAG) 思路，但用 knowledge graph 取代/补充向量库。 延续 neuro-symbolic 与 KG-augmented LLM 方向（如 GraphRAG、KG-RAG 类工作）。 形式化校验部分借鉴 Semantic Web 栈（RDF、OWL、SHACL）。 规划评测沿用经典 Tower of Hanoi 一类 symbolic planning benchmark。 尚未回答的问题 自动抽取的本体质量如何量化？抽取错误如何影响下游推理？ 相对 GraphRAG、纯符号 planner、以及 LLM &#43; tools 的公平对比缺失。 本体构建与校验的延迟、成本、可扩展性在大规模语料下是否可行。 本体漂移、冲突消解、版本管理等长期维护问题未讨论。 除 Tower of Hanoi 外，在真实 agent / 机器人任务上的泛化性尚待验证。 论文图表 图 1: Figure 1 (extracted from PDF)">
+  <meta property="og:locale" content="zh">
+  <meta property="og:type" content="article">
+    <meta property="article:section" content="posts">
+    <meta property="article:published_time" content="2026-04-27T05:13:00+00:00">
+    <meta property="article:modified_time" content="2026-04-27T05:13:00+00:00">
+
+
+
+
+<link rel="canonical" href="https://ftxj.github.io/zh/posts/2026-04-22/03-automatic-ontology-construction-using-llms-as-an-external-la/">
+
+
+<link rel="preload" href="/fonts/fa-brands-400.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="/fonts/fa-regular-400.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="/fonts/fa-solid-900.woff2" as="font" type="font/woff2" crossorigin>
+
+
+  
+  
+  <link rel="stylesheet" href="/css/coder.min.5e94c1acf7aa2066035cf2764ae3e4fe39db101d68b870f919966100d51fb861.css" integrity="sha256-XpTBrPeqIGYDXPJ2SuPk/jnbEB1ouHD5GZZhANUfuGE=" crossorigin="anonymous" media="screen" />
+
+
+
+
+
+
+  
+    
+    
+    <link rel="stylesheet" href="/css/coder-dark.min.a00e6364bacbc8266ad1cc81230774a1397198f8cfb7bcba29b7d6fcb54ce57f.css" integrity="sha256-oA5jZLrLyCZq0cyBIwd0oTlxmPjPt7y6KbfW/LVM5X8=" crossorigin="anonymous" media="screen" />
+  
+
+
+
+ 
+
+
+
+
+<link rel="icon" type="image/svg+xml" href="/images/favicon.svg" sizes="any">
+<link rel="icon" type="image/png" href="/images/favicon-32x32.png" sizes="32x32">
+<link rel="icon" type="image/png" href="/images/favicon-16x16.png" sizes="16x16">
+
+<link rel="apple-touch-icon" href="/images/apple-touch-icon.png">
+<link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon.png">
+
+<link rel="manifest" href="/site.webmanifest">
+<link rel="mask-icon" href="/images/safari-pinned-tab.svg" color="#5bbad5">
+
+
+
+
+
+
+<style>
+.content article ul {
+  list-style: disc !important;
+  padding-left: 2.5rem !important;
+}
+
+.content article ul li {
+  display: list-item !important;
+}
+</style>
+
+
+
+
+  
+</head>
+
+
+
+
+
+
+<body class="preload-transitions colorscheme-auto">
+  
+<div class="float-container">
+    <a id="dark-mode-toggle" class="colorscheme-toggle">
+        <i class="fa-solid fa-adjust fa-fw" aria-hidden="true"></i>
+    </a>
+</div>
+
+
+  <main class="wrapper">
+    <nav class="navigation">
+  <section class="container">
+    
+    <a class="navigation-title" href="https://ftxj.github.io/zh/">
+      JXIN&#39;s Home
+    </a>
+    
+    
+      <input type="checkbox" id="menu-toggle" />
+      <label class="menu-button float-right" for="menu-toggle">
+        <i class="fa-solid fa-bars fa-fw" aria-hidden="true"></i>
+      </label>
+      <ul class="navigation-list">
+        
+          
+            <li class="navigation-item">
+              <a class="navigation-link " href="/zh/about/">关于</a>
+            </li>
+          
+            <li class="navigation-item">
+              <a class="navigation-link " href="/zh/travel/">旅行</a>
+            </li>
+          
+            <li class="navigation-item">
+              <a class="navigation-link " href="/zh/posts/">博客</a>
+            </li>
+          
+            <li class="navigation-item">
+              <a class="navigation-link " href="https://ftxj.github.io/cv/cv_zh.pdf">简历</a>
+            </li>
+          
+        
+        
+          
+          
+          
+            
+              
+                <li class="navigation-item menu-separator">
+                  <span>|</span>
+                </li>
+                
+              
+              <li class="navigation-item">
+                <a href="/posts/2026-04-22/03-automatic-ontology-construction-using-llms-as-an-external-la/">EN</a>
+              </li>
+            
+          
+        
+      </ul>
+    
+  </section>
+</nav>
+
+
+    <div class="content">
+      
+  <section class="container post">
+    <article>
+      <header>
+        <div class="post-title">
+          <h1 class="title">
+            <a class="title-link" href="https://ftxj.github.io/zh/posts/2026-04-22/03-automatic-ontology-construction-using-llms-as-an-external-la/">
+              Automatic Ontology Construction Using LLMs as an External Layer of Memory, Verification, and Planning for Hybrid Intelligent Systems
+            </a>
+          </h1>
+        </div>
+        <div class="post-meta">
+          <div class="date">
+            <span class="posted-on">
+              <i class="fa-solid fa-calendar" aria-hidden="true"></i>
+              <time datetime="2026-04-27T05:13:00Z">
+                四月 27, 2026
+              </time>
+            </span>
+            <span class="reading-time">
+              <i class="fa-solid fa-clock" aria-hidden="true"></i>
+              2-minute read
+            </span>
+          </div>
+          
+          <div class="categories">
+  <i class="fa-solid fa-folder" aria-hidden="true"></i>
+    <a href="/zh/categories/paper-digest/">Paper-Digest</a>
+      <span class="separator">•</span>
+    <a href="/zh/categories/2026-04-22/">2026-04-22</a></div>
+
+          
+        </div>
+      </header>
+
+      
+
+
+      <div class="post-content">
+        
+        <p><strong>arXiv:</strong> <a href="https://arxiv.org/abs/2604.20795v1">2604.20795</a> · <a href="https://arxiv.org/pdf/2604.20795v1">PDF</a></p>
+<p><strong>作者:</strong> Pavel Salovskii, Iuliia Gorshkova</p>
+<p><strong>主分类:</strong> <code>cs.AI</code> · 全部: cs.AI</p>
+<p><strong>命中关键词:</strong> large language model, llm, agent, retrieval, rag, reasoning, inference</p>
+<hr>
+<h2 id="tldr">TL;DR</h2>
+<p>论文提出一种混合架构，用自动构建的 RDF/OWL 本体作为 LLM 的外部记忆层，结合 RAG 与图推理，提升多步规划的可验证性与可靠性。</p>
+<h2 id="核心观点">核心观点</h2>
+<ul>
+<li>LLM 的参数化知识 + 向量 RAG 不足以支撑长期记忆、结构化理解与严格推理。</li>
+<li>引入 RDF/OWL 本体作为外部记忆层，可提供持久化、可验证、语义 grounded 的推理基础。</li>
+<li>构建一套&quot;生成—验证—修正&quot;pipeline，把 LLM 输出纳入形式化校验闭环。</li>
+<li>架构面向 agent、机器人、企业 AI 等需要可解释与可靠决策的场景。</li>
+</ul>
+<h2 id="方法">方法</h2>
+<ul>
+<li>自动化本体构建 pipeline，数据源覆盖文档、API、对话日志。</li>
+<li>流程：实体识别 → 关系抽取 → 归一化 → 三元组生成 → SHACL/OWL 约束校验 → 持续图更新。</li>
+<li>推理阶段 LLM 在&quot;向量检索 + 图推理 + 外部工具调用&quot;的组合上下文中工作。</li>
+<li>用本体层对生成结果做形式化校验，失败则进入修正循环。</li>
+</ul>
+<h2 id="实验">实验</h2>
+<ul>
+<li>规划类任务为主，点名 Tower of Hanoi 作为 benchmark。</li>
+<li>基线为纯 LLM 系统（未加本体增强）。</li>
+<li>摘要未披露数据集规模、具体指标数值与评估细节。</li>
+</ul>
+<h2 id="结果">结果</h2>
+<ul>
+<li>作者称在多步推理场景下，ontology 增强优于基线 LLM。</li>
+<li>本体层使输出可被形式化校验，系统具备生成—验证—修正能力。</li>
+<li>摘要仅给出定性结论，未提供具体数字，主张的强度受限。</li>
+</ul>
+<h2 id="为什么重要">为什么重要</h2>
+<ul>
+<li>给 LLM agent 提供一条&quot;非 RAG&quot;的长期记忆路线：结构化、可校验、可累积。</li>
+<li>SHACL/OWL 约束把幻觉问题从&quot;检测&quot;推向&quot;拒绝 + 修正&quot;，对企业级与安全敏感应用更友好。</li>
+<li>对 robotics 与多步规划 agent，提供了一个显式世界模型接入点。</li>
+</ul>
+<h2 id="与已有工作的关系">与已有工作的关系</h2>
+<ul>
+<li>承接 Retrieval-Augmented Generation (RAG) 思路，但用 knowledge graph 取代/补充向量库。</li>
+<li>延续 neuro-symbolic 与 KG-augmented LLM 方向（如 GraphRAG、KG-RAG 类工作）。</li>
+<li>形式化校验部分借鉴 Semantic Web 栈（RDF、OWL、SHACL）。</li>
+<li>规划评测沿用经典 Tower of Hanoi 一类 symbolic planning benchmark。</li>
+</ul>
+<h2 id="尚未回答的问题">尚未回答的问题</h2>
+<ul>
+<li>自动抽取的本体质量如何量化？抽取错误如何影响下游推理？</li>
+<li>相对 GraphRAG、纯符号 planner、以及 LLM + tools 的公平对比缺失。</li>
+<li>本体构建与校验的延迟、成本、可扩展性在大规模语料下是否可行。</li>
+<li>本体漂移、冲突消解、版本管理等长期维护问题未讨论。</li>
+<li>除 Tower of Hanoi 外，在真实 agent / 机器人任务上的泛化性尚待验证。</li>
+</ul>
+<hr>
+<h2 id="论文图表">论文图表</h2>
+<p><strong>图 1:</strong> Figure 1 (extracted from PDF)</p>
+<p><img alt="图 1" src="/images/papers/2604.20795/fig1.jpg"></p>
+<hr>
+<h2 id="原始摘要">原始摘要</h2>
+<p>This paper presents a hybrid architecture for intelligent systems in which large language models (LLMs) are extended with an external ontological memory layer. Instead of relying solely on parametric knowledge and vector-based retrieval (RAG), the proposed approach constructs and maintains a structured knowledge graph using RDF/OWL representations, enabling persistent, verifiable, and semantically grounded reasoning. The core contribution is an automated pipeline for ontology construction from heterogeneous data sources, including documents, APIs, and dialogue logs. The system performs entity recognition, relation extraction, normalization, and triple generation, followed by validation using SHACL and OWL constraints, and continuous graph updates. During inference, LLMs operate over a combined context that integrates vector-based retrieval with graph-based reasoning and external tool interaction. Experimental observations on planning tasks, including the Tower of Hanoi benchmark, indicate that ontology augmentation improves performance in multi-step reasoning scenarios compared to baseline LLM systems. In addition, the ontology layer enables formal validation of generated outputs, transforming the system into a generation-verification-correction pipeline. The proposed architecture addresses key limitations of current LLM-based systems, including lack of long-term memory, weak structural understanding, and limited reasoning capabilities. It provides a foundation for building agent-based systems, robotics applications, and enterprise AI solutions that require persistent knowledge, explainability, and reliable decision-making.</p>
+
+      </div>
+
+
+      <footer>
+        
+
+
+        
+        
+        
+        
+        
+        
+        
+      </footer>
+    </article>
+
+    
+  </section>
+
+    </div>
+
+    <footer class="footer">
+  <section class="container">
+    ©
+    
+      2019 -
+    
+    2026
+     Jie Xin 
+    ·
+    
+    Powered by <a href="https://gohugo.io/" target="_blank" rel="noopener">Hugo</a> & <a href="https://github.com/luizdepra/hugo-coder/" target="_blank" rel="noopener">Coder</a>.
+    
+  </section>
+</footer>
+
+  </main>
+
+  
+
+  
+  
+  <script src="/js/coder.min.6ae284be93d2d19dad1f02b0039508d9aab3180a12a06dcc71b0b0ef7825a317.js" integrity="sha256-auKEvpPS0Z2tHwKwA5UI2aqzGAoSoG3McbCw73gloxc="></script>
+  
+
+  
+
+  
+
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+</body>
+</html>

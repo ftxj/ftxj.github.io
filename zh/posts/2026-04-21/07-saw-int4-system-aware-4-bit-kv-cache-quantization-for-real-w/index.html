@@ -1,0 +1,364 @@
+<!DOCTYPE html>
+<html lang="zh">
+
+<head>
+  <title>
+  SAW-INT4: System-Aware 4-Bit KV-Cache Quantization for Real-World LLM Serving · JXIN&#39;s Home
+</title>
+  <meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="color-scheme" content="light dark">
+
+
+
+
+<meta name="author" content="Jie Xin">
+<meta name="description" content="arXiv: 2604.19157 · PDF
+作者: Jinda Jia, Jisen Li, Zhongzhu Zhou, Jung Hwan Heo, Jue Wang, Tri Dao, Shuaiwen Leon Song, Ben Athiwaratkun, Chenfeng Xu, Tianyi Zhang, Xiaoxia Wu
+主分类: cs.LG · 全部: cs.LG
+命中关键词: llm, serving, kv-cache, quantization, attention, throughput, latency
+
+TL;DR
+SAW-INT4 提出 token-wise INT4 &#43; block-diagonal Hadamard 旋转的 KV-cache 量化方案，在 paged attention 等真实 serving 约束下几乎无损恢复精度且零额外开销。
+核心观点
+
+KV-cache 压缩需作为系统协同设计问题看待，必须兼容 paged 内存布局、规则访存与 fused attention。
+在这些约束下，简单的 token-wise INT4 &#43; 块对角 Hadamard 旋转就能逼近最佳精度-效率折中。
+更复杂的 vector quantization、Hessian-aware 量化在考虑 serving 兼容性后仅带来边际收益。
+融合旋转-量化 kernel 可直接嵌入 paged KV-cache，实测端到端零额外开销。
+
+方法
+作者筛选出在 serving 约束下仍可行的 4-bit KV 量化方法的最小集合，核心设计为 token-wise INT4 量化配合 block-diagonal Hadamard 旋转以抑制 outlier。随后实现一个 fused rotation-quantization kernel，将旋转与量化与 paged KV-cache 布局对齐，直接与 fused attention 执行路径集成。">
+<meta name="keywords" content="blog,developer,personal">
+
+
+
+  <meta name="twitter:card" content="summary">
+  <meta name="twitter:title" content="SAW-INT4: System-Aware 4-Bit KV-Cache Quantization for Real-World LLM Serving">
+  <meta name="twitter:description" content="arXiv: 2604.19157 · PDF
+作者: Jinda Jia, Jisen Li, Zhongzhu Zhou, Jung Hwan Heo, Jue Wang, Tri Dao, Shuaiwen Leon Song, Ben Athiwaratkun, Chenfeng Xu, Tianyi Zhang, Xiaoxia Wu
+主分类: cs.LG · 全部: cs.LG
+命中关键词: llm, serving, kv-cache, quantization, attention, throughput, latency
+TL;DR SAW-INT4 提出 token-wise INT4 &#43; block-diagonal Hadamard 旋转的 KV-cache 量化方案，在 paged attention 等真实 serving 约束下几乎无损恢复精度且零额外开销。
+核心观点 KV-cache 压缩需作为系统协同设计问题看待，必须兼容 paged 内存布局、规则访存与 fused attention。 在这些约束下，简单的 token-wise INT4 &#43; 块对角 Hadamard 旋转就能逼近最佳精度-效率折中。 更复杂的 vector quantization、Hessian-aware 量化在考虑 serving 兼容性后仅带来边际收益。 融合旋转-量化 kernel 可直接嵌入 paged KV-cache，实测端到端零额外开销。 方法 作者筛选出在 serving 约束下仍可行的 4-bit KV 量化方法的最小集合，核心设计为 token-wise INT4 量化配合 block-diagonal Hadamard 旋转以抑制 outlier。随后实现一个 fused rotation-quantization kernel，将旋转与量化与 paged KV-cache 布局对齐，直接与 fused attention 执行路径集成。">
+
+<meta property="og:url" content="https://ftxj.github.io/zh/posts/2026-04-21/07-saw-int4-system-aware-4-bit-kv-cache-quantization-for-real-w/">
+  <meta property="og:site_name" content="JXIN&#39;s Home">
+  <meta property="og:title" content="SAW-INT4: System-Aware 4-Bit KV-Cache Quantization for Real-World LLM Serving">
+  <meta property="og:description" content="arXiv: 2604.19157 · PDF
+作者: Jinda Jia, Jisen Li, Zhongzhu Zhou, Jung Hwan Heo, Jue Wang, Tri Dao, Shuaiwen Leon Song, Ben Athiwaratkun, Chenfeng Xu, Tianyi Zhang, Xiaoxia Wu
+主分类: cs.LG · 全部: cs.LG
+命中关键词: llm, serving, kv-cache, quantization, attention, throughput, latency
+TL;DR SAW-INT4 提出 token-wise INT4 &#43; block-diagonal Hadamard 旋转的 KV-cache 量化方案，在 paged attention 等真实 serving 约束下几乎无损恢复精度且零额外开销。
+核心观点 KV-cache 压缩需作为系统协同设计问题看待，必须兼容 paged 内存布局、规则访存与 fused attention。 在这些约束下，简单的 token-wise INT4 &#43; 块对角 Hadamard 旋转就能逼近最佳精度-效率折中。 更复杂的 vector quantization、Hessian-aware 量化在考虑 serving 兼容性后仅带来边际收益。 融合旋转-量化 kernel 可直接嵌入 paged KV-cache，实测端到端零额外开销。 方法 作者筛选出在 serving 约束下仍可行的 4-bit KV 量化方法的最小集合，核心设计为 token-wise INT4 量化配合 block-diagonal Hadamard 旋转以抑制 outlier。随后实现一个 fused rotation-quantization kernel，将旋转与量化与 paged KV-cache 布局对齐，直接与 fused attention 执行路径集成。">
+  <meta property="og:locale" content="zh">
+  <meta property="og:type" content="article">
+    <meta property="article:section" content="posts">
+    <meta property="article:published_time" content="2026-04-27T05:21:04+00:00">
+    <meta property="article:modified_time" content="2026-04-27T05:21:04+00:00">
+
+
+
+
+<link rel="canonical" href="https://ftxj.github.io/zh/posts/2026-04-21/07-saw-int4-system-aware-4-bit-kv-cache-quantization-for-real-w/">
+
+
+<link rel="preload" href="/fonts/fa-brands-400.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="/fonts/fa-regular-400.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="/fonts/fa-solid-900.woff2" as="font" type="font/woff2" crossorigin>
+
+
+  
+  
+  <link rel="stylesheet" href="/css/coder.min.5e94c1acf7aa2066035cf2764ae3e4fe39db101d68b870f919966100d51fb861.css" integrity="sha256-XpTBrPeqIGYDXPJ2SuPk/jnbEB1ouHD5GZZhANUfuGE=" crossorigin="anonymous" media="screen" />
+
+
+
+
+
+
+  
+    
+    
+    <link rel="stylesheet" href="/css/coder-dark.min.a00e6364bacbc8266ad1cc81230774a1397198f8cfb7bcba29b7d6fcb54ce57f.css" integrity="sha256-oA5jZLrLyCZq0cyBIwd0oTlxmPjPt7y6KbfW/LVM5X8=" crossorigin="anonymous" media="screen" />
+  
+
+
+
+ 
+
+
+
+
+<link rel="icon" type="image/svg+xml" href="/images/favicon.svg" sizes="any">
+<link rel="icon" type="image/png" href="/images/favicon-32x32.png" sizes="32x32">
+<link rel="icon" type="image/png" href="/images/favicon-16x16.png" sizes="16x16">
+
+<link rel="apple-touch-icon" href="/images/apple-touch-icon.png">
+<link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon.png">
+
+<link rel="manifest" href="/site.webmanifest">
+<link rel="mask-icon" href="/images/safari-pinned-tab.svg" color="#5bbad5">
+
+
+
+
+
+
+<style>
+.content article ul {
+  list-style: disc !important;
+  padding-left: 2.5rem !important;
+}
+
+.content article ul li {
+  display: list-item !important;
+}
+</style>
+
+
+
+
+  
+</head>
+
+
+
+
+
+
+<body class="preload-transitions colorscheme-auto">
+  
+<div class="float-container">
+    <a id="dark-mode-toggle" class="colorscheme-toggle">
+        <i class="fa-solid fa-adjust fa-fw" aria-hidden="true"></i>
+    </a>
+</div>
+
+
+  <main class="wrapper">
+    <nav class="navigation">
+  <section class="container">
+    
+    <a class="navigation-title" href="https://ftxj.github.io/zh/">
+      JXIN&#39;s Home
+    </a>
+    
+    
+      <input type="checkbox" id="menu-toggle" />
+      <label class="menu-button float-right" for="menu-toggle">
+        <i class="fa-solid fa-bars fa-fw" aria-hidden="true"></i>
+      </label>
+      <ul class="navigation-list">
+        
+          
+            <li class="navigation-item">
+              <a class="navigation-link " href="/zh/about/">关于</a>
+            </li>
+          
+            <li class="navigation-item">
+              <a class="navigation-link " href="/zh/travel/">旅行</a>
+            </li>
+          
+            <li class="navigation-item">
+              <a class="navigation-link " href="/zh/posts/">博客</a>
+            </li>
+          
+            <li class="navigation-item">
+              <a class="navigation-link " href="https://ftxj.github.io/cv/cv_zh.pdf">简历</a>
+            </li>
+          
+        
+        
+          
+          
+          
+            
+              
+                <li class="navigation-item menu-separator">
+                  <span>|</span>
+                </li>
+                
+              
+              <li class="navigation-item">
+                <a href="/posts/2026-04-21/07-saw-int4-system-aware-4-bit-kv-cache-quantization-for-real-w/">EN</a>
+              </li>
+            
+          
+        
+      </ul>
+    
+  </section>
+</nav>
+
+
+    <div class="content">
+      
+  <section class="container post">
+    <article>
+      <header>
+        <div class="post-title">
+          <h1 class="title">
+            <a class="title-link" href="https://ftxj.github.io/zh/posts/2026-04-21/07-saw-int4-system-aware-4-bit-kv-cache-quantization-for-real-w/">
+              SAW-INT4: System-Aware 4-Bit KV-Cache Quantization for Real-World LLM Serving
+            </a>
+          </h1>
+        </div>
+        <div class="post-meta">
+          <div class="date">
+            <span class="posted-on">
+              <i class="fa-solid fa-calendar" aria-hidden="true"></i>
+              <time datetime="2026-04-27T05:21:04Z">
+                四月 27, 2026
+              </time>
+            </span>
+            <span class="reading-time">
+              <i class="fa-solid fa-clock" aria-hidden="true"></i>
+              2-minute read
+            </span>
+          </div>
+          
+          <div class="categories">
+  <i class="fa-solid fa-folder" aria-hidden="true"></i>
+    <a href="/zh/categories/paper-digest/">Paper-Digest</a>
+      <span class="separator">•</span>
+    <a href="/zh/categories/2026-04-21/">2026-04-21</a></div>
+
+          
+        </div>
+      </header>
+
+      
+
+
+      <div class="post-content">
+        
+        <p><strong>arXiv:</strong> <a href="https://arxiv.org/abs/2604.19157v1">2604.19157</a> · <a href="https://arxiv.org/pdf/2604.19157v1">PDF</a></p>
+<p><strong>作者:</strong> Jinda Jia, Jisen Li, Zhongzhu Zhou, Jung Hwan Heo, Jue Wang, Tri Dao, Shuaiwen Leon Song, Ben Athiwaratkun, Chenfeng Xu, Tianyi Zhang, Xiaoxia Wu</p>
+<p><strong>主分类:</strong> <code>cs.LG</code> · 全部: cs.LG</p>
+<p><strong>命中关键词:</strong> llm, serving, kv-cache, quantization, attention, throughput, latency</p>
+<hr>
+<h2 id="tldr">TL;DR</h2>
+<p>SAW-INT4 提出 token-wise INT4 + block-diagonal Hadamard 旋转的 KV-cache 量化方案，在 paged attention 等真实 serving 约束下几乎无损恢复精度且零额外开销。</p>
+<h2 id="核心观点">核心观点</h2>
+<ul>
+<li>KV-cache 压缩需作为系统协同设计问题看待，必须兼容 paged 内存布局、规则访存与 fused attention。</li>
+<li>在这些约束下，简单的 token-wise INT4 + 块对角 Hadamard 旋转就能逼近最佳精度-效率折中。</li>
+<li>更复杂的 vector quantization、Hessian-aware 量化在考虑 serving 兼容性后仅带来边际收益。</li>
+<li>融合旋转-量化 kernel 可直接嵌入 paged KV-cache，实测端到端零额外开销。</li>
+</ul>
+<h2 id="方法">方法</h2>
+<p>作者筛选出在 serving 约束下仍可行的 4-bit KV 量化方法的最小集合，核心设计为 token-wise INT4 量化配合 block-diagonal Hadamard 旋转以抑制 outlier。随后实现一个 fused rotation-quantization kernel，将旋转与量化与 paged KV-cache 布局对齐，直接与 fused attention 执行路径集成。</p>
+<h2 id="实验">实验</h2>
+<p>跨多个模型与 benchmark 评估精度恢复程度；与 naive INT4、vector quantization、Hessian-aware quantization 等方案比较；在不同并发度下对比吞吐量与端到端延迟。具体模型与数据集摘要未给出。</p>
+<h2 id="结果">结果</h2>
+<p>token-wise INT4 + 块对角 Hadamard 几乎恢复 naive INT4 损失的全部精度；更复杂方法仅带来边际提升。融合 kernel 达到与 plain INT4 同等吞吐，端到端开销不可测。</p>
+<h2 id="为什么重要">为什么重要</h2>
+<p>对 LLM serving 基础设施团队，给出一个在 paged attention、fused kernel 等工业约束下真正可落地的 KV-cache 压缩方案：近无损精度 + 零额外开销，直接缓解长上下文、高并发场景下的显存瓶颈。</p>
+<h2 id="与已有工作的关系">与已有工作的关系</h2>
+<p>延续 KVQuant、KIVI 等 KV-cache 量化线路；借鉴 QuIP、SpinQuant 的 Hadamard/旋转式 outlier 抑制；对比 vector quantization 与 Hessian-aware（如 GPTQ 系）方法；与 PagedAttention / vLLM 的系统抽象直接对接。</p>
+<h2 id="尚未回答的问题">尚未回答的问题</h2>
+<ul>
+<li>在更长上下文（&gt;128k）与 MoE、多模态模型上的表现？</li>
+<li>是否可与 weight/activation 量化联合，进一步压榨端到端吞吐？</li>
+<li>块对角 Hadamard 的块大小、旋转选择是否需按模型调参？</li>
+<li>低于 4-bit（INT3/INT2）时此范式是否仍成立？</li>
+</ul>
+<hr>
+<h2 id="论文图表">论文图表</h2>
+<p><strong>图 1:</strong> Figure 1 (extracted from PDF)</p>
+<p><img alt="图 1" src="/images/papers/2604.19157/fig1.png"></p>
+<p><strong>图 2:</strong> Figure 2 (extracted from PDF)</p>
+<p><img alt="图 2" src="/images/papers/2604.19157/fig2.png"></p>
+<p><strong>图 3:</strong> Figure 3 (extracted from PDF)</p>
+<p><img alt="图 3" src="/images/papers/2604.19157/fig3.png"></p>
+<hr>
+<h2 id="原始摘要">原始摘要</h2>
+<p>KV-cache memory is a major bottleneck in real-world LLM serving, where systems must simultaneously support latency-sensitive small-batch requests and high-throughput concurrent workloads. Although many KV-cache compression methods improve offline accuracy or compression ratio, they often violate practical serving constraints such as paged memory layouts, regular memory access, and fused attention execution, limiting their effectiveness in deployment. In this work, we identify the minimal set of 4-bit KV-cache quantization methods that remain viable under these constraints. Our central finding is that a simple design&ndash;token-wise INT4 quantization with block-diagonal Hadamard rotation&ndash;consistently achieves the best accuracy-efficiency trade-off. Across multiple models and benchmarks, this approach recovers nearly all of the accuracy lost by naive INT4, while more complex methods such as vector quantization and Hessian-aware quantization provide only marginal additional gains once serving compatibility is taken into account. To make this practical, we implement a fused rotation-quantization kernel that integrates directly into paged KV-cache layouts and introduces zero measurable end-to-end overhead, matching plain INT4 throughput across concurrency levels. Our results show that effective KV-cache compression is fundamentally a systems co-design problem: under real serving constraints, lightweight block-diagonal Hadamard rotation is a viable method that delivers near-lossless accuracy without sacrificing serving efficiency.</p>
+
+      </div>
+
+
+      <footer>
+        
+
+
+        
+        
+        
+        
+        
+        
+        
+      </footer>
+    </article>
+
+    
+  </section>
+
+    </div>
+
+    <footer class="footer">
+  <section class="container">
+    ©
+    
+      2019 -
+    
+    2026
+     Jie Xin 
+    ·
+    
+    Powered by <a href="https://gohugo.io/" target="_blank" rel="noopener">Hugo</a> & <a href="https://github.com/luizdepra/hugo-coder/" target="_blank" rel="noopener">Coder</a>.
+    
+  </section>
+</footer>
+
+  </main>
+
+  
+
+  
+  
+  <script src="/js/coder.min.6ae284be93d2d19dad1f02b0039508d9aab3180a12a06dcc71b0b0ef7825a317.js" integrity="sha256-auKEvpPS0Z2tHwKwA5UI2aqzGAoSoG3McbCw73gloxc="></script>
+  
+
+  
+
+  
+
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+</body>
+</html>

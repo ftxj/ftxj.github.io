@@ -1,0 +1,363 @@
+<!DOCTYPE html>
+<html lang="zh">
+
+<head>
+  <title>
+  2026-04-22 论文速递 · JXIN&#39;s Home
+</title>
+  <meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="color-scheme" content="light dark">
+
+
+
+
+<meta name="author" content="Jie Xin">
+<meta name="description" content="对 agent / LLM / AI 基础设施方向共 10 篇 arXiv 论文的自动摘要，由 Claude Code 生成分析。
+1. SAKE: Self-aware Knowledge Exploitation-Exploration for Grounded Multimodal Named Entity Recognition
+arXiv: 2604.20146 · cs.IR · 相关度分数 32
+SAKE 是一个端到端 agentic 框架，通过自我感知推理与自适应检索工具调用，在 Grounded Multimodal NER 任务上协调 MLLM 的内部知识利用与外部知识探索。
+阅读完整分析 →
+
+2. HaS: Accelerating RAG through Homology-Aware Speculative Retrieval
+arXiv: 2604.20452 · cs.IR · 相关度分数 26
+HaS 提出一种同源感知的推测式检索框架，通过小范围推测 &#43; 同源查询再识别验证，在几乎不损精度的前提下显著加速 RAG 检索。
+阅读完整分析 →
+
+3. Automatic Ontology Construction Using LLMs as an External Layer of Memory, Verification, and Planning for Hybrid Intelligent Systems
+arXiv: 2604.20795 · cs.AI · 相关度分数 22">
+<meta name="keywords" content="blog,developer,personal">
+
+
+
+  <meta name="twitter:card" content="summary">
+  <meta name="twitter:title" content="2026-04-22 论文速递">
+  <meta name="twitter:description" content="对 agent / LLM / AI 基础设施方向共 10 篇 arXiv 论文的自动摘要，由 Claude Code 生成分析。
+1. SAKE: Self-aware Knowledge Exploitation-Exploration for Grounded Multimodal Named Entity Recognition arXiv: 2604.20146 · cs.IR · 相关度分数 32
+SAKE 是一个端到端 agentic 框架，通过自我感知推理与自适应检索工具调用，在 Grounded Multimodal NER 任务上协调 MLLM 的内部知识利用与外部知识探索。
+阅读完整分析 →
+2. HaS: Accelerating RAG through Homology-Aware Speculative Retrieval arXiv: 2604.20452 · cs.IR · 相关度分数 26
+HaS 提出一种同源感知的推测式检索框架，通过小范围推测 &#43; 同源查询再识别验证，在几乎不损精度的前提下显著加速 RAG 检索。
+阅读完整分析 →
+3. Automatic Ontology Construction Using LLMs as an External Layer of Memory, Verification, and Planning for Hybrid Intelligent Systems arXiv: 2604.20795 · cs.AI · 相关度分数 22">
+
+<meta property="og:url" content="https://ftxj.github.io/zh/posts/2026-04-22/">
+  <meta property="og:site_name" content="JXIN&#39;s Home">
+  <meta property="og:title" content="2026-04-22 论文速递">
+  <meta property="og:description" content="对 agent / LLM / AI 基础设施方向共 10 篇 arXiv 论文的自动摘要，由 Claude Code 生成分析。
+1. SAKE: Self-aware Knowledge Exploitation-Exploration for Grounded Multimodal Named Entity Recognition arXiv: 2604.20146 · cs.IR · 相关度分数 32
+SAKE 是一个端到端 agentic 框架，通过自我感知推理与自适应检索工具调用，在 Grounded Multimodal NER 任务上协调 MLLM 的内部知识利用与外部知识探索。
+阅读完整分析 →
+2. HaS: Accelerating RAG through Homology-Aware Speculative Retrieval arXiv: 2604.20452 · cs.IR · 相关度分数 26
+HaS 提出一种同源感知的推测式检索框架，通过小范围推测 &#43; 同源查询再识别验证，在几乎不损精度的前提下显著加速 RAG 检索。
+阅读完整分析 →
+3. Automatic Ontology Construction Using LLMs as an External Layer of Memory, Verification, and Planning for Hybrid Intelligent Systems arXiv: 2604.20795 · cs.AI · 相关度分数 22">
+  <meta property="og:locale" content="zh">
+  <meta property="og:type" content="website">
+
+
+
+
+<link rel="canonical" href="https://ftxj.github.io/zh/posts/2026-04-22/">
+
+
+<link rel="preload" href="/fonts/fa-brands-400.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="/fonts/fa-regular-400.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="/fonts/fa-solid-900.woff2" as="font" type="font/woff2" crossorigin>
+
+
+  
+  
+  <link rel="stylesheet" href="/css/coder.min.5e94c1acf7aa2066035cf2764ae3e4fe39db101d68b870f919966100d51fb861.css" integrity="sha256-XpTBrPeqIGYDXPJ2SuPk/jnbEB1ouHD5GZZhANUfuGE=" crossorigin="anonymous" media="screen" />
+
+
+
+
+
+
+  
+    
+    
+    <link rel="stylesheet" href="/css/coder-dark.min.a00e6364bacbc8266ad1cc81230774a1397198f8cfb7bcba29b7d6fcb54ce57f.css" integrity="sha256-oA5jZLrLyCZq0cyBIwd0oTlxmPjPt7y6KbfW/LVM5X8=" crossorigin="anonymous" media="screen" />
+  
+
+
+
+ 
+
+
+
+
+<link rel="icon" type="image/svg+xml" href="/images/favicon.svg" sizes="any">
+<link rel="icon" type="image/png" href="/images/favicon-32x32.png" sizes="32x32">
+<link rel="icon" type="image/png" href="/images/favicon-16x16.png" sizes="16x16">
+
+<link rel="apple-touch-icon" href="/images/apple-touch-icon.png">
+<link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon.png">
+
+<link rel="manifest" href="/site.webmanifest">
+<link rel="mask-icon" href="/images/safari-pinned-tab.svg" color="#5bbad5">
+
+
+<link rel="alternate" type="application/rss+xml" href="/zh/posts/2026-04-22/index.xml" title="JXIN's Home" />
+
+
+
+
+<style>
+.content article ul {
+  list-style: disc !important;
+  padding-left: 2.5rem !important;
+}
+
+.content article ul li {
+  display: list-item !important;
+}
+</style>
+
+
+
+
+  
+</head>
+
+
+
+
+
+
+<body class="preload-transitions colorscheme-auto">
+  
+<div class="float-container">
+    <a id="dark-mode-toggle" class="colorscheme-toggle">
+        <i class="fa-solid fa-adjust fa-fw" aria-hidden="true"></i>
+    </a>
+</div>
+
+
+  <main class="wrapper">
+    <nav class="navigation">
+  <section class="container">
+    
+    <a class="navigation-title" href="https://ftxj.github.io/zh/">
+      JXIN&#39;s Home
+    </a>
+    
+    
+      <input type="checkbox" id="menu-toggle" />
+      <label class="menu-button float-right" for="menu-toggle">
+        <i class="fa-solid fa-bars fa-fw" aria-hidden="true"></i>
+      </label>
+      <ul class="navigation-list">
+        
+          
+            <li class="navigation-item">
+              <a class="navigation-link " href="/zh/about/">关于</a>
+            </li>
+          
+            <li class="navigation-item">
+              <a class="navigation-link " href="/zh/travel/">旅行</a>
+            </li>
+          
+            <li class="navigation-item">
+              <a class="navigation-link " href="/zh/posts/">博客</a>
+            </li>
+          
+            <li class="navigation-item">
+              <a class="navigation-link " href="https://ftxj.github.io/cv/cv_zh.pdf">简历</a>
+            </li>
+          
+        
+        
+          
+          
+          
+            
+              
+                <li class="navigation-item menu-separator">
+                  <span>|</span>
+                </li>
+                
+              
+              <li class="navigation-item">
+                <a href="/posts/2026-04-22/">EN</a>
+              </li>
+            
+          
+        
+      </ul>
+    
+  </section>
+</nav>
+
+
+    <div class="content">
+      
+  <section class="container list">
+    <header>
+      <h1 class="title">
+        <a class="title-link" href="https://ftxj.github.io/zh/posts/2026-04-22/">
+          2026-04-22 论文速递
+        </a>
+      </h1>
+    </header>
+    <p>对 agent / LLM / AI 基础设施方向共 <strong>10</strong> 篇 arXiv 论文的自动摘要，由 Claude Code 生成分析。</p>
+<h3 id="1-sake-self-aware-knowledge-exploitation-exploration-for-grounded-multimodal-named-entity-recognition">1. SAKE: Self-aware Knowledge Exploitation-Exploration for Grounded Multimodal Named Entity Recognition</h3>
+<p><em>arXiv: <a href="https://arxiv.org/abs/2604.20146v1">2604.20146</a> · <code>cs.IR</code> · 相关度分数 <strong>32</strong></em></p>
+<p>SAKE 是一个端到端 agentic 框架，通过自我感知推理与自适应检索工具调用，在 Grounded Multimodal NER 任务上协调 MLLM 的内部知识利用与外部知识探索。</p>
+<p><a href="/zh/posts/2026-04-22/01-sake-self-aware-knowledge-exploitation-exploration-for-groun/">阅读完整分析 →</a></p>
+<hr>
+<h3 id="2-has-accelerating-rag-through-homology-aware-speculative-retrieval">2. HaS: Accelerating RAG through Homology-Aware Speculative Retrieval</h3>
+<p><em>arXiv: <a href="https://arxiv.org/abs/2604.20452v1">2604.20452</a> · <code>cs.IR</code> · 相关度分数 <strong>26</strong></em></p>
+<p>HaS 提出一种同源感知的推测式检索框架，通过小范围推测 + 同源查询再识别验证，在几乎不损精度的前提下显著加速 RAG 检索。</p>
+<p><a href="/zh/posts/2026-04-22/02-has-accelerating-rag-through-homology-aware-speculative-retr/">阅读完整分析 →</a></p>
+<hr>
+<h3 id="3-automatic-ontology-construction-using-llms-as-an-external-layer-of-memory-verification-and-planning-for-hybrid-intelligent-systems">3. Automatic Ontology Construction Using LLMs as an External Layer of Memory, Verification, and Planning for Hybrid Intelligent Systems</h3>
+<p><em>arXiv: <a href="https://arxiv.org/abs/2604.20795v1">2604.20795</a> · <code>cs.AI</code> · 相关度分数 <strong>22</strong></em></p>
+<p>论文提出一种混合架构，用自动构建的 RDF/OWL 本体作为 LLM 的外部记忆层，结合 RAG 与图推理，提升多步规划的可验证性与可靠性。</p>
+<p><a href="/zh/posts/2026-04-22/03-automatic-ontology-construction-using-llms-as-an-external-la/">阅读完整分析 →</a></p>
+<hr>
+<h3 id="4-breaking-mcp-with-function-hijacking-attacks-novel-threats-for-function-calling-and-agentic-models">4. Breaking MCP with Function Hijacking Attacks: Novel Threats for Function Calling and Agentic Models</h3>
+<p><em>arXiv: <a href="https://arxiv.org/abs/2604.20994v1">2604.20994</a> · <code>cs.CR</code> · 相关度分数 <strong>21</strong></em></p>
+<p>提出 Function Hijacking Attack (FHA)，通过操纵 agentic LLM 的工具选择过程，强制调用攻击者指定的函数，在 BFCL 上对 5 个模型实现 70%–100% 攻击成功率。</p>
+<p><a href="/zh/posts/2026-04-22/04-breaking-mcp-with-function-hijacking-attacks-novel-threats-f/">阅读完整分析 →</a></p>
+<hr>
+<h3 id="5-cooperative-profiles-predict-multi-agent-llm-team-performance-in-ai-for-science-workflows">5. Cooperative Profiles Predict Multi-Agent LLM Team Performance in AI for Science Workflows</h3>
+<p><em>arXiv: <a href="https://arxiv.org/abs/2604.20658v1">2604.20658</a> · <code>cs.CL</code> · 相关度分数 <strong>21</strong></em></p>
+<p>用行为经济学博弈测出的&quot;合作画像&quot;能稳健预测 LLM 多智能体团队在 AI-for-Science 协作任务中的表现，可作为部署前的廉价筛选工具。</p>
+<p><a href="/zh/posts/2026-04-22/05-cooperative-profiles-predict-multi-agent-llm-team-performanc/">阅读完整分析 →</a></p>
+<hr>
+<h3 id="6-faser-fine-grained-phase-management-for-speculative-decoding-in-dynamic-llm-serving">6. FASER: Fine-Grained Phase Management for Speculative Decoding in Dynamic LLM Serving</h3>
+<p><em>arXiv: <a href="https://arxiv.org/abs/2604.20503v1">2604.20503</a> · <code>cs.DC</code> · 相关度分数 <strong>21</strong></em></p>
+<p>FASER 通过细粒度的推测解码阶段管理（动态投机长度、早剪枝、draft/verify 重叠），在 vLLM 中实现最高 53% 吞吐提升与 1.92× 延迟降低。</p>
+<p><a href="/zh/posts/2026-04-22/06-faser-fine-grained-phase-management-for-speculative-decoding/">阅读完整分析 →</a></p>
+<hr>
+<h3 id="7-dual-cluster-memory-agent-resolving-multi-paradigm-ambiguity-in-optimization-problem-solving">7. Dual-Cluster Memory Agent: Resolving Multi-Paradigm Ambiguity in Optimization Problem Solving</h3>
+<p><em>arXiv: <a href="https://arxiv.org/abs/2604.20183v1">2604.20183</a> · <code>cs.CL</code> · 相关度分数 <strong>20</strong></em></p>
+<p>DCM-Agent 通过构建建模/编码双簇记忆并提炼 Approach、Checklist、Pitfall 三类结构化知识，在免训练条件下缓解优化问题求解中的多范式歧义，七项基准平均提升 11%–21%。</p>
+<p><a href="/zh/posts/2026-04-22/07-dual-cluster-memory-agent-resolving-multi-paradigm-ambiguity/">阅读完整分析 →</a></p>
+<hr>
+<h3 id="8-evoagent-an-evolvable-agent-framework-with-skill-learning-and-multi-agent-delegation">8. EvoAgent: An Evolvable Agent Framework with Skill Learning and Multi-Agent Delegation</h3>
+<p><em>arXiv: <a href="https://arxiv.org/abs/2604.20133v2">2604.20133</a> · <code>cs.AI</code> · 相关度分数 <strong>19</strong></em></p>
+<p>EvoAgent 提出可进化的 LLM agent 框架，通过结构化技能学习与分层子 agent 委派，使 GPT5.2 在外贸场景综合评分提升约 28%。</p>
+<p><a href="/zh/posts/2026-04-22/08-evoagent-an-evolvable-agent-framework-with-skill-learning-an/">阅读完整分析 →</a></p>
+<hr>
+<h3 id="9-agentic-ai-for-personalized-physiotherapy-a-multi-agent-framework-for-generative-video-training-and-real-time-pose-correction">9. Agentic AI for Personalized Physiotherapy: A Multi-Agent Framework for Generative Video Training and Real-Time Pose Correction</h3>
+<p><em>arXiv: <a href="https://arxiv.org/abs/2604.21154v1">2604.21154</a> · <code>cs.AI</code> · 相关度分数 <strong>19</strong></em></p>
+<p>提出一个多智能体框架，用生成式视频和实时姿态估计为居家物理治疗提供个性化训练与反馈。</p>
+<p><a href="/zh/posts/2026-04-22/09-agentic-ai-for-personalized-physiotherapy-a-multi-agent-fram/">阅读完整分析 →</a></p>
+<hr>
+<h3 id="10-co-evolving-llm-decision-and-skill-bank-agents-for-long-horizon-tasks">10. Co-Evolving LLM Decision and Skill Bank Agents for Long-Horizon Tasks</h3>
+<p><em>arXiv: <a href="https://arxiv.org/abs/2604.20987v1">2604.20987</a> · <code>cs.AI</code> · 相关度分数 <strong>19</strong></em></p>
+<p>COSPLAY 提出 LLM 决策 agent 与可学习 skill bank 协同演化的框架,在长时序游戏任务中让 8B 模型显著超越前沿 LLM baseline。</p>
+<p><a href="/zh/posts/2026-04-22/10-co-evolving-llm-decision-and-skill-bank-agents-for-long-hori/">阅读完整分析 →</a></p>
+<hr>
+
+    <ul>
+      <li>
+          <span class="date">四月 27, 2026</span>
+          <a class="title" href="/zh/posts/2026-04-22/10-co-evolving-llm-decision-and-skill-bank-agents-for-long-hori/">Co-Evolving LLM Decision and Skill Bank Agents for Long-Horizon Tasks</a>
+        </li><li>
+          <span class="date">四月 27, 2026</span>
+          <a class="title" href="/zh/posts/2026-04-22/09-agentic-ai-for-personalized-physiotherapy-a-multi-agent-fram/">Agentic AI for Personalized Physiotherapy: A Multi-Agent Framework for Generative Video Training and Real-Time Pose Correction</a>
+        </li><li>
+          <span class="date">四月 27, 2026</span>
+          <a class="title" href="/zh/posts/2026-04-22/08-evoagent-an-evolvable-agent-framework-with-skill-learning-an/">EvoAgent: An Evolvable Agent Framework with Skill Learning and Multi-Agent Delegation</a>
+        </li><li>
+          <span class="date">四月 27, 2026</span>
+          <a class="title" href="/zh/posts/2026-04-22/07-dual-cluster-memory-agent-resolving-multi-paradigm-ambiguity/">Dual-Cluster Memory Agent: Resolving Multi-Paradigm Ambiguity in Optimization Problem Solving</a>
+        </li><li>
+          <span class="date">四月 27, 2026</span>
+          <a class="title" href="/zh/posts/2026-04-22/06-faser-fine-grained-phase-management-for-speculative-decoding/">FASER: Fine-Grained Phase Management for Speculative Decoding in Dynamic LLM Serving</a>
+        </li><li>
+          <span class="date">四月 27, 2026</span>
+          <a class="title" href="/zh/posts/2026-04-22/05-cooperative-profiles-predict-multi-agent-llm-team-performanc/">Cooperative Profiles Predict Multi-Agent LLM Team Performance in AI for Science Workflows</a>
+        </li><li>
+          <span class="date">四月 27, 2026</span>
+          <a class="title" href="/zh/posts/2026-04-22/04-breaking-mcp-with-function-hijacking-attacks-novel-threats-f/">Breaking MCP with Function Hijacking Attacks: Novel Threats for Function Calling and Agentic Models</a>
+        </li><li>
+          <span class="date">四月 27, 2026</span>
+          <a class="title" href="/zh/posts/2026-04-22/03-automatic-ontology-construction-using-llms-as-an-external-la/">Automatic Ontology Construction Using LLMs as an External Layer of Memory, Verification, and Planning for Hybrid Intelligent Systems</a>
+        </li><li>
+          <span class="date">四月 27, 2026</span>
+          <a class="title" href="/zh/posts/2026-04-22/02-has-accelerating-rag-through-homology-aware-speculative-retr/">HaS: Accelerating RAG through Homology-Aware Speculative Retrieval</a>
+        </li><li>
+          <span class="date">四月 27, 2026</span>
+          <a class="title" href="/zh/posts/2026-04-22/01-sake-self-aware-knowledge-exploitation-exploration-for-groun/">SAKE: Self-aware Knowledge Exploitation-Exploration for Grounded Multimodal Named Entity Recognition</a>
+        </li></ul>
+
+    
+
+
+
+
+
+
+  </section>
+
+    </div>
+
+    <footer class="footer">
+  <section class="container">
+    ©
+    
+      2019 -
+    
+    2026
+     Jie Xin 
+    ·
+    
+    Powered by <a href="https://gohugo.io/" target="_blank" rel="noopener">Hugo</a> & <a href="https://github.com/luizdepra/hugo-coder/" target="_blank" rel="noopener">Coder</a>.
+    
+  </section>
+</footer>
+
+  </main>
+
+  
+
+  
+  
+  <script src="/js/coder.min.6ae284be93d2d19dad1f02b0039508d9aab3180a12a06dcc71b0b0ef7825a317.js" integrity="sha256-auKEvpPS0Z2tHwKwA5UI2aqzGAoSoG3McbCw73gloxc="></script>
+  
+
+  
+
+  
+
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+</body>
+</html>

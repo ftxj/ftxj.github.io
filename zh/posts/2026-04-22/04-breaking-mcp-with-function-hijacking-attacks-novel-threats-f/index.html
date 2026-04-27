@@ -1,0 +1,370 @@
+<!DOCTYPE html>
+<html lang="zh">
+
+<head>
+  <title>
+  Breaking MCP with Function Hijacking Attacks: Novel Threats for Function Calling and Agentic Models · JXIN&#39;s Home
+</title>
+  <meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="color-scheme" content="light dark">
+
+
+
+
+<meta name="author" content="Jie Xin">
+<meta name="description" content="arXiv: 2604.20994 · PDF
+作者: Yannis Belkhiter, Giulio Zizzo, Sergio Maffeis, Seshu Tirupathi, John D. Kelleher
+主分类: cs.CR · 全部: cs.AI, cs.CL, cs.CR
+命中关键词: large language model, llm, agent, agentic, reasoning, attention
+
+TL;DR
+提出 Function Hijacking Attack (FHA)，通过操纵 agentic LLM 的工具选择过程，强制调用攻击者指定的函数，在 BFCL 上对 5 个模型实现 70%–100% 攻击成功率。
+核心观点
+
+现有 injection/jailbreaking 攻击主要针对 prompt，而 function calling 接口本身是一个被低估的新攻击面。
+FHA 与上下文语义无关、对函数集合鲁棒，可跨领域迁移。
+可训练出 universal adversarial functions：单个被污染函数即可劫持多种 query 和 payload 的工具选择。
+结果凸显 agentic / MCP 系统亟需更强的 guardrails 与安全模块。
+
+方法
+作者针对 function calling LLM 的 tool selection 过程设计对抗扰动，不改 prompt 而是改&quot;候选函数&quot;本身（名字、描述、schema 等），让模型在面对任意用户请求时都倾向于选中攻击者指定的 function。在此基础上通过优化训练出 universal 版本，使单一恶意函数对多种 query 与 payload 均有效。摘要未披露具体损失函数与优化算法细节。">
+<meta name="keywords" content="blog,developer,personal">
+
+
+
+  <meta name="twitter:card" content="summary">
+  <meta name="twitter:title" content="Breaking MCP with Function Hijacking Attacks: Novel Threats for Function Calling and Agentic Models">
+  <meta name="twitter:description" content="arXiv: 2604.20994 · PDF
+作者: Yannis Belkhiter, Giulio Zizzo, Sergio Maffeis, Seshu Tirupathi, John D. Kelleher
+主分类: cs.CR · 全部: cs.AI, cs.CL, cs.CR
+命中关键词: large language model, llm, agent, agentic, reasoning, attention
+TL;DR 提出 Function Hijacking Attack (FHA)，通过操纵 agentic LLM 的工具选择过程，强制调用攻击者指定的函数，在 BFCL 上对 5 个模型实现 70%–100% 攻击成功率。
+核心观点 现有 injection/jailbreaking 攻击主要针对 prompt，而 function calling 接口本身是一个被低估的新攻击面。 FHA 与上下文语义无关、对函数集合鲁棒，可跨领域迁移。 可训练出 universal adversarial functions：单个被污染函数即可劫持多种 query 和 payload 的工具选择。 结果凸显 agentic / MCP 系统亟需更强的 guardrails 与安全模块。 方法 作者针对 function calling LLM 的 tool selection 过程设计对抗扰动，不改 prompt 而是改&#34;候选函数&#34;本身（名字、描述、schema 等），让模型在面对任意用户请求时都倾向于选中攻击者指定的 function。在此基础上通过优化训练出 universal 版本，使单一恶意函数对多种 query 与 payload 均有效。摘要未披露具体损失函数与优化算法细节。">
+
+<meta property="og:url" content="https://ftxj.github.io/zh/posts/2026-04-22/04-breaking-mcp-with-function-hijacking-attacks-novel-threats-f/">
+  <meta property="og:site_name" content="JXIN&#39;s Home">
+  <meta property="og:title" content="Breaking MCP with Function Hijacking Attacks: Novel Threats for Function Calling and Agentic Models">
+  <meta property="og:description" content="arXiv: 2604.20994 · PDF
+作者: Yannis Belkhiter, Giulio Zizzo, Sergio Maffeis, Seshu Tirupathi, John D. Kelleher
+主分类: cs.CR · 全部: cs.AI, cs.CL, cs.CR
+命中关键词: large language model, llm, agent, agentic, reasoning, attention
+TL;DR 提出 Function Hijacking Attack (FHA)，通过操纵 agentic LLM 的工具选择过程，强制调用攻击者指定的函数，在 BFCL 上对 5 个模型实现 70%–100% 攻击成功率。
+核心观点 现有 injection/jailbreaking 攻击主要针对 prompt，而 function calling 接口本身是一个被低估的新攻击面。 FHA 与上下文语义无关、对函数集合鲁棒，可跨领域迁移。 可训练出 universal adversarial functions：单个被污染函数即可劫持多种 query 和 payload 的工具选择。 结果凸显 agentic / MCP 系统亟需更强的 guardrails 与安全模块。 方法 作者针对 function calling LLM 的 tool selection 过程设计对抗扰动，不改 prompt 而是改&#34;候选函数&#34;本身（名字、描述、schema 等），让模型在面对任意用户请求时都倾向于选中攻击者指定的 function。在此基础上通过优化训练出 universal 版本，使单一恶意函数对多种 query 与 payload 均有效。摘要未披露具体损失函数与优化算法细节。">
+  <meta property="og:locale" content="zh">
+  <meta property="og:type" content="article">
+    <meta property="article:section" content="posts">
+    <meta property="article:published_time" content="2026-04-27T05:13:37+00:00">
+    <meta property="article:modified_time" content="2026-04-27T05:13:37+00:00">
+
+
+
+
+<link rel="canonical" href="https://ftxj.github.io/zh/posts/2026-04-22/04-breaking-mcp-with-function-hijacking-attacks-novel-threats-f/">
+
+
+<link rel="preload" href="/fonts/fa-brands-400.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="/fonts/fa-regular-400.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="/fonts/fa-solid-900.woff2" as="font" type="font/woff2" crossorigin>
+
+
+  
+  
+  <link rel="stylesheet" href="/css/coder.min.5e94c1acf7aa2066035cf2764ae3e4fe39db101d68b870f919966100d51fb861.css" integrity="sha256-XpTBrPeqIGYDXPJ2SuPk/jnbEB1ouHD5GZZhANUfuGE=" crossorigin="anonymous" media="screen" />
+
+
+
+
+
+
+  
+    
+    
+    <link rel="stylesheet" href="/css/coder-dark.min.a00e6364bacbc8266ad1cc81230774a1397198f8cfb7bcba29b7d6fcb54ce57f.css" integrity="sha256-oA5jZLrLyCZq0cyBIwd0oTlxmPjPt7y6KbfW/LVM5X8=" crossorigin="anonymous" media="screen" />
+  
+
+
+
+ 
+
+
+
+
+<link rel="icon" type="image/svg+xml" href="/images/favicon.svg" sizes="any">
+<link rel="icon" type="image/png" href="/images/favicon-32x32.png" sizes="32x32">
+<link rel="icon" type="image/png" href="/images/favicon-16x16.png" sizes="16x16">
+
+<link rel="apple-touch-icon" href="/images/apple-touch-icon.png">
+<link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon.png">
+
+<link rel="manifest" href="/site.webmanifest">
+<link rel="mask-icon" href="/images/safari-pinned-tab.svg" color="#5bbad5">
+
+
+
+
+
+
+<style>
+.content article ul {
+  list-style: disc !important;
+  padding-left: 2.5rem !important;
+}
+
+.content article ul li {
+  display: list-item !important;
+}
+</style>
+
+
+
+
+  
+</head>
+
+
+
+
+
+
+<body class="preload-transitions colorscheme-auto">
+  
+<div class="float-container">
+    <a id="dark-mode-toggle" class="colorscheme-toggle">
+        <i class="fa-solid fa-adjust fa-fw" aria-hidden="true"></i>
+    </a>
+</div>
+
+
+  <main class="wrapper">
+    <nav class="navigation">
+  <section class="container">
+    
+    <a class="navigation-title" href="https://ftxj.github.io/zh/">
+      JXIN&#39;s Home
+    </a>
+    
+    
+      <input type="checkbox" id="menu-toggle" />
+      <label class="menu-button float-right" for="menu-toggle">
+        <i class="fa-solid fa-bars fa-fw" aria-hidden="true"></i>
+      </label>
+      <ul class="navigation-list">
+        
+          
+            <li class="navigation-item">
+              <a class="navigation-link " href="/zh/about/">关于</a>
+            </li>
+          
+            <li class="navigation-item">
+              <a class="navigation-link " href="/zh/travel/">旅行</a>
+            </li>
+          
+            <li class="navigation-item">
+              <a class="navigation-link " href="/zh/posts/">博客</a>
+            </li>
+          
+            <li class="navigation-item">
+              <a class="navigation-link " href="https://ftxj.github.io/cv/cv_zh.pdf">简历</a>
+            </li>
+          
+        
+        
+          
+          
+          
+            
+              
+                <li class="navigation-item menu-separator">
+                  <span>|</span>
+                </li>
+                
+              
+              <li class="navigation-item">
+                <a href="/posts/2026-04-22/04-breaking-mcp-with-function-hijacking-attacks-novel-threats-f/">EN</a>
+              </li>
+            
+          
+        
+      </ul>
+    
+  </section>
+</nav>
+
+
+    <div class="content">
+      
+  <section class="container post">
+    <article>
+      <header>
+        <div class="post-title">
+          <h1 class="title">
+            <a class="title-link" href="https://ftxj.github.io/zh/posts/2026-04-22/04-breaking-mcp-with-function-hijacking-attacks-novel-threats-f/">
+              Breaking MCP with Function Hijacking Attacks: Novel Threats for Function Calling and Agentic Models
+            </a>
+          </h1>
+        </div>
+        <div class="post-meta">
+          <div class="date">
+            <span class="posted-on">
+              <i class="fa-solid fa-calendar" aria-hidden="true"></i>
+              <time datetime="2026-04-27T05:13:37Z">
+                四月 27, 2026
+              </time>
+            </span>
+            <span class="reading-time">
+              <i class="fa-solid fa-clock" aria-hidden="true"></i>
+              3-minute read
+            </span>
+          </div>
+          
+          <div class="categories">
+  <i class="fa-solid fa-folder" aria-hidden="true"></i>
+    <a href="/zh/categories/paper-digest/">Paper-Digest</a>
+      <span class="separator">•</span>
+    <a href="/zh/categories/2026-04-22/">2026-04-22</a></div>
+
+          
+        </div>
+      </header>
+
+      
+
+
+      <div class="post-content">
+        
+        <p><strong>arXiv:</strong> <a href="https://arxiv.org/abs/2604.20994v1">2604.20994</a> · <a href="https://arxiv.org/pdf/2604.20994v1">PDF</a></p>
+<p><strong>作者:</strong> Yannis Belkhiter, Giulio Zizzo, Sergio Maffeis, Seshu Tirupathi, John D. Kelleher</p>
+<p><strong>主分类:</strong> <code>cs.CR</code> · 全部: cs.AI, cs.CL, cs.CR</p>
+<p><strong>命中关键词:</strong> large language model, llm, agent, agentic, reasoning, attention</p>
+<hr>
+<h2 id="tldr">TL;DR</h2>
+<p>提出 Function Hijacking Attack (FHA)，通过操纵 agentic LLM 的工具选择过程，强制调用攻击者指定的函数，在 BFCL 上对 5 个模型实现 70%–100% 攻击成功率。</p>
+<h2 id="核心观点">核心观点</h2>
+<ul>
+<li>现有 injection/jailbreaking 攻击主要针对 prompt，而 function calling 接口本身是一个被低估的新攻击面。</li>
+<li>FHA 与上下文语义无关、对函数集合鲁棒，可跨领域迁移。</li>
+<li>可训练出 universal adversarial functions：单个被污染函数即可劫持多种 query 和 payload 的工具选择。</li>
+<li>结果凸显 agentic / MCP 系统亟需更强的 guardrails 与安全模块。</li>
+</ul>
+<h2 id="方法">方法</h2>
+<p>作者针对 function calling LLM 的 tool selection 过程设计对抗扰动，不改 prompt 而是改&quot;候选函数&quot;本身（名字、描述、schema 等），让模型在面对任意用户请求时都倾向于选中攻击者指定的 function。在此基础上通过优化训练出 universal 版本，使单一恶意函数对多种 query 与 payload 均有效。摘要未披露具体损失函数与优化算法细节。</p>
+<h2 id="实验">实验</h2>
+<ul>
+<li>模型：5 个 function-calling LLM，涵盖 instructed 与 reasoning 两类变体（具体型号未在摘要列出）。</li>
+<li>数据集 / benchmark：Berkeley Function Calling Leaderboard (BFCL)。</li>
+<li>指标：Attack Success Rate (ASR)，即模型被迫选择攻击者指定函数的比例。</li>
+<li>基线：摘要未明确列出对比方法。</li>
+</ul>
+<h2 id="结果">结果</h2>
+<p>跨 5 个模型在 BFCL 上取得 70%–100% ASR。universal adversarial function 能在多 query、多 payload 配置下保持有效。摘要未给出具体每个模型数字与消融，因此横向比较与鲁棒性边界需看正文。</p>
+<h2 id="为什么重要">为什么重要</h2>
+<p>对 MCP、tool-use agent、function-calling 生态而言，这类攻击意味着：只要一个工具/插件被污染或被攻击者注册进工具池，就可能在语义无关的情况下劫持整个 agent 的行为，导致数据外泄、越权调用、破坏性操作。现有以 prompt 为中心的防御无法覆盖，需要面向 tool registry、schema 校验、tool ranking 的新安全栈。</p>
+<h2 id="与已有工作的关系">与已有工作的关系</h2>
+<p>延续 prompt injection / jailbreaking 对 LLM 攻击面的探索，并扩展到近期的 function calling 滥用研究（数据篡改、死循环、有害内容生成）。相较于 BFCL 等 benchmark 关注能力，本文把它当作攻击评测床；与 universal adversarial triggers (UAT)、prompt-level 对抗攻击思路相承，但作用域从 prompt 转到 tool schema。</p>
+<h2 id="尚未回答的问题">尚未回答的问题</h2>
+<ul>
+<li>对抗函数在真实 MCP server、第三方工具市场下的可部署性和隐蔽性如何？</li>
+<li>是否能被简单防御（schema 规范化、工具签名、ranking guardrail、LLM-as-judge）挫败？</li>
+<li>对 reasoning / planner-executor 架构、多轮 tool use 的影响？</li>
+<li>是否能迁移到闭源商用模型（GPT、Claude、Gemini）及其 function calling API？</li>
+<li>universal function 的可检测性与对抗训练能否提供稳健防护？</li>
+</ul>
+<hr>
+<h2 id="论文图表">论文图表</h2>
+<p><strong>图 1:</strong> Figure 1 (extracted from PDF)</p>
+<p><img alt="图 1" src="/images/papers/2604.20994/fig1.png"></p>
+<p><strong>图 2:</strong> Figure 2 (extracted from PDF)</p>
+<p><img alt="图 2" src="/images/papers/2604.20994/fig2.png"></p>
+<p><strong>图 3:</strong> Figure 3 (extracted from PDF)</p>
+<p><img alt="图 3" src="/images/papers/2604.20994/fig3.png"></p>
+<hr>
+<h2 id="原始摘要">原始摘要</h2>
+<p>The growth of agentic AI has drawn significant attention to function calling Large Language Models (LLMs), which are designed to extend the capabilities of AI-powered system by invoking external functions. Injection and jailbreaking attacks have been extensively explored to showcase the vulnerabilities of LLMs to user prompt manipulation. The expanded capabilities of agentic models introduce further vulnerabilities via their function calling interface. Recent work in LLM security showed that function calling can be abused, leading to data tampering and theft, causing disruptive behavior such as endless loops, or causing LLMs to produce harmful content in the style of jailbreaking attacks. This paper introduces a novel function hijacking attack (FHA) that manipulates the tool selection process of agentic models to force the invocation of a specific, attacker-chosen function. While existing attacks focus on semantic preference of the model for function-calling tasks, we show that FHA is largely agnostic to the context semantics and robust to the function sets, making it applicable across diverse domains. We further demonstrate that FHA can be trained to produce universal adversarial functions, enabling a single attacked function to hijack tool selection across multiple queries and payload configurations. We conducted experiments on 5 different models, including instructed and reasoning variants, reaching 70% to 100% ASR over the established BFCL dataset. Our findings further demonstrate the need for strong guardrails and security modules for agentic systems.</p>
+
+      </div>
+
+
+      <footer>
+        
+
+
+        
+        
+        
+        
+        
+        
+        
+      </footer>
+    </article>
+
+    
+  </section>
+
+    </div>
+
+    <footer class="footer">
+  <section class="container">
+    ©
+    
+      2019 -
+    
+    2026
+     Jie Xin 
+    ·
+    
+    Powered by <a href="https://gohugo.io/" target="_blank" rel="noopener">Hugo</a> & <a href="https://github.com/luizdepra/hugo-coder/" target="_blank" rel="noopener">Coder</a>.
+    
+  </section>
+</footer>
+
+  </main>
+
+  
+
+  
+  
+  <script src="/js/coder.min.6ae284be93d2d19dad1f02b0039508d9aab3180a12a06dcc71b0b0ef7825a317.js" integrity="sha256-auKEvpPS0Z2tHwKwA5UI2aqzGAoSoG3McbCw73gloxc="></script>
+  
+
+  
+
+  
+
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+</body>
+</html>

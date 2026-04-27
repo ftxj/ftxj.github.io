@@ -1,0 +1,376 @@
+<!DOCTYPE html>
+<html lang="zh">
+
+<head>
+  <title>
+  Sovereign Agentic Loops: Decoupling AI Reasoning from Execution in Real-World Systems · JXIN&#39;s Home
+</title>
+  <meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="color-scheme" content="light dark">
+
+
+
+
+<meta name="author" content="Jie Xin">
+<meta name="description" content="arXiv: 2604.22136 · PDF
+作者: Jun He, Deying Yu
+单位: OpenKedge.io
+主分类: cs.CR · 全部: cs.CR, cs.LG
+命中关键词: large language model, llm, agent, agentic, reasoning, latency
+
+TL;DR
+提出 Sovereign Agentic Loops (SAL)：将 LLM agent 的推理与执行解耦，通过控制平面对模型输出的结构化 intent 做策略与状态校验，实现可审计、可重放的安全执行。
+核心观点
+
+当前架构直接把随机性模型输出传给执行层，存在安全风险，因为执行时无法保证模型正确性、上下文感知和对齐。
+SAL 是一种 control-plane 架构：模型只发出带 justification 的结构化 intent，由控制平面对照真实系统状态与策略校验后再执行。
+引入 obfuscation membrane 限制模型接触身份敏感状态；用加密链接的 Evidence Chain 保证可审计与可重放。
+在给定假设下可形式化证明 policy-bounded execution、identity isolation 和 deterministic replay。
+
+方法
+
+模型输出不是动作，而是结构化 intent &#43; justification；执行权交给 control plane。
+obfuscation membrane：对模型屏蔽 identity-sensitive 状态，降低信息暴露面。
+Evidence Chain：用密码学链接把 intent、校验结果和执行记录串成可审计链，支持 replay。
+对架构做形式化，证明三项安全性质（策略受限执行、身份隔离、确定性重放）。
+
+实验
+在 OpenKedge prototype（面向云基础设施场景）中落地 SAL，测量策略层拦截率、一致性检查拒绝率、不安全执行发生情况，以及延迟开销。具体 benchmark 细节与基线摘要未详述。">
+<meta name="keywords" content="blog,developer,personal">
+
+
+
+  <meta name="twitter:card" content="summary">
+  <meta name="twitter:title" content="Sovereign Agentic Loops: Decoupling AI Reasoning from Execution in Real-World Systems">
+  <meta name="twitter:description" content="arXiv: 2604.22136 · PDF
+作者: Jun He, Deying Yu
+单位: OpenKedge.io
+主分类: cs.CR · 全部: cs.CR, cs.LG
+命中关键词: large language model, llm, agent, agentic, reasoning, latency
+TL;DR 提出 Sovereign Agentic Loops (SAL)：将 LLM agent 的推理与执行解耦，通过控制平面对模型输出的结构化 intent 做策略与状态校验，实现可审计、可重放的安全执行。
+核心观点 当前架构直接把随机性模型输出传给执行层，存在安全风险，因为执行时无法保证模型正确性、上下文感知和对齐。 SAL 是一种 control-plane 架构：模型只发出带 justification 的结构化 intent，由控制平面对照真实系统状态与策略校验后再执行。 引入 obfuscation membrane 限制模型接触身份敏感状态；用加密链接的 Evidence Chain 保证可审计与可重放。 在给定假设下可形式化证明 policy-bounded execution、identity isolation 和 deterministic replay。 方法 模型输出不是动作，而是结构化 intent &#43; justification；执行权交给 control plane。 obfuscation membrane：对模型屏蔽 identity-sensitive 状态，降低信息暴露面。 Evidence Chain：用密码学链接把 intent、校验结果和执行记录串成可审计链，支持 replay。 对架构做形式化，证明三项安全性质（策略受限执行、身份隔离、确定性重放）。 实验 在 OpenKedge prototype（面向云基础设施场景）中落地 SAL，测量策略层拦截率、一致性检查拒绝率、不安全执行发生情况，以及延迟开销。具体 benchmark 细节与基线摘要未详述。">
+
+<meta property="og:url" content="https://ftxj.github.io/zh/posts/2026-04-27/02-sovereign-agentic-loops-decoupling-ai-reasoning-from-executi/">
+  <meta property="og:site_name" content="JXIN&#39;s Home">
+  <meta property="og:title" content="Sovereign Agentic Loops: Decoupling AI Reasoning from Execution in Real-World Systems">
+  <meta property="og:description" content="arXiv: 2604.22136 · PDF
+作者: Jun He, Deying Yu
+单位: OpenKedge.io
+主分类: cs.CR · 全部: cs.CR, cs.LG
+命中关键词: large language model, llm, agent, agentic, reasoning, latency
+TL;DR 提出 Sovereign Agentic Loops (SAL)：将 LLM agent 的推理与执行解耦，通过控制平面对模型输出的结构化 intent 做策略与状态校验，实现可审计、可重放的安全执行。
+核心观点 当前架构直接把随机性模型输出传给执行层，存在安全风险，因为执行时无法保证模型正确性、上下文感知和对齐。 SAL 是一种 control-plane 架构：模型只发出带 justification 的结构化 intent，由控制平面对照真实系统状态与策略校验后再执行。 引入 obfuscation membrane 限制模型接触身份敏感状态；用加密链接的 Evidence Chain 保证可审计与可重放。 在给定假设下可形式化证明 policy-bounded execution、identity isolation 和 deterministic replay。 方法 模型输出不是动作，而是结构化 intent &#43; justification；执行权交给 control plane。 obfuscation membrane：对模型屏蔽 identity-sensitive 状态，降低信息暴露面。 Evidence Chain：用密码学链接把 intent、校验结果和执行记录串成可审计链，支持 replay。 对架构做形式化，证明三项安全性质（策略受限执行、身份隔离、确定性重放）。 实验 在 OpenKedge prototype（面向云基础设施场景）中落地 SAL，测量策略层拦截率、一致性检查拒绝率、不安全执行发生情况，以及延迟开销。具体 benchmark 细节与基线摘要未详述。">
+  <meta property="og:locale" content="zh">
+  <meta property="og:type" content="article">
+    <meta property="article:section" content="posts">
+    <meta property="article:published_time" content="2026-04-27T10:15:08+00:00">
+    <meta property="article:modified_time" content="2026-04-27T10:15:08+00:00">
+
+
+
+
+<link rel="canonical" href="https://ftxj.github.io/zh/posts/2026-04-27/02-sovereign-agentic-loops-decoupling-ai-reasoning-from-executi/">
+
+
+<link rel="preload" href="/fonts/fa-brands-400.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="/fonts/fa-regular-400.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="/fonts/fa-solid-900.woff2" as="font" type="font/woff2" crossorigin>
+
+
+  
+  
+  <link rel="stylesheet" href="/css/coder.min.5e94c1acf7aa2066035cf2764ae3e4fe39db101d68b870f919966100d51fb861.css" integrity="sha256-XpTBrPeqIGYDXPJ2SuPk/jnbEB1ouHD5GZZhANUfuGE=" crossorigin="anonymous" media="screen" />
+
+
+
+
+
+
+  
+    
+    
+    <link rel="stylesheet" href="/css/coder-dark.min.a00e6364bacbc8266ad1cc81230774a1397198f8cfb7bcba29b7d6fcb54ce57f.css" integrity="sha256-oA5jZLrLyCZq0cyBIwd0oTlxmPjPt7y6KbfW/LVM5X8=" crossorigin="anonymous" media="screen" />
+  
+
+
+
+ 
+
+
+
+
+<link rel="icon" type="image/svg+xml" href="/images/favicon.svg" sizes="any">
+<link rel="icon" type="image/png" href="/images/favicon-32x32.png" sizes="32x32">
+<link rel="icon" type="image/png" href="/images/favicon-16x16.png" sizes="16x16">
+
+<link rel="apple-touch-icon" href="/images/apple-touch-icon.png">
+<link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon.png">
+
+<link rel="manifest" href="/site.webmanifest">
+<link rel="mask-icon" href="/images/safari-pinned-tab.svg" color="#5bbad5">
+
+
+
+
+
+
+<style>
+.content article ul {
+  list-style: disc !important;
+  padding-left: 2.5rem !important;
+}
+
+.content article ul li {
+  display: list-item !important;
+}
+</style>
+
+
+
+
+  
+</head>
+
+
+
+
+
+
+<body class="preload-transitions colorscheme-auto">
+  
+<div class="float-container">
+    <a id="dark-mode-toggle" class="colorscheme-toggle">
+        <i class="fa-solid fa-adjust fa-fw" aria-hidden="true"></i>
+    </a>
+</div>
+
+
+  <main class="wrapper">
+    <nav class="navigation">
+  <section class="container">
+    
+    <a class="navigation-title" href="https://ftxj.github.io/zh/">
+      JXIN&#39;s Home
+    </a>
+    
+    
+      <input type="checkbox" id="menu-toggle" />
+      <label class="menu-button float-right" for="menu-toggle">
+        <i class="fa-solid fa-bars fa-fw" aria-hidden="true"></i>
+      </label>
+      <ul class="navigation-list">
+        
+          
+            <li class="navigation-item">
+              <a class="navigation-link " href="/zh/about/">关于</a>
+            </li>
+          
+            <li class="navigation-item">
+              <a class="navigation-link " href="/zh/travel/">旅行</a>
+            </li>
+          
+            <li class="navigation-item">
+              <a class="navigation-link " href="/zh/posts/">博客</a>
+            </li>
+          
+            <li class="navigation-item">
+              <a class="navigation-link " href="https://ftxj.github.io/cv/cv_zh.pdf">简历</a>
+            </li>
+          
+        
+        
+          
+          
+          
+            
+              
+                <li class="navigation-item menu-separator">
+                  <span>|</span>
+                </li>
+                
+              
+              <li class="navigation-item">
+                <a href="/posts/2026-04-27/02-sovereign-agentic-loops-decoupling-ai-reasoning-from-executi/">EN</a>
+              </li>
+            
+          
+        
+      </ul>
+    
+  </section>
+</nav>
+
+
+    <div class="content">
+      
+  <section class="container post">
+    <article>
+      <header>
+        <div class="post-title">
+          <h1 class="title">
+            <a class="title-link" href="https://ftxj.github.io/zh/posts/2026-04-27/02-sovereign-agentic-loops-decoupling-ai-reasoning-from-executi/">
+              Sovereign Agentic Loops: Decoupling AI Reasoning from Execution in Real-World Systems
+            </a>
+          </h1>
+        </div>
+        <div class="post-meta">
+          <div class="date">
+            <span class="posted-on">
+              <i class="fa-solid fa-calendar" aria-hidden="true"></i>
+              <time datetime="2026-04-27T10:15:08Z">
+                四月 27, 2026
+              </time>
+            </span>
+            <span class="reading-time">
+              <i class="fa-solid fa-clock" aria-hidden="true"></i>
+              One-minute read
+            </span>
+          </div>
+          
+          <div class="categories">
+  <i class="fa-solid fa-folder" aria-hidden="true"></i>
+    <a href="/zh/categories/paper-digest/">Paper-Digest</a>
+      <span class="separator">•</span>
+    <a href="/zh/categories/2026-04-27/">2026-04-27</a></div>
+
+          
+        </div>
+      </header>
+
+      
+
+
+      <div class="post-content">
+        
+        <p><strong>arXiv:</strong> <a href="https://arxiv.org/abs/2604.22136v1">2604.22136</a> · <a href="https://arxiv.org/pdf/2604.22136v1">PDF</a></p>
+<p><strong>作者:</strong> Jun He, Deying Yu</p>
+<p><strong>单位:</strong> OpenKedge.io</p>
+<p><strong>主分类:</strong> <code>cs.CR</code> · 全部: cs.CR, cs.LG</p>
+<p><strong>命中关键词:</strong> large language model, llm, agent, agentic, reasoning, latency</p>
+<hr>
+<h2 id="tldr">TL;DR</h2>
+<p>提出 Sovereign Agentic Loops (SAL)：将 LLM agent 的推理与执行解耦，通过控制平面对模型输出的结构化 intent 做策略与状态校验，实现可审计、可重放的安全执行。</p>
+<h2 id="核心观点">核心观点</h2>
+<ul>
+<li>当前架构直接把随机性模型输出传给执行层，存在安全风险，因为执行时无法保证模型正确性、上下文感知和对齐。</li>
+<li>SAL 是一种 control-plane 架构：模型只发出带 justification 的结构化 intent，由控制平面对照真实系统状态与策略校验后再执行。</li>
+<li>引入 obfuscation membrane 限制模型接触身份敏感状态；用加密链接的 Evidence Chain 保证可审计与可重放。</li>
+<li>在给定假设下可形式化证明 policy-bounded execution、identity isolation 和 deterministic replay。</li>
+</ul>
+<h2 id="方法">方法</h2>
+<ul>
+<li>模型输出不是动作，而是结构化 intent + justification；执行权交给 control plane。</li>
+<li>obfuscation membrane：对模型屏蔽 identity-sensitive 状态，降低信息暴露面。</li>
+<li>Evidence Chain：用密码学链接把 intent、校验结果和执行记录串成可审计链，支持 replay。</li>
+<li>对架构做形式化，证明三项安全性质（策略受限执行、身份隔离、确定性重放）。</li>
+</ul>
+<h2 id="实验">实验</h2>
+<p>在 OpenKedge prototype（面向云基础设施场景）中落地 SAL，测量策略层拦截率、一致性检查拒绝率、不安全执行发生情况，以及延迟开销。具体 benchmark 细节与基线摘要未详述。</p>
+<h2 id="结果">结果</h2>
+<ul>
+<li>93% 的不安全 intent 在 policy 层被拦截。</li>
+<li>剩余 7% 通过 consistency checks 被拒。</li>
+<li>在 benchmark 中未发生不安全执行。</li>
+<li>中位延迟开销约 12.4 ms。</li>
+</ul>
+<h2 id="为什么重要">为什么重要</h2>
+<p>面向真正会改动生产系统的 LLM agent，它提供了一条把&quot;模型自由发挥&quot;和&quot;系统执行保证&quot;分离的工程范式，让策略、审计、回放都从 agent 外部强制，而不是依赖模型自觉。</p>
+<h2 id="与已有工作的关系">与已有工作的关系</h2>
+<p>延续 agentic AI 安全、tool use 调度与 guardrail 研究；呼应 control-plane / policy engine 思路（如 OPA 式策略层）以及可审计 AI 日志链、confidential computing 中对 identity 状态隔离的理念。</p>
+<h2 id="尚未回答的问题">尚未回答的问题</h2>
+<ul>
+<li>策略与 consistency checks 的完备性如何保证，会不会漏掉新型 unsafe intent？</li>
+<li>obfuscation membrane 在多租户、复杂上下文下是否影响任务成功率？</li>
+<li>SAL 在 OpenKedge 之外的领域（金融、机器人等）可迁移性如何？</li>
+<li>12.4 ms 中位延迟在长链路 agent 与高并发下是否仍可接受？</li>
+</ul>
+<h2 id="原始摘要中文翻译">原始摘要（中文翻译）</h2>
+<p>大语言模型 (LLM) agent 越来越多地发起会改动真实系统的 API 调用，但当前许多架构直接把具有随机性的模型输出传递到执行层。我们认为这种耦合带来安全风险，因为在执行时无法假定模型的正确性、上下文感知能力和对齐性。我们提出 Sovereign Agentic Loops (SAL)，一种 control-plane 架构：模型发出带有 justification 的结构化 intent，控制平面在执行前依据真实系统状态和策略对这些 intent 进行校验。SAL 结合了一个 obfuscation membrane（用于限制模型对身份敏感状态的访问）和一个以密码学方式链接的 Evidence Chain（用于可审计性和重放）。我们对 SAL 进行了形式化，并证明在所述假设下，它可提供 policy-bounded execution、identity isolation 以及 deterministic replay。在面向云基础设施的 OpenKedge 原型中，SAL 在策略层拦截了 93% 的不安全 intent，并通过一致性检查拒绝了剩余的 7%，在我们的 benchmark 中阻止了所有不安全执行，同时仅增加 12.4 ms 的中位延迟。</p>
+
+      </div>
+
+
+      <footer>
+        
+
+
+        
+        
+        
+        
+        
+        
+        
+      </footer>
+    </article>
+
+    
+  </section>
+
+    </div>
+
+    <footer class="footer">
+  <section class="container">
+    ©
+    
+      2019 -
+    
+    2026
+     Jie Xin 
+    ·
+    
+    Powered by <a href="https://gohugo.io/" target="_blank" rel="noopener">Hugo</a> & <a href="https://github.com/luizdepra/hugo-coder/" target="_blank" rel="noopener">Coder</a>.
+    
+  </section>
+</footer>
+
+  </main>
+
+  
+
+  
+  
+  <script src="/js/coder.min.6ae284be93d2d19dad1f02b0039508d9aab3180a12a06dcc71b0b0ef7825a317.js" integrity="sha256-auKEvpPS0Z2tHwKwA5UI2aqzGAoSoG3McbCw73gloxc="></script>
+  
+
+  
+
+  
+
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+</body>
+</html>

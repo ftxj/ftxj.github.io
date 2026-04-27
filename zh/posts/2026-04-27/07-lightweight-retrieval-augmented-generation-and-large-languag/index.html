@@ -1,0 +1,361 @@
+<!DOCTYPE html>
+<html lang="zh">
+
+<head>
+  <title>
+  Lightweight Retrieval-Augmented Generation and Large Language Model-Based Modeling for Scalable Patient-Trial Matching · JXIN&#39;s Home
+</title>
+  <meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="color-scheme" content="light dark">
+
+
+
+
+<meta name="author" content="Jie Xin">
+<meta name="description" content="arXiv: 2604.22061 · PDF
+作者: Xiaodi Li, Yang Xiao, Munhwan Lee, Konstantinos Leventakos, Young J. Juhn, David Jones, Terence T. Sio, Wei Liu, Maria Vassilaki, Nansu Zong
+单位: Mayo Clinic, University of Tulsa
+主分类: cs.CL · 全部: cs.AI, cs.CL, cs.LG
+命中关键词: large language model, llm, retrieval, reasoning, serving, fine-tun
+
+TL;DR
+提出一个轻量级框架，将 RAG 与 LLM 编码解耦用于患者-试验匹配，在多个公开数据集及 Mayo Clinic 真实数据上以显著更低算力达到与端到端 LLM 相当的效果。
+核心观点
+
+将 RAG（检索临床相关片段）与 LLM（编码成表示）明确解耦，降低长 EHR 输入复杂度。
+冻结 LLM 足以处理结构化临床数据，而非结构化临床叙述必须微调。
+通过降维 &#43; 轻量预测器实现可扩展分类，性能接近端到端 LLM，但算力大幅下降。
+
+方法
+框架分两阶段：第一阶段 RAG 从长电子病历中检索与 eligibility criteria 临床相关的片段，缩短输入；第二阶段用 LLM 将所选片段编码为信息丰富的表示，再经降维后送入轻量预测器完成下游分类，支持结构化与非结构化数据。">
+<meta name="keywords" content="blog,developer,personal">
+
+
+
+  <meta name="twitter:card" content="summary">
+  <meta name="twitter:title" content="Lightweight Retrieval-Augmented Generation and Large Language Model-Based Modeling for Scalable Patient-Trial Matching">
+  <meta name="twitter:description" content="arXiv: 2604.22061 · PDF
+作者: Xiaodi Li, Yang Xiao, Munhwan Lee, Konstantinos Leventakos, Young J. Juhn, David Jones, Terence T. Sio, Wei Liu, Maria Vassilaki, Nansu Zong
+单位: Mayo Clinic, University of Tulsa
+主分类: cs.CL · 全部: cs.AI, cs.CL, cs.LG
+命中关键词: large language model, llm, retrieval, reasoning, serving, fine-tun
+TL;DR 提出一个轻量级框架，将 RAG 与 LLM 编码解耦用于患者-试验匹配，在多个公开数据集及 Mayo Clinic 真实数据上以显著更低算力达到与端到端 LLM 相当的效果。
+核心观点 将 RAG（检索临床相关片段）与 LLM（编码成表示）明确解耦，降低长 EHR 输入复杂度。 冻结 LLM 足以处理结构化临床数据，而非结构化临床叙述必须微调。 通过降维 &#43; 轻量预测器实现可扩展分类，性能接近端到端 LLM，但算力大幅下降。 方法 框架分两阶段：第一阶段 RAG 从长电子病历中检索与 eligibility criteria 临床相关的片段，缩短输入；第二阶段用 LLM 将所选片段编码为信息丰富的表示，再经降维后送入轻量预测器完成下游分类，支持结构化与非结构化数据。">
+
+<meta property="og:url" content="https://ftxj.github.io/zh/posts/2026-04-27/07-lightweight-retrieval-augmented-generation-and-large-languag/">
+  <meta property="og:site_name" content="JXIN&#39;s Home">
+  <meta property="og:title" content="Lightweight Retrieval-Augmented Generation and Large Language Model-Based Modeling for Scalable Patient-Trial Matching">
+  <meta property="og:description" content="arXiv: 2604.22061 · PDF
+作者: Xiaodi Li, Yang Xiao, Munhwan Lee, Konstantinos Leventakos, Young J. Juhn, David Jones, Terence T. Sio, Wei Liu, Maria Vassilaki, Nansu Zong
+单位: Mayo Clinic, University of Tulsa
+主分类: cs.CL · 全部: cs.AI, cs.CL, cs.LG
+命中关键词: large language model, llm, retrieval, reasoning, serving, fine-tun
+TL;DR 提出一个轻量级框架，将 RAG 与 LLM 编码解耦用于患者-试验匹配，在多个公开数据集及 Mayo Clinic 真实数据上以显著更低算力达到与端到端 LLM 相当的效果。
+核心观点 将 RAG（检索临床相关片段）与 LLM（编码成表示）明确解耦，降低长 EHR 输入复杂度。 冻结 LLM 足以处理结构化临床数据，而非结构化临床叙述必须微调。 通过降维 &#43; 轻量预测器实现可扩展分类，性能接近端到端 LLM，但算力大幅下降。 方法 框架分两阶段：第一阶段 RAG 从长电子病历中检索与 eligibility criteria 临床相关的片段，缩短输入；第二阶段用 LLM 将所选片段编码为信息丰富的表示，再经降维后送入轻量预测器完成下游分类，支持结构化与非结构化数据。">
+  <meta property="og:locale" content="zh">
+  <meta property="og:type" content="article">
+    <meta property="article:section" content="posts">
+    <meta property="article:published_time" content="2026-04-27T10:21:37+00:00">
+    <meta property="article:modified_time" content="2026-04-27T10:21:37+00:00">
+
+
+
+
+<link rel="canonical" href="https://ftxj.github.io/zh/posts/2026-04-27/07-lightweight-retrieval-augmented-generation-and-large-languag/">
+
+
+<link rel="preload" href="/fonts/fa-brands-400.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="/fonts/fa-regular-400.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="/fonts/fa-solid-900.woff2" as="font" type="font/woff2" crossorigin>
+
+
+  
+  
+  <link rel="stylesheet" href="/css/coder.min.5e94c1acf7aa2066035cf2764ae3e4fe39db101d68b870f919966100d51fb861.css" integrity="sha256-XpTBrPeqIGYDXPJ2SuPk/jnbEB1ouHD5GZZhANUfuGE=" crossorigin="anonymous" media="screen" />
+
+
+
+
+
+
+  
+    
+    
+    <link rel="stylesheet" href="/css/coder-dark.min.a00e6364bacbc8266ad1cc81230774a1397198f8cfb7bcba29b7d6fcb54ce57f.css" integrity="sha256-oA5jZLrLyCZq0cyBIwd0oTlxmPjPt7y6KbfW/LVM5X8=" crossorigin="anonymous" media="screen" />
+  
+
+
+
+ 
+
+
+
+
+<link rel="icon" type="image/svg+xml" href="/images/favicon.svg" sizes="any">
+<link rel="icon" type="image/png" href="/images/favicon-32x32.png" sizes="32x32">
+<link rel="icon" type="image/png" href="/images/favicon-16x16.png" sizes="16x16">
+
+<link rel="apple-touch-icon" href="/images/apple-touch-icon.png">
+<link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon.png">
+
+<link rel="manifest" href="/site.webmanifest">
+<link rel="mask-icon" href="/images/safari-pinned-tab.svg" color="#5bbad5">
+
+
+
+
+
+
+<style>
+.content article ul {
+  list-style: disc !important;
+  padding-left: 2.5rem !important;
+}
+
+.content article ul li {
+  display: list-item !important;
+}
+</style>
+
+
+
+
+  
+</head>
+
+
+
+
+
+
+<body class="preload-transitions colorscheme-auto">
+  
+<div class="float-container">
+    <a id="dark-mode-toggle" class="colorscheme-toggle">
+        <i class="fa-solid fa-adjust fa-fw" aria-hidden="true"></i>
+    </a>
+</div>
+
+
+  <main class="wrapper">
+    <nav class="navigation">
+  <section class="container">
+    
+    <a class="navigation-title" href="https://ftxj.github.io/zh/">
+      JXIN&#39;s Home
+    </a>
+    
+    
+      <input type="checkbox" id="menu-toggle" />
+      <label class="menu-button float-right" for="menu-toggle">
+        <i class="fa-solid fa-bars fa-fw" aria-hidden="true"></i>
+      </label>
+      <ul class="navigation-list">
+        
+          
+            <li class="navigation-item">
+              <a class="navigation-link " href="/zh/about/">关于</a>
+            </li>
+          
+            <li class="navigation-item">
+              <a class="navigation-link " href="/zh/travel/">旅行</a>
+            </li>
+          
+            <li class="navigation-item">
+              <a class="navigation-link " href="/zh/posts/">博客</a>
+            </li>
+          
+            <li class="navigation-item">
+              <a class="navigation-link " href="https://ftxj.github.io/cv/cv_zh.pdf">简历</a>
+            </li>
+          
+        
+        
+          
+          
+          
+            
+              
+                <li class="navigation-item menu-separator">
+                  <span>|</span>
+                </li>
+                
+              
+              <li class="navigation-item">
+                <a href="/posts/2026-04-27/07-lightweight-retrieval-augmented-generation-and-large-languag/">EN</a>
+              </li>
+            
+          
+        
+      </ul>
+    
+  </section>
+</nav>
+
+
+    <div class="content">
+      
+  <section class="container post">
+    <article>
+      <header>
+        <div class="post-title">
+          <h1 class="title">
+            <a class="title-link" href="https://ftxj.github.io/zh/posts/2026-04-27/07-lightweight-retrieval-augmented-generation-and-large-languag/">
+              Lightweight Retrieval-Augmented Generation and Large Language Model-Based Modeling for Scalable Patient-Trial Matching
+            </a>
+          </h1>
+        </div>
+        <div class="post-meta">
+          <div class="date">
+            <span class="posted-on">
+              <i class="fa-solid fa-calendar" aria-hidden="true"></i>
+              <time datetime="2026-04-27T10:21:37Z">
+                四月 27, 2026
+              </time>
+            </span>
+            <span class="reading-time">
+              <i class="fa-solid fa-clock" aria-hidden="true"></i>
+              One-minute read
+            </span>
+          </div>
+          
+          <div class="categories">
+  <i class="fa-solid fa-folder" aria-hidden="true"></i>
+    <a href="/zh/categories/paper-digest/">Paper-Digest</a>
+      <span class="separator">•</span>
+    <a href="/zh/categories/2026-04-27/">2026-04-27</a></div>
+
+          
+        </div>
+      </header>
+
+      
+
+
+      <div class="post-content">
+        
+        <p><strong>arXiv:</strong> <a href="https://arxiv.org/abs/2604.22061v1">2604.22061</a> · <a href="https://arxiv.org/pdf/2604.22061v1">PDF</a></p>
+<p><strong>作者:</strong> Xiaodi Li, Yang Xiao, Munhwan Lee, Konstantinos Leventakos, Young J. Juhn, David Jones, Terence T. Sio, Wei Liu, Maria Vassilaki, Nansu Zong</p>
+<p><strong>单位:</strong> Mayo Clinic, University of Tulsa</p>
+<p><strong>主分类:</strong> <code>cs.CL</code> · 全部: cs.AI, cs.CL, cs.LG</p>
+<p><strong>命中关键词:</strong> large language model, llm, retrieval, reasoning, serving, fine-tun</p>
+<hr>
+<h2 id="tldr">TL;DR</h2>
+<p>提出一个轻量级框架，将 RAG 与 LLM 编码解耦用于患者-试验匹配，在多个公开数据集及 Mayo Clinic 真实数据上以显著更低算力达到与端到端 LLM 相当的效果。</p>
+<h2 id="核心观点">核心观点</h2>
+<ul>
+<li>将 RAG（检索临床相关片段）与 LLM（编码成表示）明确解耦，降低长 EHR 输入复杂度。</li>
+<li>冻结 LLM 足以处理结构化临床数据，而非结构化临床叙述必须微调。</li>
+<li>通过降维 + 轻量预测器实现可扩展分类，性能接近端到端 LLM，但算力大幅下降。</li>
+</ul>
+<h2 id="方法">方法</h2>
+<p>框架分两阶段：第一阶段 RAG 从长电子病历中检索与 eligibility criteria 临床相关的片段，缩短输入；第二阶段用 LLM 将所选片段编码为信息丰富的表示，再经降维后送入轻量预测器完成下游分类，支持结构化与非结构化数据。</p>
+<h2 id="实验">实验</h2>
+<p>在公开基准 n2c2、SIGIR、TREC 2021/2022 上评测，并使用 Mayo Clinic 的真实多模态数据集 MCPMD。对比对象包括端到端 LLM 方法和传统 ML 方法，关注计算开销和匹配效果。</p>
+<h2 id="结果">结果</h2>
+<ul>
+<li>基于检索的信息选择显著降低计算负担，同时保留临床有意义信号。</li>
+<li>冻结 LLM 对结构化数据表示强；非结构化临床叙述需微调才能建模。</li>
+<li>轻量 pipeline 在多个基准上达到与端到端 LLM 可比的性能，而成本大幅降低（论文未在摘要中给出具体数字）。</li>
+</ul>
+<h2 id="为什么重要">为什么重要</h2>
+<p>对医疗 AI 与 LLM 基础设施从业者，它展示了一条在长文档、敏感临床场景下把 RAG + 冻结/微调 LLM 做成可扩展管线的务实路径：不必为每条记录全量跑 LLM，也能达到近似效果，有利于院内部署与多中心扩展。</p>
+<h2 id="与已有工作的关系">与已有工作的关系</h2>
+<p>延续 RAG 在长文档问答中的思路；对比端到端 LLM 的 patient-trial matching（如直接喂 EHR 给 GPT 类模型）以及传统 ML/TREC Clinical Trials track 风格的检索-分类方法；与 frozen LLM embedding + linear probe 的表示学习路线一致。</p>
+<h2 id="尚未回答的问题">尚未回答的问题</h2>
+<ul>
+<li>检索器选择与 eligibility criteria 切分策略的敏感性未披露。</li>
+<li>结构化 vs 非结构化判定&quot;冻结 vs 微调&quot;的边界具体在哪？</li>
+<li>在更大规模、多医院的多模态数据上的泛化与公平性仍待验证。</li>
+<li>与最新临床 LLM（如 Med-PaLM、临床微调 Llama 系列）直接对比缺失。</li>
+</ul>
+<h2 id="原始摘要中文翻译">原始摘要（中文翻译）</h2>
+<p>患者-试验匹配需要在长且异构的电子健康档案（EHR）和复杂的入组标准之上进行推理，这在可扩展性、泛化能力和计算效率方面带来了重大挑战。现有方法要么依赖大语言模型（LLM）对完整文档进行处理，计算代价高昂；要么使用传统机器学习方法，难以捕捉非结构化的临床叙述。在本工作中，我们提出了一种轻量级框架，将 retrieval-augmented generation 与基于大语言模型的建模相结合，用于可扩展的患者-试验匹配。该框架显式地将两个关键组件分开：retrieval-augmented generation 用于从长 EHR 中识别临床相关片段，降低输入复杂度；而大语言模型用于将这些被选中的片段编码为具有信息量的表示。这些表示随后通过降维进一步精炼，并由轻量级预测器进行建模，从而实现高效、可扩展的下游分类。我们在多个公开基准（n2c2、SIGIR、TREC 2021/2022）以及来自 Mayo Clinic 的真实多模态数据集（MCPMD）上评估了所提出的方法。结果表明，基于检索的信息选择在保留临床有意义信号的同时，显著减轻了计算负担。我们进一步证明，冻结的 LLM 能够为结构化临床数据提供强有力的表示，而对非结构化临床叙述的建模则必须依赖微调。重要的是，所提出的轻量级流水线在计算代价大幅降低的情况下，取得了与端到端 LLM 方法相当的性能。</p>
+
+      </div>
+
+
+      <footer>
+        
+
+
+        
+        
+        
+        
+        
+        
+        
+      </footer>
+    </article>
+
+    
+  </section>
+
+    </div>
+
+    <footer class="footer">
+  <section class="container">
+    ©
+    
+      2019 -
+    
+    2026
+     Jie Xin 
+    ·
+    
+    Powered by <a href="https://gohugo.io/" target="_blank" rel="noopener">Hugo</a> & <a href="https://github.com/luizdepra/hugo-coder/" target="_blank" rel="noopener">Coder</a>.
+    
+  </section>
+</footer>
+
+  </main>
+
+  
+
+  
+  
+  <script src="/js/coder.min.6ae284be93d2d19dad1f02b0039508d9aab3180a12a06dcc71b0b0ef7825a317.js" integrity="sha256-auKEvpPS0Z2tHwKwA5UI2aqzGAoSoG3McbCw73gloxc="></script>
+  
+
+  
+
+  
+
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+</body>
+</html>

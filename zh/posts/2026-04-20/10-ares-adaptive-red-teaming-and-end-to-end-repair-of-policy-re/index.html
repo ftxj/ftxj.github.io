@@ -1,0 +1,414 @@
+<!DOCTYPE html>
+<html lang="zh">
+
+<head>
+  <title>
+  ARES: Adaptive Red-Teaming and End-to-End Repair of Policy-Reward System · JXIN&#39;s Home
+</title>
+  <meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="color-scheme" content="light dark">
+
+
+
+
+<meta name="author" content="Jie Xin">
+<meta name="description" content="arXiv: 2604.18789 · PDF
+作者: Jiacheng Liang, Yao Ma, Tharindu Kumarage, Satyapriya Krishna, Rahul Gupta, Kai-Wei Chang, Aram Galstyan, Charith Peris
+主分类: cs.AI · 全部: cs.AI, cs.CR, cs.LG
+命中关键词: large language model, llm, rag, serving, fine-tun, rlhf
+
+TL;DR
+ARES 提出一种自适应红队框架，同时攻击 policy 与 reward model，再通过两阶段微调修复二者联动的&quot;系统性弱点&quot;。
+核心观点
+
+指出 RLHF 的关键漏洞：imperfect Reward Model (RM) 与 policy 可能同时失效，形成 systemic weakness。
+现有 red-teaming 只针对 policy 层，忽略 RM 这一单点故障。
+提出 ARES：同时暴露并修复 policy 与 RM 的 dual vulnerabilities。
+建立 RLHF 安全对齐的新范式：end-to-end 修复而非单端加固。
+
+方法
+
+&ldquo;Safety Mentor&rdquo; 动态组合 structured components（topics、personas、tactics、goals）生成语义连贯的 adversarial prompts。
+针对每个 prompt 同时生成 malicious 与 safe responses，用来同时探测 LLM 与 RM 的弱点。
+两阶段修复：先微调 RM 使其更好识别 harmful content；再用改进后的 RM 优化 policy（core LLM）。
+
+实验
+
+多个 adversarial safety benchmarks（摘要未列具体名称）。
+基线与具体指标未在摘要披露；评估维度包括 safety robustness 与 model capability 保留。
+
+结果
+
+ARES 显著提升 safety robustness，同时基本保持模型通用能力。
+摘要没有给出具体数字，因此声明的幅度与对比优势无法从摘要直接验证。
+
+为什么重要
+
+对 RLHF 安全团队：揭示 RM 本身就是攻击面，单靠 policy 层红队不够。
+对做 alignment / safety infra 的人：提供一个可复用的 dual-target red-teaming &#43; 两阶段修复 pipeline。
+把 reward modeling 纳入持续对抗测试循环，可能成为未来对齐流程的标准环节。
+
+与已有工作的关系
+
+延续 RLHF / InstructGPT 的对齐脉络，但把关注点从 policy 扩展到 RM。
+与 automated red-teaming（如 Anthropic red-teaming、GCG、PAIR、AutoDAN）相比，强调 component-based、对 RM 也可见的攻击。
+与 reward model robustness、reward hacking 研究线（如 over-optimization、reward model ensemble）互补，提供对抗式诊断工具。
+
+尚未回答的问题
+
+Safety Mentor 自身是否会被对抗性绕过？其组件库如何覆盖未见过的 tactic？
+RM 修复是否会引入新的 reward hacking 或能力回退，长期训练稳定性如何？
+在更大规模模型与真实部署分布上的迁移性、以及对非英语 / 多模态场景的有效性。
+与纯 Constitutional AI、RLAIF 等非 RM-centric 方案相比的成本与收益权衡。
+
+
+论文图表
+图 1: Figure 1 (extracted from PDF)">
+<meta name="keywords" content="blog,developer,personal">
+
+
+
+  <meta name="twitter:card" content="summary">
+  <meta name="twitter:title" content="ARES: Adaptive Red-Teaming and End-to-End Repair of Policy-Reward System">
+  <meta name="twitter:description" content="arXiv: 2604.18789 · PDF
+作者: Jiacheng Liang, Yao Ma, Tharindu Kumarage, Satyapriya Krishna, Rahul Gupta, Kai-Wei Chang, Aram Galstyan, Charith Peris
+主分类: cs.AI · 全部: cs.AI, cs.CR, cs.LG
+命中关键词: large language model, llm, rag, serving, fine-tun, rlhf
+TL;DR ARES 提出一种自适应红队框架，同时攻击 policy 与 reward model，再通过两阶段微调修复二者联动的&#34;系统性弱点&#34;。
+核心观点 指出 RLHF 的关键漏洞：imperfect Reward Model (RM) 与 policy 可能同时失效，形成 systemic weakness。 现有 red-teaming 只针对 policy 层，忽略 RM 这一单点故障。 提出 ARES：同时暴露并修复 policy 与 RM 的 dual vulnerabilities。 建立 RLHF 安全对齐的新范式：end-to-end 修复而非单端加固。 方法 “Safety Mentor” 动态组合 structured components（topics、personas、tactics、goals）生成语义连贯的 adversarial prompts。 针对每个 prompt 同时生成 malicious 与 safe responses，用来同时探测 LLM 与 RM 的弱点。 两阶段修复：先微调 RM 使其更好识别 harmful content；再用改进后的 RM 优化 policy（core LLM）。 实验 多个 adversarial safety benchmarks（摘要未列具体名称）。 基线与具体指标未在摘要披露；评估维度包括 safety robustness 与 model capability 保留。 结果 ARES 显著提升 safety robustness，同时基本保持模型通用能力。 摘要没有给出具体数字，因此声明的幅度与对比优势无法从摘要直接验证。 为什么重要 对 RLHF 安全团队：揭示 RM 本身就是攻击面，单靠 policy 层红队不够。 对做 alignment / safety infra 的人：提供一个可复用的 dual-target red-teaming &#43; 两阶段修复 pipeline。 把 reward modeling 纳入持续对抗测试循环，可能成为未来对齐流程的标准环节。 与已有工作的关系 延续 RLHF / InstructGPT 的对齐脉络，但把关注点从 policy 扩展到 RM。 与 automated red-teaming（如 Anthropic red-teaming、GCG、PAIR、AutoDAN）相比，强调 component-based、对 RM 也可见的攻击。 与 reward model robustness、reward hacking 研究线（如 over-optimization、reward model ensemble）互补，提供对抗式诊断工具。 尚未回答的问题 Safety Mentor 自身是否会被对抗性绕过？其组件库如何覆盖未见过的 tactic？ RM 修复是否会引入新的 reward hacking 或能力回退，长期训练稳定性如何？ 在更大规模模型与真实部署分布上的迁移性、以及对非英语 / 多模态场景的有效性。 与纯 Constitutional AI、RLAIF 等非 RM-centric 方案相比的成本与收益权衡。 论文图表 图 1: Figure 1 (extracted from PDF)">
+
+<meta property="og:url" content="https://ftxj.github.io/zh/posts/2026-04-20/10-ares-adaptive-red-teaming-and-end-to-end-repair-of-policy-re/">
+  <meta property="og:site_name" content="JXIN&#39;s Home">
+  <meta property="og:title" content="ARES: Adaptive Red-Teaming and End-to-End Repair of Policy-Reward System">
+  <meta property="og:description" content="arXiv: 2604.18789 · PDF
+作者: Jiacheng Liang, Yao Ma, Tharindu Kumarage, Satyapriya Krishna, Rahul Gupta, Kai-Wei Chang, Aram Galstyan, Charith Peris
+主分类: cs.AI · 全部: cs.AI, cs.CR, cs.LG
+命中关键词: large language model, llm, rag, serving, fine-tun, rlhf
+TL;DR ARES 提出一种自适应红队框架，同时攻击 policy 与 reward model，再通过两阶段微调修复二者联动的&#34;系统性弱点&#34;。
+核心观点 指出 RLHF 的关键漏洞：imperfect Reward Model (RM) 与 policy 可能同时失效，形成 systemic weakness。 现有 red-teaming 只针对 policy 层，忽略 RM 这一单点故障。 提出 ARES：同时暴露并修复 policy 与 RM 的 dual vulnerabilities。 建立 RLHF 安全对齐的新范式：end-to-end 修复而非单端加固。 方法 “Safety Mentor” 动态组合 structured components（topics、personas、tactics、goals）生成语义连贯的 adversarial prompts。 针对每个 prompt 同时生成 malicious 与 safe responses，用来同时探测 LLM 与 RM 的弱点。 两阶段修复：先微调 RM 使其更好识别 harmful content；再用改进后的 RM 优化 policy（core LLM）。 实验 多个 adversarial safety benchmarks（摘要未列具体名称）。 基线与具体指标未在摘要披露；评估维度包括 safety robustness 与 model capability 保留。 结果 ARES 显著提升 safety robustness，同时基本保持模型通用能力。 摘要没有给出具体数字，因此声明的幅度与对比优势无法从摘要直接验证。 为什么重要 对 RLHF 安全团队：揭示 RM 本身就是攻击面，单靠 policy 层红队不够。 对做 alignment / safety infra 的人：提供一个可复用的 dual-target red-teaming &#43; 两阶段修复 pipeline。 把 reward modeling 纳入持续对抗测试循环，可能成为未来对齐流程的标准环节。 与已有工作的关系 延续 RLHF / InstructGPT 的对齐脉络，但把关注点从 policy 扩展到 RM。 与 automated red-teaming（如 Anthropic red-teaming、GCG、PAIR、AutoDAN）相比，强调 component-based、对 RM 也可见的攻击。 与 reward model robustness、reward hacking 研究线（如 over-optimization、reward model ensemble）互补，提供对抗式诊断工具。 尚未回答的问题 Safety Mentor 自身是否会被对抗性绕过？其组件库如何覆盖未见过的 tactic？ RM 修复是否会引入新的 reward hacking 或能力回退，长期训练稳定性如何？ 在更大规模模型与真实部署分布上的迁移性、以及对非英语 / 多模态场景的有效性。 与纯 Constitutional AI、RLAIF 等非 RM-centric 方案相比的成本与收益权衡。 论文图表 图 1: Figure 1 (extracted from PDF)">
+  <meta property="og:locale" content="zh">
+  <meta property="og:type" content="article">
+    <meta property="article:section" content="posts">
+    <meta property="article:published_time" content="2026-04-27T05:28:59+00:00">
+    <meta property="article:modified_time" content="2026-04-27T05:28:59+00:00">
+
+
+
+
+<link rel="canonical" href="https://ftxj.github.io/zh/posts/2026-04-20/10-ares-adaptive-red-teaming-and-end-to-end-repair-of-policy-re/">
+
+
+<link rel="preload" href="/fonts/fa-brands-400.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="/fonts/fa-regular-400.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="/fonts/fa-solid-900.woff2" as="font" type="font/woff2" crossorigin>
+
+
+  
+  
+  <link rel="stylesheet" href="/css/coder.min.5e94c1acf7aa2066035cf2764ae3e4fe39db101d68b870f919966100d51fb861.css" integrity="sha256-XpTBrPeqIGYDXPJ2SuPk/jnbEB1ouHD5GZZhANUfuGE=" crossorigin="anonymous" media="screen" />
+
+
+
+
+
+
+  
+    
+    
+    <link rel="stylesheet" href="/css/coder-dark.min.a00e6364bacbc8266ad1cc81230774a1397198f8cfb7bcba29b7d6fcb54ce57f.css" integrity="sha256-oA5jZLrLyCZq0cyBIwd0oTlxmPjPt7y6KbfW/LVM5X8=" crossorigin="anonymous" media="screen" />
+  
+
+
+
+ 
+
+
+
+
+<link rel="icon" type="image/svg+xml" href="/images/favicon.svg" sizes="any">
+<link rel="icon" type="image/png" href="/images/favicon-32x32.png" sizes="32x32">
+<link rel="icon" type="image/png" href="/images/favicon-16x16.png" sizes="16x16">
+
+<link rel="apple-touch-icon" href="/images/apple-touch-icon.png">
+<link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon.png">
+
+<link rel="manifest" href="/site.webmanifest">
+<link rel="mask-icon" href="/images/safari-pinned-tab.svg" color="#5bbad5">
+
+
+
+
+
+
+<style>
+.content article ul {
+  list-style: disc !important;
+  padding-left: 2.5rem !important;
+}
+
+.content article ul li {
+  display: list-item !important;
+}
+</style>
+
+
+
+
+  
+</head>
+
+
+
+
+
+
+<body class="preload-transitions colorscheme-auto">
+  
+<div class="float-container">
+    <a id="dark-mode-toggle" class="colorscheme-toggle">
+        <i class="fa-solid fa-adjust fa-fw" aria-hidden="true"></i>
+    </a>
+</div>
+
+
+  <main class="wrapper">
+    <nav class="navigation">
+  <section class="container">
+    
+    <a class="navigation-title" href="https://ftxj.github.io/zh/">
+      JXIN&#39;s Home
+    </a>
+    
+    
+      <input type="checkbox" id="menu-toggle" />
+      <label class="menu-button float-right" for="menu-toggle">
+        <i class="fa-solid fa-bars fa-fw" aria-hidden="true"></i>
+      </label>
+      <ul class="navigation-list">
+        
+          
+            <li class="navigation-item">
+              <a class="navigation-link " href="/zh/about/">关于</a>
+            </li>
+          
+            <li class="navigation-item">
+              <a class="navigation-link " href="/zh/travel/">旅行</a>
+            </li>
+          
+            <li class="navigation-item">
+              <a class="navigation-link " href="/zh/posts/">博客</a>
+            </li>
+          
+            <li class="navigation-item">
+              <a class="navigation-link " href="https://ftxj.github.io/cv/cv_zh.pdf">简历</a>
+            </li>
+          
+        
+        
+          
+          
+          
+            
+              
+                <li class="navigation-item menu-separator">
+                  <span>|</span>
+                </li>
+                
+              
+              <li class="navigation-item">
+                <a href="/posts/2026-04-20/10-ares-adaptive-red-teaming-and-end-to-end-repair-of-policy-re/">EN</a>
+              </li>
+            
+          
+        
+      </ul>
+    
+  </section>
+</nav>
+
+
+    <div class="content">
+      
+  <section class="container post">
+    <article>
+      <header>
+        <div class="post-title">
+          <h1 class="title">
+            <a class="title-link" href="https://ftxj.github.io/zh/posts/2026-04-20/10-ares-adaptive-red-teaming-and-end-to-end-repair-of-policy-re/">
+              ARES: Adaptive Red-Teaming and End-to-End Repair of Policy-Reward System
+            </a>
+          </h1>
+        </div>
+        <div class="post-meta">
+          <div class="date">
+            <span class="posted-on">
+              <i class="fa-solid fa-calendar" aria-hidden="true"></i>
+              <time datetime="2026-04-27T05:28:59Z">
+                四月 27, 2026
+              </time>
+            </span>
+            <span class="reading-time">
+              <i class="fa-solid fa-clock" aria-hidden="true"></i>
+              2-minute read
+            </span>
+          </div>
+          
+          <div class="categories">
+  <i class="fa-solid fa-folder" aria-hidden="true"></i>
+    <a href="/zh/categories/paper-digest/">Paper-Digest</a>
+      <span class="separator">•</span>
+    <a href="/zh/categories/2026-04-20/">2026-04-20</a></div>
+
+          
+        </div>
+      </header>
+
+      
+
+
+      <div class="post-content">
+        
+        <p><strong>arXiv:</strong> <a href="https://arxiv.org/abs/2604.18789v1">2604.18789</a> · <a href="https://arxiv.org/pdf/2604.18789v1">PDF</a></p>
+<p><strong>作者:</strong> Jiacheng Liang, Yao Ma, Tharindu Kumarage, Satyapriya Krishna, Rahul Gupta, Kai-Wei Chang, Aram Galstyan, Charith Peris</p>
+<p><strong>主分类:</strong> <code>cs.AI</code> · 全部: cs.AI, cs.CR, cs.LG</p>
+<p><strong>命中关键词:</strong> large language model, llm, rag, serving, fine-tun, rlhf</p>
+<hr>
+<h2 id="tldr">TL;DR</h2>
+<p>ARES 提出一种自适应红队框架，同时攻击 policy 与 reward model，再通过两阶段微调修复二者联动的&quot;系统性弱点&quot;。</p>
+<h2 id="核心观点">核心观点</h2>
+<ul>
+<li>指出 RLHF 的关键漏洞：imperfect Reward Model (RM) 与 policy 可能同时失效，形成 systemic weakness。</li>
+<li>现有 red-teaming 只针对 policy 层，忽略 RM 这一单点故障。</li>
+<li>提出 ARES：同时暴露并修复 policy 与 RM 的 dual vulnerabilities。</li>
+<li>建立 RLHF 安全对齐的新范式：end-to-end 修复而非单端加固。</li>
+</ul>
+<h2 id="方法">方法</h2>
+<ul>
+<li>&ldquo;Safety Mentor&rdquo; 动态组合 structured components（topics、personas、tactics、goals）生成语义连贯的 adversarial prompts。</li>
+<li>针对每个 prompt 同时生成 malicious 与 safe responses，用来同时探测 LLM 与 RM 的弱点。</li>
+<li>两阶段修复：先微调 RM 使其更好识别 harmful content；再用改进后的 RM 优化 policy（core LLM）。</li>
+</ul>
+<h2 id="实验">实验</h2>
+<ul>
+<li>多个 adversarial safety benchmarks（摘要未列具体名称）。</li>
+<li>基线与具体指标未在摘要披露；评估维度包括 safety robustness 与 model capability 保留。</li>
+</ul>
+<h2 id="结果">结果</h2>
+<ul>
+<li>ARES 显著提升 safety robustness，同时基本保持模型通用能力。</li>
+<li>摘要没有给出具体数字，因此声明的幅度与对比优势无法从摘要直接验证。</li>
+</ul>
+<h2 id="为什么重要">为什么重要</h2>
+<ul>
+<li>对 RLHF 安全团队：揭示 RM 本身就是攻击面，单靠 policy 层红队不够。</li>
+<li>对做 alignment / safety infra 的人：提供一个可复用的 dual-target red-teaming + 两阶段修复 pipeline。</li>
+<li>把 reward modeling 纳入持续对抗测试循环，可能成为未来对齐流程的标准环节。</li>
+</ul>
+<h2 id="与已有工作的关系">与已有工作的关系</h2>
+<ul>
+<li>延续 RLHF / InstructGPT 的对齐脉络，但把关注点从 policy 扩展到 RM。</li>
+<li>与 automated red-teaming（如 Anthropic red-teaming、GCG、PAIR、AutoDAN）相比，强调 component-based、对 RM 也可见的攻击。</li>
+<li>与 reward model robustness、reward hacking 研究线（如 over-optimization、reward model ensemble）互补，提供对抗式诊断工具。</li>
+</ul>
+<h2 id="尚未回答的问题">尚未回答的问题</h2>
+<ul>
+<li>Safety Mentor 自身是否会被对抗性绕过？其组件库如何覆盖未见过的 tactic？</li>
+<li>RM 修复是否会引入新的 reward hacking 或能力回退，长期训练稳定性如何？</li>
+<li>在更大规模模型与真实部署分布上的迁移性、以及对非英语 / 多模态场景的有效性。</li>
+<li>与纯 Constitutional AI、RLAIF 等非 RM-centric 方案相比的成本与收益权衡。</li>
+</ul>
+<hr>
+<h2 id="论文图表">论文图表</h2>
+<p><strong>图 1:</strong> Figure 1 (extracted from PDF)</p>
+<p><img alt="图 1" src="/images/papers/2604.18789/fig1.png"></p>
+<hr>
+<h2 id="原始摘要">原始摘要</h2>
+<p>Reinforcement Learning from Human Feedback (RLHF) is central to aligning Large Language Models (LLMs), yet it introduces a critical vulnerability: an imperfect Reward Model (RM) can become a single point of failure when it fails to penalize unsafe behaviors. While existing red-teaming approaches primarily target policy-level weaknesses, they overlook what we term systemic weaknesses cases where both the core LLM and the RM fail in tandem. We present ARES, a framework that systematically discovers and mitigates such dual vulnerabilities. ARES employs a ``Safety Mentor&rsquo;&rsquo; that dynamically composes semantically coherent adversarial prompts by combining structured component types (topics, personas, tactics, goals) and generates corresponding malicious and safe responses. This dual-targeting approach exposes weaknesses in both the core LLM and the RM simultaneously. Using the vulnerabilities gained, ARES implements a two-stage repair process: first fine-tuning the RM to better detect harmful content, then leveraging the improved RM to optimize the core model. Experiments across multiple adversarial safety benchmarks demonstrate that ARES substantially enhances safety robustness while preserving model capabilities, establishing a new paradigm for comprehensive RLHF safety alignment.</p>
+
+      </div>
+
+
+      <footer>
+        
+
+
+        
+        
+        
+        
+        
+        
+        
+      </footer>
+    </article>
+
+    
+  </section>
+
+    </div>
+
+    <footer class="footer">
+  <section class="container">
+    ©
+    
+      2019 -
+    
+    2026
+     Jie Xin 
+    ·
+    
+    Powered by <a href="https://gohugo.io/" target="_blank" rel="noopener">Hugo</a> & <a href="https://github.com/luizdepra/hugo-coder/" target="_blank" rel="noopener">Coder</a>.
+    
+  </section>
+</footer>
+
+  </main>
+
+  
+
+  
+  
+  <script src="/js/coder.min.6ae284be93d2d19dad1f02b0039508d9aab3180a12a06dcc71b0b0ef7825a317.js" integrity="sha256-auKEvpPS0Z2tHwKwA5UI2aqzGAoSoG3McbCw73gloxc="></script>
+  
+
+  
+
+  
+
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+</body>
+</html>

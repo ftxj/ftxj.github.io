@@ -1,0 +1,432 @@
+<!DOCTYPE html>
+<html lang="zh">
+
+<head>
+  <title>
+  GRASPrune: Global Gating for Budgeted Structured Pruning of Large Language Models · JXIN&#39;s Home
+</title>
+  <meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="color-scheme" content="light dark">
+
+
+
+
+<meta name="author" content="Jie Xin">
+<meta name="description" content="arXiv: 2604.19398 · PDF
+作者: Ziyang Wang, Jiangfeng Xiao, Chuan Xiao, Ruoxiang Li, Rui Mao, Jianbin Qin
+主分类: cs.AI · 全部: cs.AI
+命中关键词: large language model, llm, rag, inference, kv cache, attention, gpu, latency, fine-tun
+
+TL;DR
+GRASPrune 提出面向 LLM 的结构化剪枝框架，用全局预算下的轻量门控分数，在预训练后联合剪枝 FFN 通道和 KV head group，无需微调骨干权重。
+核心观点
+
+将 FFN 通道与 KV head group 统一在单一全局预算下联合剪枝，而非分模块独立决策。
+用投影式 straight-through estimator (STE) 学习门控分数，每一步都强制满足硬预算掩码。
+骨干权重冻结，仅训练轻量 gate，显著降低训练开销。
+剪枝后通过scaling factor 校准并折叠进权重，得到无额外推理参数的更小 dense checkpoint。
+
+方法
+
+训练后剪枝（post-pretraining）：在 FFN channel 与 KV head group 两种结构单元上放置 gate。
+通过 projected STE 让前向使用硬 0/1 mask 并满足预算约束，反向传递连续梯度更新 gate。
+mask 固定后，对保留单元的 scale 做校准，补偿剪枝引起的激活 scale mismatch。
+将校准后的 scale 折叠到权重，产出一个尺寸更小的 dense 模型，推理时无额外算子。
+
+实验
+
+模型：LLaMA-2-7B。
+剪枝率：50% 参数移除。
+数据：512 条无标签校准序列，训练 4 个 epoch。
+硬件：单卡 NVIDIA A100 80GB。
+评测：WikiText-2 perplexity，以及 5 个 zero-shot 基准的平均准确率。
+
+结果
+
+WikiText-2 上 perplexity 12.18（50% 剪枝率下）。
+5 个 zero-shot 基准平均准确率与基线具竞争力（摘要未给具体数值）。
+无需对整模型做 full fine-tuning，成本低。
+
+为什么重要
+
+对推理基础设施，同时压缩 FFN 和 KV cache 的剪枝能同时降低 memory、latency 与 KV cache 占用。
+单 A100 完成 7B 模型剪枝且无 full FT，门槛低、可复现，适合部署团队快速裁剪自有模型。
+输出 dense checkpoint，兼容现有推理栈，无需稀疏算子支持。
+
+与已有工作的关系
+
+延续 LLM-Pruner、SliceGPT、Wanda、SparseGPT 等 post-training 结构化/非结构化剪枝思路。
+gate &#43; STE 学习 mask 的做法与 Movement Pruning、DSNet 等一脉相承。
+关注 KV head 组剪枝与 GQA、MQA、KV cache compression 研究方向相关。
+scale 校准折叠思想与 SmoothQuant、AWQ 的 scale 迁移技巧类似。
+
+尚未回答的问题
+
+在更大模型（13B/70B）和更高剪枝率下是否仍保持 PPL？
+与 SparseGPT / Wanda 等强基线的直接对比数字未给出。
+与量化（INT4/INT8）叠加后的效果与误差累积如何？
+对 long-context 推理与 KV cache 实际延迟/显存节省的端到端测量缺失。
+gate 训练对校准数据领域分布的敏感性未讨论。
+
+
+论文图表
+图 1: Page 2 (rendered)">
+<meta name="keywords" content="blog,developer,personal">
+
+
+
+  <meta name="twitter:card" content="summary">
+  <meta name="twitter:title" content="GRASPrune: Global Gating for Budgeted Structured Pruning of Large Language Models">
+  <meta name="twitter:description" content="arXiv: 2604.19398 · PDF
+作者: Ziyang Wang, Jiangfeng Xiao, Chuan Xiao, Ruoxiang Li, Rui Mao, Jianbin Qin
+主分类: cs.AI · 全部: cs.AI
+命中关键词: large language model, llm, rag, inference, kv cache, attention, gpu, latency, fine-tun
+TL;DR GRASPrune 提出面向 LLM 的结构化剪枝框架，用全局预算下的轻量门控分数，在预训练后联合剪枝 FFN 通道和 KV head group，无需微调骨干权重。
+核心观点 将 FFN 通道与 KV head group 统一在单一全局预算下联合剪枝，而非分模块独立决策。 用投影式 straight-through estimator (STE) 学习门控分数，每一步都强制满足硬预算掩码。 骨干权重冻结，仅训练轻量 gate，显著降低训练开销。 剪枝后通过scaling factor 校准并折叠进权重，得到无额外推理参数的更小 dense checkpoint。 方法 训练后剪枝（post-pretraining）：在 FFN channel 与 KV head group 两种结构单元上放置 gate。 通过 projected STE 让前向使用硬 0/1 mask 并满足预算约束，反向传递连续梯度更新 gate。 mask 固定后，对保留单元的 scale 做校准，补偿剪枝引起的激活 scale mismatch。 将校准后的 scale 折叠到权重，产出一个尺寸更小的 dense 模型，推理时无额外算子。 实验 模型：LLaMA-2-7B。 剪枝率：50% 参数移除。 数据：512 条无标签校准序列，训练 4 个 epoch。 硬件：单卡 NVIDIA A100 80GB。 评测：WikiText-2 perplexity，以及 5 个 zero-shot 基准的平均准确率。 结果 WikiText-2 上 perplexity 12.18（50% 剪枝率下）。 5 个 zero-shot 基准平均准确率与基线具竞争力（摘要未给具体数值）。 无需对整模型做 full fine-tuning，成本低。 为什么重要 对推理基础设施，同时压缩 FFN 和 KV cache 的剪枝能同时降低 memory、latency 与 KV cache 占用。 单 A100 完成 7B 模型剪枝且无 full FT，门槛低、可复现，适合部署团队快速裁剪自有模型。 输出 dense checkpoint，兼容现有推理栈，无需稀疏算子支持。 与已有工作的关系 延续 LLM-Pruner、SliceGPT、Wanda、SparseGPT 等 post-training 结构化/非结构化剪枝思路。 gate &#43; STE 学习 mask 的做法与 Movement Pruning、DSNet 等一脉相承。 关注 KV head 组剪枝与 GQA、MQA、KV cache compression 研究方向相关。 scale 校准折叠思想与 SmoothQuant、AWQ 的 scale 迁移技巧类似。 尚未回答的问题 在更大模型（13B/70B）和更高剪枝率下是否仍保持 PPL？ 与 SparseGPT / Wanda 等强基线的直接对比数字未给出。 与量化（INT4/INT8）叠加后的效果与误差累积如何？ 对 long-context 推理与 KV cache 实际延迟/显存节省的端到端测量缺失。 gate 训练对校准数据领域分布的敏感性未讨论。 论文图表 图 1: Page 2 (rendered)">
+
+<meta property="og:url" content="https://ftxj.github.io/zh/posts/2026-04-21/02-grasprune-global-gating-for-budgeted-structured-pruning-of-l/">
+  <meta property="og:site_name" content="JXIN&#39;s Home">
+  <meta property="og:title" content="GRASPrune: Global Gating for Budgeted Structured Pruning of Large Language Models">
+  <meta property="og:description" content="arXiv: 2604.19398 · PDF
+作者: Ziyang Wang, Jiangfeng Xiao, Chuan Xiao, Ruoxiang Li, Rui Mao, Jianbin Qin
+主分类: cs.AI · 全部: cs.AI
+命中关键词: large language model, llm, rag, inference, kv cache, attention, gpu, latency, fine-tun
+TL;DR GRASPrune 提出面向 LLM 的结构化剪枝框架，用全局预算下的轻量门控分数，在预训练后联合剪枝 FFN 通道和 KV head group，无需微调骨干权重。
+核心观点 将 FFN 通道与 KV head group 统一在单一全局预算下联合剪枝，而非分模块独立决策。 用投影式 straight-through estimator (STE) 学习门控分数，每一步都强制满足硬预算掩码。 骨干权重冻结，仅训练轻量 gate，显著降低训练开销。 剪枝后通过scaling factor 校准并折叠进权重，得到无额外推理参数的更小 dense checkpoint。 方法 训练后剪枝（post-pretraining）：在 FFN channel 与 KV head group 两种结构单元上放置 gate。 通过 projected STE 让前向使用硬 0/1 mask 并满足预算约束，反向传递连续梯度更新 gate。 mask 固定后，对保留单元的 scale 做校准，补偿剪枝引起的激活 scale mismatch。 将校准后的 scale 折叠到权重，产出一个尺寸更小的 dense 模型，推理时无额外算子。 实验 模型：LLaMA-2-7B。 剪枝率：50% 参数移除。 数据：512 条无标签校准序列，训练 4 个 epoch。 硬件：单卡 NVIDIA A100 80GB。 评测：WikiText-2 perplexity，以及 5 个 zero-shot 基准的平均准确率。 结果 WikiText-2 上 perplexity 12.18（50% 剪枝率下）。 5 个 zero-shot 基准平均准确率与基线具竞争力（摘要未给具体数值）。 无需对整模型做 full fine-tuning，成本低。 为什么重要 对推理基础设施，同时压缩 FFN 和 KV cache 的剪枝能同时降低 memory、latency 与 KV cache 占用。 单 A100 完成 7B 模型剪枝且无 full FT，门槛低、可复现，适合部署团队快速裁剪自有模型。 输出 dense checkpoint，兼容现有推理栈，无需稀疏算子支持。 与已有工作的关系 延续 LLM-Pruner、SliceGPT、Wanda、SparseGPT 等 post-training 结构化/非结构化剪枝思路。 gate &#43; STE 学习 mask 的做法与 Movement Pruning、DSNet 等一脉相承。 关注 KV head 组剪枝与 GQA、MQA、KV cache compression 研究方向相关。 scale 校准折叠思想与 SmoothQuant、AWQ 的 scale 迁移技巧类似。 尚未回答的问题 在更大模型（13B/70B）和更高剪枝率下是否仍保持 PPL？ 与 SparseGPT / Wanda 等强基线的直接对比数字未给出。 与量化（INT4/INT8）叠加后的效果与误差累积如何？ 对 long-context 推理与 KV cache 实际延迟/显存节省的端到端测量缺失。 gate 训练对校准数据领域分布的敏感性未讨论。 论文图表 图 1: Page 2 (rendered)">
+  <meta property="og:locale" content="zh">
+  <meta property="og:type" content="article">
+    <meta property="article:section" content="posts">
+    <meta property="article:published_time" content="2026-04-27T05:18:29+00:00">
+    <meta property="article:modified_time" content="2026-04-27T05:18:29+00:00">
+
+
+
+
+<link rel="canonical" href="https://ftxj.github.io/zh/posts/2026-04-21/02-grasprune-global-gating-for-budgeted-structured-pruning-of-l/">
+
+
+<link rel="preload" href="/fonts/fa-brands-400.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="/fonts/fa-regular-400.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="/fonts/fa-solid-900.woff2" as="font" type="font/woff2" crossorigin>
+
+
+  
+  
+  <link rel="stylesheet" href="/css/coder.min.5e94c1acf7aa2066035cf2764ae3e4fe39db101d68b870f919966100d51fb861.css" integrity="sha256-XpTBrPeqIGYDXPJ2SuPk/jnbEB1ouHD5GZZhANUfuGE=" crossorigin="anonymous" media="screen" />
+
+
+
+
+
+
+  
+    
+    
+    <link rel="stylesheet" href="/css/coder-dark.min.a00e6364bacbc8266ad1cc81230774a1397198f8cfb7bcba29b7d6fcb54ce57f.css" integrity="sha256-oA5jZLrLyCZq0cyBIwd0oTlxmPjPt7y6KbfW/LVM5X8=" crossorigin="anonymous" media="screen" />
+  
+
+
+
+ 
+
+
+
+
+<link rel="icon" type="image/svg+xml" href="/images/favicon.svg" sizes="any">
+<link rel="icon" type="image/png" href="/images/favicon-32x32.png" sizes="32x32">
+<link rel="icon" type="image/png" href="/images/favicon-16x16.png" sizes="16x16">
+
+<link rel="apple-touch-icon" href="/images/apple-touch-icon.png">
+<link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon.png">
+
+<link rel="manifest" href="/site.webmanifest">
+<link rel="mask-icon" href="/images/safari-pinned-tab.svg" color="#5bbad5">
+
+
+
+
+
+
+<style>
+.content article ul {
+  list-style: disc !important;
+  padding-left: 2.5rem !important;
+}
+
+.content article ul li {
+  display: list-item !important;
+}
+</style>
+
+
+
+
+  
+</head>
+
+
+
+
+
+
+<body class="preload-transitions colorscheme-auto">
+  
+<div class="float-container">
+    <a id="dark-mode-toggle" class="colorscheme-toggle">
+        <i class="fa-solid fa-adjust fa-fw" aria-hidden="true"></i>
+    </a>
+</div>
+
+
+  <main class="wrapper">
+    <nav class="navigation">
+  <section class="container">
+    
+    <a class="navigation-title" href="https://ftxj.github.io/zh/">
+      JXIN&#39;s Home
+    </a>
+    
+    
+      <input type="checkbox" id="menu-toggle" />
+      <label class="menu-button float-right" for="menu-toggle">
+        <i class="fa-solid fa-bars fa-fw" aria-hidden="true"></i>
+      </label>
+      <ul class="navigation-list">
+        
+          
+            <li class="navigation-item">
+              <a class="navigation-link " href="/zh/about/">关于</a>
+            </li>
+          
+            <li class="navigation-item">
+              <a class="navigation-link " href="/zh/travel/">旅行</a>
+            </li>
+          
+            <li class="navigation-item">
+              <a class="navigation-link " href="/zh/posts/">博客</a>
+            </li>
+          
+            <li class="navigation-item">
+              <a class="navigation-link " href="https://ftxj.github.io/cv/cv_zh.pdf">简历</a>
+            </li>
+          
+        
+        
+          
+          
+          
+            
+              
+                <li class="navigation-item menu-separator">
+                  <span>|</span>
+                </li>
+                
+              
+              <li class="navigation-item">
+                <a href="/posts/2026-04-21/02-grasprune-global-gating-for-budgeted-structured-pruning-of-l/">EN</a>
+              </li>
+            
+          
+        
+      </ul>
+    
+  </section>
+</nav>
+
+
+    <div class="content">
+      
+  <section class="container post">
+    <article>
+      <header>
+        <div class="post-title">
+          <h1 class="title">
+            <a class="title-link" href="https://ftxj.github.io/zh/posts/2026-04-21/02-grasprune-global-gating-for-budgeted-structured-pruning-of-l/">
+              GRASPrune: Global Gating for Budgeted Structured Pruning of Large Language Models
+            </a>
+          </h1>
+        </div>
+        <div class="post-meta">
+          <div class="date">
+            <span class="posted-on">
+              <i class="fa-solid fa-calendar" aria-hidden="true"></i>
+              <time datetime="2026-04-27T05:18:29Z">
+                四月 27, 2026
+              </time>
+            </span>
+            <span class="reading-time">
+              <i class="fa-solid fa-clock" aria-hidden="true"></i>
+              2-minute read
+            </span>
+          </div>
+          
+          <div class="categories">
+  <i class="fa-solid fa-folder" aria-hidden="true"></i>
+    <a href="/zh/categories/paper-digest/">Paper-Digest</a>
+      <span class="separator">•</span>
+    <a href="/zh/categories/2026-04-21/">2026-04-21</a></div>
+
+          
+        </div>
+      </header>
+
+      
+
+
+      <div class="post-content">
+        
+        <p><strong>arXiv:</strong> <a href="https://arxiv.org/abs/2604.19398v1">2604.19398</a> · <a href="https://arxiv.org/pdf/2604.19398v1">PDF</a></p>
+<p><strong>作者:</strong> Ziyang Wang, Jiangfeng Xiao, Chuan Xiao, Ruoxiang Li, Rui Mao, Jianbin Qin</p>
+<p><strong>主分类:</strong> <code>cs.AI</code> · 全部: cs.AI</p>
+<p><strong>命中关键词:</strong> large language model, llm, rag, inference, kv cache, attention, gpu, latency, fine-tun</p>
+<hr>
+<h2 id="tldr">TL;DR</h2>
+<p>GRASPrune 提出面向 LLM 的结构化剪枝框架，用全局预算下的轻量门控分数，在预训练后联合剪枝 FFN 通道和 KV head group，无需微调骨干权重。</p>
+<h2 id="核心观点">核心观点</h2>
+<ul>
+<li>将 FFN 通道与 KV head group 统一在<strong>单一全局预算</strong>下联合剪枝，而非分模块独立决策。</li>
+<li>用<strong>投影式 straight-through estimator (STE)</strong> 学习门控分数，每一步都强制满足硬预算掩码。</li>
+<li>骨干权重冻结，仅训练轻量 gate，显著降低训练开销。</li>
+<li>剪枝后通过<strong>scaling factor 校准</strong>并折叠进权重，得到无额外推理参数的更小 dense checkpoint。</li>
+</ul>
+<h2 id="方法">方法</h2>
+<ul>
+<li>训练后剪枝（post-pretraining）：在 FFN channel 与 KV head group 两种结构单元上放置 gate。</li>
+<li>通过 projected STE 让前向使用硬 0/1 mask 并满足预算约束，反向传递连续梯度更新 gate。</li>
+<li>mask 固定后，对保留单元的 scale 做校准，补偿剪枝引起的激活 scale mismatch。</li>
+<li>将校准后的 scale 折叠到权重，产出一个尺寸更小的 dense 模型，推理时无额外算子。</li>
+</ul>
+<h2 id="实验">实验</h2>
+<ul>
+<li>模型：LLaMA-2-7B。</li>
+<li>剪枝率：50% 参数移除。</li>
+<li>数据：512 条无标签校准序列，训练 4 个 epoch。</li>
+<li>硬件：单卡 NVIDIA A100 80GB。</li>
+<li>评测：WikiText-2 perplexity，以及 5 个 zero-shot 基准的平均准确率。</li>
+</ul>
+<h2 id="结果">结果</h2>
+<ul>
+<li>WikiText-2 上 perplexity 12.18（50% 剪枝率下）。</li>
+<li>5 个 zero-shot 基准平均准确率与基线具竞争力（摘要未给具体数值）。</li>
+<li>无需对整模型做 full fine-tuning，成本低。</li>
+</ul>
+<h2 id="为什么重要">为什么重要</h2>
+<ul>
+<li>对推理基础设施，同时压缩 FFN 和 KV cache 的剪枝能<strong>同时降低 memory、latency 与 KV cache 占用</strong>。</li>
+<li>单 A100 完成 7B 模型剪枝且无 full FT，<strong>门槛低、可复现</strong>，适合部署团队快速裁剪自有模型。</li>
+<li>输出 dense checkpoint，兼容现有推理栈，无需稀疏算子支持。</li>
+</ul>
+<h2 id="与已有工作的关系">与已有工作的关系</h2>
+<ul>
+<li>延续 LLM-Pruner、SliceGPT、Wanda、SparseGPT 等 post-training 结构化/非结构化剪枝思路。</li>
+<li>gate + STE 学习 mask 的做法与 Movement Pruning、DSNet 等一脉相承。</li>
+<li>关注 KV head 组剪枝与 GQA、MQA、KV cache compression 研究方向相关。</li>
+<li>scale 校准折叠思想与 SmoothQuant、AWQ 的 scale 迁移技巧类似。</li>
+</ul>
+<h2 id="尚未回答的问题">尚未回答的问题</h2>
+<ul>
+<li>在更大模型（13B/70B）和更高剪枝率下是否仍保持 PPL？</li>
+<li>与 SparseGPT / Wanda 等强基线的直接对比数字未给出。</li>
+<li>与量化（INT4/INT8）叠加后的效果与误差累积如何？</li>
+<li>对 long-context 推理与 KV cache 实际延迟/显存节省的端到端测量缺失。</li>
+<li>gate 训练对校准数据领域分布的敏感性未讨论。</li>
+</ul>
+<hr>
+<h2 id="论文图表">论文图表</h2>
+<p><strong>图 1:</strong> Page 2 (rendered)</p>
+<p><img alt="图 1" src="/images/papers/2604.19398/page1.png"></p>
+<p><strong>图 2:</strong> Page 3 (rendered)</p>
+<p><img alt="图 2" src="/images/papers/2604.19398/page2.png"></p>
+<p><strong>图 3:</strong> Page 4 (rendered)</p>
+<p><img alt="图 3" src="/images/papers/2604.19398/page3.png"></p>
+<hr>
+<h2 id="原始摘要">原始摘要</h2>
+<p>Large language models (LLMs) are expensive to serve because model parameters, attention computation, and KV caches impose substantial memory and latency costs. We present GRASPrune, a structured pruning framework applied after pretraining that jointly prunes FFN channels and KV head groups under a single global budget. Instead of learning importance scores without constraints and applying the budget only after training, GRASPrune learns lightweight gate scores with a projected straight-through estimator that enforces a hard mask satisfying the budget at every step while keeping the backbone weights frozen. After the mask is fixed, we calibrate scaling factors on the retained units to mitigate scale mismatch caused by pruning, and fold these factors into the pruned weights to obtain a smaller dense checkpoint with no extra parameters at inference. On LLaMA-2-7B, GRASPrune removes 50% of parameters and achieves 12.18 perplexity on WikiText-2 while maintaining competitive average zero-shot accuracy on five benchmarks, using four epochs on 512 unlabeled calibration sequences on a single NVIDIA A100 80GB GPU without any full model fine-tuning.</p>
+
+      </div>
+
+
+      <footer>
+        
+
+
+        
+        
+        
+        
+        
+        
+        
+      </footer>
+    </article>
+
+    
+  </section>
+
+    </div>
+
+    <footer class="footer">
+  <section class="container">
+    ©
+    
+      2019 -
+    
+    2026
+     Jie Xin 
+    ·
+    
+    Powered by <a href="https://gohugo.io/" target="_blank" rel="noopener">Hugo</a> & <a href="https://github.com/luizdepra/hugo-coder/" target="_blank" rel="noopener">Coder</a>.
+    
+  </section>
+</footer>
+
+  </main>
+
+  
+
+  
+  
+  <script src="/js/coder.min.6ae284be93d2d19dad1f02b0039508d9aab3180a12a06dcc71b0b0ef7825a317.js" integrity="sha256-auKEvpPS0Z2tHwKwA5UI2aqzGAoSoG3McbCw73gloxc="></script>
+  
+
+  
+
+  
+
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+</body>
+</html>

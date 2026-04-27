@@ -1,0 +1,408 @@
+<!DOCTYPE html>
+<html lang="zh">
+
+<head>
+  <title>
+  Statistics, Not Scale: Modular Medical Dialogue with Bayesian Belief Engine · JXIN&#39;s Home
+</title>
+  <meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="color-scheme" content="light dark">
+
+
+
+
+<meta name="author" content="Jie Xin">
+<meta name="description" content="arXiv: 2604.20022 · PDF
+作者: Yusuf Kesmen, Fay Elhassan, Jiayi Ma, Julien Stalhandske, David Sasu, Alexandra Kulinkina, Akhil Arora, Lars Klein, Mary-Anne Hartley
+主分类: cs.LG · 全部: cs.AI, cs.CL, cs.LG
+命中关键词: large language model, llm, agent, rag, reasoning, inference
+
+TL;DR
+BMBE 把 LLM 降级为&quot;传感器&quot;，把医疗诊断推理交给可审计的贝叶斯引擎，模块化架构在精度、隐私和鲁棒性上超过独立 frontier LLM。
+核心观点
+
+LLM 把&quot;自然语言沟通&quot;与&quot;概率推理&quot;混在一起是架构缺陷，而非工程瑕疵。
+应严格分离语言层与推理层：LLM 只做解析和措辞，贝叶斯引擎承担全部诊断推断。
+由于患者数据不进入 LLM，架构天然私密；统计后端可按人群替换，无需重训。
+带来三大独有特性：可调的 selective diagnosis 精度-覆盖权衡、&ldquo;统计分离 gap&rdquo;，以及对抗性患者语气下的鲁棒性。
+
+方法
+提出 BMBE (Bayesian Medical Belief Engine)，模块化对话诊断框架：
+
+LLM as sensor：解析患者自由文本为结构化证据，并把引擎要问的问题口语化。
+Bayesian engine：确定性、可审计的概率推理核心，基于知识库维护疾病后验，决定下一步询问和何时给出诊断。
+Selective diagnosis：通过阈值连续调节 accuracy–coverage 折中。
+统计后端可独立替换以适配不同人群。
+
+实验
+
+在经验知识库与 LLM 生成知识库两类设置上评测。
+基线为同家族的 frontier standalone LLM（autonomous diagnostic agent）。
+指标覆盖诊断准确率、覆盖率、成本，以及对抗性沟通风格下的稳健性。具体数据集名称摘要未披露。
+
+结果
+
+廉价 sensor &#43; 贝叶斯引擎可超越同家族 frontier 独立模型，成本只是后者一小部分，呈现&quot;统计分离 gap&quot;。
+可连续调节精度-覆盖曲线，独立 LLM 无此能力。
+在对抗性患者语气下，独立模型性能崩溃，BMBE 保持稳健。
+具体数值摘要未给出，需看正文。
+
+为什么重要
+对医疗 agent、隐私合规系统和 LLM infra 从业者：展示了一条&quot;不靠 scale、靠架构&quot;的路线——把不确定性推理从 LLM 里抽出来交给可验证模块，可同时拿到隐私、可审计性、成本优势和可控的弃答机制，对高风险领域部署有直接借鉴意义。">
+<meta name="keywords" content="blog,developer,personal">
+
+
+
+  <meta name="twitter:card" content="summary">
+  <meta name="twitter:title" content="Statistics, Not Scale: Modular Medical Dialogue with Bayesian Belief Engine">
+  <meta name="twitter:description" content="arXiv: 2604.20022 · PDF
+作者: Yusuf Kesmen, Fay Elhassan, Jiayi Ma, Julien Stalhandske, David Sasu, Alexandra Kulinkina, Akhil Arora, Lars Klein, Mary-Anne Hartley
+主分类: cs.LG · 全部: cs.AI, cs.CL, cs.LG
+命中关键词: large language model, llm, agent, rag, reasoning, inference
+TL;DR BMBE 把 LLM 降级为&#34;传感器&#34;，把医疗诊断推理交给可审计的贝叶斯引擎，模块化架构在精度、隐私和鲁棒性上超过独立 frontier LLM。
+核心观点 LLM 把&#34;自然语言沟通&#34;与&#34;概率推理&#34;混在一起是架构缺陷，而非工程瑕疵。 应严格分离语言层与推理层：LLM 只做解析和措辞，贝叶斯引擎承担全部诊断推断。 由于患者数据不进入 LLM，架构天然私密；统计后端可按人群替换，无需重训。 带来三大独有特性：可调的 selective diagnosis 精度-覆盖权衡、“统计分离 gap”，以及对抗性患者语气下的鲁棒性。 方法 提出 BMBE (Bayesian Medical Belief Engine)，模块化对话诊断框架：
+LLM as sensor：解析患者自由文本为结构化证据，并把引擎要问的问题口语化。 Bayesian engine：确定性、可审计的概率推理核心，基于知识库维护疾病后验，决定下一步询问和何时给出诊断。 Selective diagnosis：通过阈值连续调节 accuracy–coverage 折中。 统计后端可独立替换以适配不同人群。 实验 在经验知识库与 LLM 生成知识库两类设置上评测。 基线为同家族的 frontier standalone LLM（autonomous diagnostic agent）。 指标覆盖诊断准确率、覆盖率、成本，以及对抗性沟通风格下的稳健性。具体数据集名称摘要未披露。 结果 廉价 sensor &#43; 贝叶斯引擎可超越同家族 frontier 独立模型，成本只是后者一小部分，呈现&#34;统计分离 gap&#34;。 可连续调节精度-覆盖曲线，独立 LLM 无此能力。 在对抗性患者语气下，独立模型性能崩溃，BMBE 保持稳健。 具体数值摘要未给出，需看正文。 为什么重要 对医疗 agent、隐私合规系统和 LLM infra 从业者：展示了一条&#34;不靠 scale、靠架构&#34;的路线——把不确定性推理从 LLM 里抽出来交给可验证模块，可同时拿到隐私、可审计性、成本优势和可控的弃答机制，对高风险领域部署有直接借鉴意义。">
+
+<meta property="og:url" content="https://ftxj.github.io/zh/posts/2026-04-21/05-statistics-not-scale-modular-medical-dialogue-with-bayesian/">
+  <meta property="og:site_name" content="JXIN&#39;s Home">
+  <meta property="og:title" content="Statistics, Not Scale: Modular Medical Dialogue with Bayesian Belief Engine">
+  <meta property="og:description" content="arXiv: 2604.20022 · PDF
+作者: Yusuf Kesmen, Fay Elhassan, Jiayi Ma, Julien Stalhandske, David Sasu, Alexandra Kulinkina, Akhil Arora, Lars Klein, Mary-Anne Hartley
+主分类: cs.LG · 全部: cs.AI, cs.CL, cs.LG
+命中关键词: large language model, llm, agent, rag, reasoning, inference
+TL;DR BMBE 把 LLM 降级为&#34;传感器&#34;，把医疗诊断推理交给可审计的贝叶斯引擎，模块化架构在精度、隐私和鲁棒性上超过独立 frontier LLM。
+核心观点 LLM 把&#34;自然语言沟通&#34;与&#34;概率推理&#34;混在一起是架构缺陷，而非工程瑕疵。 应严格分离语言层与推理层：LLM 只做解析和措辞，贝叶斯引擎承担全部诊断推断。 由于患者数据不进入 LLM，架构天然私密；统计后端可按人群替换，无需重训。 带来三大独有特性：可调的 selective diagnosis 精度-覆盖权衡、“统计分离 gap”，以及对抗性患者语气下的鲁棒性。 方法 提出 BMBE (Bayesian Medical Belief Engine)，模块化对话诊断框架：
+LLM as sensor：解析患者自由文本为结构化证据，并把引擎要问的问题口语化。 Bayesian engine：确定性、可审计的概率推理核心，基于知识库维护疾病后验，决定下一步询问和何时给出诊断。 Selective diagnosis：通过阈值连续调节 accuracy–coverage 折中。 统计后端可独立替换以适配不同人群。 实验 在经验知识库与 LLM 生成知识库两类设置上评测。 基线为同家族的 frontier standalone LLM（autonomous diagnostic agent）。 指标覆盖诊断准确率、覆盖率、成本，以及对抗性沟通风格下的稳健性。具体数据集名称摘要未披露。 结果 廉价 sensor &#43; 贝叶斯引擎可超越同家族 frontier 独立模型，成本只是后者一小部分，呈现&#34;统计分离 gap&#34;。 可连续调节精度-覆盖曲线，独立 LLM 无此能力。 在对抗性患者语气下，独立模型性能崩溃，BMBE 保持稳健。 具体数值摘要未给出，需看正文。 为什么重要 对医疗 agent、隐私合规系统和 LLM infra 从业者：展示了一条&#34;不靠 scale、靠架构&#34;的路线——把不确定性推理从 LLM 里抽出来交给可验证模块，可同时拿到隐私、可审计性、成本优势和可控的弃答机制，对高风险领域部署有直接借鉴意义。">
+  <meta property="og:locale" content="zh">
+  <meta property="og:type" content="article">
+    <meta property="article:section" content="posts">
+    <meta property="article:published_time" content="2026-04-27T05:20:01+00:00">
+    <meta property="article:modified_time" content="2026-04-27T05:20:01+00:00">
+
+
+
+
+<link rel="canonical" href="https://ftxj.github.io/zh/posts/2026-04-21/05-statistics-not-scale-modular-medical-dialogue-with-bayesian/">
+
+
+<link rel="preload" href="/fonts/fa-brands-400.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="/fonts/fa-regular-400.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="/fonts/fa-solid-900.woff2" as="font" type="font/woff2" crossorigin>
+
+
+  
+  
+  <link rel="stylesheet" href="/css/coder.min.5e94c1acf7aa2066035cf2764ae3e4fe39db101d68b870f919966100d51fb861.css" integrity="sha256-XpTBrPeqIGYDXPJ2SuPk/jnbEB1ouHD5GZZhANUfuGE=" crossorigin="anonymous" media="screen" />
+
+
+
+
+
+
+  
+    
+    
+    <link rel="stylesheet" href="/css/coder-dark.min.a00e6364bacbc8266ad1cc81230774a1397198f8cfb7bcba29b7d6fcb54ce57f.css" integrity="sha256-oA5jZLrLyCZq0cyBIwd0oTlxmPjPt7y6KbfW/LVM5X8=" crossorigin="anonymous" media="screen" />
+  
+
+
+
+ 
+
+
+
+
+<link rel="icon" type="image/svg+xml" href="/images/favicon.svg" sizes="any">
+<link rel="icon" type="image/png" href="/images/favicon-32x32.png" sizes="32x32">
+<link rel="icon" type="image/png" href="/images/favicon-16x16.png" sizes="16x16">
+
+<link rel="apple-touch-icon" href="/images/apple-touch-icon.png">
+<link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon.png">
+
+<link rel="manifest" href="/site.webmanifest">
+<link rel="mask-icon" href="/images/safari-pinned-tab.svg" color="#5bbad5">
+
+
+
+
+
+
+<style>
+.content article ul {
+  list-style: disc !important;
+  padding-left: 2.5rem !important;
+}
+
+.content article ul li {
+  display: list-item !important;
+}
+</style>
+
+
+
+
+  
+</head>
+
+
+
+
+
+
+<body class="preload-transitions colorscheme-auto">
+  
+<div class="float-container">
+    <a id="dark-mode-toggle" class="colorscheme-toggle">
+        <i class="fa-solid fa-adjust fa-fw" aria-hidden="true"></i>
+    </a>
+</div>
+
+
+  <main class="wrapper">
+    <nav class="navigation">
+  <section class="container">
+    
+    <a class="navigation-title" href="https://ftxj.github.io/zh/">
+      JXIN&#39;s Home
+    </a>
+    
+    
+      <input type="checkbox" id="menu-toggle" />
+      <label class="menu-button float-right" for="menu-toggle">
+        <i class="fa-solid fa-bars fa-fw" aria-hidden="true"></i>
+      </label>
+      <ul class="navigation-list">
+        
+          
+            <li class="navigation-item">
+              <a class="navigation-link " href="/zh/about/">关于</a>
+            </li>
+          
+            <li class="navigation-item">
+              <a class="navigation-link " href="/zh/travel/">旅行</a>
+            </li>
+          
+            <li class="navigation-item">
+              <a class="navigation-link " href="/zh/posts/">博客</a>
+            </li>
+          
+            <li class="navigation-item">
+              <a class="navigation-link " href="https://ftxj.github.io/cv/cv_zh.pdf">简历</a>
+            </li>
+          
+        
+        
+          
+          
+          
+            
+              
+                <li class="navigation-item menu-separator">
+                  <span>|</span>
+                </li>
+                
+              
+              <li class="navigation-item">
+                <a href="/posts/2026-04-21/05-statistics-not-scale-modular-medical-dialogue-with-bayesian/">EN</a>
+              </li>
+            
+          
+        
+      </ul>
+    
+  </section>
+</nav>
+
+
+    <div class="content">
+      
+  <section class="container post">
+    <article>
+      <header>
+        <div class="post-title">
+          <h1 class="title">
+            <a class="title-link" href="https://ftxj.github.io/zh/posts/2026-04-21/05-statistics-not-scale-modular-medical-dialogue-with-bayesian/">
+              Statistics, Not Scale: Modular Medical Dialogue with Bayesian Belief Engine
+            </a>
+          </h1>
+        </div>
+        <div class="post-meta">
+          <div class="date">
+            <span class="posted-on">
+              <i class="fa-solid fa-calendar" aria-hidden="true"></i>
+              <time datetime="2026-04-27T05:20:01Z">
+                四月 27, 2026
+              </time>
+            </span>
+            <span class="reading-time">
+              <i class="fa-solid fa-clock" aria-hidden="true"></i>
+              2-minute read
+            </span>
+          </div>
+          
+          <div class="categories">
+  <i class="fa-solid fa-folder" aria-hidden="true"></i>
+    <a href="/zh/categories/paper-digest/">Paper-Digest</a>
+      <span class="separator">•</span>
+    <a href="/zh/categories/2026-04-21/">2026-04-21</a></div>
+
+          
+        </div>
+      </header>
+
+      
+
+
+      <div class="post-content">
+        
+        <p><strong>arXiv:</strong> <a href="https://arxiv.org/abs/2604.20022v1">2604.20022</a> · <a href="https://arxiv.org/pdf/2604.20022v1">PDF</a></p>
+<p><strong>作者:</strong> Yusuf Kesmen, Fay Elhassan, Jiayi Ma, Julien Stalhandske, David Sasu, Alexandra Kulinkina, Akhil Arora, Lars Klein, Mary-Anne Hartley</p>
+<p><strong>主分类:</strong> <code>cs.LG</code> · 全部: cs.AI, cs.CL, cs.LG</p>
+<p><strong>命中关键词:</strong> large language model, llm, agent, rag, reasoning, inference</p>
+<hr>
+<h2 id="tldr">TL;DR</h2>
+<p>BMBE 把 LLM 降级为&quot;传感器&quot;，把医疗诊断推理交给可审计的贝叶斯引擎，模块化架构在精度、隐私和鲁棒性上超过独立 frontier LLM。</p>
+<h2 id="核心观点">核心观点</h2>
+<ul>
+<li>LLM 把&quot;自然语言沟通&quot;与&quot;概率推理&quot;混在一起是架构缺陷，而非工程瑕疵。</li>
+<li>应严格分离语言层与推理层：LLM 只做解析和措辞，贝叶斯引擎承担全部诊断推断。</li>
+<li>由于患者数据不进入 LLM，架构天然私密；统计后端可按人群替换，无需重训。</li>
+<li>带来三大独有特性：可调的 selective diagnosis 精度-覆盖权衡、&ldquo;统计分离 gap&rdquo;，以及对抗性患者语气下的鲁棒性。</li>
+</ul>
+<h2 id="方法">方法</h2>
+<p>提出 BMBE (Bayesian Medical Belief Engine)，模块化对话诊断框架：</p>
+<ul>
+<li><strong>LLM as sensor</strong>：解析患者自由文本为结构化证据，并把引擎要问的问题口语化。</li>
+<li><strong>Bayesian engine</strong>：确定性、可审计的概率推理核心，基于知识库维护疾病后验，决定下一步询问和何时给出诊断。</li>
+<li><strong>Selective diagnosis</strong>：通过阈值连续调节 accuracy–coverage 折中。</li>
+<li>统计后端可独立替换以适配不同人群。</li>
+</ul>
+<h2 id="实验">实验</h2>
+<ul>
+<li>在经验知识库与 LLM 生成知识库两类设置上评测。</li>
+<li>基线为同家族的 frontier standalone LLM（autonomous diagnostic agent）。</li>
+<li>指标覆盖诊断准确率、覆盖率、成本，以及对抗性沟通风格下的稳健性。具体数据集名称摘要未披露。</li>
+</ul>
+<h2 id="结果">结果</h2>
+<ul>
+<li>廉价 sensor + 贝叶斯引擎可超越同家族 frontier 独立模型，成本只是后者一小部分，呈现&quot;统计分离 gap&quot;。</li>
+<li>可连续调节精度-覆盖曲线，独立 LLM 无此能力。</li>
+<li>在对抗性患者语气下，独立模型性能崩溃，BMBE 保持稳健。</li>
+<li>具体数值摘要未给出，需看正文。</li>
+</ul>
+<h2 id="为什么重要">为什么重要</h2>
+<p>对医疗 agent、隐私合规系统和 LLM infra 从业者：展示了一条&quot;不靠 scale、靠架构&quot;的路线——把不确定性推理从 LLM 里抽出来交给可验证模块，可同时拿到隐私、可审计性、成本优势和可控的弃答机制，对高风险领域部署有直接借鉴意义。</p>
+<h2 id="与已有工作的关系">与已有工作的关系</h2>
+<ul>
+<li>延续 LLM-as-diagnostic-agent 方向（如 AMIE、Med-PaLM 式对话诊断）。</li>
+<li>呼应 neuro-symbolic 与 tool-augmented LLM 思路，把确定性推理外置。</li>
+<li>贝叶斯引擎部分承袭经典 medical expert system / Bayesian network 诊断（QMR-DT 等）。</li>
+<li>selective prediction / conformal 风格的 accuracy-coverage 折中亦有先例。</li>
+</ul>
+<h2 id="尚未回答的问题">尚未回答的问题</h2>
+<ul>
+<li>在真实临床数据和多语种、多文化人群上的外部效度？</li>
+<li>知识库构建与维护成本，尤其贝叶斯网络结构与条件概率的获取与更新？</li>
+<li>解析式 LLM sensor 的错误如何传播进后验，是否需要不确定性估计？</li>
+<li>面向多轮长程病史、多病共存、检验结果整合的扩展性？</li>
+<li>与临床工作流、医生监督的交互形态与监管合规路径。</li>
+</ul>
+<hr>
+<h2 id="论文图表">论文图表</h2>
+<p><strong>图 1:</strong> Page 2 (rendered)</p>
+<p><img alt="图 1" src="/images/papers/2604.20022/page1.png"></p>
+<p><strong>图 2:</strong> Page 3 (rendered)</p>
+<p><img alt="图 2" src="/images/papers/2604.20022/page2.png"></p>
+<p><strong>图 3:</strong> Page 4 (rendered)</p>
+<p><img alt="图 3" src="/images/papers/2604.20022/page3.png"></p>
+<hr>
+<h2 id="原始摘要">原始摘要</h2>
+<p>Large language models are increasingly deployed as autonomous diagnostic agents, yet they conflate two fundamentally different capabilities: natural-language communication and probabilistic reasoning. We argue that this conflation is an architectural flaw, not an engineering shortcoming. We introduce BMBE (Bayesian Medical Belief Engine), a modular diagnostic dialogue framework that enforces a strict separation between language and reasoning: an LLM serves only as a sensor, parsing patient utterances into structured evidence and verbalising questions, while all diagnostic inference resides in a deterministic, auditable Bayesian engine. Because patient data never enters the LLM, the architecture is private by construction; because the statistical backend is a standalone module, it can be replaced per target population without retraining. This separation yields three properties no autonomous LLM can offer: calibrated selective diagnosis with a continuously adjustable accuracy-coverage tradeoff, a statistical separation gap where even a cheap sensor paired with the engine outperforms a frontier standalone model from the same family at a fraction of the cost, and robustness to adversarial patient communication styles that cause standalone doctors to collapse. We validate across empirical and LLM-generated knowledge bases against frontier LLMs, confirming the advantage is architectural, not informational.</p>
+
+      </div>
+
+
+      <footer>
+        
+
+
+        
+        
+        
+        
+        
+        
+        
+      </footer>
+    </article>
+
+    
+  </section>
+
+    </div>
+
+    <footer class="footer">
+  <section class="container">
+    ©
+    
+      2019 -
+    
+    2026
+     Jie Xin 
+    ·
+    
+    Powered by <a href="https://gohugo.io/" target="_blank" rel="noopener">Hugo</a> & <a href="https://github.com/luizdepra/hugo-coder/" target="_blank" rel="noopener">Coder</a>.
+    
+  </section>
+</footer>
+
+  </main>
+
+  
+
+  
+  
+  <script src="/js/coder.min.6ae284be93d2d19dad1f02b0039508d9aab3180a12a06dcc71b0b0ef7825a317.js" integrity="sha256-auKEvpPS0Z2tHwKwA5UI2aqzGAoSoG3McbCw73gloxc="></script>
+  
+
+  
+
+  
+
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+</body>
+</html>

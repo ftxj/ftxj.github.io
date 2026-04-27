@@ -1,0 +1,355 @@
+<!DOCTYPE html>
+<html lang="zh">
+
+<head>
+  <title>
+  2026-04-21 论文速递 · JXIN&#39;s Home
+</title>
+  <meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="color-scheme" content="light dark">
+
+
+
+
+<meta name="author" content="Jie Xin">
+<meta name="description" content="对 agent / LLM / AI 基础设施方向共 10 篇 arXiv 论文的自动摘要，由 Claude Code 生成分析。
+1. ChipCraftBrain: Validation-First RTL Generation via Multi-Agent Orchestration
+arXiv: 2604.19856 · cs.AR · 相关度分数 27
+ChipCraftBrain 用多 agent 编排加符号-神经混合推理做 RTL 生成，在 VerilogEval-Human 达到 97.2% pass@1，在 CVDP 子集达 94.7%，并成功跑通 RISC-V SoC 分层生成。
+阅读完整分析 →
+
+2. GRASPrune: Global Gating for Budgeted Structured Pruning of Large Language Models
+arXiv: 2604.19398 · cs.AI · 相关度分数 26
+GRASPrune 提出面向 LLM 的结构化剪枝框架，用全局预算下的轻量门控分数，在预训练后联合剪枝 FFN 通道和 KV head group，无需微调骨干权重。">
+<meta name="keywords" content="blog,developer,personal">
+
+
+
+  <meta name="twitter:card" content="summary">
+  <meta name="twitter:title" content="2026-04-21 论文速递">
+  <meta name="twitter:description" content="对 agent / LLM / AI 基础设施方向共 10 篇 arXiv 论文的自动摘要，由 Claude Code 生成分析。
+1. ChipCraftBrain: Validation-First RTL Generation via Multi-Agent Orchestration arXiv: 2604.19856 · cs.AR · 相关度分数 27
+ChipCraftBrain 用多 agent 编排加符号-神经混合推理做 RTL 生成，在 VerilogEval-Human 达到 97.2% pass@1，在 CVDP 子集达 94.7%，并成功跑通 RISC-V SoC 分层生成。
+阅读完整分析 →
+2. GRASPrune: Global Gating for Budgeted Structured Pruning of Large Language Models arXiv: 2604.19398 · cs.AI · 相关度分数 26
+GRASPrune 提出面向 LLM 的结构化剪枝框架，用全局预算下的轻量门控分数，在预训练后联合剪枝 FFN 通道和 KV head group，无需微调骨干权重。">
+
+<meta property="og:url" content="https://ftxj.github.io/zh/posts/2026-04-21/">
+  <meta property="og:site_name" content="JXIN&#39;s Home">
+  <meta property="og:title" content="2026-04-21 论文速递">
+  <meta property="og:description" content="对 agent / LLM / AI 基础设施方向共 10 篇 arXiv 论文的自动摘要，由 Claude Code 生成分析。
+1. ChipCraftBrain: Validation-First RTL Generation via Multi-Agent Orchestration arXiv: 2604.19856 · cs.AR · 相关度分数 27
+ChipCraftBrain 用多 agent 编排加符号-神经混合推理做 RTL 生成，在 VerilogEval-Human 达到 97.2% pass@1，在 CVDP 子集达 94.7%，并成功跑通 RISC-V SoC 分层生成。
+阅读完整分析 →
+2. GRASPrune: Global Gating for Budgeted Structured Pruning of Large Language Models arXiv: 2604.19398 · cs.AI · 相关度分数 26
+GRASPrune 提出面向 LLM 的结构化剪枝框架，用全局预算下的轻量门控分数，在预训练后联合剪枝 FFN 通道和 KV head group，无需微调骨干权重。">
+  <meta property="og:locale" content="zh">
+  <meta property="og:type" content="website">
+
+
+
+
+<link rel="canonical" href="https://ftxj.github.io/zh/posts/2026-04-21/">
+
+
+<link rel="preload" href="/fonts/fa-brands-400.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="/fonts/fa-regular-400.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="/fonts/fa-solid-900.woff2" as="font" type="font/woff2" crossorigin>
+
+
+  
+  
+  <link rel="stylesheet" href="/css/coder.min.5e94c1acf7aa2066035cf2764ae3e4fe39db101d68b870f919966100d51fb861.css" integrity="sha256-XpTBrPeqIGYDXPJ2SuPk/jnbEB1ouHD5GZZhANUfuGE=" crossorigin="anonymous" media="screen" />
+
+
+
+
+
+
+  
+    
+    
+    <link rel="stylesheet" href="/css/coder-dark.min.a00e6364bacbc8266ad1cc81230774a1397198f8cfb7bcba29b7d6fcb54ce57f.css" integrity="sha256-oA5jZLrLyCZq0cyBIwd0oTlxmPjPt7y6KbfW/LVM5X8=" crossorigin="anonymous" media="screen" />
+  
+
+
+
+ 
+
+
+
+
+<link rel="icon" type="image/svg+xml" href="/images/favicon.svg" sizes="any">
+<link rel="icon" type="image/png" href="/images/favicon-32x32.png" sizes="32x32">
+<link rel="icon" type="image/png" href="/images/favicon-16x16.png" sizes="16x16">
+
+<link rel="apple-touch-icon" href="/images/apple-touch-icon.png">
+<link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon.png">
+
+<link rel="manifest" href="/site.webmanifest">
+<link rel="mask-icon" href="/images/safari-pinned-tab.svg" color="#5bbad5">
+
+
+<link rel="alternate" type="application/rss+xml" href="/zh/posts/2026-04-21/index.xml" title="JXIN's Home" />
+
+
+
+
+<style>
+.content article ul {
+  list-style: disc !important;
+  padding-left: 2.5rem !important;
+}
+
+.content article ul li {
+  display: list-item !important;
+}
+</style>
+
+
+
+
+  
+</head>
+
+
+
+
+
+
+<body class="preload-transitions colorscheme-auto">
+  
+<div class="float-container">
+    <a id="dark-mode-toggle" class="colorscheme-toggle">
+        <i class="fa-solid fa-adjust fa-fw" aria-hidden="true"></i>
+    </a>
+</div>
+
+
+  <main class="wrapper">
+    <nav class="navigation">
+  <section class="container">
+    
+    <a class="navigation-title" href="https://ftxj.github.io/zh/">
+      JXIN&#39;s Home
+    </a>
+    
+    
+      <input type="checkbox" id="menu-toggle" />
+      <label class="menu-button float-right" for="menu-toggle">
+        <i class="fa-solid fa-bars fa-fw" aria-hidden="true"></i>
+      </label>
+      <ul class="navigation-list">
+        
+          
+            <li class="navigation-item">
+              <a class="navigation-link " href="/zh/about/">关于</a>
+            </li>
+          
+            <li class="navigation-item">
+              <a class="navigation-link " href="/zh/travel/">旅行</a>
+            </li>
+          
+            <li class="navigation-item">
+              <a class="navigation-link " href="/zh/posts/">博客</a>
+            </li>
+          
+            <li class="navigation-item">
+              <a class="navigation-link " href="https://ftxj.github.io/cv/cv_zh.pdf">简历</a>
+            </li>
+          
+        
+        
+          
+          
+          
+            
+              
+                <li class="navigation-item menu-separator">
+                  <span>|</span>
+                </li>
+                
+              
+              <li class="navigation-item">
+                <a href="/posts/2026-04-21/">EN</a>
+              </li>
+            
+          
+        
+      </ul>
+    
+  </section>
+</nav>
+
+
+    <div class="content">
+      
+  <section class="container list">
+    <header>
+      <h1 class="title">
+        <a class="title-link" href="https://ftxj.github.io/zh/posts/2026-04-21/">
+          2026-04-21 论文速递
+        </a>
+      </h1>
+    </header>
+    <p>对 agent / LLM / AI 基础设施方向共 <strong>10</strong> 篇 arXiv 论文的自动摘要，由 Claude Code 生成分析。</p>
+<h3 id="1-chipcraftbrain-validation-first-rtl-generation-via-multi-agent-orchestration">1. ChipCraftBrain: Validation-First RTL Generation via Multi-Agent Orchestration</h3>
+<p><em>arXiv: <a href="https://arxiv.org/abs/2604.19856v1">2604.19856</a> · <code>cs.AR</code> · 相关度分数 <strong>27</strong></em></p>
+<p>ChipCraftBrain 用多 agent 编排加符号-神经混合推理做 RTL 生成，在 VerilogEval-Human 达到 97.2% pass@1，在 CVDP 子集达 94.7%，并成功跑通 RISC-V SoC 分层生成。</p>
+<p><a href="/zh/posts/2026-04-21/01-chipcraftbrain-validation-first-rtl-generation-via-multi-age/">阅读完整分析 →</a></p>
+<hr>
+<h3 id="2-grasprune-global-gating-for-budgeted-structured-pruning-of-large-language-models">2. GRASPrune: Global Gating for Budgeted Structured Pruning of Large Language Models</h3>
+<p><em>arXiv: <a href="https://arxiv.org/abs/2604.19398v1">2604.19398</a> · <code>cs.AI</code> · 相关度分数 <strong>26</strong></em></p>
+<p>GRASPrune 提出面向 LLM 的结构化剪枝框架，用全局预算下的轻量门控分数，在预训练后联合剪枝 FFN 通道和 KV head group，无需微调骨干权重。</p>
+<p><a href="/zh/posts/2026-04-21/02-grasprune-global-gating-for-budgeted-structured-pruning-of-l/">阅读完整分析 →</a></p>
+<hr>
+<h3 id="3-rethinking-scale-deployment-trade-offs-of-small-language-models-under-agent-paradigms">3. Rethinking Scale: Deployment Trade-offs of Small Language Models under Agent Paradigms</h3>
+<p><em>arXiv: <a href="https://arxiv.org/abs/2604.19299v1">2604.19299</a> · <code>cs.CL</code> · 相关度分数 <strong>22</strong></em></p>
+<p>首次系统评估 &lt;10B 小语言模型在 base、单 agent、多 agent 三种范式下的部署权衡，发现单 agent + 工具在性能与成本间取得最佳平衡。</p>
+<p><a href="/zh/posts/2026-04-21/03-rethinking-scale-deployment-trade-offs-of-small-language-mod/">阅读完整分析 →</a></p>
+<hr>
+<h3 id="4-a-mar-agent-based-multimodal-art-retrieval-for-fine-grained-artwork-understanding">4. A-MAR: Agent-based Multimodal Art Retrieval for Fine-Grained Artwork Understanding</h3>
+<p><em>arXiv: <a href="https://arxiv.org/abs/2604.19689v1">2604.19689</a> · <code>cs.AI</code> · 相关度分数 <strong>21</strong></em></p>
+<p>A-MAR 提出基于 agent 的多模态艺术检索框架，先生成结构化推理计划再条件化检索，实现可解释的艺术品细粒度理解。</p>
+<p><a href="/zh/posts/2026-04-21/04-a-mar-agent-based-multimodal-art-retrieval-for-fine-grained/">阅读完整分析 →</a></p>
+<hr>
+<h3 id="5-statistics-not-scale-modular-medical-dialogue-with-bayesian-belief-engine">5. Statistics, Not Scale: Modular Medical Dialogue with Bayesian Belief Engine</h3>
+<p><em>arXiv: <a href="https://arxiv.org/abs/2604.20022v1">2604.20022</a> · <code>cs.LG</code> · 相关度分数 <strong>20</strong></em></p>
+<p>BMBE 把 LLM 降级为&quot;传感器&quot;，把医疗诊断推理交给可审计的贝叶斯引擎，模块化架构在精度、隐私和鲁棒性上超过独立 frontier LLM。</p>
+<p><a href="/zh/posts/2026-04-21/05-statistics-not-scale-modular-medical-dialogue-with-bayesian/">阅读完整分析 →</a></p>
+<hr>
+<h3 id="6-if-youre-waiting-for-a-sign-that-might-not-be-it-mitigating-trust-boundary-confusion-from-visual-injections-on-vision-language-agentic-systems">6. If you&rsquo;re waiting for a sign&hellip; that might not be it! Mitigating Trust Boundary Confusion from Visual Injections on Vision-Language Agentic Systems</h3>
+<p><em>arXiv: <a href="https://arxiv.org/abs/2604.19844v1">2604.19844</a> · <code>cs.CV</code> · 相关度分数 <strong>20</strong></em></p>
+<p>针对视觉语言 agent 在真实环境信号与恶意视觉注入之间的&quot;信任边界混淆&quot;问题，提出双意图评测集与多 agent 防御框架，分离感知与决策以动态评估视觉输入可信度。</p>
+<p><a href="/zh/posts/2026-04-21/06-if-you-re-waiting-for-a-sign-that-might-not-be-it-mitigating/">阅读完整分析 →</a></p>
+<hr>
+<h3 id="7-saw-int4-system-aware-4-bit-kv-cache-quantization-for-real-world-llm-serving">7. SAW-INT4: System-Aware 4-Bit KV-Cache Quantization for Real-World LLM Serving</h3>
+<p><em>arXiv: <a href="https://arxiv.org/abs/2604.19157v1">2604.19157</a> · <code>cs.LG</code> · 相关度分数 <strong>20</strong></em></p>
+<p>SAW-INT4 提出 token-wise INT4 + block-diagonal Hadamard 旋转的 KV-cache 量化方案，在 paged attention 等真实 serving 约束下几乎无损恢复精度且零额外开销。</p>
+<p><a href="/zh/posts/2026-04-21/07-saw-int4-system-aware-4-bit-kv-cache-quantization-for-real-w/">阅读完整分析 →</a></p>
+<hr>
+<h3 id="8-detoxification-for-llm-from-dataset-itself">8. Detoxification for LLM: From Dataset Itself</h3>
+<p><em>arXiv: <a href="https://arxiv.org/abs/2604.19124v1">2604.19124</a> · <code>cs.CL</code> · 相关度分数 <strong>20</strong></em></p>
+<p>提出 HSPD pipeline + SoCD 解码，直接在预训练语料层面改写有毒片段，从源头降低 LLM 毒性，同时保留语义与数据可用性。</p>
+<p><a href="/zh/posts/2026-04-21/08-detoxification-for-llm-from-dataset-itself/">阅读完整分析 →</a></p>
+<hr>
+<h3 id="9-trn-r1-zero-text-rich-network-reasoning-via-llms-with-reinforcement-learning-only">9. TRN-R1-Zero: Text-rich Network Reasoning via LLMs with Reinforcement Learning Only</h3>
+<p><em>arXiv: <a href="https://arxiv.org/abs/2604.19070v1">2604.19070</a> · <code>cs.CL</code> · 相关度分数 <strong>20</strong></em></p>
+<p>TRN-R1-Zero 提出纯强化学习的后训练框架，让 LLM 在文本丰富网络（TRN）上实现零样本关系推理，无需 SFT 或蒸馏数据。</p>
+<p><a href="/zh/posts/2026-04-21/09-trn-r1-zero-text-rich-network-reasoning-via-llms-with-reinfo/">阅读完整分析 →</a></p>
+<hr>
+<h3 id="10-cyber-defense-benchmark-agentic-threat-hunting-evaluation-for-llms-in-secops">10. Cyber Defense Benchmark: Agentic Threat Hunting Evaluation for LLMs in SecOps</h3>
+<p><em>arXiv: <a href="https://arxiv.org/abs/2604.19533v3">2604.19533</a> · <code>cs.CR</code> · 相关度分数 <strong>19</strong></em></p>
+<p>提出 Cyber Defense Benchmark，用 106 条真实攻击、75k–135k 条 Windows 日志的 SQLite 环境让 LLM agent 做无提示威胁狩猎；五大前沿模型最高召回仅 3.8%，全部不及格。</p>
+<p><a href="/zh/posts/2026-04-21/10-cyber-defense-benchmark-agentic-threat-hunting-evaluation-fo/">阅读完整分析 →</a></p>
+<hr>
+
+    <ul>
+      <li>
+          <span class="date">四月 27, 2026</span>
+          <a class="title" href="/zh/posts/2026-04-21/10-cyber-defense-benchmark-agentic-threat-hunting-evaluation-fo/">Cyber Defense Benchmark: Agentic Threat Hunting Evaluation for LLMs in SecOps</a>
+        </li><li>
+          <span class="date">四月 27, 2026</span>
+          <a class="title" href="/zh/posts/2026-04-21/09-trn-r1-zero-text-rich-network-reasoning-via-llms-with-reinfo/">TRN-R1-Zero: Text-rich Network Reasoning via LLMs with Reinforcement Learning Only</a>
+        </li><li>
+          <span class="date">四月 27, 2026</span>
+          <a class="title" href="/zh/posts/2026-04-21/08-detoxification-for-llm-from-dataset-itself/">Detoxification for LLM: From Dataset Itself</a>
+        </li><li>
+          <span class="date">四月 27, 2026</span>
+          <a class="title" href="/zh/posts/2026-04-21/07-saw-int4-system-aware-4-bit-kv-cache-quantization-for-real-w/">SAW-INT4: System-Aware 4-Bit KV-Cache Quantization for Real-World LLM Serving</a>
+        </li><li>
+          <span class="date">四月 27, 2026</span>
+          <a class="title" href="/zh/posts/2026-04-21/06-if-you-re-waiting-for-a-sign-that-might-not-be-it-mitigating/">If you&#39;re waiting for a sign... that might not be it! Mitigating Trust Boundary Confusion from Visual Injections on Vision-Language Agentic Systems</a>
+        </li><li>
+          <span class="date">四月 27, 2026</span>
+          <a class="title" href="/zh/posts/2026-04-21/05-statistics-not-scale-modular-medical-dialogue-with-bayesian/">Statistics, Not Scale: Modular Medical Dialogue with Bayesian Belief Engine</a>
+        </li><li>
+          <span class="date">四月 27, 2026</span>
+          <a class="title" href="/zh/posts/2026-04-21/04-a-mar-agent-based-multimodal-art-retrieval-for-fine-grained/">A-MAR: Agent-based Multimodal Art Retrieval for Fine-Grained Artwork Understanding</a>
+        </li><li>
+          <span class="date">四月 27, 2026</span>
+          <a class="title" href="/zh/posts/2026-04-21/03-rethinking-scale-deployment-trade-offs-of-small-language-mod/">Rethinking Scale: Deployment Trade-offs of Small Language Models under Agent Paradigms</a>
+        </li><li>
+          <span class="date">四月 27, 2026</span>
+          <a class="title" href="/zh/posts/2026-04-21/02-grasprune-global-gating-for-budgeted-structured-pruning-of-l/">GRASPrune: Global Gating for Budgeted Structured Pruning of Large Language Models</a>
+        </li><li>
+          <span class="date">四月 27, 2026</span>
+          <a class="title" href="/zh/posts/2026-04-21/01-chipcraftbrain-validation-first-rtl-generation-via-multi-age/">ChipCraftBrain: Validation-First RTL Generation via Multi-Agent Orchestration</a>
+        </li></ul>
+
+    
+
+
+
+
+
+
+  </section>
+
+    </div>
+
+    <footer class="footer">
+  <section class="container">
+    ©
+    
+      2019 -
+    
+    2026
+     Jie Xin 
+    ·
+    
+    Powered by <a href="https://gohugo.io/" target="_blank" rel="noopener">Hugo</a> & <a href="https://github.com/luizdepra/hugo-coder/" target="_blank" rel="noopener">Coder</a>.
+    
+  </section>
+</footer>
+
+  </main>
+
+  
+
+  
+  
+  <script src="/js/coder.min.6ae284be93d2d19dad1f02b0039508d9aab3180a12a06dcc71b0b0ef7825a317.js" integrity="sha256-auKEvpPS0Z2tHwKwA5UI2aqzGAoSoG3McbCw73gloxc="></script>
+  
+
+  
+
+  
+
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+</body>
+</html>

@@ -1,0 +1,111 @@
+\documentclass[11pt,a4paper]{article}
+
+\usepackage[margin=0.6in, top=0.55in, bottom=0.55in]{geometry}
+\usepackage{titlesec}
+\usepackage{enumitem}
+\usepackage{hyperref}
+\usepackage{xcolor}
+\usepackage{xeCJK}
+
+\setCJKmainfont{Noto Sans CJK SC}
+
+\hypersetup{colorlinks=true, urlcolor=blue!70!black, linkcolor=blue!70!black}
+
+\titleformat{\section}{\large\bfseries}{}{0em}{}[\titlerule]
+\titlespacing{\section}{0pt}{12pt}{6pt}
+
+\pagenumbering{gobble}
+\setlist{nosep, leftmargin=1.5em, topsep=3pt, itemsep=2pt}
+
+% Custom commands for consistent formatting
+\newcommand{\projectentry}[5]{%
+    \noindent\textbf{#1} \hfill #2 \\[2pt]
+    #4 \hfill {\small #3} \\[1pt]
+    #5\par\vspace{8pt}%
+}
+
+\newcommand{\projectentrysingle}[3]{%
+    \noindent\textbf{#1} \hfill #2 \\[2pt]
+    #3\par\vspace{8pt}%
+}
+
+\begin{document}
+
+% Header
+\begin{center}
+    {\Huge\bfseries 辛 杰} \\[8pt]
+    [\href{mailto:cs.xinjie@gmail.com}{email}] \quad
+    [\href{https://github.com/ftxj}{github}] \quad
+    [\href{https://ftxj.github.io}{homepage}]
+\end{center}
+
+\vspace{2pt}
+
+% Experience
+\section{工作经历}
+
+\noindent\textbf{NVIDIA} \hfill 上海 \\
+\textit{Senior Compute Architect} \hfill 2022 -- Present
+\begin{itemize}
+    \item 研究下一代 GPU（Hopper、Blackwell、Rubin）上的端到端模型性能自动化优化
+    \item 开发深度学习编译器（CuTile、Triton-to-CuTile）及 MLPerf 基准测试优化
+    \item 与 PyG、Megatron-LM、OpenAI Triton 团队合作开发编译器基础设施
+\end{itemize}
+
+\vspace{4pt}
+
+% Education
+\section{教育背景}
+
+\noindent\textbf{华中科技大学} \hfill 武汉 \\
+\textit{计算机科学与技术 · 硕士} \hfill 2019 -- 2022
+
+\vspace{6pt}
+
+\noindent\textbf{华中科技大学} \hfill 武汉 \\
+\textit{计算机科学与技术 · 学士} \hfill 2015 -- 2019
+
+\vspace{4pt}
+
+% Projects
+\section{项目经历}
+
+\projectentrysingle{Agent for Compiler}{2026 -- Present}
+{设计专为编译器优化的轻量级 harness 系统。}
+
+\projectentry{Triton-to-CuTile}{2024 -- 2025}{[\href{https://github.com/triton-lang/Triton-to-tile-IR}{code}]}
+{OpenAI 孵化项目；连接 Triton 前端与 CuTile 后端的编译器桥接层。}
+{使 Triton 用户能够使用 NVIDIA 优化的 tile 编程基础设施。}
+
+\projectentry{CuTile}{2023 -- Present}{[\href{https://github.com/NVIDIA/cutile-python}{code}] [\href{https://developer.nvidia.com/blog/tag/cutile/}{blog}]}
+{NVIDIA GPU 的 CUDA Tile 编程标准。}
+{设计并实现了深度学习工作负载的优化 pass。}
+
+\projectentry{NvFuser}{2022 -- 2023}{[\href{https://github.com/csarofeen/pytorch/commits/devel/?author=ftxj}{code}] [\href{https://pytorch.org/blog/introducing-nvfuser-a-deep-learning-compiler-for-pytorch/}{blog}]}
+{PyTorch JIT 编译器，在 GNN 模型上实现 1.2x--2.5x 加速。}
+{为稀疏工作负载启用了 gather/scatter/index\_select 图操作。}
+
+\projectentry{OpenFold2 Training}{2023 -- 2023}{[\href{https://github.com/mlcommons/hpc_results_v3.0/tree/main/NVIDIA/benchmarks/openfold}{code}] [\href{https://arxiv.org/abs/2404.11068}{paper}] [\href{https://developer.nvidia.com/blog/optimizing-openfold-training-for-drug-discovery/}{blog}]}
+{MLPerf HPC v3.1 榜首，端到端加速 7.5 倍。}
+{优化大规模 GPU 集群上的蛋白质结构预测训练。}
+
+\projectentry{GPT-3 Training}{2023 -- 2023}{[\href{https://github.com/NVIDIA/Megatron-LM}{code}]}
+{MLPerf Training v4.0；为 175B 模型贡献了 1.02x 训练加速。}
+{优化大语言模型的分布式训练流水线。}
+
+\projectentry{PyTorch Geometric TorchScript}{2022 -- 2022}{[\href{https://github.com/pyg-team/pytorch_geometric/commits/master/?author=ftxj}{code}]}
+{为 PyG 社区添加 TorchScript 支持，实现 GNN 模型的 JIT 编译。}
+{贡献了图神经网络生产部署的核心基础设施。}
+
+\projectentry{SpMM on GPU -- Champion, MIT/IEEE Graph Challenge}{2021 -- 2021}{[\href{https://github.com/CGCL-codes/Graphchallenge21}{code}] [\href{https://ieeexplore.ieee.org/document/9622791}{paper}]}
+{高性能稀疏矩阵乘法；相比 cuSPARSE 最高加速 652 倍。}
+{获得 2021 年 MIT/IEEE/Amazon Graph Challenge 冠军。}
+
+\vspace{4pt}
+
+% Current Focus
+\section{当前方向}
+
+\noindent 我的研究兴趣已全面转向 AI Agent —— 探索 LLM 如何自主优化编译器、自动化性能调优，并变革传统软件开发流程。
+
+\end{document}

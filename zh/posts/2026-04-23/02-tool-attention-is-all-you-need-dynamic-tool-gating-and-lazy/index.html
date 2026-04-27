@@ -1,0 +1,380 @@
+<!DOCTYPE html>
+<html lang="zh">
+
+<head>
+  <title>
+  Tool Attention Is All You Need: Dynamic Tool Gating and Lazy Schema Loading for Eliminating the MCP/Tools Tax in Scalable Agentic Workflows · JXIN&#39;s Home
+</title>
+  <meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="color-scheme" content="light dark">
+
+
+
+
+<meta name="author" content="Jie Xin">
+<meta name="description" content="arXiv: 2604.21816 · PDF
+作者: Anuj Sadani, Deepak Kumar
+主分类: cs.AI · 全部: cs.AI
+命中关键词: large language model, llm, agent, agentic, reasoning, attention, latency
+
+TL;DR
+提出 Tool Attention 中间件：用意图-schema 嵌入相似度 &#43; 状态门控 &#43; 两阶段懒加载，将 MCP 每轮工具 token 开销削减 95%，缓解&quot;MCP Tax&quot;。
+核心观点
+
+MCP 协议的 eager schema 注入在多服务器部署下每轮消耗 10k–60k tokens，膨胀 KV cache 并在约 70% 上下文利用率处触发推理退化。
+可将&quot;Attention Is All You Need&quot;范式从 token 级自注意力推广到 tool 级门控注意力。
+可扩展 agent 的瓶颈是协议层效率，而非 raw context length。
+
+方法
+Tool Attention 由三部分组成：">
+<meta name="keywords" content="blog,developer,personal">
+
+
+
+  <meta name="twitter:card" content="summary">
+  <meta name="twitter:title" content="Tool Attention Is All You Need: Dynamic Tool Gating and Lazy Schema Loading for Eliminating the MCP/Tools Tax in Scalable Agentic Workflows">
+  <meta name="twitter:description" content="arXiv: 2604.21816 · PDF
+作者: Anuj Sadani, Deepak Kumar
+主分类: cs.AI · 全部: cs.AI
+命中关键词: large language model, llm, agent, agentic, reasoning, attention, latency
+TL;DR 提出 Tool Attention 中间件：用意图-schema 嵌入相似度 &#43; 状态门控 &#43; 两阶段懒加载，将 MCP 每轮工具 token 开销削减 95%，缓解&#34;MCP Tax&#34;。
+核心观点 MCP 协议的 eager schema 注入在多服务器部署下每轮消耗 10k–60k tokens，膨胀 KV cache 并在约 70% 上下文利用率处触发推理退化。 可将&#34;Attention Is All You Need&#34;范式从 token 级自注意力推广到 tool 级门控注意力。 可扩展 agent 的瓶颈是协议层效率，而非 raw context length。 方法 Tool Attention 由三部分组成：">
+
+<meta property="og:url" content="https://ftxj.github.io/zh/posts/2026-04-23/02-tool-attention-is-all-you-need-dynamic-tool-gating-and-lazy/">
+  <meta property="og:site_name" content="JXIN&#39;s Home">
+  <meta property="og:title" content="Tool Attention Is All You Need: Dynamic Tool Gating and Lazy Schema Loading for Eliminating the MCP/Tools Tax in Scalable Agentic Workflows">
+  <meta property="og:description" content="arXiv: 2604.21816 · PDF
+作者: Anuj Sadani, Deepak Kumar
+主分类: cs.AI · 全部: cs.AI
+命中关键词: large language model, llm, agent, agentic, reasoning, attention, latency
+TL;DR 提出 Tool Attention 中间件：用意图-schema 嵌入相似度 &#43; 状态门控 &#43; 两阶段懒加载，将 MCP 每轮工具 token 开销削减 95%，缓解&#34;MCP Tax&#34;。
+核心观点 MCP 协议的 eager schema 注入在多服务器部署下每轮消耗 10k–60k tokens，膨胀 KV cache 并在约 70% 上下文利用率处触发推理退化。 可将&#34;Attention Is All You Need&#34;范式从 token 级自注意力推广到 tool 级门控注意力。 可扩展 agent 的瓶颈是协议层效率，而非 raw context length。 方法 Tool Attention 由三部分组成：">
+  <meta property="og:locale" content="zh">
+  <meta property="og:type" content="article">
+    <meta property="article:section" content="posts">
+    <meta property="article:published_time" content="2026-04-27T05:06:38+00:00">
+    <meta property="article:modified_time" content="2026-04-27T05:06:38+00:00">
+
+
+
+
+<link rel="canonical" href="https://ftxj.github.io/zh/posts/2026-04-23/02-tool-attention-is-all-you-need-dynamic-tool-gating-and-lazy/">
+
+
+<link rel="preload" href="/fonts/fa-brands-400.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="/fonts/fa-regular-400.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="/fonts/fa-solid-900.woff2" as="font" type="font/woff2" crossorigin>
+
+
+  
+  
+  <link rel="stylesheet" href="/css/coder.min.5e94c1acf7aa2066035cf2764ae3e4fe39db101d68b870f919966100d51fb861.css" integrity="sha256-XpTBrPeqIGYDXPJ2SuPk/jnbEB1ouHD5GZZhANUfuGE=" crossorigin="anonymous" media="screen" />
+
+
+
+
+
+
+  
+    
+    
+    <link rel="stylesheet" href="/css/coder-dark.min.a00e6364bacbc8266ad1cc81230774a1397198f8cfb7bcba29b7d6fcb54ce57f.css" integrity="sha256-oA5jZLrLyCZq0cyBIwd0oTlxmPjPt7y6KbfW/LVM5X8=" crossorigin="anonymous" media="screen" />
+  
+
+
+
+ 
+
+
+
+
+<link rel="icon" type="image/svg+xml" href="/images/favicon.svg" sizes="any">
+<link rel="icon" type="image/png" href="/images/favicon-32x32.png" sizes="32x32">
+<link rel="icon" type="image/png" href="/images/favicon-16x16.png" sizes="16x16">
+
+<link rel="apple-touch-icon" href="/images/apple-touch-icon.png">
+<link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon.png">
+
+<link rel="manifest" href="/site.webmanifest">
+<link rel="mask-icon" href="/images/safari-pinned-tab.svg" color="#5bbad5">
+
+
+
+
+
+
+<style>
+.content article ul {
+  list-style: disc !important;
+  padding-left: 2.5rem !important;
+}
+
+.content article ul li {
+  display: list-item !important;
+}
+</style>
+
+
+
+
+  
+</head>
+
+
+
+
+
+
+<body class="preload-transitions colorscheme-auto">
+  
+<div class="float-container">
+    <a id="dark-mode-toggle" class="colorscheme-toggle">
+        <i class="fa-solid fa-adjust fa-fw" aria-hidden="true"></i>
+    </a>
+</div>
+
+
+  <main class="wrapper">
+    <nav class="navigation">
+  <section class="container">
+    
+    <a class="navigation-title" href="https://ftxj.github.io/zh/">
+      JXIN&#39;s Home
+    </a>
+    
+    
+      <input type="checkbox" id="menu-toggle" />
+      <label class="menu-button float-right" for="menu-toggle">
+        <i class="fa-solid fa-bars fa-fw" aria-hidden="true"></i>
+      </label>
+      <ul class="navigation-list">
+        
+          
+            <li class="navigation-item">
+              <a class="navigation-link " href="/zh/about/">关于</a>
+            </li>
+          
+            <li class="navigation-item">
+              <a class="navigation-link " href="/zh/travel/">旅行</a>
+            </li>
+          
+            <li class="navigation-item">
+              <a class="navigation-link " href="/zh/posts/">博客</a>
+            </li>
+          
+            <li class="navigation-item">
+              <a class="navigation-link " href="https://ftxj.github.io/cv/cv_zh.pdf">简历</a>
+            </li>
+          
+        
+        
+          
+          
+          
+            
+              
+                <li class="navigation-item menu-separator">
+                  <span>|</span>
+                </li>
+                
+              
+              <li class="navigation-item">
+                <a href="/posts/2026-04-23/02-tool-attention-is-all-you-need-dynamic-tool-gating-and-lazy/">EN</a>
+              </li>
+            
+          
+        
+      </ul>
+    
+  </section>
+</nav>
+
+
+    <div class="content">
+      
+  <section class="container post">
+    <article>
+      <header>
+        <div class="post-title">
+          <h1 class="title">
+            <a class="title-link" href="https://ftxj.github.io/zh/posts/2026-04-23/02-tool-attention-is-all-you-need-dynamic-tool-gating-and-lazy/">
+              Tool Attention Is All You Need: Dynamic Tool Gating and Lazy Schema Loading for Eliminating the MCP/Tools Tax in Scalable Agentic Workflows
+            </a>
+          </h1>
+        </div>
+        <div class="post-meta">
+          <div class="date">
+            <span class="posted-on">
+              <i class="fa-solid fa-calendar" aria-hidden="true"></i>
+              <time datetime="2026-04-27T05:06:38Z">
+                四月 27, 2026
+              </time>
+            </span>
+            <span class="reading-time">
+              <i class="fa-solid fa-clock" aria-hidden="true"></i>
+              3-minute read
+            </span>
+          </div>
+          
+          <div class="categories">
+  <i class="fa-solid fa-folder" aria-hidden="true"></i>
+    <a href="/zh/categories/paper-digest/">Paper-Digest</a>
+      <span class="separator">•</span>
+    <a href="/zh/categories/2026-04-23/">2026-04-23</a></div>
+
+          
+        </div>
+      </header>
+
+      
+
+
+      <div class="post-content">
+        
+        <p><strong>arXiv:</strong> <a href="https://arxiv.org/abs/2604.21816v1">2604.21816</a> · <a href="https://arxiv.org/pdf/2604.21816v1">PDF</a></p>
+<p><strong>作者:</strong> Anuj Sadani, Deepak Kumar</p>
+<p><strong>主分类:</strong> <code>cs.AI</code> · 全部: cs.AI</p>
+<p><strong>命中关键词:</strong> large language model, llm, agent, agentic, reasoning, attention, latency</p>
+<hr>
+<h2 id="tldr">TL;DR</h2>
+<p>提出 Tool Attention 中间件：用意图-schema 嵌入相似度 + 状态门控 + 两阶段懒加载，将 MCP 每轮工具 token 开销削减 95%，缓解&quot;MCP Tax&quot;。</p>
+<h2 id="核心观点">核心观点</h2>
+<ul>
+<li>MCP 协议的 eager schema 注入在多服务器部署下每轮消耗 10k–60k tokens，膨胀 KV cache 并在约 70% 上下文利用率处触发推理退化。</li>
+<li>可将&quot;Attention Is All You Need&quot;范式从 token 级自注意力推广到 tool 级门控注意力。</li>
+<li>可扩展 agent 的瓶颈是协议层效率，而非 raw context length。</li>
+</ul>
+<h2 id="方法">方法</h2>
+<p>Tool Attention 由三部分组成：</p>
+<ul>
+<li><strong>ISO 分数</strong>：用 sentence embedding 计算用户 intent 与工具 schema 的语义重叠。</li>
+<li><strong>状态感知门控</strong>：强制执行 precondition 与 access scope，过滤当前不可用工具。</li>
+<li><strong>两阶段懒 schema 加载器</strong>：上下文中只保留压缩摘要池，仅对 top-k 被门控通过的工具提升为完整 JSON schema。
+作为 middleware 部署，不改 LLM 本体。</li>
+</ul>
+<h2 id="实验">实验</h2>
+<ul>
+<li>基准：模拟 120 工具、6 MCP server 环境；每 server 的 token 数按公开 MCP 部署审计数据校准。</li>
+<li>指标：per-turn tool token 数、有效上下文利用率；task success / latency / cost / reasoning quality 仅作投影（projection）。</li>
+<li>基线：eager schema injection 的默认 MCP 行为。</li>
+</ul>
+<h2 id="结果">结果</h2>
+<ul>
+<li>per-turn tool tokens：47.3k → 2.4k，降低 95.0%。</li>
+<li>有效上下文利用率（token ratio）：24% → 91%。</li>
+<li>端到端的成功率、时延、成本、推理质量均为基于 token 数 + 已发布遥测推导的 projection，论文明确标注，未在真实 LLM agent 上实测。</li>
+</ul>
+<h2 id="为什么重要">为什么重要</h2>
+<p>对 agent / MCP 基础设施从业者，给出了可直接集成的 middleware，缓解多 server 场景下的 token 税与 KV cache 膨胀，延迟 context fracture 的到来，降低每轮推理成本。</p>
+<h2 id="与已有工作的关系">与已有工作的关系</h2>
+<ul>
+<li>延续 Transformer &ldquo;Attention Is All You Need&rdquo; 的门控思想，但对象换成 tools。</li>
+<li>针对 MCP 协议 eager schema injection 的已知痛点（多方 practitioner audit）。</li>
+<li>与 RAG 式 tool retrieval、tool selection via embedding（如 ToolLLM、Gorilla）思路同源，但在协议/中间件层实现，并加入 precondition 门控和两阶段懒加载。</li>
+</ul>
+<h2 id="尚未回答的问题">尚未回答的问题</h2>
+<ul>
+<li>端到端指标只是 projection，真实 LLM agent 下的 success rate 与推理质量如何？</li>
+<li>top-k 与摘要池大小的选择对长尾工具召回与误 gate 的影响？</li>
+<li>状态门控的 precondition 维护成本，以及跨 server schema drift 的鲁棒性？</li>
+<li>对抗/多跳任务中，ISO 嵌入是否足以捕捉深层意图？是否需要可学习的 gating？</li>
+</ul>
+<hr>
+<h2 id="论文图表">论文图表</h2>
+<p><strong>图 1:</strong> Page 2 (rendered)</p>
+<p><img alt="图 1" src="/images/papers/2604.21816/page1.png"></p>
+<p><strong>图 2:</strong> Page 3 (rendered)</p>
+<p><img alt="图 2" src="/images/papers/2604.21816/page2.png"></p>
+<p><strong>图 3:</strong> Page 4 (rendered)</p>
+<p><img alt="图 3" src="/images/papers/2604.21816/page3.png"></p>
+<hr>
+<h2 id="原始摘要">原始摘要</h2>
+<p>The Model Context Protocol (MCP) has become a common interface for connecting large language model (LLM) agents to external tools, but its reliance on stateless, eager schema injection imposes a hidden per-turn overhead the MCP Tax or Tools Tax that practitioner reports place between roughly 10k and 60k tokens in typical multi-server deployments. This payload inflates the key-value cache, is associated with reasoning degradation as context utilization approaches published fracture points around 70%, and turns token budgets into a recurring operational cost. We introduce Tool Attention, a middleware-layer mechanism that generalizes the &ldquo;Attention Is All You Need&rdquo; paradigm from self-attention over tokens to gated attention over tools. Tool Attention combines (i) an Intent Schema Overlap (ISO) score from sentence embeddings, (ii) a state-aware gating function enforcing preconditions and access scopes, and (iii) a two-phase lazy schema loader that keeps a compact summary pool in context and promotes full JSON schemas only for top-k gated tools. We evaluate on a simulated 120-tool, six-server benchmark whose per-server token counts are calibrated to public audits of real MCP deployments. In this simulation, Tool Attention directly reduces measured per-turn tool tokens by 95.0% (47.3k -&gt; 2.4k) and raises effective context utilization (a token-ratio quantity) from 24% to 91%. End-to-end figures for task success, latency, cost, and reasoning quality are reported as projections derived from the measured token counts combined with published deployment telemetry; they are not measured on live LLM agents, and we mark projected values explicitly throughout. Taken together, the results support a simple thesis: protocol-level efficiency, not raw context length, is a binding constraint on scalable gentic systems. The code for this work is accessible at <a href="https://github.com/asadani/tool-attention">https://github.com/asadani/tool-attention</a></p>
+
+      </div>
+
+
+      <footer>
+        
+
+
+        
+        
+        
+        
+        
+        
+        
+      </footer>
+    </article>
+
+    
+  </section>
+
+    </div>
+
+    <footer class="footer">
+  <section class="container">
+    ©
+    
+      2019 -
+    
+    2026
+     Jie Xin 
+    ·
+    
+    Powered by <a href="https://gohugo.io/" target="_blank" rel="noopener">Hugo</a> & <a href="https://github.com/luizdepra/hugo-coder/" target="_blank" rel="noopener">Coder</a>.
+    
+  </section>
+</footer>
+
+  </main>
+
+  
+
+  
+  
+  <script src="/js/coder.min.6ae284be93d2d19dad1f02b0039508d9aab3180a12a06dcc71b0b0ef7825a317.js" integrity="sha256-auKEvpPS0Z2tHwKwA5UI2aqzGAoSoG3McbCw73gloxc="></script>
+  
+
+  
+
+  
+
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+</body>
+</html>

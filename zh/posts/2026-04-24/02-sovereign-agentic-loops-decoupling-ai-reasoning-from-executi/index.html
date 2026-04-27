@@ -1,0 +1,390 @@
+<!DOCTYPE html>
+<html lang="zh">
+
+<head>
+  <title>
+  Sovereign Agentic Loops: Decoupling AI Reasoning from Execution in Real-World Systems · JXIN&#39;s Home
+</title>
+  <meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="color-scheme" content="light dark">
+
+
+
+
+<meta name="author" content="Jie Xin">
+<meta name="description" content="arXiv: 2604.22136 · PDF
+作者: Jun He, Deying Yu
+主分类: cs.CR · 全部: cs.CR, cs.LG
+命中关键词: large language model, llm, agent, agentic, reasoning, latency
+
+TL;DR
+论文提出 Sovereign Agentic Loops (SAL)，通过控制平面解耦 LLM 推理与真实系统执行，用策略校验与证据链保证 agent 调用的安全可审计。
+核心观点
+
+LLM agent 直接把随机输出送进执行层会带来不可接受的安全风险。
+SAL 让模型只发出带 justification 的结构化 intent，由控制平面对照真实状态与策略再决定是否执行。
+引入 obfuscation membrane 做身份隔离，以及 cryptographically linked Evidence Chain 支持审计与 replay。
+在形式化假设下可保证 policy-bounded execution、identity isolation 与 deterministic replay。
+
+方法
+
+SAL 是一种 control-plane 架构：
+
+Intent 接口：模型输出结构化 intent &#43; justification，而不是直接 API call。
+Obfuscation membrane：向模型暴露的状态被脱敏，限制其接触 identity-sensitive 字段。
+Policy &#43; consistency 校验：控制平面把 intent 对照真实系统状态和策略规则验证，两层把关。
+Evidence Chain：对每次 intent、校验结果、执行动作做密码学链式记录，支持事后审计和 deterministic replay。
+作者给出形式化定义并证明上述三项安全性属性在假设下成立。
+
+">
+<meta name="keywords" content="blog,developer,personal">
+
+
+
+  <meta name="twitter:card" content="summary">
+  <meta name="twitter:title" content="Sovereign Agentic Loops: Decoupling AI Reasoning from Execution in Real-World Systems">
+  <meta name="twitter:description" content="arXiv: 2604.22136 · PDF
+作者: Jun He, Deying Yu
+主分类: cs.CR · 全部: cs.CR, cs.LG
+命中关键词: large language model, llm, agent, agentic, reasoning, latency
+TL;DR 论文提出 Sovereign Agentic Loops (SAL)，通过控制平面解耦 LLM 推理与真实系统执行，用策略校验与证据链保证 agent 调用的安全可审计。
+核心观点 LLM agent 直接把随机输出送进执行层会带来不可接受的安全风险。 SAL 让模型只发出带 justification 的结构化 intent，由控制平面对照真实状态与策略再决定是否执行。 引入 obfuscation membrane 做身份隔离，以及 cryptographically linked Evidence Chain 支持审计与 replay。 在形式化假设下可保证 policy-bounded execution、identity isolation 与 deterministic replay。 方法 SAL 是一种 control-plane 架构：
+Intent 接口：模型输出结构化 intent &#43; justification，而不是直接 API call。 Obfuscation membrane：向模型暴露的状态被脱敏，限制其接触 identity-sensitive 字段。 Policy &#43; consistency 校验：控制平面把 intent 对照真实系统状态和策略规则验证，两层把关。 Evidence Chain：对每次 intent、校验结果、执行动作做密码学链式记录，支持事后审计和 deterministic replay。 作者给出形式化定义并证明上述三项安全性属性在假设下成立。">
+
+<meta property="og:url" content="https://ftxj.github.io/zh/posts/2026-04-24/02-sovereign-agentic-loops-decoupling-ai-reasoning-from-executi/">
+  <meta property="og:site_name" content="JXIN&#39;s Home">
+  <meta property="og:title" content="Sovereign Agentic Loops: Decoupling AI Reasoning from Execution in Real-World Systems">
+  <meta property="og:description" content="arXiv: 2604.22136 · PDF
+作者: Jun He, Deying Yu
+主分类: cs.CR · 全部: cs.CR, cs.LG
+命中关键词: large language model, llm, agent, agentic, reasoning, latency
+TL;DR 论文提出 Sovereign Agentic Loops (SAL)，通过控制平面解耦 LLM 推理与真实系统执行，用策略校验与证据链保证 agent 调用的安全可审计。
+核心观点 LLM agent 直接把随机输出送进执行层会带来不可接受的安全风险。 SAL 让模型只发出带 justification 的结构化 intent，由控制平面对照真实状态与策略再决定是否执行。 引入 obfuscation membrane 做身份隔离，以及 cryptographically linked Evidence Chain 支持审计与 replay。 在形式化假设下可保证 policy-bounded execution、identity isolation 与 deterministic replay。 方法 SAL 是一种 control-plane 架构：
+Intent 接口：模型输出结构化 intent &#43; justification，而不是直接 API call。 Obfuscation membrane：向模型暴露的状态被脱敏，限制其接触 identity-sensitive 字段。 Policy &#43; consistency 校验：控制平面把 intent 对照真实系统状态和策略规则验证，两层把关。 Evidence Chain：对每次 intent、校验结果、执行动作做密码学链式记录，支持事后审计和 deterministic replay。 作者给出形式化定义并证明上述三项安全性属性在假设下成立。">
+  <meta property="og:locale" content="zh">
+  <meta property="og:type" content="article">
+    <meta property="article:section" content="posts">
+    <meta property="article:published_time" content="2026-04-27T07:56:45+00:00">
+    <meta property="article:modified_time" content="2026-04-27T07:56:45+00:00">
+
+
+
+
+<link rel="canonical" href="https://ftxj.github.io/zh/posts/2026-04-24/02-sovereign-agentic-loops-decoupling-ai-reasoning-from-executi/">
+
+
+<link rel="preload" href="/fonts/fa-brands-400.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="/fonts/fa-regular-400.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="/fonts/fa-solid-900.woff2" as="font" type="font/woff2" crossorigin>
+
+
+  
+  
+  <link rel="stylesheet" href="/css/coder.min.5e94c1acf7aa2066035cf2764ae3e4fe39db101d68b870f919966100d51fb861.css" integrity="sha256-XpTBrPeqIGYDXPJ2SuPk/jnbEB1ouHD5GZZhANUfuGE=" crossorigin="anonymous" media="screen" />
+
+
+
+
+
+
+  
+    
+    
+    <link rel="stylesheet" href="/css/coder-dark.min.a00e6364bacbc8266ad1cc81230774a1397198f8cfb7bcba29b7d6fcb54ce57f.css" integrity="sha256-oA5jZLrLyCZq0cyBIwd0oTlxmPjPt7y6KbfW/LVM5X8=" crossorigin="anonymous" media="screen" />
+  
+
+
+
+ 
+
+
+
+
+<link rel="icon" type="image/svg+xml" href="/images/favicon.svg" sizes="any">
+<link rel="icon" type="image/png" href="/images/favicon-32x32.png" sizes="32x32">
+<link rel="icon" type="image/png" href="/images/favicon-16x16.png" sizes="16x16">
+
+<link rel="apple-touch-icon" href="/images/apple-touch-icon.png">
+<link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon.png">
+
+<link rel="manifest" href="/site.webmanifest">
+<link rel="mask-icon" href="/images/safari-pinned-tab.svg" color="#5bbad5">
+
+
+
+
+
+
+<style>
+.content article ul {
+  list-style: disc !important;
+  padding-left: 2.5rem !important;
+}
+
+.content article ul li {
+  display: list-item !important;
+}
+</style>
+
+
+
+
+  
+</head>
+
+
+
+
+
+
+<body class="preload-transitions colorscheme-auto">
+  
+<div class="float-container">
+    <a id="dark-mode-toggle" class="colorscheme-toggle">
+        <i class="fa-solid fa-adjust fa-fw" aria-hidden="true"></i>
+    </a>
+</div>
+
+
+  <main class="wrapper">
+    <nav class="navigation">
+  <section class="container">
+    
+    <a class="navigation-title" href="https://ftxj.github.io/zh/">
+      JXIN&#39;s Home
+    </a>
+    
+    
+      <input type="checkbox" id="menu-toggle" />
+      <label class="menu-button float-right" for="menu-toggle">
+        <i class="fa-solid fa-bars fa-fw" aria-hidden="true"></i>
+      </label>
+      <ul class="navigation-list">
+        
+          
+            <li class="navigation-item">
+              <a class="navigation-link " href="/zh/about/">关于</a>
+            </li>
+          
+            <li class="navigation-item">
+              <a class="navigation-link " href="/zh/travel/">旅行</a>
+            </li>
+          
+            <li class="navigation-item">
+              <a class="navigation-link " href="/zh/posts/">博客</a>
+            </li>
+          
+            <li class="navigation-item">
+              <a class="navigation-link " href="https://ftxj.github.io/cv/cv_zh.pdf">简历</a>
+            </li>
+          
+        
+        
+          
+          
+          
+            
+              
+                <li class="navigation-item menu-separator">
+                  <span>|</span>
+                </li>
+                
+              
+              <li class="navigation-item">
+                <a href="/posts/2026-04-24/02-sovereign-agentic-loops-decoupling-ai-reasoning-from-executi/">EN</a>
+              </li>
+            
+          
+        
+      </ul>
+    
+  </section>
+</nav>
+
+
+    <div class="content">
+      
+  <section class="container post">
+    <article>
+      <header>
+        <div class="post-title">
+          <h1 class="title">
+            <a class="title-link" href="https://ftxj.github.io/zh/posts/2026-04-24/02-sovereign-agentic-loops-decoupling-ai-reasoning-from-executi/">
+              Sovereign Agentic Loops: Decoupling AI Reasoning from Execution in Real-World Systems
+            </a>
+          </h1>
+        </div>
+        <div class="post-meta">
+          <div class="date">
+            <span class="posted-on">
+              <i class="fa-solid fa-calendar" aria-hidden="true"></i>
+              <time datetime="2026-04-27T07:56:45Z">
+                四月 27, 2026
+              </time>
+            </span>
+            <span class="reading-time">
+              <i class="fa-solid fa-clock" aria-hidden="true"></i>
+              2-minute read
+            </span>
+          </div>
+          
+          <div class="categories">
+  <i class="fa-solid fa-folder" aria-hidden="true"></i>
+    <a href="/zh/categories/paper-digest/">Paper-Digest</a>
+      <span class="separator">•</span>
+    <a href="/zh/categories/2026-04-24/">2026-04-24</a></div>
+
+          
+        </div>
+      </header>
+
+      
+
+
+      <div class="post-content">
+        
+        <p><strong>arXiv:</strong> <a href="https://arxiv.org/abs/2604.22136v1">2604.22136</a> · <a href="https://arxiv.org/pdf/2604.22136v1">PDF</a></p>
+<p><strong>作者:</strong> Jun He, Deying Yu</p>
+<p><strong>主分类:</strong> <code>cs.CR</code> · 全部: cs.CR, cs.LG</p>
+<p><strong>命中关键词:</strong> large language model, llm, agent, agentic, reasoning, latency</p>
+<hr>
+<h2 id="tldr">TL;DR</h2>
+<p>论文提出 Sovereign Agentic Loops (SAL)，通过控制平面解耦 LLM 推理与真实系统执行，用策略校验与证据链保证 agent 调用的安全可审计。</p>
+<h2 id="核心观点">核心观点</h2>
+<ul>
+<li>LLM agent 直接把随机输出送进执行层会带来不可接受的安全风险。</li>
+<li>SAL 让模型只发出带 justification 的结构化 intent，由控制平面对照真实状态与策略再决定是否执行。</li>
+<li>引入 obfuscation membrane 做身份隔离，以及 cryptographically linked Evidence Chain 支持审计与 replay。</li>
+<li>在形式化假设下可保证 policy-bounded execution、identity isolation 与 deterministic replay。</li>
+</ul>
+<h2 id="方法">方法</h2>
+<p><img alt="图 1" src="/images/papers/2604.22136/page1.png"></p>
+<p>SAL 是一种 control-plane 架构：</p>
+<ul>
+<li>Intent 接口：模型输出结构化 intent + justification，而不是直接 API call。</li>
+<li>Obfuscation membrane：向模型暴露的状态被脱敏，限制其接触 identity-sensitive 字段。</li>
+<li>Policy + consistency 校验：控制平面把 intent 对照真实系统状态和策略规则验证，两层把关。</li>
+<li>Evidence Chain：对每次 intent、校验结果、执行动作做密码学链式记录，支持事后审计和 deterministic replay。</li>
+<li>作者给出形式化定义并证明上述三项安全性属性在假设下成立。</li>
+</ul>
+<p><img alt="图 2" src="/images/papers/2604.22136/page2.png"></p>
+<h2 id="实验">实验</h2>
+<p>在作者自建的 OpenKedge 云基础设施原型上评估，面向 unsafe intent 基准：</p>
+<ul>
+<li>系统：OpenKedge cloud infrastructure prototype。</li>
+<li>对比维度：policy 层拦截率、consistency 检查拦截率、最终 unsafe execution 数、延迟开销。</li>
+<li>指标：拦截比例、是否出现 unsafe execution、median latency。</li>
+</ul>
+<p>摘要未披露数据集规模、基线架构或具体 workload 细节。</p>
+<h2 id="结果">结果</h2>
+<p><img alt="图 3" src="/images/papers/2604.22136/page3.png"></p>
+<ul>
+<li>93% 的 unsafe intent 在 policy 层直接被拒。</li>
+<li>剩余 7% 被 consistency 检查识破。</li>
+<li>基准中最终 unsafe execution 为 0。</li>
+<li>中位延迟仅增加 12.4 ms，说明 control plane 成本可接受。</li>
+<li>结论建立在作者的形式化假设与自建 benchmark 上，外部有效性仍需验证。</li>
+</ul>
+<h2 id="为什么重要">为什么重要</h2>
+<p>对做 LLM agent / AI 基础设施的人来说，SAL 提供了一条可落地的&quot;模型提议、系统裁决&quot;范式：把不可信的随机输出关进 intent schema，把信任转移到可审计的控制平面；同时 Evidence Chain 让事故可 replay，契合合规与安全运营需求，对云控制面、DevOps agent、金融后台等 high-stakes 场景尤其有价值。</p>
+<h2 id="与已有工作的关系">与已有工作的关系</h2>
+<p>延续 ReAct、Toolformer 等 tool-use agent 思路，但在执行侧更靠近 policy-as-code（OPA/Rego）、capability-based security 与 confidential computing 中的 reference monitor 思想；Evidence Chain 呼应 transparency log 与 tamper-evident audit（类 Sigstore / Merkle log）；obfuscation membrane 与 differential privacy、PII redaction 研究有概念重叠。</p>
+<h2 id="尚未回答的问题">尚未回答的问题</h2>
+<ul>
+<li>Policy 本身的完备性与维护成本：规则漏洞会否重新打开攻击面？</li>
+<li>对抗性 intent（prompt injection 驱动）下 consistency 检查的鲁棒性。</li>
+<li>OpenKedge 之外的真实生产负载、长尾 API 表现仍未知。</li>
+<li>Obfuscation membrane 对模型推理质量的影响缺乏量化。</li>
+<li>证据链在多租户、跨组织场景下的密钥与隐私治理方案。</li>
+</ul>
+<hr>
+<h2 id="原始摘要">原始摘要</h2>
+<p>Large language model (LLM) agents increasingly issue API calls that mutate real systems, yet many current architectures pass stochastic model outputs directly to execution layers. We argue that this coupling creates a safety risk because model correctness, context awareness, and alignment cannot be assumed at execution time. We introduce Sovereign Agentic Loops (SAL), a control-plane architecture in which models emit structured intents with justifications, and the control plane validates those intents against true system state and policy before execution. SAL combines an obfuscation membrane, which limits model access to identity-sensitive state, with a cryptographically linked Evidence Chain for auditability and replay. We formalize SAL and show that, under the stated assumptions, it provides policy-bounded execution, identity isolation, and deterministic replay. In an OpenKedge prototype for cloud infrastructure, SAL blocks 93% of unsafe intents at the policy layer, rejects the remaining 7% via consistency checks, prevents unsafe executions in our benchmark, and adds 12.4 ms median latency.</p>
+
+      </div>
+
+
+      <footer>
+        
+
+
+        
+        
+        
+        
+        
+        
+        
+      </footer>
+    </article>
+
+    
+  </section>
+
+    </div>
+
+    <footer class="footer">
+  <section class="container">
+    ©
+    
+      2019 -
+    
+    2026
+     Jie Xin 
+    ·
+    
+    Powered by <a href="https://gohugo.io/" target="_blank" rel="noopener">Hugo</a> & <a href="https://github.com/luizdepra/hugo-coder/" target="_blank" rel="noopener">Coder</a>.
+    
+  </section>
+</footer>
+
+  </main>
+
+  
+
+  
+  
+  <script src="/js/coder.min.6ae284be93d2d19dad1f02b0039508d9aab3180a12a06dcc71b0b0ef7825a317.js" integrity="sha256-auKEvpPS0Z2tHwKwA5UI2aqzGAoSoG3McbCw73gloxc="></script>
+  
+
+  
+
+  
+
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+</body>
+</html>

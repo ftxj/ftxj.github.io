@@ -1,0 +1,428 @@
+<!DOCTYPE html>
+<html lang="zh">
+
+<head>
+  <title>
+  Dual-Cluster Memory Agent: Resolving Multi-Paradigm Ambiguity in Optimization Problem Solving · JXIN&#39;s Home
+</title>
+  <meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="color-scheme" content="light dark">
+
+
+
+
+<meta name="author" content="Jie Xin">
+<meta name="description" content="arXiv: 2604.20183 · PDF
+作者: Xinyu Zhang, Yuchen Wan, Boxuan Zhang, Zesheng Yang, Lingling Zhang, Bifan Wei, Jun Liu
+主分类: cs.CL · 全部: cs.CL
+命中关键词: large language model, llm, agent, rag, reasoning, inference
+
+TL;DR
+DCM-Agent 通过构建建模/编码双簇记忆并提炼 Approach、Checklist、Pitfall 三类结构化知识，在免训练条件下缓解优化问题求解中的多范式歧义，七项基准平均提升 11%–21%。
+核心观点
+
+优化问题常存在结构性歧义：同一问题有多种互相冲突的建模范式，阻碍 LLM 生成正确解。
+提出 Dual-Cluster Memory Agent（DCM-Agent），训练无关地利用历史解决方案。
+双簇记忆 &#43; 三类结构化知识（Approach / Checklist / Pitfall）可泛化为指导性知识。
+发现&quot;知识继承&quot;现象：大模型构建的记忆能提升小模型表现。
+
+方法
+
+Dual-Cluster Memory Construction：将历史解按建模（modeling）与编码（coding）两类聚簇。
+每个簇内蒸馏出三种结构化条目：Approach（思路）、Checklist（检查项）、Pitfall（易错点）。
+Memory-augmented Inference：在推理时动态检索记忆，导航求解路径、检测并修复错误，并在必要时自适应切换推理路径。
+整个流程无需微调，纯 prompt / agent 级增强。
+
+实验
+
+覆盖 7 个优化问题基准（摘要未列具体名称）。
+基线与指标：摘要未披露具体基线模型和评测指标，仅报告平均性能提升。
+还测试了大模型构建的记忆对小模型的迁移效果。
+
+结果
+
+平均性能提升 11%–21%。
+观察到 knowledge inheritance：大模型蒸馏的记忆能让小模型表现显著改善。
+具体绝对分数、每个 benchmark 的细节、与 SOTA 的对比摘要未给出，无法独立核验。
+
+为什么重要
+
+为 agent 框架处理&quot;同问题多范式&quot;这种结构性歧义提供可复用模板，不局限于优化领域。
+训练免费 &#43; 记忆迁移的思路对成本敏感的部署（小模型 &#43; 大模型蒸馏的记忆）有实际意义。
+三元组（Approach/Checklist/Pitfall）是一种可推广的记忆抽象，适合嵌入通用 LLM agent。
+
+与已有工作的关系
+
+延续 memory-augmented agent 线路：Reflexion、Generative Agents、MemGPT。
+与 LLM 求解优化/数学问题工作相关：OptiMUS、Chain-of-Experts、MathPrompter。
+Checklist/Pitfall 抽象与 self-refine、self-debug 的错误修复思路呼应。
+知识继承现象与 weak-to-strong、distillation 研究方向形成互补。
+
+尚未回答的问题
+
+具体基准、基线与评测指标未披露，效果难独立验证。
+记忆库规模、检索策略、冷启动（无历史解）行为如何？
+双簇划分是否泛化到非优化领域（如代码生成、科学推理）？
+Pitfall 是否会把历史错误作为偏见继承到新问题？
+记忆更新与遗忘机制、长期维护成本尚未讨论。
+
+
+论文图表
+图 1: Page 2 (rendered)">
+<meta name="keywords" content="blog,developer,personal">
+
+
+
+  <meta name="twitter:card" content="summary">
+  <meta name="twitter:title" content="Dual-Cluster Memory Agent: Resolving Multi-Paradigm Ambiguity in Optimization Problem Solving">
+  <meta name="twitter:description" content="arXiv: 2604.20183 · PDF
+作者: Xinyu Zhang, Yuchen Wan, Boxuan Zhang, Zesheng Yang, Lingling Zhang, Bifan Wei, Jun Liu
+主分类: cs.CL · 全部: cs.CL
+命中关键词: large language model, llm, agent, rag, reasoning, inference
+TL;DR DCM-Agent 通过构建建模/编码双簇记忆并提炼 Approach、Checklist、Pitfall 三类结构化知识，在免训练条件下缓解优化问题求解中的多范式歧义，七项基准平均提升 11%–21%。
+核心观点 优化问题常存在结构性歧义：同一问题有多种互相冲突的建模范式，阻碍 LLM 生成正确解。 提出 Dual-Cluster Memory Agent（DCM-Agent），训练无关地利用历史解决方案。 双簇记忆 &#43; 三类结构化知识（Approach / Checklist / Pitfall）可泛化为指导性知识。 发现&#34;知识继承&#34;现象：大模型构建的记忆能提升小模型表现。 方法 Dual-Cluster Memory Construction：将历史解按建模（modeling）与编码（coding）两类聚簇。 每个簇内蒸馏出三种结构化条目：Approach（思路）、Checklist（检查项）、Pitfall（易错点）。 Memory-augmented Inference：在推理时动态检索记忆，导航求解路径、检测并修复错误，并在必要时自适应切换推理路径。 整个流程无需微调，纯 prompt / agent 级增强。 实验 覆盖 7 个优化问题基准（摘要未列具体名称）。 基线与指标：摘要未披露具体基线模型和评测指标，仅报告平均性能提升。 还测试了大模型构建的记忆对小模型的迁移效果。 结果 平均性能提升 11%–21%。 观察到 knowledge inheritance：大模型蒸馏的记忆能让小模型表现显著改善。 具体绝对分数、每个 benchmark 的细节、与 SOTA 的对比摘要未给出，无法独立核验。 为什么重要 为 agent 框架处理&#34;同问题多范式&#34;这种结构性歧义提供可复用模板，不局限于优化领域。 训练免费 &#43; 记忆迁移的思路对成本敏感的部署（小模型 &#43; 大模型蒸馏的记忆）有实际意义。 三元组（Approach/Checklist/Pitfall）是一种可推广的记忆抽象，适合嵌入通用 LLM agent。 与已有工作的关系 延续 memory-augmented agent 线路：Reflexion、Generative Agents、MemGPT。 与 LLM 求解优化/数学问题工作相关：OptiMUS、Chain-of-Experts、MathPrompter。 Checklist/Pitfall 抽象与 self-refine、self-debug 的错误修复思路呼应。 知识继承现象与 weak-to-strong、distillation 研究方向形成互补。 尚未回答的问题 具体基准、基线与评测指标未披露，效果难独立验证。 记忆库规模、检索策略、冷启动（无历史解）行为如何？ 双簇划分是否泛化到非优化领域（如代码生成、科学推理）？ Pitfall 是否会把历史错误作为偏见继承到新问题？ 记忆更新与遗忘机制、长期维护成本尚未讨论。 论文图表 图 1: Page 2 (rendered)">
+
+<meta property="og:url" content="https://ftxj.github.io/zh/posts/2026-04-22/07-dual-cluster-memory-agent-resolving-multi-paradigm-ambiguity/">
+  <meta property="og:site_name" content="JXIN&#39;s Home">
+  <meta property="og:title" content="Dual-Cluster Memory Agent: Resolving Multi-Paradigm Ambiguity in Optimization Problem Solving">
+  <meta property="og:description" content="arXiv: 2604.20183 · PDF
+作者: Xinyu Zhang, Yuchen Wan, Boxuan Zhang, Zesheng Yang, Lingling Zhang, Bifan Wei, Jun Liu
+主分类: cs.CL · 全部: cs.CL
+命中关键词: large language model, llm, agent, rag, reasoning, inference
+TL;DR DCM-Agent 通过构建建模/编码双簇记忆并提炼 Approach、Checklist、Pitfall 三类结构化知识，在免训练条件下缓解优化问题求解中的多范式歧义，七项基准平均提升 11%–21%。
+核心观点 优化问题常存在结构性歧义：同一问题有多种互相冲突的建模范式，阻碍 LLM 生成正确解。 提出 Dual-Cluster Memory Agent（DCM-Agent），训练无关地利用历史解决方案。 双簇记忆 &#43; 三类结构化知识（Approach / Checklist / Pitfall）可泛化为指导性知识。 发现&#34;知识继承&#34;现象：大模型构建的记忆能提升小模型表现。 方法 Dual-Cluster Memory Construction：将历史解按建模（modeling）与编码（coding）两类聚簇。 每个簇内蒸馏出三种结构化条目：Approach（思路）、Checklist（检查项）、Pitfall（易错点）。 Memory-augmented Inference：在推理时动态检索记忆，导航求解路径、检测并修复错误，并在必要时自适应切换推理路径。 整个流程无需微调，纯 prompt / agent 级增强。 实验 覆盖 7 个优化问题基准（摘要未列具体名称）。 基线与指标：摘要未披露具体基线模型和评测指标，仅报告平均性能提升。 还测试了大模型构建的记忆对小模型的迁移效果。 结果 平均性能提升 11%–21%。 观察到 knowledge inheritance：大模型蒸馏的记忆能让小模型表现显著改善。 具体绝对分数、每个 benchmark 的细节、与 SOTA 的对比摘要未给出，无法独立核验。 为什么重要 为 agent 框架处理&#34;同问题多范式&#34;这种结构性歧义提供可复用模板，不局限于优化领域。 训练免费 &#43; 记忆迁移的思路对成本敏感的部署（小模型 &#43; 大模型蒸馏的记忆）有实际意义。 三元组（Approach/Checklist/Pitfall）是一种可推广的记忆抽象，适合嵌入通用 LLM agent。 与已有工作的关系 延续 memory-augmented agent 线路：Reflexion、Generative Agents、MemGPT。 与 LLM 求解优化/数学问题工作相关：OptiMUS、Chain-of-Experts、MathPrompter。 Checklist/Pitfall 抽象与 self-refine、self-debug 的错误修复思路呼应。 知识继承现象与 weak-to-strong、distillation 研究方向形成互补。 尚未回答的问题 具体基准、基线与评测指标未披露，效果难独立验证。 记忆库规模、检索策略、冷启动（无历史解）行为如何？ 双簇划分是否泛化到非优化领域（如代码生成、科学推理）？ Pitfall 是否会把历史错误作为偏见继承到新问题？ 记忆更新与遗忘机制、长期维护成本尚未讨论。 论文图表 图 1: Page 2 (rendered)">
+  <meta property="og:locale" content="zh">
+  <meta property="og:type" content="article">
+    <meta property="article:section" content="posts">
+    <meta property="article:published_time" content="2026-04-27T05:15:15+00:00">
+    <meta property="article:modified_time" content="2026-04-27T05:15:15+00:00">
+
+
+
+
+<link rel="canonical" href="https://ftxj.github.io/zh/posts/2026-04-22/07-dual-cluster-memory-agent-resolving-multi-paradigm-ambiguity/">
+
+
+<link rel="preload" href="/fonts/fa-brands-400.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="/fonts/fa-regular-400.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="/fonts/fa-solid-900.woff2" as="font" type="font/woff2" crossorigin>
+
+
+  
+  
+  <link rel="stylesheet" href="/css/coder.min.5e94c1acf7aa2066035cf2764ae3e4fe39db101d68b870f919966100d51fb861.css" integrity="sha256-XpTBrPeqIGYDXPJ2SuPk/jnbEB1ouHD5GZZhANUfuGE=" crossorigin="anonymous" media="screen" />
+
+
+
+
+
+
+  
+    
+    
+    <link rel="stylesheet" href="/css/coder-dark.min.a00e6364bacbc8266ad1cc81230774a1397198f8cfb7bcba29b7d6fcb54ce57f.css" integrity="sha256-oA5jZLrLyCZq0cyBIwd0oTlxmPjPt7y6KbfW/LVM5X8=" crossorigin="anonymous" media="screen" />
+  
+
+
+
+ 
+
+
+
+
+<link rel="icon" type="image/svg+xml" href="/images/favicon.svg" sizes="any">
+<link rel="icon" type="image/png" href="/images/favicon-32x32.png" sizes="32x32">
+<link rel="icon" type="image/png" href="/images/favicon-16x16.png" sizes="16x16">
+
+<link rel="apple-touch-icon" href="/images/apple-touch-icon.png">
+<link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon.png">
+
+<link rel="manifest" href="/site.webmanifest">
+<link rel="mask-icon" href="/images/safari-pinned-tab.svg" color="#5bbad5">
+
+
+
+
+
+
+<style>
+.content article ul {
+  list-style: disc !important;
+  padding-left: 2.5rem !important;
+}
+
+.content article ul li {
+  display: list-item !important;
+}
+</style>
+
+
+
+
+  
+</head>
+
+
+
+
+
+
+<body class="preload-transitions colorscheme-auto">
+  
+<div class="float-container">
+    <a id="dark-mode-toggle" class="colorscheme-toggle">
+        <i class="fa-solid fa-adjust fa-fw" aria-hidden="true"></i>
+    </a>
+</div>
+
+
+  <main class="wrapper">
+    <nav class="navigation">
+  <section class="container">
+    
+    <a class="navigation-title" href="https://ftxj.github.io/zh/">
+      JXIN&#39;s Home
+    </a>
+    
+    
+      <input type="checkbox" id="menu-toggle" />
+      <label class="menu-button float-right" for="menu-toggle">
+        <i class="fa-solid fa-bars fa-fw" aria-hidden="true"></i>
+      </label>
+      <ul class="navigation-list">
+        
+          
+            <li class="navigation-item">
+              <a class="navigation-link " href="/zh/about/">关于</a>
+            </li>
+          
+            <li class="navigation-item">
+              <a class="navigation-link " href="/zh/travel/">旅行</a>
+            </li>
+          
+            <li class="navigation-item">
+              <a class="navigation-link " href="/zh/posts/">博客</a>
+            </li>
+          
+            <li class="navigation-item">
+              <a class="navigation-link " href="https://ftxj.github.io/cv/cv_zh.pdf">简历</a>
+            </li>
+          
+        
+        
+          
+          
+          
+            
+              
+                <li class="navigation-item menu-separator">
+                  <span>|</span>
+                </li>
+                
+              
+              <li class="navigation-item">
+                <a href="/posts/2026-04-22/07-dual-cluster-memory-agent-resolving-multi-paradigm-ambiguity/">EN</a>
+              </li>
+            
+          
+        
+      </ul>
+    
+  </section>
+</nav>
+
+
+    <div class="content">
+      
+  <section class="container post">
+    <article>
+      <header>
+        <div class="post-title">
+          <h1 class="title">
+            <a class="title-link" href="https://ftxj.github.io/zh/posts/2026-04-22/07-dual-cluster-memory-agent-resolving-multi-paradigm-ambiguity/">
+              Dual-Cluster Memory Agent: Resolving Multi-Paradigm Ambiguity in Optimization Problem Solving
+            </a>
+          </h1>
+        </div>
+        <div class="post-meta">
+          <div class="date">
+            <span class="posted-on">
+              <i class="fa-solid fa-calendar" aria-hidden="true"></i>
+              <time datetime="2026-04-27T05:15:15Z">
+                四月 27, 2026
+              </time>
+            </span>
+            <span class="reading-time">
+              <i class="fa-solid fa-clock" aria-hidden="true"></i>
+              2-minute read
+            </span>
+          </div>
+          
+          <div class="categories">
+  <i class="fa-solid fa-folder" aria-hidden="true"></i>
+    <a href="/zh/categories/paper-digest/">Paper-Digest</a>
+      <span class="separator">•</span>
+    <a href="/zh/categories/2026-04-22/">2026-04-22</a></div>
+
+          
+        </div>
+      </header>
+
+      
+
+
+      <div class="post-content">
+        
+        <p><strong>arXiv:</strong> <a href="https://arxiv.org/abs/2604.20183v1">2604.20183</a> · <a href="https://arxiv.org/pdf/2604.20183v1">PDF</a></p>
+<p><strong>作者:</strong> Xinyu Zhang, Yuchen Wan, Boxuan Zhang, Zesheng Yang, Lingling Zhang, Bifan Wei, Jun Liu</p>
+<p><strong>主分类:</strong> <code>cs.CL</code> · 全部: cs.CL</p>
+<p><strong>命中关键词:</strong> large language model, llm, agent, rag, reasoning, inference</p>
+<hr>
+<h2 id="tldr">TL;DR</h2>
+<p>DCM-Agent 通过构建建模/编码双簇记忆并提炼 Approach、Checklist、Pitfall 三类结构化知识，在免训练条件下缓解优化问题求解中的多范式歧义，七项基准平均提升 11%–21%。</p>
+<h2 id="核心观点">核心观点</h2>
+<ul>
+<li>优化问题常存在结构性歧义：同一问题有多种互相冲突的建模范式，阻碍 LLM 生成正确解。</li>
+<li>提出 Dual-Cluster Memory Agent（DCM-Agent），训练无关地利用历史解决方案。</li>
+<li>双簇记忆 + 三类结构化知识（Approach / Checklist / Pitfall）可泛化为指导性知识。</li>
+<li>发现&quot;知识继承&quot;现象：大模型构建的记忆能提升小模型表现。</li>
+</ul>
+<h2 id="方法">方法</h2>
+<ul>
+<li><strong>Dual-Cluster Memory Construction</strong>：将历史解按建模（modeling）与编码（coding）两类聚簇。</li>
+<li>每个簇内蒸馏出三种结构化条目：Approach（思路）、Checklist（检查项）、Pitfall（易错点）。</li>
+<li><strong>Memory-augmented Inference</strong>：在推理时动态检索记忆，导航求解路径、检测并修复错误，并在必要时自适应切换推理路径。</li>
+<li>整个流程无需微调，纯 prompt / agent 级增强。</li>
+</ul>
+<h2 id="实验">实验</h2>
+<ul>
+<li>覆盖 7 个优化问题基准（摘要未列具体名称）。</li>
+<li>基线与指标：摘要未披露具体基线模型和评测指标，仅报告平均性能提升。</li>
+<li>还测试了大模型构建的记忆对小模型的迁移效果。</li>
+</ul>
+<h2 id="结果">结果</h2>
+<ul>
+<li>平均性能提升 11%–21%。</li>
+<li>观察到 knowledge inheritance：大模型蒸馏的记忆能让小模型表现显著改善。</li>
+<li>具体绝对分数、每个 benchmark 的细节、与 SOTA 的对比摘要未给出，无法独立核验。</li>
+</ul>
+<h2 id="为什么重要">为什么重要</h2>
+<ul>
+<li>为 agent 框架处理&quot;同问题多范式&quot;这种结构性歧义提供可复用模板，不局限于优化领域。</li>
+<li>训练免费 + 记忆迁移的思路对成本敏感的部署（小模型 + 大模型蒸馏的记忆）有实际意义。</li>
+<li>三元组（Approach/Checklist/Pitfall）是一种可推广的记忆抽象，适合嵌入通用 LLM agent。</li>
+</ul>
+<h2 id="与已有工作的关系">与已有工作的关系</h2>
+<ul>
+<li>延续 memory-augmented agent 线路：Reflexion、Generative Agents、MemGPT。</li>
+<li>与 LLM 求解优化/数学问题工作相关：OptiMUS、Chain-of-Experts、MathPrompter。</li>
+<li>Checklist/Pitfall 抽象与 self-refine、self-debug 的错误修复思路呼应。</li>
+<li>知识继承现象与 weak-to-strong、distillation 研究方向形成互补。</li>
+</ul>
+<h2 id="尚未回答的问题">尚未回答的问题</h2>
+<ul>
+<li>具体基准、基线与评测指标未披露，效果难独立验证。</li>
+<li>记忆库规模、检索策略、冷启动（无历史解）行为如何？</li>
+<li>双簇划分是否泛化到非优化领域（如代码生成、科学推理）？</li>
+<li>Pitfall 是否会把历史错误作为偏见继承到新问题？</li>
+<li>记忆更新与遗忘机制、长期维护成本尚未讨论。</li>
+</ul>
+<hr>
+<h2 id="论文图表">论文图表</h2>
+<p><strong>图 1:</strong> Page 2 (rendered)</p>
+<p><img alt="图 1" src="/images/papers/2604.20183/page1.png"></p>
+<p><strong>图 2:</strong> Page 3 (rendered)</p>
+<p><img alt="图 2" src="/images/papers/2604.20183/page2.png"></p>
+<p><strong>图 3:</strong> Page 4 (rendered)</p>
+<p><img alt="图 3" src="/images/papers/2604.20183/page3.png"></p>
+<hr>
+<h2 id="原始摘要">原始摘要</h2>
+<p>Large Language Models (LLMs) often struggle with structural ambiguity in optimization problems, where a single problem admits multiple related but conflicting modeling paradigms, hindering effective solution generation. To address this, we propose Dual-Cluster Memory Agent (DCM-Agent) to enhance performance by leveraging historical solutions in a training-free manner. Central to this is Dual-Cluster Memory Construction. This agent assigns historical solutions to modeling and coding clusters, then distills each cluster&rsquo;s content into three structured types: Approach, Checklist, and Pitfall. This process derives generalizable guidance knowledge. Furthermore, this agent introduces Memory-augmented Inference to dynamically navigate solution paths, detect and repair errors, and adaptively switch reasoning paths with structured knowledge. The experiments across seven optimization benchmarks demonstrate that DCM-Agent achieves an average performance improvement of 11%- 21%. Notably, our analysis reveals a ``knowledge inheritance&rsquo;&rsquo; phenomenon: memory constructed by larger models can guide smaller models toward superior performance, highlighting the framework&rsquo;s scalability and efficiency.</p>
+
+      </div>
+
+
+      <footer>
+        
+
+
+        
+        
+        
+        
+        
+        
+        
+      </footer>
+    </article>
+
+    
+  </section>
+
+    </div>
+
+    <footer class="footer">
+  <section class="container">
+    ©
+    
+      2019 -
+    
+    2026
+     Jie Xin 
+    ·
+    
+    Powered by <a href="https://gohugo.io/" target="_blank" rel="noopener">Hugo</a> & <a href="https://github.com/luizdepra/hugo-coder/" target="_blank" rel="noopener">Coder</a>.
+    
+  </section>
+</footer>
+
+  </main>
+
+  
+
+  
+  
+  <script src="/js/coder.min.6ae284be93d2d19dad1f02b0039508d9aab3180a12a06dcc71b0b0ef7825a317.js" integrity="sha256-auKEvpPS0Z2tHwKwA5UI2aqzGAoSoG3McbCw73gloxc="></script>
+  
+
+  
+
+  
+
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+</body>
+</html>

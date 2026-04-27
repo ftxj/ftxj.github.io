@@ -1,0 +1,466 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <title>
+  Travel · JXIN&#39;s Home
+</title>
+  <meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="color-scheme" content="light dark">
+
+
+
+
+<meta name="author" content="Jie Xin">
+<meta name="description" content="
+
+
+
+
+ Visited
+ Not yet
+
+
+Destinations
+USA">
+<meta name="keywords" content="blog,developer,personal">
+
+
+
+  <meta name="twitter:card" content="summary">
+  <meta name="twitter:title" content="Travel">
+  <meta name="twitter:description" content="Visited Not yet Destinations USA">
+
+<meta property="og:url" content="https://ftxj.github.io/travel/">
+  <meta property="og:site_name" content="JXIN&#39;s Home">
+  <meta property="og:title" content="Travel">
+  <meta property="og:description" content="Visited Not yet Destinations USA">
+  <meta property="og:locale" content="en">
+  <meta property="og:type" content="article">
+    <meta property="article:published_time" content="2024-01-01T00:00:00+00:00">
+    <meta property="article:modified_time" content="2024-01-01T00:00:00+00:00">
+
+
+
+
+<link rel="canonical" href="https://ftxj.github.io/travel/">
+
+
+<link rel="preload" href="/fonts/fa-brands-400.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="/fonts/fa-regular-400.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="/fonts/fa-solid-900.woff2" as="font" type="font/woff2" crossorigin>
+
+
+  
+  
+  <link rel="stylesheet" href="/css/coder.min.5e94c1acf7aa2066035cf2764ae3e4fe39db101d68b870f919966100d51fb861.css" integrity="sha256-XpTBrPeqIGYDXPJ2SuPk/jnbEB1ouHD5GZZhANUfuGE=" crossorigin="anonymous" media="screen" />
+
+
+
+
+
+
+  
+    
+    
+    <link rel="stylesheet" href="/css/coder-dark.min.a00e6364bacbc8266ad1cc81230774a1397198f8cfb7bcba29b7d6fcb54ce57f.css" integrity="sha256-oA5jZLrLyCZq0cyBIwd0oTlxmPjPt7y6KbfW/LVM5X8=" crossorigin="anonymous" media="screen" />
+  
+
+
+
+ 
+
+
+
+
+<link rel="icon" type="image/svg+xml" href="/images/favicon.svg" sizes="any">
+<link rel="icon" type="image/png" href="/images/favicon-32x32.png" sizes="32x32">
+<link rel="icon" type="image/png" href="/images/favicon-16x16.png" sizes="16x16">
+
+<link rel="apple-touch-icon" href="/images/apple-touch-icon.png">
+<link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon.png">
+
+<link rel="manifest" href="/site.webmanifest">
+<link rel="mask-icon" href="/images/safari-pinned-tab.svg" color="#5bbad5">
+
+
+
+
+
+
+<style>
+.content article ul {
+  list-style: disc !important;
+  padding-left: 2.5rem !important;
+}
+
+.content article ul li {
+  display: list-item !important;
+}
+</style>
+
+
+
+
+  
+</head>
+
+
+
+
+
+
+<body class="preload-transitions colorscheme-auto">
+  
+<div class="float-container">
+    <a id="dark-mode-toggle" class="colorscheme-toggle">
+        <i class="fa-solid fa-adjust fa-fw" aria-hidden="true"></i>
+    </a>
+</div>
+
+
+  <main class="wrapper">
+    <nav class="navigation">
+  <section class="container">
+    
+    <a class="navigation-title" href="https://ftxj.github.io/">
+      JXIN&#39;s Home
+    </a>
+    
+    
+      <input type="checkbox" id="menu-toggle" />
+      <label class="menu-button float-right" for="menu-toggle">
+        <i class="fa-solid fa-bars fa-fw" aria-hidden="true"></i>
+      </label>
+      <ul class="navigation-list">
+        
+          
+            <li class="navigation-item">
+              <a class="navigation-link " href="/about/">About</a>
+            </li>
+          
+            <li class="navigation-item">
+              <a class="navigation-link " href="/travel/">Travel</a>
+            </li>
+          
+            <li class="navigation-item">
+              <a class="navigation-link " href="/posts/">Blog</a>
+            </li>
+          
+            <li class="navigation-item">
+              <a class="navigation-link " href="https://ftxj.github.io/cv/cv.pdf">CV</a>
+            </li>
+          
+        
+        
+          
+          
+          
+            
+          
+            
+              
+                <li class="navigation-item menu-separator">
+                  <span>|</span>
+                </li>
+                
+              
+              <li class="navigation-item">
+                <a href="/zh/">中文</a>
+              </li>
+            
+          
+        
+      </ul>
+    
+  </section>
+</nav>
+
+
+    <div class="content">
+      
+  <section class="container page">
+  <article>
+    <header>
+      <h1 class="title">
+        <a class="title-link" href="https://ftxj.github.io/travel/">
+          Travel
+        </a>
+      </h1>
+    </header>
+
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<style>
+#map {
+width: 100%;
+height: 500px;
+border-radius: 8px;
+margin: 1rem 0;
+}
+.map-legend {
+display: flex;
+justify-content: center;
+gap: 2rem;
+margin: 1rem 0;
+font-size: 0.9rem;
+}
+.legend-item {
+display: flex;
+align-items: center;
+gap: 6px;
+}
+.legend-dot {
+width: 14px;
+height: 14px;
+border-radius: 3px;
+}
+.legend-dot.visited { background: #4a90d9; }
+.legend-dot.not-visited { background: #ddd; }
+</style>
+<div id="map"></div>
+<div class="map-legend">
+<div class="legend-item"><span class="legend-dot visited"></span> Visited</div>
+<div class="legend-item"><span class="legend-dot not-visited"></span> Not yet</div>
+</div>
+<script>
+(function() {
+var map = L.map('map').setView([30, 0], 2);
+
+L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', {
+attribution: '&copy; OSM &copy; CARTO'
+}).addTo(map);
+
+var visitedStyle = { fillColor: '#4a90d9', fillOpacity: 0.6, color: '#2e6db4', weight: 0.5 };
+var defaultStyle = { fillColor: '#eee', fillOpacity: 0.4, color: '#ccc', weight: 0.5 };
+
+function bindEvents(layer, visited) {
+layer.on('mouseover', function(e) { e.target.setStyle({fillOpacity: 0.8, weight: 1}); });
+layer.on('mouseout', function(e) { e.target.setStyle(visited ? visitedStyle : defaultStyle); });
+}
+
+function loadGeoJSON(url, visitedList, labelMap) {
+fetch(url)
+.then(function(r) { return r.json(); })
+.then(function(data) {
+L.geoJSON(data, {
+style: function(f) {
+return visitedList.includes(f.properties.name) ? visitedStyle : defaultStyle;
+},
+onEachFeature: function(f, layer) {
+var name = f.properties.name;
+var v = visitedList.includes(name);
+var label = (labelMap && labelMap[name]) || name;
+layer.bindPopup('<b>' + label + '</b>' + (v ? '<br>✓ Visited' : ''));
+bindEvents(layer, v);
+}
+}).addTo(map);
+});
+}
+
+var wholeProvinces = ['北京市', '上海市', '重庆市', '香港特别行政区', '澳门特别行政区'];
+var skipProvinces = [
+'海南省', '西藏自治区', '新疆维吾尔自治区', '贵州省', '四川省',
+'辽宁省', '山西省', '山东省', '河南省', '湖北省', '内蒙古自治区',
+'陕西省', '甘肃省', '湖南省', '江西省', '江苏省', '浙江省', '云南省', '广东省'
+];
+
+fetch('/data/china.json')
+.then(function(r) { return r.json(); })
+.then(function(data) {
+data.features = data.features.filter(function(f) {
+return !skipProvinces.includes(f.properties.name);
+});
+L.geoJSON(data, {
+style: function(f) {
+return wholeProvinces.includes(f.properties.name) ? visitedStyle : defaultStyle;
+},
+onEachFeature: function(f, layer) {
+var v = wholeProvinces.includes(f.properties.name);
+layer.bindPopup('<b>' + f.properties.name + '</b>' + (v ? '<br>✓ Visited' : ''));
+bindEvents(layer, v);
+}
+}).addTo(map);
+});
+
+loadGeoJSON('/data/sichuan.json', ['成都市', '德阳市'], {
+'成都市': '成都 (都江堰)',
+'德阳市': '德阳 (广汉)'
+});
+
+loadGeoJSON('/data/hainan.json', ['海口市', '三亚市', '儋州市', '万宁市']);
+
+loadGeoJSON('/data/tibet.json', ['拉萨市', '日喀则市', '山南市']);
+
+loadGeoJSON('/data/xinjiang.json', ['乌鲁木齐市', '伊犁哈萨克自治州', '石河子市', '克拉玛依市', '博尔塔拉蒙古自治州']);
+
+loadGeoJSON('/data/guizhou.json', [
+'贵阳市', '安顺市',
+'黔西南布依族苗族自治州', '黔东南苗族侗族自治州', '黔南布依族苗族自治州'
+], {
+'黔西南布依族苗族自治州': '黔西南',
+'黔东南苗族侗族自治州': '黔东南',
+'黔南布依族苗族自治州': '黔南'
+});
+
+loadGeoJSON('/data/liaoning.json', ['沈阳市']);
+
+loadGeoJSON('/data/shandong.json', ['临沂市']);
+
+loadGeoJSON('/data/shanxi.json', ['太原市', '大同市', '忻州市', '晋中市'], {
+'晋中市': '晋中 (平遥)'
+});
+
+loadGeoJSON('/data/henan.json', ['郑州市', '开封市']);
+
+loadGeoJSON('/data/hubei.json', ['武汉市', '仙桃市', '荆州市']);
+
+loadGeoJSON('/data/neimenggu.json', ['鄂尔多斯市', '包头市']);
+
+loadGeoJSON('/data/shaanxi.json', ['西安市', '咸阳市']);
+
+loadGeoJSON('/data/gansu.json', ['兰州市']);
+
+loadGeoJSON('/data/hunan.json', ['长沙市']);
+
+loadGeoJSON('/data/jiangxi.json', ['南昌市']);
+
+loadGeoJSON('/data/jiangsu.json', ['南京市', '苏州市', '无锡市', '常州市', '徐州市']);
+
+loadGeoJSON('/data/zhejiang.json', ['杭州市', '舟山市', '宁波市', '绍兴市']);
+
+loadGeoJSON('/data/yunnan.json', ['大理白族自治州', '丽江市', '迪庆藏族自治州', '西双版纳傣族自治州'], {
+'迪庆藏族自治州': '迪庆 (香格里拉)'
+});
+
+loadGeoJSON('/data/guangdong.json', ['广州市', '深圳市', '珠海市', '佛山市', '汕头市', '潮州市', '揭阳市']);
+
+fetch('/data/us-states.json')
+.then(function(r) { return r.json(); })
+.then(function(data) {
+data.features = data.features.filter(function(f) {
+return f.properties.name !== 'California';
+});
+L.geoJSON(data, {
+style: defaultStyle,
+onEachFeature: function(f, layer) {
+layer.bindPopup('<b>' + f.properties.name + '</b>');
+bindEvents(layer, false);
+}
+}).addTo(map);
+});
+
+loadGeoJSON('/data/california.json', [
+'Los Angeles', 'Santa Barbara', 'San Luis Obispo', 'Monterey', 'San Francisco', 'Santa Clara'
+], {
+'Los Angeles': 'Los Angeles',
+'Santa Barbara': 'Santa Barbara',
+'San Luis Obispo': 'San Luis Obispo',
+'Monterey': 'Monterey',
+'San Francisco': 'San Francisco',
+'Santa Clara': 'Santa Clara (Silicon Valley)'
+});
+})();
+</script>
+<h2 id="destinations">Destinations</h2>
+<p><strong>USA</strong></p>
+<ul>
+<li>California - Los Angeles, Santa Barbara, San Luis Obispo, Monterey, San Francisco, Santa Clara</li>
+</ul>
+<p><strong>China</strong></p>
+<ul>
+<li>Beijing, Shanghai, Chongqing</li>
+<li>Sichuan - Chengdu, Guanghan, Dujiangyan</li>
+<li>Jiangsu - Nanjing, Suzhou, Wuxi, Changzhou, Xuzhou</li>
+<li>Zhejiang - Hangzhou, Ningbo, Shaoxing, Zhoushan</li>
+<li>Shandong - Linyi</li>
+<li>Guangdong - Guangzhou, Shenzhen, Zhuhai, Foshan, Chaoshan</li>
+<li>Guizhou - Guiyang, Anshun, Qiandongnan, Qianxinan, Qiannan</li>
+<li>Yunnan - Dali, Lijiang, Shangri-La, Xishuangbanna</li>
+<li>Hubei - Wuhan, Xiantao, Jingzhou</li>
+<li>Hunan - Changsha</li>
+<li>Henan - Zhengzhou, Kaifeng</li>
+<li>Jiangxi - Nanchang</li>
+<li>Shanxi - Taiyuan, Datong, Xinzhou, Pingyao</li>
+<li>Shaanxi - Xi&rsquo;an, Xianyang</li>
+<li>Gansu - Lanzhou</li>
+<li>Liaoning - Shenyang</li>
+<li>Inner Mongolia - Ordos, Baotou</li>
+<li>Xinjiang - Urumqi, Ili, Shihezi, Karamay, Bortala</li>
+<li>Tibet - Lhasa, Shigatse, Shannan</li>
+<li>Hainan - Haikou, Sanya, Danzhou, Wanning</li>
+<li>Hong Kong, Macau</li>
+</ul>
+
+  </article>
+</section>
+
+  
+
+    </div>
+
+    <footer class="footer">
+  <section class="container">
+    ©
+    
+      2019 -
+    
+    2026
+     Jie Xin 
+    ·
+    
+    Powered by <a href="https://gohugo.io/" target="_blank" rel="noopener">Hugo</a> & <a href="https://github.com/luizdepra/hugo-coder/" target="_blank" rel="noopener">Coder</a>.
+    
+  </section>
+</footer>
+
+  </main>
+
+  
+
+  
+  
+  <script src="/js/coder.min.6ae284be93d2d19dad1f02b0039508d9aab3180a12a06dcc71b0b0ef7825a317.js" integrity="sha256-auKEvpPS0Z2tHwKwA5UI2aqzGAoSoG3McbCw73gloxc="></script>
+  
+
+  
+
+  
+
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+</body>
+</html>

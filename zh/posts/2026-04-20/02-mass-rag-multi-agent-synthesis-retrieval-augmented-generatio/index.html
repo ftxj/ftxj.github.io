@@ -1,0 +1,365 @@
+<!DOCTYPE html>
+<html lang="zh">
+
+<head>
+  <title>
+  MASS-RAG: Multi-Agent Synthesis Retrieval-Augmented Generation · JXIN&#39;s Home
+</title>
+  <meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="color-scheme" content="light dark">
+
+
+
+
+<meta name="author" content="Jie Xin">
+<meta name="description" content="arXiv: 2604.18509 · PDF
+作者: Xingchen Xiao, Heyan Huang, Runheng Liu, Jincheng Xie
+主分类: cs.CL · 全部: cs.CL
+命中关键词: large language model, llm, agent, multi-agent, retrieval, rag, reasoning, inference
+
+TL;DR
+MASS-RAG 用多 agent 分工（摘要、抽取、推理）处理检索证据，再经合成阶段产出答案，在证据分散场景下稳定优于单次生成的 RAG baseline。
+核心观点
+
+单次生成在噪声、残缺或异质检索上下文下难以有效整合证据。
+将证据处理拆分为角色专门化的多个 agent，暴露多视角中间证据表示。
+通过专门的 synthesis 阶段汇合不同视角，提升跨文档证据整合能力。
+
+方法
+MASS-RAG 在检索阶段之后引入三类角色 agent：evidence summarization、evidence extraction、reasoning over retrieved documents。三者分别产生互补的中间证据视图，最后由一个 dedicated synthesis stage 将它们合并，生成最终答案。该流水线让模型可在答案生成前先对比并整合来自不同 agent 的证据，而不是在一次 prompt 中混合所有检索片段。
+实验
+摘要提到在 4 个 benchmark 上评测，并与 strong RAG baselines 对比。但未披露具体数据集名称、backbone LLM、检索器、指标细节或 agent 数量消融设置。">
+<meta name="keywords" content="blog,developer,personal">
+
+
+
+  <meta name="twitter:card" content="summary">
+  <meta name="twitter:title" content="MASS-RAG: Multi-Agent Synthesis Retrieval-Augmented Generation">
+  <meta name="twitter:description" content="arXiv: 2604.18509 · PDF
+作者: Xingchen Xiao, Heyan Huang, Runheng Liu, Jincheng Xie
+主分类: cs.CL · 全部: cs.CL
+命中关键词: large language model, llm, agent, multi-agent, retrieval, rag, reasoning, inference
+TL;DR MASS-RAG 用多 agent 分工（摘要、抽取、推理）处理检索证据，再经合成阶段产出答案，在证据分散场景下稳定优于单次生成的 RAG baseline。
+核心观点 单次生成在噪声、残缺或异质检索上下文下难以有效整合证据。 将证据处理拆分为角色专门化的多个 agent，暴露多视角中间证据表示。 通过专门的 synthesis 阶段汇合不同视角，提升跨文档证据整合能力。 方法 MASS-RAG 在检索阶段之后引入三类角色 agent：evidence summarization、evidence extraction、reasoning over retrieved documents。三者分别产生互补的中间证据视图，最后由一个 dedicated synthesis stage 将它们合并，生成最终答案。该流水线让模型可在答案生成前先对比并整合来自不同 agent 的证据，而不是在一次 prompt 中混合所有检索片段。
+实验 摘要提到在 4 个 benchmark 上评测，并与 strong RAG baselines 对比。但未披露具体数据集名称、backbone LLM、检索器、指标细节或 agent 数量消融设置。">
+
+<meta property="og:url" content="https://ftxj.github.io/zh/posts/2026-04-20/02-mass-rag-multi-agent-synthesis-retrieval-augmented-generatio/">
+  <meta property="og:site_name" content="JXIN&#39;s Home">
+  <meta property="og:title" content="MASS-RAG: Multi-Agent Synthesis Retrieval-Augmented Generation">
+  <meta property="og:description" content="arXiv: 2604.18509 · PDF
+作者: Xingchen Xiao, Heyan Huang, Runheng Liu, Jincheng Xie
+主分类: cs.CL · 全部: cs.CL
+命中关键词: large language model, llm, agent, multi-agent, retrieval, rag, reasoning, inference
+TL;DR MASS-RAG 用多 agent 分工（摘要、抽取、推理）处理检索证据，再经合成阶段产出答案，在证据分散场景下稳定优于单次生成的 RAG baseline。
+核心观点 单次生成在噪声、残缺或异质检索上下文下难以有效整合证据。 将证据处理拆分为角色专门化的多个 agent，暴露多视角中间证据表示。 通过专门的 synthesis 阶段汇合不同视角，提升跨文档证据整合能力。 方法 MASS-RAG 在检索阶段之后引入三类角色 agent：evidence summarization、evidence extraction、reasoning over retrieved documents。三者分别产生互补的中间证据视图，最后由一个 dedicated synthesis stage 将它们合并，生成最终答案。该流水线让模型可在答案生成前先对比并整合来自不同 agent 的证据，而不是在一次 prompt 中混合所有检索片段。
+实验 摘要提到在 4 个 benchmark 上评测，并与 strong RAG baselines 对比。但未披露具体数据集名称、backbone LLM、检索器、指标细节或 agent 数量消融设置。">
+  <meta property="og:locale" content="zh">
+  <meta property="og:type" content="article">
+    <meta property="article:section" content="posts">
+    <meta property="article:published_time" content="2026-04-27T05:24:02+00:00">
+    <meta property="article:modified_time" content="2026-04-27T05:24:02+00:00">
+
+
+
+
+<link rel="canonical" href="https://ftxj.github.io/zh/posts/2026-04-20/02-mass-rag-multi-agent-synthesis-retrieval-augmented-generatio/">
+
+
+<link rel="preload" href="/fonts/fa-brands-400.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="/fonts/fa-regular-400.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="/fonts/fa-solid-900.woff2" as="font" type="font/woff2" crossorigin>
+
+
+  
+  
+  <link rel="stylesheet" href="/css/coder.min.5e94c1acf7aa2066035cf2764ae3e4fe39db101d68b870f919966100d51fb861.css" integrity="sha256-XpTBrPeqIGYDXPJ2SuPk/jnbEB1ouHD5GZZhANUfuGE=" crossorigin="anonymous" media="screen" />
+
+
+
+
+
+
+  
+    
+    
+    <link rel="stylesheet" href="/css/coder-dark.min.a00e6364bacbc8266ad1cc81230774a1397198f8cfb7bcba29b7d6fcb54ce57f.css" integrity="sha256-oA5jZLrLyCZq0cyBIwd0oTlxmPjPt7y6KbfW/LVM5X8=" crossorigin="anonymous" media="screen" />
+  
+
+
+
+ 
+
+
+
+
+<link rel="icon" type="image/svg+xml" href="/images/favicon.svg" sizes="any">
+<link rel="icon" type="image/png" href="/images/favicon-32x32.png" sizes="32x32">
+<link rel="icon" type="image/png" href="/images/favicon-16x16.png" sizes="16x16">
+
+<link rel="apple-touch-icon" href="/images/apple-touch-icon.png">
+<link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon.png">
+
+<link rel="manifest" href="/site.webmanifest">
+<link rel="mask-icon" href="/images/safari-pinned-tab.svg" color="#5bbad5">
+
+
+
+
+
+
+<style>
+.content article ul {
+  list-style: disc !important;
+  padding-left: 2.5rem !important;
+}
+
+.content article ul li {
+  display: list-item !important;
+}
+</style>
+
+
+
+
+  
+</head>
+
+
+
+
+
+
+<body class="preload-transitions colorscheme-auto">
+  
+<div class="float-container">
+    <a id="dark-mode-toggle" class="colorscheme-toggle">
+        <i class="fa-solid fa-adjust fa-fw" aria-hidden="true"></i>
+    </a>
+</div>
+
+
+  <main class="wrapper">
+    <nav class="navigation">
+  <section class="container">
+    
+    <a class="navigation-title" href="https://ftxj.github.io/zh/">
+      JXIN&#39;s Home
+    </a>
+    
+    
+      <input type="checkbox" id="menu-toggle" />
+      <label class="menu-button float-right" for="menu-toggle">
+        <i class="fa-solid fa-bars fa-fw" aria-hidden="true"></i>
+      </label>
+      <ul class="navigation-list">
+        
+          
+            <li class="navigation-item">
+              <a class="navigation-link " href="/zh/about/">关于</a>
+            </li>
+          
+            <li class="navigation-item">
+              <a class="navigation-link " href="/zh/travel/">旅行</a>
+            </li>
+          
+            <li class="navigation-item">
+              <a class="navigation-link " href="/zh/posts/">博客</a>
+            </li>
+          
+            <li class="navigation-item">
+              <a class="navigation-link " href="https://ftxj.github.io/cv/cv_zh.pdf">简历</a>
+            </li>
+          
+        
+        
+          
+          
+          
+            
+              
+                <li class="navigation-item menu-separator">
+                  <span>|</span>
+                </li>
+                
+              
+              <li class="navigation-item">
+                <a href="/posts/2026-04-20/02-mass-rag-multi-agent-synthesis-retrieval-augmented-generatio/">EN</a>
+              </li>
+            
+          
+        
+      </ul>
+    
+  </section>
+</nav>
+
+
+    <div class="content">
+      
+  <section class="container post">
+    <article>
+      <header>
+        <div class="post-title">
+          <h1 class="title">
+            <a class="title-link" href="https://ftxj.github.io/zh/posts/2026-04-20/02-mass-rag-multi-agent-synthesis-retrieval-augmented-generatio/">
+              MASS-RAG: Multi-Agent Synthesis Retrieval-Augmented Generation
+            </a>
+          </h1>
+        </div>
+        <div class="post-meta">
+          <div class="date">
+            <span class="posted-on">
+              <i class="fa-solid fa-calendar" aria-hidden="true"></i>
+              <time datetime="2026-04-27T05:24:02Z">
+                四月 27, 2026
+              </time>
+            </span>
+            <span class="reading-time">
+              <i class="fa-solid fa-clock" aria-hidden="true"></i>
+              2-minute read
+            </span>
+          </div>
+          
+          <div class="categories">
+  <i class="fa-solid fa-folder" aria-hidden="true"></i>
+    <a href="/zh/categories/paper-digest/">Paper-Digest</a>
+      <span class="separator">•</span>
+    <a href="/zh/categories/2026-04-20/">2026-04-20</a></div>
+
+          
+        </div>
+      </header>
+
+      
+
+
+      <div class="post-content">
+        
+        <p><strong>arXiv:</strong> <a href="https://arxiv.org/abs/2604.18509v2">2604.18509</a> · <a href="https://arxiv.org/pdf/2604.18509v2">PDF</a></p>
+<p><strong>作者:</strong> Xingchen Xiao, Heyan Huang, Runheng Liu, Jincheng Xie</p>
+<p><strong>主分类:</strong> <code>cs.CL</code> · 全部: cs.CL</p>
+<p><strong>命中关键词:</strong> large language model, llm, agent, multi-agent, retrieval, rag, reasoning, inference</p>
+<hr>
+<h2 id="tldr">TL;DR</h2>
+<p>MASS-RAG 用多 agent 分工（摘要、抽取、推理）处理检索证据，再经合成阶段产出答案，在证据分散场景下稳定优于单次生成的 RAG baseline。</p>
+<h2 id="核心观点">核心观点</h2>
+<ul>
+<li>单次生成在噪声、残缺或异质检索上下文下难以有效整合证据。</li>
+<li>将证据处理拆分为角色专门化的多个 agent，暴露多视角中间证据表示。</li>
+<li>通过专门的 synthesis 阶段汇合不同视角，提升跨文档证据整合能力。</li>
+</ul>
+<h2 id="方法">方法</h2>
+<p>MASS-RAG 在检索阶段之后引入三类角色 agent：evidence summarization、evidence extraction、reasoning over retrieved documents。三者分别产生互补的中间证据视图，最后由一个 dedicated synthesis stage 将它们合并，生成最终答案。该流水线让模型可在答案生成前先对比并整合来自不同 agent 的证据，而不是在一次 prompt 中混合所有检索片段。</p>
+<h2 id="实验">实验</h2>
+<p>摘要提到在 4 个 benchmark 上评测，并与 strong RAG baselines 对比。但未披露具体数据集名称、backbone LLM、检索器、指标细节或 agent 数量消融设置。</p>
+<h2 id="结果">结果</h2>
+<p>论文声称 MASS-RAG 在四个 benchmark 上&quot;consistently&quot;优于强 RAG baseline，尤其在相关证据分散于多个检索上下文时增益最明显。摘要未给出具体数值，因此量化幅度与统计显著性无法从摘要判断。</p>
+<h2 id="为什么重要">为什么重要</h2>
+<p>对 RAG 系统设计者来说，它提供了一个可插拔的&quot;多 agent 证据处理层&quot;范式：把长且杂的检索结果拆给角色化 agent 处理，再 synthesis。这和当前把 RAG 上下文一次性塞进 LLM 的主流做法形成对比，更贴近 agentic LLM 基础设施的演进方向。</p>
+<h2 id="与已有工作的关系">与已有工作的关系</h2>
+<p>处在 RAG（Lewis et al. 的 RAG、Self-RAG、RAG-Fusion）与 multi-agent LLM 框架（Debate、Society of Mind、AutoGen、LLM-Blender）的交汇点；思路上接近把 Chain-of-Agents、ReAct 式分工机制引入证据整合阶段。</p>
+<h2 id="尚未回答的问题">尚未回答的问题</h2>
+<ul>
+<li>具体 benchmark、backbone、检索器与数值增益是多少？</li>
+<li>多 agent 带来的推理成本与 latency 开销是否可接受？</li>
+<li>各角色 agent 的必要性和消融贡献？</li>
+<li>在对抗性或高度冲突证据下 synthesis 是否仍稳健？</li>
+<li>是否可扩展到超长上下文或 tool-use / agentic RAG 场景？</li>
+</ul>
+<hr>
+<h2 id="论文图表">论文图表</h2>
+<p><strong>图 1:</strong> Figure 1 (extracted from PDF)</p>
+<p><img alt="图 1" src="/images/papers/2604.18509/fig1.jpg"></p>
+<p><strong>图 2:</strong> Figure 2 (extracted from PDF)</p>
+<p><img alt="图 2" src="/images/papers/2604.18509/fig2.jpg"></p>
+<hr>
+<h2 id="原始摘要">原始摘要</h2>
+<p>Large language models (LLMs) are widely used in retrieval-augmented generation (RAG) to incorporate external knowledge at inference time. However, when retrieved contexts are noisy, incomplete, or heterogeneous, a single generation process often struggles to reconcile evidence effectively. We propose \textbf{MASS-RAG}, a multi-agent synthesis approach to retrieval-augmented generation that structures evidence processing into multiple role-specialized agents. MASS-RAG applies distinct agents for evidence summarization, evidence extraction, and reasoning over retrieved documents, and combines their outputs through a dedicated synthesis stage to produce the final answer. This design exposes multiple intermediate evidence views, allowing the model to compare and integrate complementary information before answer generation. Experiments on four benchmarks show that MASS-RAG consistently improves performance over strong RAG baselines, particularly in settings where relevant evidence is distributed across retrieved contexts.</p>
+
+      </div>
+
+
+      <footer>
+        
+
+
+        
+        
+        
+        
+        
+        
+        
+      </footer>
+    </article>
+
+    
+  </section>
+
+    </div>
+
+    <footer class="footer">
+  <section class="container">
+    ©
+    
+      2019 -
+    
+    2026
+     Jie Xin 
+    ·
+    
+    Powered by <a href="https://gohugo.io/" target="_blank" rel="noopener">Hugo</a> & <a href="https://github.com/luizdepra/hugo-coder/" target="_blank" rel="noopener">Coder</a>.
+    
+  </section>
+</footer>
+
+  </main>
+
+  
+
+  
+  
+  <script src="/js/coder.min.6ae284be93d2d19dad1f02b0039508d9aab3180a12a06dcc71b0b0ef7825a317.js" integrity="sha256-auKEvpPS0Z2tHwKwA5UI2aqzGAoSoG3McbCw73gloxc="></script>
+  
+
+  
+
+  
+
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+</body>
+</html>

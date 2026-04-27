@@ -1,0 +1,428 @@
+<!DOCTYPE html>
+<html lang="zh">
+
+<head>
+  <title>
+  Memanto: Typed Semantic Memory with Information-Theoretic Retrieval for Long-Horizon Agents · JXIN&#39;s Home
+</title>
+  <meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="color-scheme" content="light dark">
+
+
+
+
+<meta name="author" content="Jie Xin">
+<meta name="description" content="arXiv: 2604.22085 · PDF
+作者: Seyed Moein Abtahi, Rasa Rahnema, Hetkumar Patel, Neel Patel, Majid Fekri, Tara Khani
+主分类: cs.AI · 全部: cs.AI
+命中关键词: large language model, agent, agentic, retrieval, inference, latency
+
+TL;DR
+Memanto 用类型化语义 memory schema &#43; 信息论检索引擎，摒弃知识图谱，在 LongMemEval/LoCoMo 上达到 SOTA，单次检索、零 ingestion 延迟。
+核心观点
+
+挑战&quot;agent memory 必须依赖知识图谱&quot;的假设，主张类型化 schema &#43; 语义检索已足够。
+提出 Memanto：13 类预定义 memory 类别、自动冲突消解、时间版本化。
+基于 Moorcheh Information-Theoretic Search：无索引、亚 90ms 延迟、无 ingestion 开销。
+单次 retrieval query 即可超越 hybrid graph / vector 系统。
+
+方法
+
+Typed Semantic Schema：13 个预定义 memory 类别，替代开放式实体抽取与 graph schema。
+Conflict Resolution：自动处理冲突记录，保持一致性。
+Temporal Versioning：为 memory 条目维护时间版本。
+Moorcheh 检索引擎：信息论驱动的 no-indexing 语义数据库，确定性检索，sub-90ms 延迟，消除写入延迟。
+整体流程：写入直接归类，不做 LLM 实体抽取；检索走单次 query。
+
+实验
+
+Benchmark：LongMemEval、LoCoMo（长程 / 多会话 memory 评测）。
+基线：hybrid semantic graph 系统、vector-based memory 系统（具体名称摘要未列）。
+指标：准确率；另做 5 阶段渐进式 ablation 量化各组件贡献。
+
+结果
+
+LongMemEval 89.8%，LoCoMo 87.1%，均为 SOTA，超过所有评估的 graph/vector 基线。
+仅需单次 retrieval query，无 ingestion 成本，延迟 &lt;90ms。
+Ablation 显示 typed schema、冲突消解、Moorcheh 检索均有贡献（具体数字摘要未给）。
+
+为什么重要
+
+对 agent 基础设施：大幅降低长程 memory 的运维复杂度与延迟，去掉 LLM 实体抽取和 graph 维护这两个瓶颈。
+为 multi-session autonomous agent 提供可规模化部署的 memory 层，适合生产环境。
+重新定义&quot;高保真 agent memory&quot;的成本上界：不必上知识图谱。
+
+与已有工作的关系
+
+对标 hybrid semantic graph memory（如 MemGPT、Zep、GraphRAG 式方案）与 vector-based memory。
+延续 LongMemEval、LoCoMo 的长程 memory 评测脉络。
+Moorcheh 引擎属于信息论检索一线，与传统 ANN/向量索引（FAISS、HNSW）形成对比。
+
+尚未回答的问题
+
+13 类 schema 的普适性：跨领域（编码、医疗、法律）是否需要扩展或自定义？
+Moorcheh 的可复现性与开源情况，以及在十亿级条目下的可扩展性。
+冲突消解规则细节，以及错误消解导致的下游 agent 行为风险。
+与具身 / 工具调用 agent 的端到端集成效果尚未评测。
+对抗性写入（噪声、恶意 memory）下的鲁棒性未讨论。
+
+
+论文图表
+图 1: Page 2 (rendered)">
+<meta name="keywords" content="blog,developer,personal">
+
+
+
+  <meta name="twitter:card" content="summary">
+  <meta name="twitter:title" content="Memanto: Typed Semantic Memory with Information-Theoretic Retrieval for Long-Horizon Agents">
+  <meta name="twitter:description" content="arXiv: 2604.22085 · PDF
+作者: Seyed Moein Abtahi, Rasa Rahnema, Hetkumar Patel, Neel Patel, Majid Fekri, Tara Khani
+主分类: cs.AI · 全部: cs.AI
+命中关键词: large language model, agent, agentic, retrieval, inference, latency
+TL;DR Memanto 用类型化语义 memory schema &#43; 信息论检索引擎，摒弃知识图谱，在 LongMemEval/LoCoMo 上达到 SOTA，单次检索、零 ingestion 延迟。
+核心观点 挑战&#34;agent memory 必须依赖知识图谱&#34;的假设，主张类型化 schema &#43; 语义检索已足够。 提出 Memanto：13 类预定义 memory 类别、自动冲突消解、时间版本化。 基于 Moorcheh Information-Theoretic Search：无索引、亚 90ms 延迟、无 ingestion 开销。 单次 retrieval query 即可超越 hybrid graph / vector 系统。 方法 Typed Semantic Schema：13 个预定义 memory 类别，替代开放式实体抽取与 graph schema。 Conflict Resolution：自动处理冲突记录，保持一致性。 Temporal Versioning：为 memory 条目维护时间版本。 Moorcheh 检索引擎：信息论驱动的 no-indexing 语义数据库，确定性检索，sub-90ms 延迟，消除写入延迟。 整体流程：写入直接归类，不做 LLM 实体抽取；检索走单次 query。 实验 Benchmark：LongMemEval、LoCoMo（长程 / 多会话 memory 评测）。 基线：hybrid semantic graph 系统、vector-based memory 系统（具体名称摘要未列）。 指标：准确率；另做 5 阶段渐进式 ablation 量化各组件贡献。 结果 LongMemEval 89.8%，LoCoMo 87.1%，均为 SOTA，超过所有评估的 graph/vector 基线。 仅需单次 retrieval query，无 ingestion 成本，延迟 &lt;90ms。 Ablation 显示 typed schema、冲突消解、Moorcheh 检索均有贡献（具体数字摘要未给）。 为什么重要 对 agent 基础设施：大幅降低长程 memory 的运维复杂度与延迟，去掉 LLM 实体抽取和 graph 维护这两个瓶颈。 为 multi-session autonomous agent 提供可规模化部署的 memory 层，适合生产环境。 重新定义&#34;高保真 agent memory&#34;的成本上界：不必上知识图谱。 与已有工作的关系 对标 hybrid semantic graph memory（如 MemGPT、Zep、GraphRAG 式方案）与 vector-based memory。 延续 LongMemEval、LoCoMo 的长程 memory 评测脉络。 Moorcheh 引擎属于信息论检索一线，与传统 ANN/向量索引（FAISS、HNSW）形成对比。 尚未回答的问题 13 类 schema 的普适性：跨领域（编码、医疗、法律）是否需要扩展或自定义？ Moorcheh 的可复现性与开源情况，以及在十亿级条目下的可扩展性。 冲突消解规则细节，以及错误消解导致的下游 agent 行为风险。 与具身 / 工具调用 agent 的端到端集成效果尚未评测。 对抗性写入（噪声、恶意 memory）下的鲁棒性未讨论。 论文图表 图 1: Page 2 (rendered)">
+
+<meta property="og:url" content="https://ftxj.github.io/zh/posts/2026-04-23/03-memanto-typed-semantic-memory-with-information-theoretic-ret/">
+  <meta property="og:site_name" content="JXIN&#39;s Home">
+  <meta property="og:title" content="Memanto: Typed Semantic Memory with Information-Theoretic Retrieval for Long-Horizon Agents">
+  <meta property="og:description" content="arXiv: 2604.22085 · PDF
+作者: Seyed Moein Abtahi, Rasa Rahnema, Hetkumar Patel, Neel Patel, Majid Fekri, Tara Khani
+主分类: cs.AI · 全部: cs.AI
+命中关键词: large language model, agent, agentic, retrieval, inference, latency
+TL;DR Memanto 用类型化语义 memory schema &#43; 信息论检索引擎，摒弃知识图谱，在 LongMemEval/LoCoMo 上达到 SOTA，单次检索、零 ingestion 延迟。
+核心观点 挑战&#34;agent memory 必须依赖知识图谱&#34;的假设，主张类型化 schema &#43; 语义检索已足够。 提出 Memanto：13 类预定义 memory 类别、自动冲突消解、时间版本化。 基于 Moorcheh Information-Theoretic Search：无索引、亚 90ms 延迟、无 ingestion 开销。 单次 retrieval query 即可超越 hybrid graph / vector 系统。 方法 Typed Semantic Schema：13 个预定义 memory 类别，替代开放式实体抽取与 graph schema。 Conflict Resolution：自动处理冲突记录，保持一致性。 Temporal Versioning：为 memory 条目维护时间版本。 Moorcheh 检索引擎：信息论驱动的 no-indexing 语义数据库，确定性检索，sub-90ms 延迟，消除写入延迟。 整体流程：写入直接归类，不做 LLM 实体抽取；检索走单次 query。 实验 Benchmark：LongMemEval、LoCoMo（长程 / 多会话 memory 评测）。 基线：hybrid semantic graph 系统、vector-based memory 系统（具体名称摘要未列）。 指标：准确率；另做 5 阶段渐进式 ablation 量化各组件贡献。 结果 LongMemEval 89.8%，LoCoMo 87.1%，均为 SOTA，超过所有评估的 graph/vector 基线。 仅需单次 retrieval query，无 ingestion 成本，延迟 &lt;90ms。 Ablation 显示 typed schema、冲突消解、Moorcheh 检索均有贡献（具体数字摘要未给）。 为什么重要 对 agent 基础设施：大幅降低长程 memory 的运维复杂度与延迟，去掉 LLM 实体抽取和 graph 维护这两个瓶颈。 为 multi-session autonomous agent 提供可规模化部署的 memory 层，适合生产环境。 重新定义&#34;高保真 agent memory&#34;的成本上界：不必上知识图谱。 与已有工作的关系 对标 hybrid semantic graph memory（如 MemGPT、Zep、GraphRAG 式方案）与 vector-based memory。 延续 LongMemEval、LoCoMo 的长程 memory 评测脉络。 Moorcheh 引擎属于信息论检索一线，与传统 ANN/向量索引（FAISS、HNSW）形成对比。 尚未回答的问题 13 类 schema 的普适性：跨领域（编码、医疗、法律）是否需要扩展或自定义？ Moorcheh 的可复现性与开源情况，以及在十亿级条目下的可扩展性。 冲突消解规则细节，以及错误消解导致的下游 agent 行为风险。 与具身 / 工具调用 agent 的端到端集成效果尚未评测。 对抗性写入（噪声、恶意 memory）下的鲁棒性未讨论。 论文图表 图 1: Page 2 (rendered)">
+  <meta property="og:locale" content="zh">
+  <meta property="og:type" content="article">
+    <meta property="article:section" content="posts">
+    <meta property="article:published_time" content="2026-04-27T05:07:09+00:00">
+    <meta property="article:modified_time" content="2026-04-27T05:07:09+00:00">
+
+
+
+
+<link rel="canonical" href="https://ftxj.github.io/zh/posts/2026-04-23/03-memanto-typed-semantic-memory-with-information-theoretic-ret/">
+
+
+<link rel="preload" href="/fonts/fa-brands-400.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="/fonts/fa-regular-400.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="/fonts/fa-solid-900.woff2" as="font" type="font/woff2" crossorigin>
+
+
+  
+  
+  <link rel="stylesheet" href="/css/coder.min.5e94c1acf7aa2066035cf2764ae3e4fe39db101d68b870f919966100d51fb861.css" integrity="sha256-XpTBrPeqIGYDXPJ2SuPk/jnbEB1ouHD5GZZhANUfuGE=" crossorigin="anonymous" media="screen" />
+
+
+
+
+
+
+  
+    
+    
+    <link rel="stylesheet" href="/css/coder-dark.min.a00e6364bacbc8266ad1cc81230774a1397198f8cfb7bcba29b7d6fcb54ce57f.css" integrity="sha256-oA5jZLrLyCZq0cyBIwd0oTlxmPjPt7y6KbfW/LVM5X8=" crossorigin="anonymous" media="screen" />
+  
+
+
+
+ 
+
+
+
+
+<link rel="icon" type="image/svg+xml" href="/images/favicon.svg" sizes="any">
+<link rel="icon" type="image/png" href="/images/favicon-32x32.png" sizes="32x32">
+<link rel="icon" type="image/png" href="/images/favicon-16x16.png" sizes="16x16">
+
+<link rel="apple-touch-icon" href="/images/apple-touch-icon.png">
+<link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon.png">
+
+<link rel="manifest" href="/site.webmanifest">
+<link rel="mask-icon" href="/images/safari-pinned-tab.svg" color="#5bbad5">
+
+
+
+
+
+
+<style>
+.content article ul {
+  list-style: disc !important;
+  padding-left: 2.5rem !important;
+}
+
+.content article ul li {
+  display: list-item !important;
+}
+</style>
+
+
+
+
+  
+</head>
+
+
+
+
+
+
+<body class="preload-transitions colorscheme-auto">
+  
+<div class="float-container">
+    <a id="dark-mode-toggle" class="colorscheme-toggle">
+        <i class="fa-solid fa-adjust fa-fw" aria-hidden="true"></i>
+    </a>
+</div>
+
+
+  <main class="wrapper">
+    <nav class="navigation">
+  <section class="container">
+    
+    <a class="navigation-title" href="https://ftxj.github.io/zh/">
+      JXIN&#39;s Home
+    </a>
+    
+    
+      <input type="checkbox" id="menu-toggle" />
+      <label class="menu-button float-right" for="menu-toggle">
+        <i class="fa-solid fa-bars fa-fw" aria-hidden="true"></i>
+      </label>
+      <ul class="navigation-list">
+        
+          
+            <li class="navigation-item">
+              <a class="navigation-link " href="/zh/about/">关于</a>
+            </li>
+          
+            <li class="navigation-item">
+              <a class="navigation-link " href="/zh/travel/">旅行</a>
+            </li>
+          
+            <li class="navigation-item">
+              <a class="navigation-link " href="/zh/posts/">博客</a>
+            </li>
+          
+            <li class="navigation-item">
+              <a class="navigation-link " href="https://ftxj.github.io/cv/cv_zh.pdf">简历</a>
+            </li>
+          
+        
+        
+          
+          
+          
+            
+              
+                <li class="navigation-item menu-separator">
+                  <span>|</span>
+                </li>
+                
+              
+              <li class="navigation-item">
+                <a href="/posts/2026-04-23/03-memanto-typed-semantic-memory-with-information-theoretic-ret/">EN</a>
+              </li>
+            
+          
+        
+      </ul>
+    
+  </section>
+</nav>
+
+
+    <div class="content">
+      
+  <section class="container post">
+    <article>
+      <header>
+        <div class="post-title">
+          <h1 class="title">
+            <a class="title-link" href="https://ftxj.github.io/zh/posts/2026-04-23/03-memanto-typed-semantic-memory-with-information-theoretic-ret/">
+              Memanto: Typed Semantic Memory with Information-Theoretic Retrieval for Long-Horizon Agents
+            </a>
+          </h1>
+        </div>
+        <div class="post-meta">
+          <div class="date">
+            <span class="posted-on">
+              <i class="fa-solid fa-calendar" aria-hidden="true"></i>
+              <time datetime="2026-04-27T05:07:09Z">
+                四月 27, 2026
+              </time>
+            </span>
+            <span class="reading-time">
+              <i class="fa-solid fa-clock" aria-hidden="true"></i>
+              3-minute read
+            </span>
+          </div>
+          
+          <div class="categories">
+  <i class="fa-solid fa-folder" aria-hidden="true"></i>
+    <a href="/zh/categories/paper-digest/">Paper-Digest</a>
+      <span class="separator">•</span>
+    <a href="/zh/categories/2026-04-23/">2026-04-23</a></div>
+
+          
+        </div>
+      </header>
+
+      
+
+
+      <div class="post-content">
+        
+        <p><strong>arXiv:</strong> <a href="https://arxiv.org/abs/2604.22085v1">2604.22085</a> · <a href="https://arxiv.org/pdf/2604.22085v1">PDF</a></p>
+<p><strong>作者:</strong> Seyed Moein Abtahi, Rasa Rahnema, Hetkumar Patel, Neel Patel, Majid Fekri, Tara Khani</p>
+<p><strong>主分类:</strong> <code>cs.AI</code> · 全部: cs.AI</p>
+<p><strong>命中关键词:</strong> large language model, agent, agentic, retrieval, inference, latency</p>
+<hr>
+<h2 id="tldr">TL;DR</h2>
+<p>Memanto 用类型化语义 memory schema + 信息论检索引擎，摒弃知识图谱，在 LongMemEval/LoCoMo 上达到 SOTA，单次检索、零 ingestion 延迟。</p>
+<h2 id="核心观点">核心观点</h2>
+<ul>
+<li>挑战&quot;agent memory 必须依赖知识图谱&quot;的假设，主张类型化 schema + 语义检索已足够。</li>
+<li>提出 Memanto：13 类预定义 memory 类别、自动冲突消解、时间版本化。</li>
+<li>基于 Moorcheh Information-Theoretic Search：无索引、亚 90ms 延迟、无 ingestion 开销。</li>
+<li>单次 retrieval query 即可超越 hybrid graph / vector 系统。</li>
+</ul>
+<h2 id="方法">方法</h2>
+<ul>
+<li><strong>Typed Semantic Schema</strong>：13 个预定义 memory 类别，替代开放式实体抽取与 graph schema。</li>
+<li><strong>Conflict Resolution</strong>：自动处理冲突记录，保持一致性。</li>
+<li><strong>Temporal Versioning</strong>：为 memory 条目维护时间版本。</li>
+<li><strong>Moorcheh 检索引擎</strong>：信息论驱动的 no-indexing 语义数据库，确定性检索，sub-90ms 延迟，消除写入延迟。</li>
+<li>整体流程：写入直接归类，不做 LLM 实体抽取；检索走单次 query。</li>
+</ul>
+<h2 id="实验">实验</h2>
+<ul>
+<li>Benchmark：LongMemEval、LoCoMo（长程 / 多会话 memory 评测）。</li>
+<li>基线：hybrid semantic graph 系统、vector-based memory 系统（具体名称摘要未列）。</li>
+<li>指标：准确率；另做 5 阶段渐进式 ablation 量化各组件贡献。</li>
+</ul>
+<h2 id="结果">结果</h2>
+<ul>
+<li>LongMemEval 89.8%，LoCoMo 87.1%，均为 SOTA，超过所有评估的 graph/vector 基线。</li>
+<li>仅需单次 retrieval query，无 ingestion 成本，延迟 &lt;90ms。</li>
+<li>Ablation 显示 typed schema、冲突消解、Moorcheh 检索均有贡献（具体数字摘要未给）。</li>
+</ul>
+<h2 id="为什么重要">为什么重要</h2>
+<ul>
+<li>对 agent 基础设施：大幅降低长程 memory 的运维复杂度与延迟，去掉 LLM 实体抽取和 graph 维护这两个瓶颈。</li>
+<li>为 multi-session autonomous agent 提供可规模化部署的 memory 层，适合生产环境。</li>
+<li>重新定义&quot;高保真 agent memory&quot;的成本上界：不必上知识图谱。</li>
+</ul>
+<h2 id="与已有工作的关系">与已有工作的关系</h2>
+<ul>
+<li>对标 hybrid semantic graph memory（如 MemGPT、Zep、GraphRAG 式方案）与 vector-based memory。</li>
+<li>延续 LongMemEval、LoCoMo 的长程 memory 评测脉络。</li>
+<li>Moorcheh 引擎属于信息论检索一线，与传统 ANN/向量索引（FAISS、HNSW）形成对比。</li>
+</ul>
+<h2 id="尚未回答的问题">尚未回答的问题</h2>
+<ul>
+<li>13 类 schema 的普适性：跨领域（编码、医疗、法律）是否需要扩展或自定义？</li>
+<li>Moorcheh 的可复现性与开源情况，以及在十亿级条目下的可扩展性。</li>
+<li>冲突消解规则细节，以及错误消解导致的下游 agent 行为风险。</li>
+<li>与具身 / 工具调用 agent 的端到端集成效果尚未评测。</li>
+<li>对抗性写入（噪声、恶意 memory）下的鲁棒性未讨论。</li>
+</ul>
+<hr>
+<h2 id="论文图表">论文图表</h2>
+<p><strong>图 1:</strong> Page 2 (rendered)</p>
+<p><img alt="图 1" src="/images/papers/2604.22085/page1.png"></p>
+<p><strong>图 2:</strong> Page 3 (rendered)</p>
+<p><img alt="图 2" src="/images/papers/2604.22085/page2.png"></p>
+<p><strong>图 3:</strong> Page 4 (rendered)</p>
+<p><img alt="图 3" src="/images/papers/2604.22085/page3.png"></p>
+<hr>
+<h2 id="原始摘要">原始摘要</h2>
+<p>The transition from stateless language model inference to persistent, multi session autonomous agents has revealed memory to be a primary architectural bottleneck in the deployment of production grade agentic systems. Existing methodologies largely depend on hybrid semantic graph architectures, which impose substantial computational overhead during both ingestion and retrieval. These systems typically require large language model mediated entity extraction, explicit graph schema maintenance, and multi query retrieval pipelines. This paper introduces Memanto, a universal memory layer for agentic artificial intelligence that challenges the prevailing assumption that knowledge graph complexity is necessary to achieve high fidelity agent memory. Memanto integrates a typed semantic memory schema comprising thirteen predefined memory categories, an automated conflict resolution mechanism, and temporal versioning. These components are enabled by Moorcheh&rsquo;s Information Theoretic Search engine, a no indexing semantic database that provides deterministic retrieval within sub ninety millisecond latency while eliminating ingestion delay. Through systematic benchmarking on the LongMemEval and LoCoMo evaluation suites, Memanto achieves state of the art accuracy scores of 89.8 percent and 87.1 percent respectively. These results surpass all evaluated hybrid graph and vector based systems while requiring only a single retrieval query, incurring no ingestion cost, and maintaining substantially lower operational complexity. A five stage progressive ablation study is presented to quantify the contribution of each architectural component, followed by a discussion of the implications for scalable deployment of agentic memory systems.</p>
+
+      </div>
+
+
+      <footer>
+        
+
+
+        
+        
+        
+        
+        
+        
+        
+      </footer>
+    </article>
+
+    
+  </section>
+
+    </div>
+
+    <footer class="footer">
+  <section class="container">
+    ©
+    
+      2019 -
+    
+    2026
+     Jie Xin 
+    ·
+    
+    Powered by <a href="https://gohugo.io/" target="_blank" rel="noopener">Hugo</a> & <a href="https://github.com/luizdepra/hugo-coder/" target="_blank" rel="noopener">Coder</a>.
+    
+  </section>
+</footer>
+
+  </main>
+
+  
+
+  
+  
+  <script src="/js/coder.min.6ae284be93d2d19dad1f02b0039508d9aab3180a12a06dcc71b0b0ef7825a317.js" integrity="sha256-auKEvpPS0Z2tHwKwA5UI2aqzGAoSoG3McbCw73gloxc="></script>
+  
+
+  
+
+  
+
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+</body>
+</html>

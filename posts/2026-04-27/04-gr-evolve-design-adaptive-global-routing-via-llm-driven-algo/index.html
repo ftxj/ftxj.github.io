@@ -1,0 +1,367 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <title>
+  GR-Evolve: Design-Adaptive Global Routing via LLM-Driven Algorithm Evolution · JXIN&#39;s Home
+</title>
+  <meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="color-scheme" content="light dark">
+
+
+
+
+<meta name="author" content="Jie Xin">
+<meta name="description" content="arXiv: 2604.22234 · PDF
+Authors: Taizun Jafri, Vidya A. Chhabria
+Affiliations: Arizona State University
+Primary category: cs.AR · all: cs.AR
+Matched keywords: large language model, llm, agent, agentic, rag
+
+TL;DR
+GR-Evolve is a code-evolution framework that uses an agentic LLM to iteratively modify global routing source code based on QoR feedback, producing design-adaptive EDA tooling. It achieves up to 8.72% post-detailed-routing wirelength reduction over baseline routers across seven benchmarks.
+Key Ideas
+
+Introduces design-adaptive EDA tooling: internal algorithms specialize to each design rather than relying on fixed heuristics or hyperparameter tuning.
+Uses an agentic LLM to evolve global router source code iteratively, guided by QoR feedback.
+Provides the LLM with persistent contextual knowledge of open-source global routers plus an integrated QoR evaluation toolchain in OpenROAD.
+Demonstrates that LLM-driven code evolution can outperform static algorithm implementations.
+
+Approach
+GR-Evolve frames global routing improvement as a code-evolution loop. An agentic LLM is given persistent context about open-source global routers and accumulated QoR history from prior iterations, then proposes source-code modifications. Each candidate is compiled and evaluated inside the OpenROAD infrastructure; the resulting QoR metrics feed back into the next iteration, driving design-specific algorithm specialization.">
+<meta name="keywords" content="blog,developer,personal">
+
+
+
+  <meta name="twitter:card" content="summary">
+  <meta name="twitter:title" content="GR-Evolve: Design-Adaptive Global Routing via LLM-Driven Algorithm Evolution">
+  <meta name="twitter:description" content="arXiv: 2604.22234 · PDF
+Authors: Taizun Jafri, Vidya A. Chhabria
+Affiliations: Arizona State University
+Primary category: cs.AR · all: cs.AR
+Matched keywords: large language model, llm, agent, agentic, rag
+TL;DR GR-Evolve is a code-evolution framework that uses an agentic LLM to iteratively modify global routing source code based on QoR feedback, producing design-adaptive EDA tooling. It achieves up to 8.72% post-detailed-routing wirelength reduction over baseline routers across seven benchmarks.
+Key Ideas Introduces design-adaptive EDA tooling: internal algorithms specialize to each design rather than relying on fixed heuristics or hyperparameter tuning. Uses an agentic LLM to evolve global router source code iteratively, guided by QoR feedback. Provides the LLM with persistent contextual knowledge of open-source global routers plus an integrated QoR evaluation toolchain in OpenROAD. Demonstrates that LLM-driven code evolution can outperform static algorithm implementations. Approach GR-Evolve frames global routing improvement as a code-evolution loop. An agentic LLM is given persistent context about open-source global routers and accumulated QoR history from prior iterations, then proposes source-code modifications. Each candidate is compiled and evaluated inside the OpenROAD infrastructure; the resulting QoR metrics feed back into the next iteration, driving design-specific algorithm specialization.">
+
+<meta property="og:url" content="https://ftxj.github.io/posts/2026-04-27/04-gr-evolve-design-adaptive-global-routing-via-llm-driven-algo/">
+  <meta property="og:site_name" content="JXIN&#39;s Home">
+  <meta property="og:title" content="GR-Evolve: Design-Adaptive Global Routing via LLM-Driven Algorithm Evolution">
+  <meta property="og:description" content="arXiv: 2604.22234 · PDF
+Authors: Taizun Jafri, Vidya A. Chhabria
+Affiliations: Arizona State University
+Primary category: cs.AR · all: cs.AR
+Matched keywords: large language model, llm, agent, agentic, rag
+TL;DR GR-Evolve is a code-evolution framework that uses an agentic LLM to iteratively modify global routing source code based on QoR feedback, producing design-adaptive EDA tooling. It achieves up to 8.72% post-detailed-routing wirelength reduction over baseline routers across seven benchmarks.
+Key Ideas Introduces design-adaptive EDA tooling: internal algorithms specialize to each design rather than relying on fixed heuristics or hyperparameter tuning. Uses an agentic LLM to evolve global router source code iteratively, guided by QoR feedback. Provides the LLM with persistent contextual knowledge of open-source global routers plus an integrated QoR evaluation toolchain in OpenROAD. Demonstrates that LLM-driven code evolution can outperform static algorithm implementations. Approach GR-Evolve frames global routing improvement as a code-evolution loop. An agentic LLM is given persistent context about open-source global routers and accumulated QoR history from prior iterations, then proposes source-code modifications. Each candidate is compiled and evaluated inside the OpenROAD infrastructure; the resulting QoR metrics feed back into the next iteration, driving design-specific algorithm specialization.">
+  <meta property="og:locale" content="en">
+  <meta property="og:type" content="article">
+    <meta property="article:section" content="posts">
+    <meta property="article:published_time" content="2026-04-27T10:17:18+00:00">
+    <meta property="article:modified_time" content="2026-04-27T10:17:18+00:00">
+
+
+
+
+<link rel="canonical" href="https://ftxj.github.io/posts/2026-04-27/04-gr-evolve-design-adaptive-global-routing-via-llm-driven-algo/">
+
+
+<link rel="preload" href="/fonts/fa-brands-400.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="/fonts/fa-regular-400.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="/fonts/fa-solid-900.woff2" as="font" type="font/woff2" crossorigin>
+
+
+  
+  
+  <link rel="stylesheet" href="/css/coder.min.5e94c1acf7aa2066035cf2764ae3e4fe39db101d68b870f919966100d51fb861.css" integrity="sha256-XpTBrPeqIGYDXPJ2SuPk/jnbEB1ouHD5GZZhANUfuGE=" crossorigin="anonymous" media="screen" />
+
+
+
+
+
+
+  
+    
+    
+    <link rel="stylesheet" href="/css/coder-dark.min.a00e6364bacbc8266ad1cc81230774a1397198f8cfb7bcba29b7d6fcb54ce57f.css" integrity="sha256-oA5jZLrLyCZq0cyBIwd0oTlxmPjPt7y6KbfW/LVM5X8=" crossorigin="anonymous" media="screen" />
+  
+
+
+
+ 
+
+
+
+
+<link rel="icon" type="image/svg+xml" href="/images/favicon.svg" sizes="any">
+<link rel="icon" type="image/png" href="/images/favicon-32x32.png" sizes="32x32">
+<link rel="icon" type="image/png" href="/images/favicon-16x16.png" sizes="16x16">
+
+<link rel="apple-touch-icon" href="/images/apple-touch-icon.png">
+<link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon.png">
+
+<link rel="manifest" href="/site.webmanifest">
+<link rel="mask-icon" href="/images/safari-pinned-tab.svg" color="#5bbad5">
+
+
+
+
+
+
+<style>
+.content article ul {
+  list-style: disc !important;
+  padding-left: 2.5rem !important;
+}
+
+.content article ul li {
+  display: list-item !important;
+}
+</style>
+
+
+
+
+  
+</head>
+
+
+
+
+
+
+<body class="preload-transitions colorscheme-auto">
+  
+<div class="float-container">
+    <a id="dark-mode-toggle" class="colorscheme-toggle">
+        <i class="fa-solid fa-adjust fa-fw" aria-hidden="true"></i>
+    </a>
+</div>
+
+
+  <main class="wrapper">
+    <nav class="navigation">
+  <section class="container">
+    
+    <a class="navigation-title" href="https://ftxj.github.io/">
+      JXIN&#39;s Home
+    </a>
+    
+    
+      <input type="checkbox" id="menu-toggle" />
+      <label class="menu-button float-right" for="menu-toggle">
+        <i class="fa-solid fa-bars fa-fw" aria-hidden="true"></i>
+      </label>
+      <ul class="navigation-list">
+        
+          
+            <li class="navigation-item">
+              <a class="navigation-link " href="/about/">About</a>
+            </li>
+          
+            <li class="navigation-item">
+              <a class="navigation-link " href="/travel/">Travel</a>
+            </li>
+          
+            <li class="navigation-item">
+              <a class="navigation-link " href="/posts/">Blog</a>
+            </li>
+          
+            <li class="navigation-item">
+              <a class="navigation-link " href="https://ftxj.github.io/cv/cv.pdf">CV</a>
+            </li>
+          
+        
+        
+          
+          
+          
+            
+              
+                <li class="navigation-item menu-separator">
+                  <span>|</span>
+                </li>
+                
+              
+              <li class="navigation-item">
+                <a href="/zh/posts/2026-04-27/04-gr-evolve-design-adaptive-global-routing-via-llm-driven-algo/">中文</a>
+              </li>
+            
+          
+        
+      </ul>
+    
+  </section>
+</nav>
+
+
+    <div class="content">
+      
+  <section class="container post">
+    <article>
+      <header>
+        <div class="post-title">
+          <h1 class="title">
+            <a class="title-link" href="https://ftxj.github.io/posts/2026-04-27/04-gr-evolve-design-adaptive-global-routing-via-llm-driven-algo/">
+              GR-Evolve: Design-Adaptive Global Routing via LLM-Driven Algorithm Evolution
+            </a>
+          </h1>
+        </div>
+        <div class="post-meta">
+          <div class="date">
+            <span class="posted-on">
+              <i class="fa-solid fa-calendar" aria-hidden="true"></i>
+              <time datetime="2026-04-27T10:17:18Z">
+                April 27, 2026
+              </time>
+            </span>
+            <span class="reading-time">
+              <i class="fa-solid fa-clock" aria-hidden="true"></i>
+              3-minute read
+            </span>
+          </div>
+          
+          <div class="categories">
+  <i class="fa-solid fa-folder" aria-hidden="true"></i>
+    <a href="/categories/paper-digest/">Paper-Digest</a>
+      <span class="separator">•</span>
+    <a href="/categories/2026-04-27/">2026-04-27</a></div>
+
+          
+        </div>
+      </header>
+
+      
+
+
+      <div class="post-content">
+        
+        <p><strong>arXiv:</strong> <a href="https://arxiv.org/abs/2604.22234v1">2604.22234</a> · <a href="https://arxiv.org/pdf/2604.22234v1">PDF</a></p>
+<p><strong>Authors:</strong> Taizun Jafri, Vidya A. Chhabria</p>
+<p><strong>Affiliations:</strong> Arizona State University</p>
+<p><strong>Primary category:</strong> <code>cs.AR</code> · all: cs.AR</p>
+<p><strong>Matched keywords:</strong> large language model, llm, agent, agentic, rag</p>
+<hr>
+<h2 id="tldr">TL;DR</h2>
+<p>GR-Evolve is a code-evolution framework that uses an agentic LLM to iteratively modify global routing source code based on QoR feedback, producing design-adaptive EDA tooling. It achieves up to 8.72% post-detailed-routing wirelength reduction over baseline routers across seven benchmarks.</p>
+<h2 id="key-ideas">Key Ideas</h2>
+<ul>
+<li>Introduces <strong>design-adaptive EDA tooling</strong>: internal algorithms specialize to each design rather than relying on fixed heuristics or hyperparameter tuning.</li>
+<li>Uses an <strong>agentic LLM</strong> to evolve global router source code iteratively, guided by QoR feedback.</li>
+<li>Provides the LLM with persistent contextual knowledge of open-source global routers plus an integrated QoR evaluation toolchain in OpenROAD.</li>
+<li>Demonstrates that LLM-driven code evolution can outperform static algorithm implementations.</li>
+</ul>
+<h2 id="approach">Approach</h2>
+<p>GR-Evolve frames global routing improvement as a code-evolution loop. An agentic LLM is given persistent context about open-source global routers and accumulated QoR history from prior iterations, then proposes source-code modifications. Each candidate is compiled and evaluated inside the OpenROAD infrastructure; the resulting QoR metrics feed back into the next iteration, driving design-specific algorithm specialization.</p>
+<p><img alt="Figure 1" src="/images/papers/2604.22234/fig1.png">
+<img alt="Figure 2" src="/images/papers/2604.22234/fig2.png">
+<img alt="Figure 3" src="/images/papers/2604.22234/fig3.png"></p>
+<h2 id="experiments">Experiments</h2>
+<p>Evaluated on <strong>seven benchmark designs</strong> spanning <strong>three technology nodes</strong>, using OpenROAD&rsquo;s detailed routing flow. Baselines are existing open-source global routers. The headline metric is post-detailed-routing wirelength; the abstract does not disclose runtime, DRC, or congestion numbers.</p>
+<h2 id="results">Results</h2>
+<p>Up to <strong>8.72% reduction in post-detailed-routing wirelength</strong> versus baseline routers. The abstract reports only this single aggregate figure, so per-design or per-node breakdowns are not substantiated here.</p>
+<h2 id="why-it-matters">Why It Matters</h2>
+<p>Shifts EDA tooling from static heuristics plus hyperparameter tuning toward algorithms that an LLM rewrites per design. For AI-infra and chip-design practitioners, this suggests a new axis of optimization — evolving the tool source itself — and positions LLM agents as first-class participants in physical-design flows, not just wrappers around them.</p>
+<h2 id="connections-to-prior-work">Connections to Prior Work</h2>
+<ul>
+<li><strong>Learning-based EDA optimization</strong> and <strong>hyperparameter auto-tuning</strong> (e.g., AutoTuner-style work) — GR-Evolve goes beyond by editing algorithms, not just knobs.</li>
+<li><strong>LLM code-evolution frameworks</strong> such as FunSearch and AlphaEvolve, adapted here to EDA source code.</li>
+<li><strong>Open-source global routing</strong> within the OpenROAD ecosystem (e.g., FastRoute, CUGR-style routers) as both context and baseline.</li>
+</ul>
+<h2 id="open-questions">Open Questions</h2>
+<ul>
+<li>Compilation cost, iteration count, and wall-clock budget per design are not reported.</li>
+<li>Generalization: do evolved routers transfer across designs/nodes, or must evolution restart each time?</li>
+<li>Effects on DRC violations, congestion, timing, and runtime beyond wirelength.</li>
+<li>Robustness of LLM-generated C++ changes (correctness, safety, regressions) and which model was used.</li>
+</ul>
+<hr>
+<h2 id="original-abstract">Original abstract</h2>
+<p>Modern ASIC design is becoming increasingly complex, driving up design costs while limiting productivity gains from existing EDA tools. Despite decades of progress, current tools rely on fixed heuristics and offer limited control via tool hyperparameters, requiring extensive manual tuning to achieve an acceptable quality of results (QoR). While prior work has explored learning-based optimization and design-specific hyperparameter tuning, these approaches operate within the constraints of static tool algorithm implementations and do not adapt the underlying algorithms to individual designs. To address this limitation, we introduce the concept of design-adaptive EDA tooling, in which the internal algorithms of EDA tools are automatically specialized to the characteristics of a given design. We instantiate this paradigm through GR-Evolve, a code evolution framework that leverages an agentic large language model (LLM) to iteratively modify global routing source code using QoR-driven feedback. The framework equips the LLM with persistent contextual knowledge of open-source global routers along with an integrated toolchain for QoR evaluation within the OpenROAD infrastructure. We evaluate GR-Evolve across seven benchmark designs across three technology nodes and demonstrate up to 8.72% reduction in post-detailed-routing wirelength over existing baseline routers, highlighting the potential of LLM-driven EDA code evolution for design-adaptive global routing.</p>
+
+      </div>
+
+
+      <footer>
+        
+
+
+        
+        
+        
+        
+        
+        
+        
+      </footer>
+    </article>
+
+    
+  </section>
+
+    </div>
+
+    <footer class="footer">
+  <section class="container">
+    ©
+    
+      2019 -
+    
+    2026
+     Jie Xin 
+    ·
+    
+    Powered by <a href="https://gohugo.io/" target="_blank" rel="noopener">Hugo</a> & <a href="https://github.com/luizdepra/hugo-coder/" target="_blank" rel="noopener">Coder</a>.
+    
+  </section>
+</footer>
+
+  </main>
+
+  
+
+  
+  
+  <script src="/js/coder.min.6ae284be93d2d19dad1f02b0039508d9aab3180a12a06dcc71b0b0ef7825a317.js" integrity="sha256-auKEvpPS0Z2tHwKwA5UI2aqzGAoSoG3McbCw73gloxc="></script>
+  
+
+  
+
+  
+
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+</body>
+</html>
