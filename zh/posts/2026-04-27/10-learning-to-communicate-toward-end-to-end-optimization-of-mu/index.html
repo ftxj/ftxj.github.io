@@ -1,0 +1,359 @@
+<!DOCTYPE html>
+<html lang="zh">
+
+<head>
+  <title>
+  Learning to Communicate: Toward End-to-End Optimization of Multi-Agent Language Systems · JXIN&#39;s Home
+</title>
+  <meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="color-scheme" content="light dark">
+
+
+
+
+<meta name="author" content="Jie Xin">
+<meta name="description" content="arXiv: 2604.21794 · PDF
+作者: Ye Yu, Heming Liu, Haibo Jin, Xiaopeng Yuan, Peng Kuang, Haohan Wang
+单位: University of Illinois Urbana-Champaign
+主分类: cs.AI · 全部: cs.AI, cs.CL, cs.MA
+命中关键词: large language model, agent, multi-agent, reasoning, inference
+
+TL;DR
+DiffMAS 把多智能体之间的 latent 通信（KV cache）当作可学习组件，用参数高效监督训练端到端优化推理链，在数学、科学 QA、代码、常识基准上均优于单智能体与文本式多智能体。
+核心观点
+
+现有多 agent LLM 系统把 agent 间通信当作固定文本接口，未与推理联合优化。
+Latent 通信（如 KV cache）比文本协议更具潜力，但此前方法不做联合训练。
+提出 DiffMAS：将 latent 通信作为可学习模块，端到端优化多 agent 轨迹。
+在 AIME24、GPQA-Diamond、代码生成、常识基准上超越 single-agent、text MAS 与先前 latent 方法。
+
+方法
+DiffMAS 分两阶段：Stage I 中 agent 1 到 K–1 顺序预填充已有 KV cache 并追加各自生成的 KV 段，构造共享 KV trace 作为跨 agent 的隐通信介质，此阶段无梯度更新；Stage II 由最终 agent 基于该 trace 进行推理。训练采用参数高效的监督微调，在多 agent latent 轨迹上联合学习信息如何被编码与解读，使上游 agent 的隐状态与下游推理处于同一计算图中、联合优化。">
+<meta name="keywords" content="blog,developer,personal">
+
+
+
+  <meta name="twitter:card" content="summary">
+  <meta name="twitter:title" content="Learning to Communicate: Toward End-to-End Optimization of Multi-Agent Language Systems">
+  <meta name="twitter:description" content="arXiv: 2604.21794 · PDF
+作者: Ye Yu, Heming Liu, Haibo Jin, Xiaopeng Yuan, Peng Kuang, Haohan Wang
+单位: University of Illinois Urbana-Champaign
+主分类: cs.AI · 全部: cs.AI, cs.CL, cs.MA
+命中关键词: large language model, agent, multi-agent, reasoning, inference
+TL;DR DiffMAS 把多智能体之间的 latent 通信（KV cache）当作可学习组件，用参数高效监督训练端到端优化推理链，在数学、科学 QA、代码、常识基准上均优于单智能体与文本式多智能体。
+核心观点 现有多 agent LLM 系统把 agent 间通信当作固定文本接口，未与推理联合优化。 Latent 通信（如 KV cache）比文本协议更具潜力，但此前方法不做联合训练。 提出 DiffMAS：将 latent 通信作为可学习模块，端到端优化多 agent 轨迹。 在 AIME24、GPQA-Diamond、代码生成、常识基准上超越 single-agent、text MAS 与先前 latent 方法。 方法 DiffMAS 分两阶段：Stage I 中 agent 1 到 K–1 顺序预填充已有 KV cache 并追加各自生成的 KV 段，构造共享 KV trace 作为跨 agent 的隐通信介质，此阶段无梯度更新；Stage II 由最终 agent 基于该 trace 进行推理。训练采用参数高效的监督微调，在多 agent latent 轨迹上联合学习信息如何被编码与解读，使上游 agent 的隐状态与下游推理处于同一计算图中、联合优化。">
+
+<meta property="og:url" content="https://ftxj.github.io/zh/posts/2026-04-27/10-learning-to-communicate-toward-end-to-end-optimization-of-mu/">
+  <meta property="og:site_name" content="JXIN&#39;s Home">
+  <meta property="og:title" content="Learning to Communicate: Toward End-to-End Optimization of Multi-Agent Language Systems">
+  <meta property="og:description" content="arXiv: 2604.21794 · PDF
+作者: Ye Yu, Heming Liu, Haibo Jin, Xiaopeng Yuan, Peng Kuang, Haohan Wang
+单位: University of Illinois Urbana-Champaign
+主分类: cs.AI · 全部: cs.AI, cs.CL, cs.MA
+命中关键词: large language model, agent, multi-agent, reasoning, inference
+TL;DR DiffMAS 把多智能体之间的 latent 通信（KV cache）当作可学习组件，用参数高效监督训练端到端优化推理链，在数学、科学 QA、代码、常识基准上均优于单智能体与文本式多智能体。
+核心观点 现有多 agent LLM 系统把 agent 间通信当作固定文本接口，未与推理联合优化。 Latent 通信（如 KV cache）比文本协议更具潜力，但此前方法不做联合训练。 提出 DiffMAS：将 latent 通信作为可学习模块，端到端优化多 agent 轨迹。 在 AIME24、GPQA-Diamond、代码生成、常识基准上超越 single-agent、text MAS 与先前 latent 方法。 方法 DiffMAS 分两阶段：Stage I 中 agent 1 到 K–1 顺序预填充已有 KV cache 并追加各自生成的 KV 段，构造共享 KV trace 作为跨 agent 的隐通信介质，此阶段无梯度更新；Stage II 由最终 agent 基于该 trace 进行推理。训练采用参数高效的监督微调，在多 agent latent 轨迹上联合学习信息如何被编码与解读，使上游 agent 的隐状态与下游推理处于同一计算图中、联合优化。">
+  <meta property="og:locale" content="zh">
+  <meta property="og:type" content="article">
+    <meta property="article:section" content="posts">
+    <meta property="article:published_time" content="2026-04-27T15:55:43+00:00">
+    <meta property="article:modified_time" content="2026-04-27T15:55:43+00:00">
+
+
+
+
+<link rel="canonical" href="https://ftxj.github.io/zh/posts/2026-04-27/10-learning-to-communicate-toward-end-to-end-optimization-of-mu/">
+
+
+<link rel="preload" href="/fonts/fa-brands-400.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="/fonts/fa-regular-400.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="/fonts/fa-solid-900.woff2" as="font" type="font/woff2" crossorigin>
+
+
+  
+  
+  <link rel="stylesheet" href="/css/coder.min.5e94c1acf7aa2066035cf2764ae3e4fe39db101d68b870f919966100d51fb861.css" integrity="sha256-XpTBrPeqIGYDXPJ2SuPk/jnbEB1ouHD5GZZhANUfuGE=" crossorigin="anonymous" media="screen" />
+
+
+
+
+
+
+  
+    
+    
+    <link rel="stylesheet" href="/css/coder-dark.min.a00e6364bacbc8266ad1cc81230774a1397198f8cfb7bcba29b7d6fcb54ce57f.css" integrity="sha256-oA5jZLrLyCZq0cyBIwd0oTlxmPjPt7y6KbfW/LVM5X8=" crossorigin="anonymous" media="screen" />
+  
+
+
+
+ 
+
+
+
+
+<link rel="icon" type="image/svg+xml" href="/images/favicon.svg" sizes="any">
+<link rel="icon" type="image/png" href="/images/favicon-32x32.png" sizes="32x32">
+<link rel="icon" type="image/png" href="/images/favicon-16x16.png" sizes="16x16">
+
+<link rel="apple-touch-icon" href="/images/apple-touch-icon.png">
+<link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon.png">
+
+<link rel="manifest" href="/site.webmanifest">
+<link rel="mask-icon" href="/images/safari-pinned-tab.svg" color="#5bbad5">
+
+
+
+
+
+
+<style>
+.content article ul {
+  list-style: disc !important;
+  padding-left: 2.5rem !important;
+}
+
+.content article ul li {
+  display: list-item !important;
+}
+</style>
+
+
+
+
+  
+</head>
+
+
+
+
+
+
+<body class="preload-transitions colorscheme-auto">
+  
+<div class="float-container">
+    <a id="dark-mode-toggle" class="colorscheme-toggle">
+        <i class="fa-solid fa-adjust fa-fw" aria-hidden="true"></i>
+    </a>
+</div>
+
+
+  <main class="wrapper">
+    <nav class="navigation">
+  <section class="container">
+    
+    <a class="navigation-title" href="https://ftxj.github.io/zh/">
+      JXIN&#39;s Home
+    </a>
+    
+    
+      <input type="checkbox" id="menu-toggle" />
+      <label class="menu-button float-right" for="menu-toggle">
+        <i class="fa-solid fa-bars fa-fw" aria-hidden="true"></i>
+      </label>
+      <ul class="navigation-list">
+        
+          
+            <li class="navigation-item">
+              <a class="navigation-link " href="/zh/about/">关于</a>
+            </li>
+          
+            <li class="navigation-item">
+              <a class="navigation-link " href="/zh/travel/">旅行</a>
+            </li>
+          
+            <li class="navigation-item">
+              <a class="navigation-link " href="/zh/posts/">博客</a>
+            </li>
+          
+            <li class="navigation-item">
+              <a class="navigation-link " href="https://ftxj.github.io/cv/cv_zh.pdf">简历</a>
+            </li>
+          
+        
+        
+          
+          
+          
+            
+              
+                <li class="navigation-item menu-separator">
+                  <span>|</span>
+                </li>
+                
+              
+              <li class="navigation-item">
+                <a href="/posts/2026-04-27/10-learning-to-communicate-toward-end-to-end-optimization-of-mu/">EN</a>
+              </li>
+            
+          
+        
+      </ul>
+    
+  </section>
+</nav>
+
+
+    <div class="content">
+      
+  <section class="container post">
+    <article>
+      <header>
+        <div class="post-title">
+          <h1 class="title">
+            <a class="title-link" href="https://ftxj.github.io/zh/posts/2026-04-27/10-learning-to-communicate-toward-end-to-end-optimization-of-mu/">
+              Learning to Communicate: Toward End-to-End Optimization of Multi-Agent Language Systems
+            </a>
+          </h1>
+        </div>
+        <div class="post-meta">
+          <div class="date">
+            <span class="posted-on">
+              <i class="fa-solid fa-calendar" aria-hidden="true"></i>
+              <time datetime="2026-04-27T15:55:43Z">
+                四月 27, 2026
+              </time>
+            </span>
+            <span class="reading-time">
+              <i class="fa-solid fa-clock" aria-hidden="true"></i>
+              2-minute read
+            </span>
+          </div>
+          
+          <div class="categories">
+  <i class="fa-solid fa-folder" aria-hidden="true"></i>
+    <a href="/zh/categories/paper-digest/">Paper-Digest</a>
+      <span class="separator">•</span>
+    <a href="/zh/categories/2026-04-27/">2026-04-27</a></div>
+
+          
+        </div>
+      </header>
+
+      
+
+
+      <div class="post-content">
+        
+        <p><strong>arXiv:</strong> <a href="https://arxiv.org/abs/2604.21794v1">2604.21794</a> · <a href="https://arxiv.org/pdf/2604.21794v1">PDF</a></p>
+<p><strong>作者:</strong> Ye Yu, Heming Liu, Haibo Jin, Xiaopeng Yuan, Peng Kuang, Haohan Wang</p>
+<p><strong>单位:</strong> University of Illinois Urbana-Champaign</p>
+<p><strong>主分类:</strong> <code>cs.AI</code> · 全部: cs.AI, cs.CL, cs.MA</p>
+<p><strong>命中关键词:</strong> large language model, agent, multi-agent, reasoning, inference</p>
+<hr>
+<h2 id="tldr">TL;DR</h2>
+<p>DiffMAS 把多智能体之间的 latent 通信（KV cache）当作可学习组件，用参数高效监督训练端到端优化推理链，在数学、科学 QA、代码、常识基准上均优于单智能体与文本式多智能体。</p>
+<h2 id="核心观点">核心观点</h2>
+<ul>
+<li>现有多 agent LLM 系统把 agent 间通信当作固定文本接口，未与推理联合优化。</li>
+<li>Latent 通信（如 KV cache）比文本协议更具潜力，但此前方法不做联合训练。</li>
+<li>提出 DiffMAS：将 latent 通信作为可学习模块，端到端优化多 agent 轨迹。</li>
+<li>在 AIME24、GPQA-Diamond、代码生成、常识基准上超越 single-agent、text MAS 与先前 latent 方法。</li>
+</ul>
+<h2 id="方法">方法</h2>
+<p>DiffMAS 分两阶段：Stage I 中 agent 1 到 K–1 顺序预填充已有 KV cache 并追加各自生成的 KV 段，构造共享 KV trace 作为跨 agent 的隐通信介质，此阶段无梯度更新；Stage II 由最终 agent 基于该 trace 进行推理。训练采用参数高效的监督微调，在多 agent latent 轨迹上联合学习信息如何被编码与解读，使上游 agent 的隐状态与下游推理处于同一计算图中、联合优化。</p>
+<p><img alt="图 1" src="/images/papers/2604.21794/fig1.png"></p>
+<p>图 1 展示了该两阶段流水线：前 K–1 个 agent 协作构建共享 KV trace，最后一个 agent 消费该 trace 完成任务。</p>
+<h2 id="实验">实验</h2>
+<p>覆盖数学推理（AIME24）、科学 QA（GPQA-Diamond）、代码生成、常识推理多个基准；基线包括 single-agent 推理、text-based 多 agent 系统，以及先前的 latent 通信方法（如 LatentMAS）。评估指标为推理准确率与解码稳定性，并通过 judger agent 的 token 级 top-25 预测熵分析通信结构差异。</p>
+<h2 id="结果">结果</h2>
+<p>DiffMAS 在 AIME24 达到 26.7%，GPQA-Diamond 达到 20.2%，在各推理基准上均稳定提升。</p>
+<p><img alt="图 2" src="/images/papers/2604.21794/fig2.png"></p>
+<p>图 2 / 图 3 对比 LatentMAS 与 DiffMAS 上 judger agent 的 token 级预测熵：由于 DiffMAS 的跨 agent latent 状态处于共享计算图中并被联合优化，上游表示能够适配下游解码需求，呈现出比静态 latent 注入更稳定的熵分布。</p>
+<p><img alt="图 3" src="/images/papers/2604.21794/fig3.png"></p>
+<h2 id="为什么重要">为什么重要</h2>
+<p>对 agent/LLM 基础设施而言，把 inter-agent 通信从&quot;文本 prompt 拼接&quot;提升为&quot;可训练的 latent 通道&quot;，意味着 multi-agent 系统可被当作一个端到端可微网络来优化，有望降低 token 开销、提升协作稳定性，并启发下一代 agent 编排与训练范式。</p>
+<h2 id="与已有工作的关系">与已有工作的关系</h2>
+<p>延续 multi-agent LLM 协作（如 debate/orchestration 风格系统）与 latent 通信研究（如 LatentMAS）的脉络，借鉴参数高效监督微调思路，将两者合并为联合训练框架。</p>
+<h2 id="尚未回答的问题">尚未回答的问题</h2>
+<p>KV trace 在异构模型 / 不同 tokenizer 间如何共享？规模扩展到更多 agent 或更长轨迹时的成本与稳定性？latent 通信的可解释性与安全审计如何做？与 RL 式 agent 训练如何结合？</p>
+<h2 id="原始摘要中文翻译">原始摘要（中文翻译）</h2>
+<p>基于大语言模型构建的多智能体系统在复杂推理任务上表现出色，但大多数工作聚焦于 agent 角色与编排，而把 agent 间通信当作一个固定接口。通过诸如 key-value cache 等内部表示进行的 latent 通信，为基于文本的协议提供了一种有前景的替代方案，但现有方法并未将通信与多 agent 推理联合优化。因此我们提出 DiffMAS，一种将 latent 通信视为多 agent 系统中可学习组件的训练框架。DiffMAS 在多 agent latent 轨迹上执行参数高效的监督训练，使各 agent 能够联合学习如何在交互中对信息进行编码和解读。在数学推理、科学问答、代码生成以及常识基准上的实验表明，DiffMAS 相比单 agent 推理、基于文本的多 agent 系统以及此前的 latent 通信方法，持续提升了推理准确率与解码稳定性，在 AIME24 上取得 26.7%、在 GPQA-Diamond 上取得 20.2%，并在各推理基准上取得一致的增益。</p>
+
+      </div>
+
+
+      <footer>
+        
+
+
+        
+        
+        
+        
+        
+        
+        
+      </footer>
+    </article>
+
+    
+  </section>
+
+    </div>
+
+    <footer class="footer">
+  <section class="container">
+    ©
+    
+      2019 -
+    
+    2026
+     Jie Xin 
+    ·
+    
+    Powered by <a href="https://gohugo.io/" target="_blank" rel="noopener">Hugo</a> & <a href="https://github.com/luizdepra/hugo-coder/" target="_blank" rel="noopener">Coder</a>.
+    
+  </section>
+</footer>
+
+  </main>
+
+  
+
+  
+  
+  <script src="/js/coder.min.6ae284be93d2d19dad1f02b0039508d9aab3180a12a06dcc71b0b0ef7825a317.js" integrity="sha256-auKEvpPS0Z2tHwKwA5UI2aqzGAoSoG3McbCw73gloxc="></script>
+  
+
+  
+
+  
+
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+</body>
+</html>

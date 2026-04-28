@@ -1,0 +1,363 @@
+<!DOCTYPE html>
+<html lang="zh">
+
+<head>
+  <title>
+  BitRL: Reinforcement Learning with 1-bit Quantized Language Models for Resource-Constrained Edge Deployment · JXIN&#39;s Home
+</title>
+  <meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="color-scheme" content="light dark">
+
+
+
+
+<meta name="author" content="Jie Xin">
+<meta name="description" content="arXiv: 2604.24273 · PDF
+作者: Md. Ashiq Ul Islam Sajid, Mohammad Sakib Mahmood, Md. Tareq Hasan, Md Abdur Rahim, Rafat Ara, Md. Arafat Hossain
+单位: Daffodil International University
+主分类: cs.LG · 全部: cs.LG
+命中关键词: large language model, llm, agent, rag, inference, quantization, latency
+
+TL;DR
+BitRL 用 1-bit 量化（BitNet b1.58，三值权重）的语言模型做 RL agent 的冻结 backbone，内存降 10–16×、能效升 3–5×，仍保留 85–98% 任务性能，能在边缘设备上跑。
+Motivation
+RL agent 部署到边缘设备一直卡在同一个瓶颈：现代深度模型（尤其 LLM-based 决策器）动辄数十亿参数，内存、算力、能耗都远超手机、IoT、机器人板卡的承受范围。今天业内的 workaround 是把推理塞回云端，但这就意味着延迟、隐私、网络依赖三件事同时出现——对实时控制、离线环境或敏感数据场景都不可接受。已有的 8-bit / 4-bit 量化虽然能压一些 LLM，但对 RL 场景里策略梯度的稳定性影响没有被系统分析，而把 RL &#43; 1-bit 这条更激进的路径拼起来、同时给出收敛性保证的工作几乎没有。作者认为时机变了：BitNet b1.58 这类原生三值权重（-1, 0, &#43;1）架构出现后，1-bit 模型不再只是事后压缩，而是可训练的 backbone；配上优化过的推理栈，边缘端跑 RL agent 从&quot;凑合&quot;变成&quot;可量化工程问题&quot;。这篇要回答的是：把 backbone 冻到 1.58-bit、只训 policy / value head，能不能在 commodity 边缘硬件上做到内存、能耗、性能三者都可接受。">
+<meta name="keywords" content="blog,developer,personal">
+
+
+
+  <meta name="twitter:card" content="summary">
+  <meta name="twitter:title" content="BitRL: Reinforcement Learning with 1-bit Quantized Language Models for Resource-Constrained Edge Deployment">
+  <meta name="twitter:description" content="arXiv: 2604.24273 · PDF
+作者: Md. Ashiq Ul Islam Sajid, Mohammad Sakib Mahmood, Md. Tareq Hasan, Md Abdur Rahim, Rafat Ara, Md. Arafat Hossain
+单位: Daffodil International University
+主分类: cs.LG · 全部: cs.LG
+命中关键词: large language model, llm, agent, rag, inference, quantization, latency
+TL;DR BitRL 用 1-bit 量化（BitNet b1.58，三值权重）的语言模型做 RL agent 的冻结 backbone，内存降 10–16×、能效升 3–5×，仍保留 85–98% 任务性能，能在边缘设备上跑。
+Motivation RL agent 部署到边缘设备一直卡在同一个瓶颈：现代深度模型（尤其 LLM-based 决策器）动辄数十亿参数，内存、算力、能耗都远超手机、IoT、机器人板卡的承受范围。今天业内的 workaround 是把推理塞回云端，但这就意味着延迟、隐私、网络依赖三件事同时出现——对实时控制、离线环境或敏感数据场景都不可接受。已有的 8-bit / 4-bit 量化虽然能压一些 LLM，但对 RL 场景里策略梯度的稳定性影响没有被系统分析，而把 RL &#43; 1-bit 这条更激进的路径拼起来、同时给出收敛性保证的工作几乎没有。作者认为时机变了：BitNet b1.58 这类原生三值权重（-1, 0, &#43;1）架构出现后，1-bit 模型不再只是事后压缩，而是可训练的 backbone；配上优化过的推理栈，边缘端跑 RL agent 从&#34;凑合&#34;变成&#34;可量化工程问题&#34;。这篇要回答的是：把 backbone 冻到 1.58-bit、只训 policy / value head，能不能在 commodity 边缘硬件上做到内存、能耗、性能三者都可接受。">
+
+<meta property="og:url" content="https://ftxj.github.io/zh/posts/2026-04-28/09-bitrl-reinforcement-learning-with-1-bit-quantized-language-m/">
+  <meta property="og:site_name" content="JXIN&#39;s Home">
+  <meta property="og:title" content="BitRL: Reinforcement Learning with 1-bit Quantized Language Models for Resource-Constrained Edge Deployment">
+  <meta property="og:description" content="arXiv: 2604.24273 · PDF
+作者: Md. Ashiq Ul Islam Sajid, Mohammad Sakib Mahmood, Md. Tareq Hasan, Md Abdur Rahim, Rafat Ara, Md. Arafat Hossain
+单位: Daffodil International University
+主分类: cs.LG · 全部: cs.LG
+命中关键词: large language model, llm, agent, rag, inference, quantization, latency
+TL;DR BitRL 用 1-bit 量化（BitNet b1.58，三值权重）的语言模型做 RL agent 的冻结 backbone，内存降 10–16×、能效升 3–5×，仍保留 85–98% 任务性能，能在边缘设备上跑。
+Motivation RL agent 部署到边缘设备一直卡在同一个瓶颈：现代深度模型（尤其 LLM-based 决策器）动辄数十亿参数，内存、算力、能耗都远超手机、IoT、机器人板卡的承受范围。今天业内的 workaround 是把推理塞回云端，但这就意味着延迟、隐私、网络依赖三件事同时出现——对实时控制、离线环境或敏感数据场景都不可接受。已有的 8-bit / 4-bit 量化虽然能压一些 LLM，但对 RL 场景里策略梯度的稳定性影响没有被系统分析，而把 RL &#43; 1-bit 这条更激进的路径拼起来、同时给出收敛性保证的工作几乎没有。作者认为时机变了：BitNet b1.58 这类原生三值权重（-1, 0, &#43;1）架构出现后，1-bit 模型不再只是事后压缩，而是可训练的 backbone；配上优化过的推理栈，边缘端跑 RL agent 从&#34;凑合&#34;变成&#34;可量化工程问题&#34;。这篇要回答的是：把 backbone 冻到 1.58-bit、只训 policy / value head，能不能在 commodity 边缘硬件上做到内存、能耗、性能三者都可接受。">
+  <meta property="og:locale" content="zh">
+  <meta property="og:type" content="article">
+    <meta property="article:section" content="posts">
+    <meta property="article:published_time" content="2026-04-28T09:13:15+00:00">
+    <meta property="article:modified_time" content="2026-04-28T09:13:15+00:00">
+
+
+
+
+<link rel="canonical" href="https://ftxj.github.io/zh/posts/2026-04-28/09-bitrl-reinforcement-learning-with-1-bit-quantized-language-m/">
+
+
+<link rel="preload" href="/fonts/fa-brands-400.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="/fonts/fa-regular-400.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="/fonts/fa-solid-900.woff2" as="font" type="font/woff2" crossorigin>
+
+
+  
+  
+  <link rel="stylesheet" href="/css/coder.min.5e94c1acf7aa2066035cf2764ae3e4fe39db101d68b870f919966100d51fb861.css" integrity="sha256-XpTBrPeqIGYDXPJ2SuPk/jnbEB1ouHD5GZZhANUfuGE=" crossorigin="anonymous" media="screen" />
+
+
+
+
+
+
+  
+    
+    
+    <link rel="stylesheet" href="/css/coder-dark.min.a00e6364bacbc8266ad1cc81230774a1397198f8cfb7bcba29b7d6fcb54ce57f.css" integrity="sha256-oA5jZLrLyCZq0cyBIwd0oTlxmPjPt7y6KbfW/LVM5X8=" crossorigin="anonymous" media="screen" />
+  
+
+
+
+ 
+
+
+
+
+<link rel="icon" type="image/svg+xml" href="/images/favicon.svg" sizes="any">
+<link rel="icon" type="image/png" href="/images/favicon-32x32.png" sizes="32x32">
+<link rel="icon" type="image/png" href="/images/favicon-16x16.png" sizes="16x16">
+
+<link rel="apple-touch-icon" href="/images/apple-touch-icon.png">
+<link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon.png">
+
+<link rel="manifest" href="/site.webmanifest">
+<link rel="mask-icon" href="/images/safari-pinned-tab.svg" color="#5bbad5">
+
+
+
+
+
+
+<style>
+.content article ul {
+  list-style: disc !important;
+  padding-left: 2.5rem !important;
+}
+
+.content article ul li {
+  display: list-item !important;
+}
+</style>
+
+
+
+
+  
+</head>
+
+
+
+
+
+
+<body class="preload-transitions colorscheme-auto">
+  
+<div class="float-container">
+    <a id="dark-mode-toggle" class="colorscheme-toggle">
+        <i class="fa-solid fa-adjust fa-fw" aria-hidden="true"></i>
+    </a>
+</div>
+
+
+  <main class="wrapper">
+    <nav class="navigation">
+  <section class="container">
+    
+    <a class="navigation-title" href="https://ftxj.github.io/zh/">
+      JXIN&#39;s Home
+    </a>
+    
+    
+      <input type="checkbox" id="menu-toggle" />
+      <label class="menu-button float-right" for="menu-toggle">
+        <i class="fa-solid fa-bars fa-fw" aria-hidden="true"></i>
+      </label>
+      <ul class="navigation-list">
+        
+          
+            <li class="navigation-item">
+              <a class="navigation-link " href="/zh/about/">关于</a>
+            </li>
+          
+            <li class="navigation-item">
+              <a class="navigation-link " href="/zh/travel/">旅行</a>
+            </li>
+          
+            <li class="navigation-item">
+              <a class="navigation-link " href="/zh/posts/">博客</a>
+            </li>
+          
+            <li class="navigation-item">
+              <a class="navigation-link " href="https://ftxj.github.io/cv/cv_zh.pdf">简历</a>
+            </li>
+          
+        
+        
+          
+          
+          
+            
+              
+                <li class="navigation-item menu-separator">
+                  <span>|</span>
+                </li>
+                
+              
+              <li class="navigation-item">
+                <a href="/posts/2026-04-28/09-bitrl-reinforcement-learning-with-1-bit-quantized-language-m/">EN</a>
+              </li>
+            
+          
+        
+      </ul>
+    
+  </section>
+</nav>
+
+
+    <div class="content">
+      
+  <section class="container post">
+    <article>
+      <header>
+        <div class="post-title">
+          <h1 class="title">
+            <a class="title-link" href="https://ftxj.github.io/zh/posts/2026-04-28/09-bitrl-reinforcement-learning-with-1-bit-quantized-language-m/">
+              BitRL: Reinforcement Learning with 1-bit Quantized Language Models for Resource-Constrained Edge Deployment
+            </a>
+          </h1>
+        </div>
+        <div class="post-meta">
+          <div class="date">
+            <span class="posted-on">
+              <i class="fa-solid fa-calendar" aria-hidden="true"></i>
+              <time datetime="2026-04-28T09:13:15Z">
+                四月 28, 2026
+              </time>
+            </span>
+            <span class="reading-time">
+              <i class="fa-solid fa-clock" aria-hidden="true"></i>
+              2-minute read
+            </span>
+          </div>
+          
+          <div class="categories">
+  <i class="fa-solid fa-folder" aria-hidden="true"></i>
+    <a href="/zh/categories/paper-digest/">Paper-Digest</a>
+      <span class="separator">•</span>
+    <a href="/zh/categories/2026-04-28/">2026-04-28</a></div>
+
+          
+        </div>
+      </header>
+
+      
+
+
+      <div class="post-content">
+        
+        <p><strong>arXiv:</strong> <a href="https://arxiv.org/abs/2604.24273v1">2604.24273</a> · <a href="https://arxiv.org/pdf/2604.24273v1">PDF</a></p>
+<p><strong>作者:</strong> Md. Ashiq Ul Islam Sajid, Mohammad Sakib Mahmood, Md. Tareq Hasan, Md Abdur Rahim, Rafat Ara, Md. Arafat Hossain</p>
+<p><strong>单位:</strong> Daffodil International University</p>
+<p><strong>主分类:</strong> <code>cs.LG</code> · 全部: cs.LG</p>
+<p><strong>命中关键词:</strong> large language model, llm, agent, rag, inference, quantization, latency</p>
+<hr>
+<h2 id="tldr">TL;DR</h2>
+<p>BitRL 用 1-bit 量化（BitNet b1.58，三值权重）的语言模型做 RL agent 的冻结 backbone，内存降 10–16×、能效升 3–5×，仍保留 85–98% 任务性能，能在边缘设备上跑。</p>
+<h2 id="motivation">Motivation</h2>
+<p>RL agent 部署到边缘设备一直卡在同一个瓶颈：现代深度模型（尤其 LLM-based 决策器）动辄数十亿参数，内存、算力、能耗都远超手机、IoT、机器人板卡的承受范围。今天业内的 workaround 是把推理塞回云端，但这就意味着延迟、隐私、网络依赖三件事同时出现——对实时控制、离线环境或敏感数据场景都不可接受。已有的 8-bit / 4-bit 量化虽然能压一些 LLM，但对 RL 场景里策略梯度的稳定性影响没有被系统分析，而把 RL + 1-bit 这条更激进的路径拼起来、同时给出收敛性保证的工作几乎没有。作者认为时机变了：BitNet b1.58 这类原生三值权重（-1, 0, +1）架构出现后，1-bit 模型不再只是事后压缩，而是可训练的 backbone；配上优化过的推理栈，边缘端跑 RL agent 从&quot;凑合&quot;变成&quot;可量化工程问题&quot;。这篇要回答的是：把 backbone 冻到 1.58-bit、只训 policy / value head，能不能在 commodity 边缘硬件上做到内存、能耗、性能三者都可接受。</p>
+<h2 id="核心观点">核心观点</h2>
+<ul>
+<li>提出 BitRL：用 BitNet b1.58 作为冻结 backbone 的 1-bit 量化 RL agent 框架，面向边缘部署。</li>
+<li>工程上实现了 10–16× 内存压缩、3–5× 能效提升，且在 benchmark 上保持 85–98% 任务性能。</li>
+<li>理论上把量化看作 structured parameter perturbation，在 frozen-backbone 下推导出量化 policy gradient 的收敛 bound。</li>
+<li>指出 extreme quantization 里存在 exploration-stability trade-off，并据此指导训练配方。</li>
+<li>给出一个把 1-bit LLM 与 RL 系统性整合的 end-to-end pipeline，在商用硬件上实测可行。</li>
+</ul>
+<h2 id="方法">方法</h2>
+<p>BitRL 的核心是&quot;冻结 + 轻量头&quot;结构：把 BitNet b1.58（三值权重 -1/0/+1）的语言模型整体冻住作为 representation backbone，只训练在其上的 policy head 与 value head。观测先经 text serialization 转成 token 序列喂进 BitNet，再由两路可训练 head 分别输出动作分布和 value 估计。推理侧用针对三值权重优化的 inference stack 来兑现内存 / 能耗收益。理论部分把 1-bit 量化建模成对参数的 structured perturbation，在冻结 backbone 的假设下推出量化版 policy gradient 的收敛界，并形式化 extreme quantization 下 exploration（噪声利好）与 stability（噪声有害）之间的取舍，用来指导熵系数等超参。</p>
+<p><img alt="图 1" src="/images/papers/2604.24273/fig1.png"></p>
+<p>图 1 就是上面这套管线的系统视图，直接支撑&quot;冻结 backbone + 可训 head&quot;这一核心做法：左侧把观测做 text serialization，中间 BitNet b1.58 backbone 带锁标记（参数不更新），右侧分出 policy 和 value 两条可训练 head。读者即使不看图也该记住一件事：RL 梯度只流到两个小 head，backbone 的 1.58-bit 权重全程不动，这是内存和能效收益能兑现、同时收敛性分析能成立的前提。</p>
+<h2 id="实验">实验</h2>
+<p>摘要只给了高层信息：在多个 benchmark 上对比 full-precision 基线，指标覆盖内存占用、能效、任务性能三类，并在 commodity hardware 上做部署验证。具体任务集、基线模型族、硬件型号摘要未披露。</p>
+<h2 id="结果">结果</h2>
+<p>相对 full-precision baseline，内存下降 10–16×，能效提升 3–5×，任务性能保留 85–98%；理论侧给出了冻结 backbone 下量化 policy gradient 的收敛 bound，并实证观察到 exploration-stability trade-off。</p>
+<h2 id="结论">结论</h2>
+<p>实践者该带走的一点：在边缘部署 LLM-based RL agent 时，&ldquo;冻 BitNet b1.58 当 backbone + 只训 policy/value head&quot;是一个已经被工程验证的可行配方——10–16× 内存节省足以把原本只能跑云端的 agent 塞进商用边缘硬件，而任务性能下限仍在 85% 以上。边界也要说清：这是冻结 backbone 下的结论，不涉及 1-bit 端到端训练；benchmark、基线和硬件细节摘要未给全，对长 horizon、稀疏奖励任务是否仍守住 85% 下限尚待验证；exploration-stability trade-off 存在，说明结果对超参和任务类型敏感。</p>
+<h2 id="是否新瓶装旧酒">是否新瓶装旧酒</h2>
+<ul>
+<li>BitNet / BitNet b1.58：提供三值权重 backbone 本身，本文是把它当 RL agent 的冻结 representation 来用，新在&quot;RL 场景 + 收敛性分析&rdquo;，backbone 本身不是新的。</li>
+<li>QLoRA / LLM 量化 + 下游微调：同样是&quot;冻低比特 backbone、训小头&quot;的思路，但目标是 SFT；BitRL 的增量在于把这个 pattern 搬到 policy gradient 并给出量化 PG 的收敛 bound。</li>
+<li>量化 RL / 低比特 DQN 类工作：早有 8-bit、4-bit RL 研究，但多针对小策略网络；本文新在把对象换成 LLM-scale backbone 且推到 1.58-bit，并强调边缘部署。</li>
+<li>综合看不是换名工作，但也不是全新范式：更像&quot;BitNet × frozen-backbone RL&quot;的系统化组合 + 理论收敛分析，属于有实质增量的工程-理论整合。</li>
+</ul>
+<h2 id="尚未回答的问题">尚未回答的问题</h2>
+<ul>
+<li>是否支持 backbone 端到端 1-bit 训练，而非仅冻结？</li>
+<li>在长 horizon、稀疏奖励、多模态观测任务上掉点幅度是否仍在 2–15% 区间？</li>
+<li>具体 benchmark / 硬件 / 基线是什么，可复现性如何？</li>
+<li>exploration-stability trade-off 是否能用自适应熵或噪声注入自动调节？</li>
+<li>与 4-bit、8-bit QLoRA-style RL 的 Pareto 前沿对比如何？</li>
+</ul>
+<h2 id="原始摘要中文翻译">原始摘要（中文翻译）</h2>
+<p>在资源受限的边缘设备上部署智能强化学习（RL）agent 仍是一个根本性挑战，原因在于现代深度学习系统对内存、算力和能耗的巨大需求。尽管大型语言模型（LLM）已成为决策 agent 的强大架构，但其数十亿参数规模将其限制在云端部署，由此带来延迟、隐私和连接依赖等问题。我们提出 BitRL，一个使用 1-bit 量化语言模型构建 RL agent 的框架，使得在严苛资源约束下的端侧学习与推理成为可能。借助采用三值权重（-1, 0, +1）的 BitNet b1.58 架构以及一套优化过的推理栈，BitRL 相比全精度基线实现了 10–16 倍的内存压缩与 3–5 倍的能效提升，同时在各项基准上保留 85–98% 的任务性能。我们对量化进行了理论分析，将其视为 structured parameter perturbation，在冻结 backbone 架构下推导了量化 policy gradient 的收敛界，并识别出 extreme quantization 下的 exploration-stability trade-off。我们的框架将 1-bit 量化语言模型与强化学习系统性地整合用于边缘部署，并在商用硬件上验证了其有效性。</p>
+
+      </div>
+
+
+      <footer>
+        
+
+
+        
+        
+        
+        
+        
+        
+        
+      </footer>
+    </article>
+
+    
+  </section>
+
+    </div>
+
+    <footer class="footer">
+  <section class="container">
+    ©
+    
+      2019 -
+    
+    2026
+     Jie Xin 
+    ·
+    
+    Powered by <a href="https://gohugo.io/" target="_blank" rel="noopener">Hugo</a> & <a href="https://github.com/luizdepra/hugo-coder/" target="_blank" rel="noopener">Coder</a>.
+    
+  </section>
+</footer>
+
+  </main>
+
+  
+
+  
+  
+  <script src="/js/coder.min.6ae284be93d2d19dad1f02b0039508d9aab3180a12a06dcc71b0b0ef7825a317.js" integrity="sha256-auKEvpPS0Z2tHwKwA5UI2aqzGAoSoG3McbCw73gloxc="></script>
+  
+
+  
+
+  
+
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+</body>
+</html>

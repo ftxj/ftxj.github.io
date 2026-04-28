@@ -1,0 +1,378 @@
+<!DOCTYPE html>
+<html lang="zh">
+
+<head>
+  <title>
+  Rewarding the Scientific Process: Process-Level Reward Modeling for Agentic Data Analysis · JXIN&#39;s Home
+</title>
+  <meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="color-scheme" content="light dark">
+
+
+
+
+<meta name="author" content="Jie Xin">
+<meta name="description" content="arXiv: 2604.24198 · PDF
+作者: Zhisong Qiu, Shuofei Qiao, Kewei Xu, Yuqi Zhu, Lun Du, Ningyu Zhang, Huajun Chen
+单位: Ant Group, Zhejiang University
+主分类: cs.CL · 全部: cs.AI, cs.CE, cs.CL, cs.LG, cs.MA
+命中关键词: large language model, llm, agent, agentic, reasoning, inference
+
+TL;DR
+DataPRM 是一个环境感知的生成式过程奖励模型，通过主动交互探测中间执行状态和三值反思奖励，解决通用 PRM 在数据分析 agent 上漏判静默错误、误罚探索行为的问题，仅 4B 参数即可在 ScienceAgentBench 上带来 7.21% 提升。
+Motivation
+Process Reward Model（PRM）在数学等静态域已经证明能显著增强 LLM 的推理能力，但搬到数据分析这种动态、需要与解释器反复交互的任务上就失灵了。作者做了一项实证研究，发现通用 PRM 存在两类系统性失败：一是漏掉 silent errors——代码没抛异常但逻辑错，结果数值错但 PRM 给高分；二是把必要的 trial-and-error exploration 当成 grounding 失败而过度惩罚，打压了 agent 正常的试错路径。">
+<meta name="keywords" content="blog,developer,personal">
+
+
+
+  <meta name="twitter:card" content="summary">
+  <meta name="twitter:title" content="Rewarding the Scientific Process: Process-Level Reward Modeling for Agentic Data Analysis">
+  <meta name="twitter:description" content="arXiv: 2604.24198 · PDF
+作者: Zhisong Qiu, Shuofei Qiao, Kewei Xu, Yuqi Zhu, Lun Du, Ningyu Zhang, Huajun Chen
+单位: Ant Group, Zhejiang University
+主分类: cs.CL · 全部: cs.AI, cs.CE, cs.CL, cs.LG, cs.MA
+命中关键词: large language model, llm, agent, agentic, reasoning, inference
+TL;DR DataPRM 是一个环境感知的生成式过程奖励模型，通过主动交互探测中间执行状态和三值反思奖励，解决通用 PRM 在数据分析 agent 上漏判静默错误、误罚探索行为的问题，仅 4B 参数即可在 ScienceAgentBench 上带来 7.21% 提升。
+Motivation Process Reward Model（PRM）在数学等静态域已经证明能显著增强 LLM 的推理能力，但搬到数据分析这种动态、需要与解释器反复交互的任务上就失灵了。作者做了一项实证研究，发现通用 PRM 存在两类系统性失败：一是漏掉 silent errors——代码没抛异常但逻辑错，结果数值错但 PRM 给高分；二是把必要的 trial-and-error exploration 当成 grounding 失败而过度惩罚，打压了 agent 正常的试错路径。">
+
+<meta property="og:url" content="https://ftxj.github.io/zh/posts/2026-04-28/10-rewarding-the-scientific-process-process-level-reward-modeli/">
+  <meta property="og:site_name" content="JXIN&#39;s Home">
+  <meta property="og:title" content="Rewarding the Scientific Process: Process-Level Reward Modeling for Agentic Data Analysis">
+  <meta property="og:description" content="arXiv: 2604.24198 · PDF
+作者: Zhisong Qiu, Shuofei Qiao, Kewei Xu, Yuqi Zhu, Lun Du, Ningyu Zhang, Huajun Chen
+单位: Ant Group, Zhejiang University
+主分类: cs.CL · 全部: cs.AI, cs.CE, cs.CL, cs.LG, cs.MA
+命中关键词: large language model, llm, agent, agentic, reasoning, inference
+TL;DR DataPRM 是一个环境感知的生成式过程奖励模型，通过主动交互探测中间执行状态和三值反思奖励，解决通用 PRM 在数据分析 agent 上漏判静默错误、误罚探索行为的问题，仅 4B 参数即可在 ScienceAgentBench 上带来 7.21% 提升。
+Motivation Process Reward Model（PRM）在数学等静态域已经证明能显著增强 LLM 的推理能力，但搬到数据分析这种动态、需要与解释器反复交互的任务上就失灵了。作者做了一项实证研究，发现通用 PRM 存在两类系统性失败：一是漏掉 silent errors——代码没抛异常但逻辑错，结果数值错但 PRM 给高分；二是把必要的 trial-and-error exploration 当成 grounding 失败而过度惩罚，打压了 agent 正常的试错路径。">
+  <meta property="og:locale" content="zh">
+  <meta property="og:type" content="article">
+    <meta property="article:section" content="posts">
+    <meta property="article:published_time" content="2026-04-28T09:23:35+00:00">
+    <meta property="article:modified_time" content="2026-04-28T09:23:35+00:00">
+
+
+
+
+<link rel="canonical" href="https://ftxj.github.io/zh/posts/2026-04-28/10-rewarding-the-scientific-process-process-level-reward-modeli/">
+
+
+<link rel="preload" href="/fonts/fa-brands-400.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="/fonts/fa-regular-400.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="/fonts/fa-solid-900.woff2" as="font" type="font/woff2" crossorigin>
+
+
+  
+  
+  <link rel="stylesheet" href="/css/coder.min.5e94c1acf7aa2066035cf2764ae3e4fe39db101d68b870f919966100d51fb861.css" integrity="sha256-XpTBrPeqIGYDXPJ2SuPk/jnbEB1ouHD5GZZhANUfuGE=" crossorigin="anonymous" media="screen" />
+
+
+
+
+
+
+  
+    
+    
+    <link rel="stylesheet" href="/css/coder-dark.min.a00e6364bacbc8266ad1cc81230774a1397198f8cfb7bcba29b7d6fcb54ce57f.css" integrity="sha256-oA5jZLrLyCZq0cyBIwd0oTlxmPjPt7y6KbfW/LVM5X8=" crossorigin="anonymous" media="screen" />
+  
+
+
+
+ 
+
+
+
+
+<link rel="icon" type="image/svg+xml" href="/images/favicon.svg" sizes="any">
+<link rel="icon" type="image/png" href="/images/favicon-32x32.png" sizes="32x32">
+<link rel="icon" type="image/png" href="/images/favicon-16x16.png" sizes="16x16">
+
+<link rel="apple-touch-icon" href="/images/apple-touch-icon.png">
+<link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon.png">
+
+<link rel="manifest" href="/site.webmanifest">
+<link rel="mask-icon" href="/images/safari-pinned-tab.svg" color="#5bbad5">
+
+
+
+
+
+
+<style>
+.content article ul {
+  list-style: disc !important;
+  padding-left: 2.5rem !important;
+}
+
+.content article ul li {
+  display: list-item !important;
+}
+</style>
+
+
+
+
+  
+</head>
+
+
+
+
+
+
+<body class="preload-transitions colorscheme-auto">
+  
+<div class="float-container">
+    <a id="dark-mode-toggle" class="colorscheme-toggle">
+        <i class="fa-solid fa-adjust fa-fw" aria-hidden="true"></i>
+    </a>
+</div>
+
+
+  <main class="wrapper">
+    <nav class="navigation">
+  <section class="container">
+    
+    <a class="navigation-title" href="https://ftxj.github.io/zh/">
+      JXIN&#39;s Home
+    </a>
+    
+    
+      <input type="checkbox" id="menu-toggle" />
+      <label class="menu-button float-right" for="menu-toggle">
+        <i class="fa-solid fa-bars fa-fw" aria-hidden="true"></i>
+      </label>
+      <ul class="navigation-list">
+        
+          
+            <li class="navigation-item">
+              <a class="navigation-link " href="/zh/about/">关于</a>
+            </li>
+          
+            <li class="navigation-item">
+              <a class="navigation-link " href="/zh/travel/">旅行</a>
+            </li>
+          
+            <li class="navigation-item">
+              <a class="navigation-link " href="/zh/posts/">博客</a>
+            </li>
+          
+            <li class="navigation-item">
+              <a class="navigation-link " href="https://ftxj.github.io/cv/cv_zh.pdf">简历</a>
+            </li>
+          
+        
+        
+          
+          
+          
+            
+              
+                <li class="navigation-item menu-separator">
+                  <span>|</span>
+                </li>
+                
+              
+              <li class="navigation-item">
+                <a href="/posts/2026-04-28/10-rewarding-the-scientific-process-process-level-reward-modeli/">EN</a>
+              </li>
+            
+          
+        
+      </ul>
+    
+  </section>
+</nav>
+
+
+    <div class="content">
+      
+  <section class="container post">
+    <article>
+      <header>
+        <div class="post-title">
+          <h1 class="title">
+            <a class="title-link" href="https://ftxj.github.io/zh/posts/2026-04-28/10-rewarding-the-scientific-process-process-level-reward-modeli/">
+              Rewarding the Scientific Process: Process-Level Reward Modeling for Agentic Data Analysis
+            </a>
+          </h1>
+        </div>
+        <div class="post-meta">
+          <div class="date">
+            <span class="posted-on">
+              <i class="fa-solid fa-calendar" aria-hidden="true"></i>
+              <time datetime="2026-04-28T09:23:35Z">
+                四月 28, 2026
+              </time>
+            </span>
+            <span class="reading-time">
+              <i class="fa-solid fa-clock" aria-hidden="true"></i>
+              3-minute read
+            </span>
+          </div>
+          
+          <div class="categories">
+  <i class="fa-solid fa-folder" aria-hidden="true"></i>
+    <a href="/zh/categories/paper-digest/">Paper-Digest</a>
+      <span class="separator">•</span>
+    <a href="/zh/categories/2026-04-28/">2026-04-28</a></div>
+
+          
+        </div>
+      </header>
+
+      
+
+
+      <div class="post-content">
+        
+        <p><strong>arXiv:</strong> <a href="https://arxiv.org/abs/2604.24198v1">2604.24198</a> · <a href="https://arxiv.org/pdf/2604.24198v1">PDF</a></p>
+<p><strong>作者:</strong> Zhisong Qiu, Shuofei Qiao, Kewei Xu, Yuqi Zhu, Lun Du, Ningyu Zhang, Huajun Chen</p>
+<p><strong>单位:</strong> Ant Group, Zhejiang University</p>
+<p><strong>主分类:</strong> <code>cs.CL</code> · 全部: cs.AI, cs.CE, cs.CL, cs.LG, cs.MA</p>
+<p><strong>命中关键词:</strong> large language model, llm, agent, agentic, reasoning, inference</p>
+<hr>
+<h2 id="tldr">TL;DR</h2>
+<p>DataPRM 是一个环境感知的生成式过程奖励模型，通过主动交互探测中间执行状态和三值反思奖励，解决通用 PRM 在数据分析 agent 上漏判静默错误、误罚探索行为的问题，仅 4B 参数即可在 ScienceAgentBench 上带来 7.21% 提升。</p>
+<h2 id="motivation">Motivation</h2>
+<p>Process Reward Model（PRM）在数学等静态域已经证明能显著增强 LLM 的推理能力，但搬到数据分析这种动态、需要与解释器反复交互的任务上就失灵了。作者做了一项实证研究，发现通用 PRM 存在两类系统性失败：一是漏掉 <strong>silent errors</strong>——代码没抛异常但逻辑错，结果数值错但 PRM 给高分；二是把必要的 <strong>trial-and-error exploration</strong> 当成 grounding 失败而过度惩罚，打压了 agent 正常的试错路径。</p>
+<p>今天受这个问题困扰的是做 agentic data analysis 的团队——比如 ScienceAgentBench、DABStep、DABench、TableBench 这一类需要 agent 写 pandas/SQL、跑数据、再根据中间输出调整策略的场景。目前的 workaround 要么是只用 outcome reward（结果对就给分），粒度太粗、RL 时 credit assignment 很差；要么是直接套数学域 PRM，但静默错误和探索行为根本没进训练分布。</p>
+<p>这件事现在才值得做的前置条件，是 agent 已经具备了调用解释器、观察中间状态的能力，PRM 本身也可以被设计成能主动与环境交互的 verifier，而不只是一个被动评分器。如果 PRM 不接入环境，就看不到那些只有执行后才暴露的 silent bug。作者的实际影响范围也说得比较诚实：聚焦 data analysis agent 这一类，不声称通用。</p>
+<h2 id="核心观点">核心观点</h2>
+<ul>
+<li>通用 PRM 在数据分析 agent 上存在两类系统性失败：漏判 silent errors、错罚探索动作。</li>
+<li>PRM 需要成为 <strong>active verifier</strong>——可以自己调用环境去探中间状态，而不是只看 trajectory 文本打分。</li>
+<li>三值 <strong>reflection-aware</strong> 奖励：区分&quot;可纠正的 grounding 错误&quot;和&quot;不可恢复的错误&quot;，避免把探索当成失败。</li>
+<li>用 diversity-driven trajectory generation + knowledge-augmented step-level 标注，构造 8K+ 高质量训练样本。</li>
+<li>4B 参数就能打过更大基线，并且在 Best-of-N、Beam Search、DVTS、RL 四种下游用法中都稳定有效。</li>
+</ul>
+<p>下图对应作者的 pilot study：通用 PRM 在 data analysis 上整体分数偏低，且在 grounding error 场景下的分数分布明显错配——本该低分的反而高分、探索步却被压到低分，直接佐证了上述两类失败模式。</p>
+<p><img alt="图 2" src="/images/papers/2604.24198/fig2.png"></p>
+<p><img alt="图 3" src="/images/papers/2604.24198/fig3.png"></p>
+<h2 id="方法">方法</h2>
+<p>DataPRM 的定位是一个 <strong>环境感知生成式 PRM</strong>。给定历史 trajectory $h_t$ 和当前步 $\tau_t$，它不仅读文本，还具备工具调用能力主动重跑 / 探查中间执行状态，从而抓 silent error。奖励端采用 ternary reflection-aware 策略：正确 / 可纠正的 grounding 错误 / 不可恢复错误三档，让 agent 在探索时不被一刀切地扣分。</p>
+<p>下图是它与 data analysis agent 协同的 pipeline：agent 负责执行任务，PRM 逐步监督每一步 procedural action，必要时主动和环境交互来验证。</p>
+<p><img alt="图 1" src="/images/papers/2604.24198/fig1.png"></p>
+<p>训练数据方面，作者设计了 scalable 的两段式 pipeline：(a) diversity-driven trajectory generation 扩大行为覆盖 + knowledge-augmented step-level annotation 给每步打标；(b) 打分端用 multi-turn interaction、tool-augmented、reflection-aware 三种机制共同产出奖励。总共构造 8K+ 高质量训练实例。</p>
+<p><img alt="图 5" src="/images/papers/2604.24198/fig5.png"></p>
+<h2 id="实验">实验</h2>
+<p>Benchmark：ScienceAgentBench、DABStep、DABench、TableBench。用法覆盖 Best-of-N、Beam Search、DVTS 等 Test-Time Scaling 策略，以及把 PRM 接进 RL 做 process reward 监督，与 outcome-reward baseline 对比。模型规模 4B。</p>
+<h2 id="结果">结果</h2>
+<p>Best-of-N 推理下，DataPRM 在 ScienceAgentBench 上把下游 policy LLM 提升 7.21%，在 DABStep 上提升 11.28%。4B 参数跑赢更强的大尺寸 baseline。</p>
+<p>在扩展的 TTS 策略下，Beam Search 和 DVTS 两种搜索、各计算预算档位上都稳定优于所有 baseline，说明它不是只在 Best-of-N 一种采样下 overfit。</p>
+<p><img alt="图 6" src="/images/papers/2604.24198/fig6.png"></p>
+<p>接进 RL 后，process reward 相对 outcome-reward baseline 收益明显：DABench 达到 78.73%，TableBench 达到 64.84%，验证 step 级监督确实比只看最终答案更能稳住训练。</p>
+<p><img alt="图 7" src="/images/papers/2604.24198/fig7.png"></p>
+<p>训练曲线也显示 reward 随 step 稳定上升，没出现 outcome-reward 常见的 reward hacking 塌陷。</p>
+<p><img alt="图 8" src="/images/papers/2604.24198/fig8.png"></p>
+<p>环境交互这一组件的 ablation 证明主动探测中间状态是抓 silent error 的关键，去掉后性能回落。</p>
+<p><img alt="图 4" src="/images/papers/2604.24198/fig4.png"></p>
+<h2 id="结论">结论</h2>
+<p>实践者最该带走的一点：给 data analysis agent 做 PRM，别只当被动文本评分器——让 PRM 自己能调环境去验证中间状态，并且用三值奖励区分&quot;可纠正 grounding 错误&quot;和&quot;真错&quot;，就能用 4B 的小模型把下游 policy 在 ScienceAgentBench 上推高 7.21%、DABStep 推高 11.28%，且在 Best-of-N / Beam Search / DVTS / RL 四种用法下都稳定受益。边界也要说清：结论集中在 data analysis 这一类可执行、可观测的任务；数学、开放域 reasoning 是否同样受益没有验证；训练数据规模只有 8K+，更大规模下的 scaling 行为仍是未知。</p>
+<h2 id="是否新瓶装旧酒">是否新瓶装旧酒</h2>
+<ul>
+<li>对比 Math-Shepherd / PRM800K 这类静态域 PRM：核心 idea（step-level reward 监督）一致，但这些工作 PRM 是纯文本打分，没有环境交互；DataPRM 真正新的部分是让 PRM 变成 active verifier，主动跑中间状态抓 silent error。</li>
+<li>对比 code execution-based verifier（如用 unit test/解释器反馈做 reward）：也利用了执行信号，但执行信号一般只在 outcome 层或异常层；DataPRM 把它下沉到 step 级 PRM，并加入 ternary reflection-aware 以区分探索。</li>
+<li>对比 agent 的 self-reflection / self-critique：共享&quot;区分可纠正错误&quot;的直觉，但那一类是 actor 自评，DataPRM 是独立的 reward model 并用于 RL 训练。</li>
+<li>整体判断：不是换名字的增量工作，核心机制（环境交互 + 三值反思奖励）在 data analysis PRM 这个具体场景下是实打实的新设计，但概念级别的新颖度有限。</li>
+</ul>
+<h2 id="尚未回答的问题">尚未回答的问题</h2>
+<ul>
+<li>PRM 主动调用环境带来的额外执行成本 / 延迟没有系统量化。</li>
+<li>8K 训练样本之外的 scaling 曲线未知，更大规模是否继续受益不确定。</li>
+<li>能否迁移到非数据分析的 agent 任务（如 web agent、软件工程 agent）未验证。</li>
+<li>ternary reward 的阈值 / 判定是否对 prompt 分布敏感，缺更细的 ablation。</li>
+<li>与 outcome reward 混合使用的最优比例、以及在线 RL 中 PRM drift 问题没讨论。</li>
+</ul>
+<h2 id="原始摘要中文翻译">原始摘要（中文翻译）</h2>
+<p>Process Reward Models（PRM）在数学等静态领域已经取得了显著成功，用于增强大语言模型（LLM）的推理能力。然而，它们在动态数据分析任务中的潜力仍未被充分探索。在这项工作中，我们首先给出一项实证研究，揭示通用领域的 PRM 难以监督数据分析 agent：具体而言，它们无法检测到 silent errors（那些不会触发解释器异常、但会产生错误结果的逻辑缺陷），并且会错误地惩罚探索性动作，把必要的 trial-and-error 探索误判为 grounding failure。为弥合这一 gap，我们提出 DataPRM，一种新颖的、环境感知的生成式过程奖励模型：(1) 可以作为 active verifier，自主地与环境交互以探测中间执行状态，揭示 silent errors；(2) 采用 reflection-aware 的三值奖励策略，区分可纠正的 grounding 错误与不可恢复的错误。我们设计了一个可扩展的 pipeline，通过 diversity-driven 的 trajectory 生成和 knowledge-augmented 的 step 级标注，为 DataPRM 构建了超过 8K 条高质量训练实例。实验结果表明，在 Best-of-N 推理下，DataPRM 在 ScienceAgentBench 上为下游 policy LLM 带来 7.21% 的提升，在 DABStep 上带来 11.28% 的提升。值得注意的是，DataPRM 仅用 4B 参数便超越了强基线，并在多种 Test-Time Scaling 策略下表现出稳健的泛化能力。此外，将 DataPRM 集成到强化学习中，相对于 outcome-reward 基线带来了显著收益，在 DABench 上达到 78.73%，在 TableBench 上达到 64.84%，验证了 process reward 监督的有效性。代码已公开在 <a href="https://github.com/zjunlp/DataMind">https://github.com/zjunlp/DataMind</a> 。</p>
+
+      </div>
+
+
+      <footer>
+        
+
+
+        
+        
+        
+        
+        
+        
+        
+      </footer>
+    </article>
+
+    
+  </section>
+
+    </div>
+
+    <footer class="footer">
+  <section class="container">
+    ©
+    
+      2019 -
+    
+    2026
+     Jie Xin 
+    ·
+    
+    Powered by <a href="https://gohugo.io/" target="_blank" rel="noopener">Hugo</a> & <a href="https://github.com/luizdepra/hugo-coder/" target="_blank" rel="noopener">Coder</a>.
+    
+  </section>
+</footer>
+
+  </main>
+
+  
+
+  
+  
+  <script src="/js/coder.min.6ae284be93d2d19dad1f02b0039508d9aab3180a12a06dcc71b0b0ef7825a317.js" integrity="sha256-auKEvpPS0Z2tHwKwA5UI2aqzGAoSoG3McbCw73gloxc="></script>
+  
+
+  
+
+  
+
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+</body>
+</html>

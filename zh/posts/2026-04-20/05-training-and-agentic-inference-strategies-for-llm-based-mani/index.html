@@ -1,0 +1,422 @@
+<!DOCTYPE html>
+<html lang="zh">
+
+<head>
+  <title>
+  Training and Agentic Inference Strategies for LLM-based Manim Animation Generation · JXIN&#39;s Home
+</title>
+  <meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="color-scheme" content="light dark">
+
+
+
+
+<meta name="author" content="Jie Xin">
+<meta name="description" content="arXiv: 2604.18364 · PDF
+作者: Ravidu Suien Rammuni Silva, Ahmad Lotfi, Isibor Kennedy Ihianle, Golnaz Shahtahmassebi, Jordan J. Bird
+主分类: cs.AI · 全部: cs.AI, cs.GR, cs.MA
+命中关键词: large language model, llm, agent, agentic, reasoning, inference, fine-tun
+
+TL;DR
+提出 ManimTrainer（SFT&#43;GRPO）与 ManimAgent（RITL/RITL-DOC）两套训练-推理管线，首次系统研究 LLM 生成 Manim 动画的 text-to-code-to-video 任务。
+核心观点
+
+首次统一研究 Manim 动画生成的训练与推理策略交互。
+SFT 提升代码质量，GRPO 提升视觉输出并增强自我修正对外部信号的响应性。
+提出融合代码与视觉评估的统一奖励信号。
+推理阶段引入 Renderer-in-the-loop（RITL）及文档增强版 RITL-DOC。
+
+方法
+
+ManimTrainer：SFT &#43; 基于 GRPO 的 RL，奖励同时融合代码正确性与视觉相似度信号。
+ManimAgent：推理时将渲染器结果回灌给 LLM（RITL），并额外注入 Manim API 文档（RITL-DOC），支持自我修正。
+任务形式：文本 → Manim 代码 → 视频。
+
+实验
+
+基准：ManimBench。
+模型：17 个开源 sub-30B LLM（含 Qwen 3 Coder 30B 等），对比 GPT-4.1 基线。
+组合：9 种训练 × 推理策略组合。
+指标：Render Success Rate（RSR）、Visual Similarity（VS），以及代码-视觉相关性分析。
+
+结果
+
+最佳组合 Qwen 3 Coder 30B &#43; GRPO &#43; RITL-DOC：RSR 94%，VS 85.7%。
+VS 比 GPT-4.1 基线高 &#43;3 个百分点。
+SFT/GRPO 强化代码与视觉指标相关性；推理增强（RITL）反而削弱该相关性，说明二者互补。
+
+为什么重要
+
+给出面向小参数量开源模型的可行配方：训练侧用 SFT&#43;GRPO，推理侧用渲染回路&#43;文档检索，即可在视频生成这类 spatial&#43;temporal&#43;API 密集任务上超越 GPT-4.1。
+对 agent infra：验证 renderer-in-the-loop 作为外部验证器能显著提升代码-to-artifact 任务的可靠性。
+
+与已有工作的关系
+
+训练方法延续 SFT&#43;RLHF/GRPO 路线（DeepSeek GRPO）。
+推理策略属于 agentic self-correction / tool-use 家族，与 Reflexion、Self-Debug、Self-Refine 相近，但以渲染器为 grounding。
+任务上接续 text-to-code、text-to-video 研究脉络，特化到 Manim 这类 DSL。
+
+尚未回答的问题
+
+能否扩展到 &gt;30B 闭源模型或其他图形 DSL（如 TikZ、Three.js）？
+统一奖励信号的权重设计与 reward hacking 风险未深入讨论。
+推理增强削弱代码-视觉相关性的机制仍需解释。
+长时序、多场景复杂动画下的泛化能力未验证。
+
+
+论文图表
+图 1: Figure 1 (extracted from PDF)">
+<meta name="keywords" content="blog,developer,personal">
+
+
+
+  <meta name="twitter:card" content="summary">
+  <meta name="twitter:title" content="Training and Agentic Inference Strategies for LLM-based Manim Animation Generation">
+  <meta name="twitter:description" content="arXiv: 2604.18364 · PDF
+作者: Ravidu Suien Rammuni Silva, Ahmad Lotfi, Isibor Kennedy Ihianle, Golnaz Shahtahmassebi, Jordan J. Bird
+主分类: cs.AI · 全部: cs.AI, cs.GR, cs.MA
+命中关键词: large language model, llm, agent, agentic, reasoning, inference, fine-tun
+TL;DR 提出 ManimTrainer（SFT&#43;GRPO）与 ManimAgent（RITL/RITL-DOC）两套训练-推理管线，首次系统研究 LLM 生成 Manim 动画的 text-to-code-to-video 任务。
+核心观点 首次统一研究 Manim 动画生成的训练与推理策略交互。 SFT 提升代码质量，GRPO 提升视觉输出并增强自我修正对外部信号的响应性。 提出融合代码与视觉评估的统一奖励信号。 推理阶段引入 Renderer-in-the-loop（RITL）及文档增强版 RITL-DOC。 方法 ManimTrainer：SFT &#43; 基于 GRPO 的 RL，奖励同时融合代码正确性与视觉相似度信号。 ManimAgent：推理时将渲染器结果回灌给 LLM（RITL），并额外注入 Manim API 文档（RITL-DOC），支持自我修正。 任务形式：文本 → Manim 代码 → 视频。 实验 基准：ManimBench。 模型：17 个开源 sub-30B LLM（含 Qwen 3 Coder 30B 等），对比 GPT-4.1 基线。 组合：9 种训练 × 推理策略组合。 指标：Render Success Rate（RSR）、Visual Similarity（VS），以及代码-视觉相关性分析。 结果 最佳组合 Qwen 3 Coder 30B &#43; GRPO &#43; RITL-DOC：RSR 94%，VS 85.7%。 VS 比 GPT-4.1 基线高 &#43;3 个百分点。 SFT/GRPO 强化代码与视觉指标相关性；推理增强（RITL）反而削弱该相关性，说明二者互补。 为什么重要 给出面向小参数量开源模型的可行配方：训练侧用 SFT&#43;GRPO，推理侧用渲染回路&#43;文档检索，即可在视频生成这类 spatial&#43;temporal&#43;API 密集任务上超越 GPT-4.1。 对 agent infra：验证 renderer-in-the-loop 作为外部验证器能显著提升代码-to-artifact 任务的可靠性。 与已有工作的关系 训练方法延续 SFT&#43;RLHF/GRPO 路线（DeepSeek GRPO）。 推理策略属于 agentic self-correction / tool-use 家族，与 Reflexion、Self-Debug、Self-Refine 相近，但以渲染器为 grounding。 任务上接续 text-to-code、text-to-video 研究脉络，特化到 Manim 这类 DSL。 尚未回答的问题 能否扩展到 &gt;30B 闭源模型或其他图形 DSL（如 TikZ、Three.js）？ 统一奖励信号的权重设计与 reward hacking 风险未深入讨论。 推理增强削弱代码-视觉相关性的机制仍需解释。 长时序、多场景复杂动画下的泛化能力未验证。 论文图表 图 1: Figure 1 (extracted from PDF)">
+
+<meta property="og:url" content="https://ftxj.github.io/zh/posts/2026-04-20/05-training-and-agentic-inference-strategies-for-llm-based-mani/">
+  <meta property="og:site_name" content="JXIN&#39;s Home">
+  <meta property="og:title" content="Training and Agentic Inference Strategies for LLM-based Manim Animation Generation">
+  <meta property="og:description" content="arXiv: 2604.18364 · PDF
+作者: Ravidu Suien Rammuni Silva, Ahmad Lotfi, Isibor Kennedy Ihianle, Golnaz Shahtahmassebi, Jordan J. Bird
+主分类: cs.AI · 全部: cs.AI, cs.GR, cs.MA
+命中关键词: large language model, llm, agent, agentic, reasoning, inference, fine-tun
+TL;DR 提出 ManimTrainer（SFT&#43;GRPO）与 ManimAgent（RITL/RITL-DOC）两套训练-推理管线，首次系统研究 LLM 生成 Manim 动画的 text-to-code-to-video 任务。
+核心观点 首次统一研究 Manim 动画生成的训练与推理策略交互。 SFT 提升代码质量，GRPO 提升视觉输出并增强自我修正对外部信号的响应性。 提出融合代码与视觉评估的统一奖励信号。 推理阶段引入 Renderer-in-the-loop（RITL）及文档增强版 RITL-DOC。 方法 ManimTrainer：SFT &#43; 基于 GRPO 的 RL，奖励同时融合代码正确性与视觉相似度信号。 ManimAgent：推理时将渲染器结果回灌给 LLM（RITL），并额外注入 Manim API 文档（RITL-DOC），支持自我修正。 任务形式：文本 → Manim 代码 → 视频。 实验 基准：ManimBench。 模型：17 个开源 sub-30B LLM（含 Qwen 3 Coder 30B 等），对比 GPT-4.1 基线。 组合：9 种训练 × 推理策略组合。 指标：Render Success Rate（RSR）、Visual Similarity（VS），以及代码-视觉相关性分析。 结果 最佳组合 Qwen 3 Coder 30B &#43; GRPO &#43; RITL-DOC：RSR 94%，VS 85.7%。 VS 比 GPT-4.1 基线高 &#43;3 个百分点。 SFT/GRPO 强化代码与视觉指标相关性；推理增强（RITL）反而削弱该相关性，说明二者互补。 为什么重要 给出面向小参数量开源模型的可行配方：训练侧用 SFT&#43;GRPO，推理侧用渲染回路&#43;文档检索，即可在视频生成这类 spatial&#43;temporal&#43;API 密集任务上超越 GPT-4.1。 对 agent infra：验证 renderer-in-the-loop 作为外部验证器能显著提升代码-to-artifact 任务的可靠性。 与已有工作的关系 训练方法延续 SFT&#43;RLHF/GRPO 路线（DeepSeek GRPO）。 推理策略属于 agentic self-correction / tool-use 家族，与 Reflexion、Self-Debug、Self-Refine 相近，但以渲染器为 grounding。 任务上接续 text-to-code、text-to-video 研究脉络，特化到 Manim 这类 DSL。 尚未回答的问题 能否扩展到 &gt;30B 闭源模型或其他图形 DSL（如 TikZ、Three.js）？ 统一奖励信号的权重设计与 reward hacking 风险未深入讨论。 推理增强削弱代码-视觉相关性的机制仍需解释。 长时序、多场景复杂动画下的泛化能力未验证。 论文图表 图 1: Figure 1 (extracted from PDF)">
+  <meta property="og:locale" content="zh">
+  <meta property="og:type" content="article">
+    <meta property="article:section" content="posts">
+    <meta property="article:published_time" content="2026-04-27T05:26:04+00:00">
+    <meta property="article:modified_time" content="2026-04-27T05:26:04+00:00">
+
+
+
+
+<link rel="canonical" href="https://ftxj.github.io/zh/posts/2026-04-20/05-training-and-agentic-inference-strategies-for-llm-based-mani/">
+
+
+<link rel="preload" href="/fonts/fa-brands-400.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="/fonts/fa-regular-400.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="/fonts/fa-solid-900.woff2" as="font" type="font/woff2" crossorigin>
+
+
+  
+  
+  <link rel="stylesheet" href="/css/coder.min.5e94c1acf7aa2066035cf2764ae3e4fe39db101d68b870f919966100d51fb861.css" integrity="sha256-XpTBrPeqIGYDXPJ2SuPk/jnbEB1ouHD5GZZhANUfuGE=" crossorigin="anonymous" media="screen" />
+
+
+
+
+
+
+  
+    
+    
+    <link rel="stylesheet" href="/css/coder-dark.min.a00e6364bacbc8266ad1cc81230774a1397198f8cfb7bcba29b7d6fcb54ce57f.css" integrity="sha256-oA5jZLrLyCZq0cyBIwd0oTlxmPjPt7y6KbfW/LVM5X8=" crossorigin="anonymous" media="screen" />
+  
+
+
+
+ 
+
+
+
+
+<link rel="icon" type="image/svg+xml" href="/images/favicon.svg" sizes="any">
+<link rel="icon" type="image/png" href="/images/favicon-32x32.png" sizes="32x32">
+<link rel="icon" type="image/png" href="/images/favicon-16x16.png" sizes="16x16">
+
+<link rel="apple-touch-icon" href="/images/apple-touch-icon.png">
+<link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon.png">
+
+<link rel="manifest" href="/site.webmanifest">
+<link rel="mask-icon" href="/images/safari-pinned-tab.svg" color="#5bbad5">
+
+
+
+
+
+
+<style>
+.content article ul {
+  list-style: disc !important;
+  padding-left: 2.5rem !important;
+}
+
+.content article ul li {
+  display: list-item !important;
+}
+</style>
+
+
+
+
+  
+</head>
+
+
+
+
+
+
+<body class="preload-transitions colorscheme-auto">
+  
+<div class="float-container">
+    <a id="dark-mode-toggle" class="colorscheme-toggle">
+        <i class="fa-solid fa-adjust fa-fw" aria-hidden="true"></i>
+    </a>
+</div>
+
+
+  <main class="wrapper">
+    <nav class="navigation">
+  <section class="container">
+    
+    <a class="navigation-title" href="https://ftxj.github.io/zh/">
+      JXIN&#39;s Home
+    </a>
+    
+    
+      <input type="checkbox" id="menu-toggle" />
+      <label class="menu-button float-right" for="menu-toggle">
+        <i class="fa-solid fa-bars fa-fw" aria-hidden="true"></i>
+      </label>
+      <ul class="navigation-list">
+        
+          
+            <li class="navigation-item">
+              <a class="navigation-link " href="/zh/about/">关于</a>
+            </li>
+          
+            <li class="navigation-item">
+              <a class="navigation-link " href="/zh/travel/">旅行</a>
+            </li>
+          
+            <li class="navigation-item">
+              <a class="navigation-link " href="/zh/posts/">博客</a>
+            </li>
+          
+            <li class="navigation-item">
+              <a class="navigation-link " href="https://ftxj.github.io/cv/cv_zh.pdf">简历</a>
+            </li>
+          
+        
+        
+          
+          
+          
+            
+              
+                <li class="navigation-item menu-separator">
+                  <span>|</span>
+                </li>
+                
+              
+              <li class="navigation-item">
+                <a href="/posts/2026-04-20/05-training-and-agentic-inference-strategies-for-llm-based-mani/">EN</a>
+              </li>
+            
+          
+        
+      </ul>
+    
+  </section>
+</nav>
+
+
+    <div class="content">
+      
+  <section class="container post">
+    <article>
+      <header>
+        <div class="post-title">
+          <h1 class="title">
+            <a class="title-link" href="https://ftxj.github.io/zh/posts/2026-04-20/05-training-and-agentic-inference-strategies-for-llm-based-mani/">
+              Training and Agentic Inference Strategies for LLM-based Manim Animation Generation
+            </a>
+          </h1>
+        </div>
+        <div class="post-meta">
+          <div class="date">
+            <span class="posted-on">
+              <i class="fa-solid fa-calendar" aria-hidden="true"></i>
+              <time datetime="2026-04-27T05:26:04Z">
+                四月 27, 2026
+              </time>
+            </span>
+            <span class="reading-time">
+              <i class="fa-solid fa-clock" aria-hidden="true"></i>
+              2-minute read
+            </span>
+          </div>
+          
+          <div class="categories">
+  <i class="fa-solid fa-folder" aria-hidden="true"></i>
+    <a href="/zh/categories/paper-digest/">Paper-Digest</a>
+      <span class="separator">•</span>
+    <a href="/zh/categories/2026-04-20/">2026-04-20</a></div>
+
+          
+        </div>
+      </header>
+
+      
+
+
+      <div class="post-content">
+        
+        <p><strong>arXiv:</strong> <a href="https://arxiv.org/abs/2604.18364v1">2604.18364</a> · <a href="https://arxiv.org/pdf/2604.18364v1">PDF</a></p>
+<p><strong>作者:</strong> Ravidu Suien Rammuni Silva, Ahmad Lotfi, Isibor Kennedy Ihianle, Golnaz Shahtahmassebi, Jordan J. Bird</p>
+<p><strong>主分类:</strong> <code>cs.AI</code> · 全部: cs.AI, cs.GR, cs.MA</p>
+<p><strong>命中关键词:</strong> large language model, llm, agent, agentic, reasoning, inference, fine-tun</p>
+<hr>
+<h2 id="tldr">TL;DR</h2>
+<p>提出 ManimTrainer（SFT+GRPO）与 ManimAgent（RITL/RITL-DOC）两套训练-推理管线，首次系统研究 LLM 生成 Manim 动画的 text-to-code-to-video 任务。</p>
+<h2 id="核心观点">核心观点</h2>
+<ul>
+<li>首次统一研究 Manim 动画生成的训练与推理策略交互。</li>
+<li>SFT 提升代码质量，GRPO 提升视觉输出并增强自我修正对外部信号的响应性。</li>
+<li>提出融合代码与视觉评估的统一奖励信号。</li>
+<li>推理阶段引入 Renderer-in-the-loop（RITL）及文档增强版 RITL-DOC。</li>
+</ul>
+<h2 id="方法">方法</h2>
+<ul>
+<li><strong>ManimTrainer</strong>：SFT + 基于 GRPO 的 RL，奖励同时融合代码正确性与视觉相似度信号。</li>
+<li><strong>ManimAgent</strong>：推理时将渲染器结果回灌给 LLM（RITL），并额外注入 Manim API 文档（RITL-DOC），支持自我修正。</li>
+<li>任务形式：文本 → Manim 代码 → 视频。</li>
+</ul>
+<h2 id="实验">实验</h2>
+<ul>
+<li>基准：ManimBench。</li>
+<li>模型：17 个开源 sub-30B LLM（含 Qwen 3 Coder 30B 等），对比 GPT-4.1 基线。</li>
+<li>组合：9 种训练 × 推理策略组合。</li>
+<li>指标：Render Success Rate（RSR）、Visual Similarity（VS），以及代码-视觉相关性分析。</li>
+</ul>
+<h2 id="结果">结果</h2>
+<ul>
+<li>最佳组合 Qwen 3 Coder 30B + GRPO + RITL-DOC：RSR 94%，VS 85.7%。</li>
+<li>VS 比 GPT-4.1 基线高 +3 个百分点。</li>
+<li>SFT/GRPO 强化代码与视觉指标相关性；推理增强（RITL）反而削弱该相关性，说明二者互补。</li>
+</ul>
+<h2 id="为什么重要">为什么重要</h2>
+<ul>
+<li>给出面向小参数量开源模型的可行配方：训练侧用 SFT+GRPO，推理侧用渲染回路+文档检索，即可在视频生成这类 spatial+temporal+API 密集任务上超越 GPT-4.1。</li>
+<li>对 agent infra：验证 renderer-in-the-loop 作为外部验证器能显著提升代码-to-artifact 任务的可靠性。</li>
+</ul>
+<h2 id="与已有工作的关系">与已有工作的关系</h2>
+<ul>
+<li>训练方法延续 SFT+RLHF/GRPO 路线（DeepSeek GRPO）。</li>
+<li>推理策略属于 agentic self-correction / tool-use 家族，与 Reflexion、Self-Debug、Self-Refine 相近，但以渲染器为 grounding。</li>
+<li>任务上接续 text-to-code、text-to-video 研究脉络，特化到 Manim 这类 DSL。</li>
+</ul>
+<h2 id="尚未回答的问题">尚未回答的问题</h2>
+<ul>
+<li>能否扩展到 &gt;30B 闭源模型或其他图形 DSL（如 TikZ、Three.js）？</li>
+<li>统一奖励信号的权重设计与 reward hacking 风险未深入讨论。</li>
+<li>推理增强削弱代码-视觉相关性的机制仍需解释。</li>
+<li>长时序、多场景复杂动画下的泛化能力未验证。</li>
+</ul>
+<hr>
+<h2 id="论文图表">论文图表</h2>
+<p><strong>图 1:</strong> Figure 1 (extracted from PDF)</p>
+<p><img alt="图 1" src="/images/papers/2604.18364/fig1.png"></p>
+<p><strong>图 2:</strong> Figure 2 (extracted from PDF)</p>
+<p><img alt="图 2" src="/images/papers/2604.18364/fig2.png"></p>
+<p><strong>图 3:</strong> Figure 3 (extracted from PDF)</p>
+<p><img alt="图 3" src="/images/papers/2604.18364/fig3.png"></p>
+<hr>
+<h2 id="原始摘要">原始摘要</h2>
+<p>Generating programmatic animation using libraries such as Manim presents unique challenges for Large Language Models (LLMs), requiring spatial reasoning, temporal sequencing, and familiarity with domain-specific APIs that are underrepresented in general pre-training data. A systematic study of how training and inference strategies interact in this setting is lacking in current research. This study introduces ManimTrainer, a training pipeline that combines Supervised Fine-tuning (SFT) with Reinforcement Learning (RL) based Group Relative Policy Optimisation (GRPO) using a unified reward signal that fuses code and visual assessment signals, and ManimAgent, an inference pipeline featuring Renderer-in-the-loop (RITL) and API documentation-augmented RITL (RITL-DOC) strategies. Using these techniques, this study presents the first unified training and inference study for text-to-code-to-video transformation with Manim. It evaluates 17 open-source sub-30B LLMs across nine combinations of training and inference strategies using ManimBench. Results show that SFT generally improves code quality, while GRPO enhances visual outputs and increases the models&rsquo; responsiveness to extrinsic signals during self-correction at inference time. The Qwen 3 Coder 30B model with GRPO and RITL-DOC achieved the highest overall performance, with a 94% Render Success Rate (RSR) and 85.7% Visual Similarity (VS) to reference videos, surpassing the baseline GPT-4.1 model by +3 percentage points in VS. Additionally, the analysis shows that the correlation between code and visual metrics strengthens with SFT and GRPO but weakens with inference-time enhancements, highlighting the complementary roles of training and agentic inference strategies in Manim animation generation.</p>
+
+      </div>
+
+
+      <footer>
+        
+
+
+        
+        
+        
+        
+        
+        
+        
+      </footer>
+    </article>
+
+    
+  </section>
+
+    </div>
+
+    <footer class="footer">
+  <section class="container">
+    ©
+    
+      2019 -
+    
+    2026
+     Jie Xin 
+    ·
+    
+    Powered by <a href="https://gohugo.io/" target="_blank" rel="noopener">Hugo</a> & <a href="https://github.com/luizdepra/hugo-coder/" target="_blank" rel="noopener">Coder</a>.
+    
+  </section>
+</footer>
+
+  </main>
+
+  
+
+  
+  
+  <script src="/js/coder.min.6ae284be93d2d19dad1f02b0039508d9aab3180a12a06dcc71b0b0ef7825a317.js" integrity="sha256-auKEvpPS0Z2tHwKwA5UI2aqzGAoSoG3McbCw73gloxc="></script>
+  
+
+  
+
+  
+
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+</body>
+</html>

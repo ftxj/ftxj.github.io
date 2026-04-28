@@ -1,0 +1,348 @@
+<!DOCTYPE html>
+<html lang="zh">
+
+<head>
+  <title>
+  Agentic World Modeling: Foundations, Capabilities, Laws, and Beyond · JXIN&#39;s Home
+</title>
+  <meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="color-scheme" content="light dark">
+
+
+
+
+<meta name="author" content="Jie Xin">
+<meta name="description" content="arXiv: 2604.22748 · PDF
+作者: Meng Chu, Xuan Billy Zhang, Kevin Qinghong Lin, Lingdong Kong, Jize Zhang, Teng Tu, Weijian Ma, Ziqi Huang, Senqiao Yang, Wei Huang, Yeying Jin, Zhefan Rao, Jinhui Ye, Xinyu Lin, Xichen Zhang, Qisheng Hu, Shuai Yang, Leyang Shen, Wei Chow, Yifei Dong, Fengyi Wu, Quanyu Long, Bin Xia, Shaozuo Yu, Mingkang Zhu, Wenhu Zhang, Jiehui Huang, Haokun Gui, Haoxuan Che, Long Chen, Qifeng Chen, Wenxuan Zhang, Wenya Wang, Xiaojuan Qi, Yang Deng, Yanwei Li, Mike Zheng Shou, Zhi-Qi Cheng, See-Kiong Ng, Ziwei Liu, Philip Torr, Jiaya Jia">
+<meta name="keywords" content="blog,developer,personal">
+
+
+
+  <meta name="twitter:card" content="summary">
+  <meta name="twitter:title" content="Agentic World Modeling: Foundations, Capabilities, Laws, and Beyond">
+  <meta name="twitter:description" content="arXiv: 2604.22748 · PDF
+作者: Meng Chu, Xuan Billy Zhang, Kevin Qinghong Lin, Lingdong Kong, Jize Zhang, Teng Tu, Weijian Ma, Ziqi Huang, Senqiao Yang, Wei Huang, Yeying Jin, Zhefan Rao, Jinhui Ye, Xinyu Lin, Xichen Zhang, Qisheng Hu, Shuai Yang, Leyang Shen, Wei Chow, Yifei Dong, Fengyi Wu, Quanyu Long, Bin Xia, Shaozuo Yu, Mingkang Zhu, Wenhu Zhang, Jiehui Huang, Haokun Gui, Haoxuan Che, Long Chen, Qifeng Chen, Wenxuan Zhang, Wenya Wang, Xiaojuan Qi, Yang Deng, Yanwei Li, Mike Zheng Shou, Zhi-Qi Cheng, See-Kiong Ng, Ziwei Liu, Philip Torr, Jiaya Jia">
+
+<meta property="og:url" content="https://ftxj.github.io/zh/posts/2026-04-27/04-agentic-world-modeling-foundations-capabilities-laws-and-bey/">
+  <meta property="og:site_name" content="JXIN&#39;s Home">
+  <meta property="og:title" content="Agentic World Modeling: Foundations, Capabilities, Laws, and Beyond">
+  <meta property="og:description" content="arXiv: 2604.22748 · PDF
+作者: Meng Chu, Xuan Billy Zhang, Kevin Qinghong Lin, Lingdong Kong, Jize Zhang, Teng Tu, Weijian Ma, Ziqi Huang, Senqiao Yang, Wei Huang, Yeying Jin, Zhefan Rao, Jinhui Ye, Xinyu Lin, Xichen Zhang, Qisheng Hu, Shuai Yang, Leyang Shen, Wei Chow, Yifei Dong, Fengyi Wu, Quanyu Long, Bin Xia, Shaozuo Yu, Mingkang Zhu, Wenhu Zhang, Jiehui Huang, Haokun Gui, Haoxuan Che, Long Chen, Qifeng Chen, Wenxuan Zhang, Wenya Wang, Xiaojuan Qi, Yang Deng, Yanwei Li, Mike Zheng Shou, Zhi-Qi Cheng, See-Kiong Ng, Ziwei Liu, Philip Torr, Jiaya Jia">
+  <meta property="og:locale" content="zh">
+  <meta property="og:type" content="article">
+    <meta property="article:section" content="posts">
+    <meta property="article:published_time" content="2026-04-27T15:46:20+00:00">
+    <meta property="article:modified_time" content="2026-04-27T15:46:20+00:00">
+
+
+
+
+<link rel="canonical" href="https://ftxj.github.io/zh/posts/2026-04-27/04-agentic-world-modeling-foundations-capabilities-laws-and-bey/">
+
+
+<link rel="preload" href="/fonts/fa-brands-400.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="/fonts/fa-regular-400.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="/fonts/fa-solid-900.woff2" as="font" type="font/woff2" crossorigin>
+
+
+  
+  
+  <link rel="stylesheet" href="/css/coder.min.5e94c1acf7aa2066035cf2764ae3e4fe39db101d68b870f919966100d51fb861.css" integrity="sha256-XpTBrPeqIGYDXPJ2SuPk/jnbEB1ouHD5GZZhANUfuGE=" crossorigin="anonymous" media="screen" />
+
+
+
+
+
+
+  
+    
+    
+    <link rel="stylesheet" href="/css/coder-dark.min.a00e6364bacbc8266ad1cc81230774a1397198f8cfb7bcba29b7d6fcb54ce57f.css" integrity="sha256-oA5jZLrLyCZq0cyBIwd0oTlxmPjPt7y6KbfW/LVM5X8=" crossorigin="anonymous" media="screen" />
+  
+
+
+
+ 
+
+
+
+
+<link rel="icon" type="image/svg+xml" href="/images/favicon.svg" sizes="any">
+<link rel="icon" type="image/png" href="/images/favicon-32x32.png" sizes="32x32">
+<link rel="icon" type="image/png" href="/images/favicon-16x16.png" sizes="16x16">
+
+<link rel="apple-touch-icon" href="/images/apple-touch-icon.png">
+<link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon.png">
+
+<link rel="manifest" href="/site.webmanifest">
+<link rel="mask-icon" href="/images/safari-pinned-tab.svg" color="#5bbad5">
+
+
+
+
+
+
+<style>
+.content article ul {
+  list-style: disc !important;
+  padding-left: 2.5rem !important;
+}
+
+.content article ul li {
+  display: list-item !important;
+}
+</style>
+
+
+
+
+  
+</head>
+
+
+
+
+
+
+<body class="preload-transitions colorscheme-auto">
+  
+<div class="float-container">
+    <a id="dark-mode-toggle" class="colorscheme-toggle">
+        <i class="fa-solid fa-adjust fa-fw" aria-hidden="true"></i>
+    </a>
+</div>
+
+
+  <main class="wrapper">
+    <nav class="navigation">
+  <section class="container">
+    
+    <a class="navigation-title" href="https://ftxj.github.io/zh/">
+      JXIN&#39;s Home
+    </a>
+    
+    
+      <input type="checkbox" id="menu-toggle" />
+      <label class="menu-button float-right" for="menu-toggle">
+        <i class="fa-solid fa-bars fa-fw" aria-hidden="true"></i>
+      </label>
+      <ul class="navigation-list">
+        
+          
+            <li class="navigation-item">
+              <a class="navigation-link " href="/zh/about/">关于</a>
+            </li>
+          
+            <li class="navigation-item">
+              <a class="navigation-link " href="/zh/travel/">旅行</a>
+            </li>
+          
+            <li class="navigation-item">
+              <a class="navigation-link " href="/zh/posts/">博客</a>
+            </li>
+          
+            <li class="navigation-item">
+              <a class="navigation-link " href="https://ftxj.github.io/cv/cv_zh.pdf">简历</a>
+            </li>
+          
+        
+        
+          
+          
+          
+            
+              
+                <li class="navigation-item menu-separator">
+                  <span>|</span>
+                </li>
+                
+              
+              <li class="navigation-item">
+                <a href="/posts/2026-04-27/04-agentic-world-modeling-foundations-capabilities-laws-and-bey/">EN</a>
+              </li>
+            
+          
+        
+      </ul>
+    
+  </section>
+</nav>
+
+
+    <div class="content">
+      
+  <section class="container post">
+    <article>
+      <header>
+        <div class="post-title">
+          <h1 class="title">
+            <a class="title-link" href="https://ftxj.github.io/zh/posts/2026-04-27/04-agentic-world-modeling-foundations-capabilities-laws-and-bey/">
+              Agentic World Modeling: Foundations, Capabilities, Laws, and Beyond
+            </a>
+          </h1>
+        </div>
+        <div class="post-meta">
+          <div class="date">
+            <span class="posted-on">
+              <i class="fa-solid fa-calendar" aria-hidden="true"></i>
+              <time datetime="2026-04-27T15:46:20Z">
+                四月 27, 2026
+              </time>
+            </span>
+            <span class="reading-time">
+              <i class="fa-solid fa-clock" aria-hidden="true"></i>
+              2-minute read
+            </span>
+          </div>
+          
+          <div class="categories">
+  <i class="fa-solid fa-folder" aria-hidden="true"></i>
+    <a href="/zh/categories/paper-digest/">Paper-Digest</a>
+      <span class="separator">•</span>
+    <a href="/zh/categories/2026-04-27/">2026-04-27</a></div>
+
+          
+        </div>
+      </header>
+
+      
+
+
+      <div class="post-content">
+        
+        <p><strong>arXiv:</strong> <a href="https://arxiv.org/abs/2604.22748v1">2604.22748</a> · <a href="https://arxiv.org/pdf/2604.22748v1">PDF</a></p>
+<p><strong>作者:</strong> Meng Chu, Xuan Billy Zhang, Kevin Qinghong Lin, Lingdong Kong, Jize Zhang, Teng Tu, Weijian Ma, Ziqi Huang, Senqiao Yang, Wei Huang, Yeying Jin, Zhefan Rao, Jinhui Ye, Xinyu Lin, Xichen Zhang, Qisheng Hu, Shuai Yang, Leyang Shen, Wei Chow, Yifei Dong, Fengyi Wu, Quanyu Long, Bin Xia, Shaozuo Yu, Mingkang Zhu, Wenhu Zhang, Jiehui Huang, Haokun Gui, Haoxuan Che, Long Chen, Qifeng Chen, Wenxuan Zhang, Wenya Wang, Xiaojuan Qi, Yang Deng, Yanwei Li, Mike Zheng Shou, Zhi-Qi Cheng, See-Kiong Ng, Ziwei Liu, Philip Torr, Jiaya Jia</p>
+<p><strong>单位:</strong> Hong Kong University of Science and Technology, National University of Singapore, University of Oxford, Nanyang Technological University, Chinese University of Hong Kong, University of Hong Kong, University of Washington, Hong Kong University of Science and Technology (Guangzhou), Singapore University of Technology and Design, Singapore Management University</p>
+<p><strong>主分类:</strong> <code>cs.AI</code> · 全部: cs.AI</p>
+<p><strong>命中关键词:</strong> agent, agentic, multi-agent, ai system</p>
+<hr>
+<h2 id="tldr">TL;DR</h2>
+<p>提出&quot;levels × laws&quot;二维分类框架，把 agentic world model 划分为 L1/L2/L3 三级能力与物理、数字、社会、科学四类规律域，综述 400+ 工作并给出评测与治理建议。</p>
+<h2 id="核心观点">核心观点</h2>
+<ul>
+<li>指出&quot;world model&quot;在不同社群含义混乱，需要统一分类学；文章给出了一个两轴框架：能力层级 × 规律域。</li>
+<li>三个能力层级：<strong>L1 Predictor</strong>（单步局部转移）、<strong>L2 Simulator</strong>（多步、动作条件化 rollout 且遵循领域规律）、<strong>L3 Evolver</strong>（预测失败时能自我修订模型）。</li>
+<li>四类 governing-law regimes：<strong>physical / digital / social / scientific</strong>，决定了模型必须满足的约束以及最可能失败的位置。</li>
+</ul>
+<p><img alt="图 1" src="/images/papers/2604.22748/fig1.jpg"></p>
+<p>上图以四个代表性场景（机器人操控、代码 / UI 交互、多智能体对话、实验装置）直观说明了四类规律域各自的对象与边界。</p>
+<ul>
+<li>贡献包括：统一分类、综述跨社群代表性系统、提出 decision-centric 评测原则与一个可复现的 minimal evaluation package，以及给出架构指引、开放问题与治理挑战。</li>
+</ul>
+<p><img alt="图 2" src="/images/papers/2604.22748/fig2.png"></p>
+<p>图中按年份 × 能力层级排布 2018–2026 的 70 个代表性系统（每格最多 5 个），用于说明 world-modeling 系统的演进轨迹以及目前仍集中在 L1/L2 的现状。</p>
+<h2 id="方法">方法</h2>
+<p>以文献综合为主：作者沿两轴（levels、laws）构建分类，把 model-based RL、视频生成、web/GUI agent、多智能体社会模拟、AI for science 等子领域系统映射到对应的 level-regime 单元格，并在每个单元格里分析方法论、典型失败模式和评测实践。</p>
+<h2 id="实验">实验</h2>
+<p>非实证论文，而是系统综述：综合 400+ 工作，梳理 100+ 代表性系统，覆盖从 model-based RL 到 AI-driven scientific discovery 的多个方向；另提出 decision-centric 评测原则与 minimal reproducible evaluation package 作为评测工具。</p>
+<h2 id="结果">结果</h2>
+<ul>
+<li>指出现有系统多停留在 L1/L2，L3 Evolver 仍是开放挑战。</li>
+<li>不同 regime 下的失败模式差异显著（如物理世界受物理约束、社会世界受规范与多智能体交互约束）。</li>
+<li>现有评测偏&quot;下一步预测&quot;，对决策有用性不足，需要转向 decision-centric 评测。</li>
+</ul>
+<h2 id="为什么重要">为什么重要</h2>
+<p>为 agent / LLM 基础设施从业者提供统一语言：判断一个系统是 predictor、simulator 还是 evolver，以及它面向哪类规律域，从而选择合适的架构、评测指标和治理策略，把此前彼此隔离的社区连接起来。</p>
+<h2 id="与已有工作的关系">与已有工作的关系</h2>
+<p>衔接 model-based RL（如 Dreamer 系列）、视频生成式世界模型、GUI/web agent、multi-agent 社会模拟（generative agents 路线）以及 AI-driven scientific discovery 等方向，将它们纳入同一分类坐标。</p>
+<h2 id="尚未回答的问题">尚未回答的问题</h2>
+<ul>
+<li>如何真正实现 L3 Evolver 的自我修订闭环？</li>
+<li>跨 regime 的统一世界模型是否可行，或必然专用化？</li>
+<li>decision-centric 评测的标准化指标与基准还需细化。</li>
+<li>治理与安全挑战（特别是具备&quot;重塑环境&quot;能力的模型）。</li>
+</ul>
+<h2 id="原始摘要中文翻译">原始摘要（中文翻译）</h2>
+<p>随着 AI 系统从生成文本转向通过持续交互来完成目标，对环境动力学建模的能力正成为核心瓶颈。操控物体、在软件中导航、与他人协作或设计实验的 agent 都需要具备预测能力的环境模型，但&quot;world model&quot;一词在不同研究社群中含义各异。我们提出一个&quot;levels × laws&quot;分类法，沿两个轴组织。第一轴定义三种能力层级：L1 Predictor，学习单步的局部转移算子；L2 Simulator，将其组合为多步、动作条件化的 rollout 并遵循领域规律；L3 Evolver，在预测与新证据冲突时能自主修订自身模型。第二轴识别出四种 governing-law regimes：physical、digital、social、scientific。这些 regime 决定了 world model 必须满足哪些约束以及在哪里最容易失败。基于该框架，我们综合了 400 多篇工作，并总结了 100 多个代表性系统，涵盖 model-based reinforcement learning、视频生成、web 与 GUI agent、多智能体社会模拟以及 AI 驱动的科学发现。我们分析了各 level-regime 组合下的方法、失败模式与评测实践，提出以决策为中心的评测原则和一个最小可复现的评测包，并给出架构指引、开放问题与治理挑战。最终形成的路线图连接了此前相互隔离的社区，勾勒出从被动的下一步预测迈向可以模拟、乃至最终重塑 agent 所处环境的 world model 的路径。</p>
+<hr>
+<h2 id="论文图表">论文图表</h2>
+<p><strong>图 1:</strong> Figure 4: Timeline of representative world-modeling systems (2018–2026) organized by capa- bility level. The roadmap shows 70 survey anchors, capped at five systems per year–level cell for readabil- ity. L1 Predictor denotes one-step dynamics, L2 Simulator denotes decision-usable multi-step rollout, and L3 Evolver denotes full evidence-driven model revision; partial L3 loops remain in Table 8. Each pill is</p>
+<p><img alt="图 1" src="/images/papers/2604.22748/fig3.png"></p>
+
+      </div>
+
+
+      <footer>
+        
+
+
+        
+        
+        
+        
+        
+        
+        
+      </footer>
+    </article>
+
+    
+  </section>
+
+    </div>
+
+    <footer class="footer">
+  <section class="container">
+    ©
+    
+      2019 -
+    
+    2026
+     Jie Xin 
+    ·
+    
+    Powered by <a href="https://gohugo.io/" target="_blank" rel="noopener">Hugo</a> & <a href="https://github.com/luizdepra/hugo-coder/" target="_blank" rel="noopener">Coder</a>.
+    
+  </section>
+</footer>
+
+  </main>
+
+  
+
+  
+  
+  <script src="/js/coder.min.6ae284be93d2d19dad1f02b0039508d9aab3180a12a06dcc71b0b0ef7825a317.js" integrity="sha256-auKEvpPS0Z2tHwKwA5UI2aqzGAoSoG3McbCw73gloxc="></script>
+  
+
+  
+
+  
+
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+</body>
+</html>

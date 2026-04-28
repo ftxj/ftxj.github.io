@@ -1,0 +1,374 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <title>
+  FASER: Fine-Grained Phase Management for Speculative Decoding in Dynamic LLM Serving · JXIN&#39;s Home
+</title>
+  <meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="color-scheme" content="light dark">
+
+
+
+
+<meta name="author" content="Jie Xin">
+<meta name="description" content="arXiv: 2604.20503 · PDF
+Authors: Wenyan Chen, Chengzhi Lu, Yanying Lin, Dmitrii Ustiugov
+Primary category: cs.DC · all: cs.DC
+Matched keywords: llm, inference, serving, speculative decoding, gpu, throughput, latency
+
+TL;DR
+FASER is a fine-grained speculative-decoding scheduler for dynamic LLM serving that tunes speculative length per request, prunes rejected tokens early, and spatially overlaps draft and verification phases, yielding up to 53% higher throughput and 1.92× lower latency over SOTA in vLLM.
+Key Ideas
+
+Coarse-grained, batch-level speculative decoding (SD) wastes GPU cycles under both low and high load.
+Speculative length should be a per-request knob inside a continuous batch, not a global constant.
+Verification can be chunked into &ldquo;frontiers&rdquo; and overlapped with drafting via spatial multiplexing.
+Rejected tokens can be pruned mid-verification to avoid wasted compute.
+
+Approach
+FASER extends vLLM with three mechanisms: (1) dynamic per-request speculative length based on acceptance behavior within a continuous batch; (2) early pruning that terminates verification for tokens already rejected, reclaiming GPU work; (3) frontier-based verification that splits the verify pass into chunks and co-executes them with draft kernels using fine-grained spatial multiplexing for low interference.">
+<meta name="keywords" content="blog,developer,personal">
+
+
+
+  <meta name="twitter:card" content="summary">
+  <meta name="twitter:title" content="FASER: Fine-Grained Phase Management for Speculative Decoding in Dynamic LLM Serving">
+  <meta name="twitter:description" content="arXiv: 2604.20503 · PDF
+Authors: Wenyan Chen, Chengzhi Lu, Yanying Lin, Dmitrii Ustiugov
+Primary category: cs.DC · all: cs.DC
+Matched keywords: llm, inference, serving, speculative decoding, gpu, throughput, latency
+TL;DR FASER is a fine-grained speculative-decoding scheduler for dynamic LLM serving that tunes speculative length per request, prunes rejected tokens early, and spatially overlaps draft and verification phases, yielding up to 53% higher throughput and 1.92× lower latency over SOTA in vLLM.
+Key Ideas Coarse-grained, batch-level speculative decoding (SD) wastes GPU cycles under both low and high load. Speculative length should be a per-request knob inside a continuous batch, not a global constant. Verification can be chunked into “frontiers” and overlapped with drafting via spatial multiplexing. Rejected tokens can be pruned mid-verification to avoid wasted compute. Approach FASER extends vLLM with three mechanisms: (1) dynamic per-request speculative length based on acceptance behavior within a continuous batch; (2) early pruning that terminates verification for tokens already rejected, reclaiming GPU work; (3) frontier-based verification that splits the verify pass into chunks and co-executes them with draft kernels using fine-grained spatial multiplexing for low interference.">
+
+<meta property="og:url" content="https://ftxj.github.io/posts/2026-04-22/06-faser-fine-grained-phase-management-for-speculative-decoding/">
+  <meta property="og:site_name" content="JXIN&#39;s Home">
+  <meta property="og:title" content="FASER: Fine-Grained Phase Management for Speculative Decoding in Dynamic LLM Serving">
+  <meta property="og:description" content="arXiv: 2604.20503 · PDF
+Authors: Wenyan Chen, Chengzhi Lu, Yanying Lin, Dmitrii Ustiugov
+Primary category: cs.DC · all: cs.DC
+Matched keywords: llm, inference, serving, speculative decoding, gpu, throughput, latency
+TL;DR FASER is a fine-grained speculative-decoding scheduler for dynamic LLM serving that tunes speculative length per request, prunes rejected tokens early, and spatially overlaps draft and verification phases, yielding up to 53% higher throughput and 1.92× lower latency over SOTA in vLLM.
+Key Ideas Coarse-grained, batch-level speculative decoding (SD) wastes GPU cycles under both low and high load. Speculative length should be a per-request knob inside a continuous batch, not a global constant. Verification can be chunked into “frontiers” and overlapped with drafting via spatial multiplexing. Rejected tokens can be pruned mid-verification to avoid wasted compute. Approach FASER extends vLLM with three mechanisms: (1) dynamic per-request speculative length based on acceptance behavior within a continuous batch; (2) early pruning that terminates verification for tokens already rejected, reclaiming GPU work; (3) frontier-based verification that splits the verify pass into chunks and co-executes them with draft kernels using fine-grained spatial multiplexing for low interference.">
+  <meta property="og:locale" content="en">
+  <meta property="og:type" content="article">
+    <meta property="article:section" content="posts">
+    <meta property="article:published_time" content="2026-04-27T05:14:26+00:00">
+    <meta property="article:modified_time" content="2026-04-27T05:14:26+00:00">
+
+
+
+
+<link rel="canonical" href="https://ftxj.github.io/posts/2026-04-22/06-faser-fine-grained-phase-management-for-speculative-decoding/">
+
+
+<link rel="preload" href="/fonts/fa-brands-400.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="/fonts/fa-regular-400.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="/fonts/fa-solid-900.woff2" as="font" type="font/woff2" crossorigin>
+
+
+  
+  
+  <link rel="stylesheet" href="/css/coder.min.5e94c1acf7aa2066035cf2764ae3e4fe39db101d68b870f919966100d51fb861.css" integrity="sha256-XpTBrPeqIGYDXPJ2SuPk/jnbEB1ouHD5GZZhANUfuGE=" crossorigin="anonymous" media="screen" />
+
+
+
+
+
+
+  
+    
+    
+    <link rel="stylesheet" href="/css/coder-dark.min.a00e6364bacbc8266ad1cc81230774a1397198f8cfb7bcba29b7d6fcb54ce57f.css" integrity="sha256-oA5jZLrLyCZq0cyBIwd0oTlxmPjPt7y6KbfW/LVM5X8=" crossorigin="anonymous" media="screen" />
+  
+
+
+
+ 
+
+
+
+
+<link rel="icon" type="image/svg+xml" href="/images/favicon.svg" sizes="any">
+<link rel="icon" type="image/png" href="/images/favicon-32x32.png" sizes="32x32">
+<link rel="icon" type="image/png" href="/images/favicon-16x16.png" sizes="16x16">
+
+<link rel="apple-touch-icon" href="/images/apple-touch-icon.png">
+<link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon.png">
+
+<link rel="manifest" href="/site.webmanifest">
+<link rel="mask-icon" href="/images/safari-pinned-tab.svg" color="#5bbad5">
+
+
+
+
+
+
+<style>
+.content article ul {
+  list-style: disc !important;
+  padding-left: 2.5rem !important;
+}
+
+.content article ul li {
+  display: list-item !important;
+}
+</style>
+
+
+
+
+  
+</head>
+
+
+
+
+
+
+<body class="preload-transitions colorscheme-auto">
+  
+<div class="float-container">
+    <a id="dark-mode-toggle" class="colorscheme-toggle">
+        <i class="fa-solid fa-adjust fa-fw" aria-hidden="true"></i>
+    </a>
+</div>
+
+
+  <main class="wrapper">
+    <nav class="navigation">
+  <section class="container">
+    
+    <a class="navigation-title" href="https://ftxj.github.io/">
+      JXIN&#39;s Home
+    </a>
+    
+    
+      <input type="checkbox" id="menu-toggle" />
+      <label class="menu-button float-right" for="menu-toggle">
+        <i class="fa-solid fa-bars fa-fw" aria-hidden="true"></i>
+      </label>
+      <ul class="navigation-list">
+        
+          
+            <li class="navigation-item">
+              <a class="navigation-link " href="/about/">About</a>
+            </li>
+          
+            <li class="navigation-item">
+              <a class="navigation-link " href="/travel/">Travel</a>
+            </li>
+          
+            <li class="navigation-item">
+              <a class="navigation-link " href="/posts/">Blog</a>
+            </li>
+          
+            <li class="navigation-item">
+              <a class="navigation-link " href="https://ftxj.github.io/cv/cv.pdf">CV</a>
+            </li>
+          
+        
+        
+          
+          
+          
+            
+              
+                <li class="navigation-item menu-separator">
+                  <span>|</span>
+                </li>
+                
+              
+              <li class="navigation-item">
+                <a href="/zh/posts/2026-04-22/06-faser-fine-grained-phase-management-for-speculative-decoding/">中文</a>
+              </li>
+            
+          
+        
+      </ul>
+    
+  </section>
+</nav>
+
+
+    <div class="content">
+      
+  <section class="container post">
+    <article>
+      <header>
+        <div class="post-title">
+          <h1 class="title">
+            <a class="title-link" href="https://ftxj.github.io/posts/2026-04-22/06-faser-fine-grained-phase-management-for-speculative-decoding/">
+              FASER: Fine-Grained Phase Management for Speculative Decoding in Dynamic LLM Serving
+            </a>
+          </h1>
+        </div>
+        <div class="post-meta">
+          <div class="date">
+            <span class="posted-on">
+              <i class="fa-solid fa-calendar" aria-hidden="true"></i>
+              <time datetime="2026-04-27T05:14:26Z">
+                April 27, 2026
+              </time>
+            </span>
+            <span class="reading-time">
+              <i class="fa-solid fa-clock" aria-hidden="true"></i>
+              3-minute read
+            </span>
+          </div>
+          
+          <div class="categories">
+  <i class="fa-solid fa-folder" aria-hidden="true"></i>
+    <a href="/categories/paper-digest/">Paper-Digest</a>
+      <span class="separator">•</span>
+    <a href="/categories/2026-04-22/">2026-04-22</a></div>
+
+          
+        </div>
+      </header>
+
+      
+
+
+      <div class="post-content">
+        
+        <p><strong>arXiv:</strong> <a href="https://arxiv.org/abs/2604.20503v1">2604.20503</a> · <a href="https://arxiv.org/pdf/2604.20503v1">PDF</a></p>
+<p><strong>Authors:</strong> Wenyan Chen, Chengzhi Lu, Yanying Lin, Dmitrii Ustiugov</p>
+<p><strong>Primary category:</strong> <code>cs.DC</code> · all: cs.DC</p>
+<p><strong>Matched keywords:</strong> llm, inference, serving, speculative decoding, gpu, throughput, latency</p>
+<hr>
+<h2 id="tldr">TL;DR</h2>
+<p>FASER is a fine-grained speculative-decoding scheduler for dynamic LLM serving that tunes speculative length per request, prunes rejected tokens early, and spatially overlaps draft and verification phases, yielding up to 53% higher throughput and 1.92× lower latency over SOTA in vLLM.</p>
+<h2 id="key-ideas">Key Ideas</h2>
+<ul>
+<li>Coarse-grained, batch-level speculative decoding (SD) wastes GPU cycles under both low and high load.</li>
+<li>Speculative length should be a per-request knob inside a continuous batch, not a global constant.</li>
+<li>Verification can be chunked into &ldquo;frontiers&rdquo; and overlapped with drafting via spatial multiplexing.</li>
+<li>Rejected tokens can be pruned mid-verification to avoid wasted compute.</li>
+</ul>
+<h2 id="approach">Approach</h2>
+<p>FASER extends vLLM with three mechanisms: (1) dynamic per-request speculative length based on acceptance behavior within a continuous batch; (2) early pruning that terminates verification for tokens already rejected, reclaiming GPU work; (3) frontier-based verification that splits the verify pass into chunks and co-executes them with draft kernels using fine-grained spatial multiplexing for low interference.</p>
+<h2 id="experiments">Experiments</h2>
+<p>Prototype built on vLLM and compared against state-of-the-art SD systems. The abstract does not name datasets, models, baseline systems, or metric definitions beyond throughput and latency — details are thin.</p>
+<h2 id="results">Results</h2>
+<ul>
+<li>Up to <strong>53% throughput improvement</strong> over SOTA SD systems.</li>
+<li>Up to <strong>1.92× latency reduction</strong>.</li>
+<li>Gains attributed to eliminating draft/verify serialization and reducing rejected-token compute; no breakdown shown in the abstract.</li>
+</ul>
+<h2 id="why-it-matters">Why It Matters</h2>
+<p>For LLM serving infra, SD is already standard, but rigid batch-level scheduling caps its benefit under bursty online traffic. Fine-grained phase management offers a path to keep GPUs saturated at low load and avoid wasted verification at high load — directly improving $/token and tail latency for production inference stacks.</p>
+<h2 id="connections-to-prior-work">Connections to Prior Work</h2>
+<ul>
+<li>Speculative decoding lineage: Leviathan et al., Medusa, EAGLE, SpecInfer.</li>
+<li>Continuous batching / serving: vLLM, Orca.</li>
+<li>GPU spatial multiplexing and kernel overlap: REEF, Paella, NVIDIA MPS/Streams-based schedulers.</li>
+<li>Adaptive speculative length: SpecDec++, dynamic-γ variants.</li>
+</ul>
+<h2 id="open-questions">Open Questions</h2>
+<ul>
+<li>Which draft/target model pairs and workloads were evaluated? Does the win hold for long-context or MoE models?</li>
+<li>How is per-request speculative length predicted — heuristic, learned, or feedback-based?</li>
+<li>What is the overhead and interference profile of spatial multiplexing on modern GPUs (H100/B200)?</li>
+<li>Interaction with prefill-heavy traffic and chunked prefill scheduling.</li>
+<li>Robustness when draft-target acceptance rate shifts mid-stream.</li>
+</ul>
+<hr>
+<h2 id="figures">Figures</h2>
+<p><strong>Figure 1:</strong> Page 2 (rendered)</p>
+<p><img alt="Figure 1" src="/images/papers/2604.20503/page1.png"></p>
+<p><strong>Figure 2:</strong> Page 3 (rendered)</p>
+<p><img alt="Figure 2" src="/images/papers/2604.20503/page2.png"></p>
+<p><strong>Figure 3:</strong> Page 4 (rendered)</p>
+<p><img alt="Figure 3" src="/images/papers/2604.20503/page3.png"></p>
+<hr>
+<h2 id="original-abstract">Original abstract</h2>
+<p>Speculative decoding (SD) is a widely used approach for accelerating decode-heavy LLM inference workloads. While online inference workloads are highly dynamic, existing SD systems are rigid and take a coarse-grained approach to SD management. They typically set the speculative token length for an entire batch and serialize the execution of the draft and verification phases. Consequently, these systems fall short at adapting to volatile online inference traffic. Under low load, they exhibit prolonged latency because the draft phase blocks the verification phase for the entire batch, leaving GPU computing resources underutilized. Conversely, under high load, they waste computation on rejected tokens during the verification phase, overloading GPU resources. We introduce FASER, a novel system that features fine-grained SD phase management. First, FASER minimizes computational waste by dynamically adjusting the speculative length for each request within a continuous batch and by performing early pruning of rejected tokens inside the verification phase. Second, FASER breaks the verification phase into frontiers, or chunks, to overlap them with the draft phase. This overlap is achieved via fine-grained spatial multiplexing with minimal resource interference. Our FASER prototype in vLLM improves throughput by up to 53% and reduces latency by up to 1.92$\times$ compared to state-of-the-art systems.</p>
+
+      </div>
+
+
+      <footer>
+        
+
+
+        
+        
+        
+        
+        
+        
+        
+      </footer>
+    </article>
+
+    
+  </section>
+
+    </div>
+
+    <footer class="footer">
+  <section class="container">
+    ©
+    
+      2019 -
+    
+    2026
+     Jie Xin 
+    ·
+    
+    Powered by <a href="https://gohugo.io/" target="_blank" rel="noopener">Hugo</a> & <a href="https://github.com/luizdepra/hugo-coder/" target="_blank" rel="noopener">Coder</a>.
+    
+  </section>
+</footer>
+
+  </main>
+
+  
+
+  
+  
+  <script src="/js/coder.min.6ae284be93d2d19dad1f02b0039508d9aab3180a12a06dcc71b0b0ef7825a317.js" integrity="sha256-auKEvpPS0Z2tHwKwA5UI2aqzGAoSoG3McbCw73gloxc="></script>
+  
+
+  
+
+  
+
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+</body>
+</html>

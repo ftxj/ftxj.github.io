@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Agent on JXIN&#39;s Home</title>
+    <link>https://ftxj.github.io/tags/agent/</link>
+    <description>Recent content in Agent on JXIN&#39;s Home</description>
+    <generator>Hugo</generator>
+    <language>en</language>
+    <lastBuildDate>Tue, 28 Apr 2026 09:23:35 +0000</lastBuildDate>
+    <atom:link href="https://ftxj.github.io/tags/agent/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>2026-04-28 Paper Digest</title>
+      <link>https://ftxj.github.io/posts/2026-04-28/</link>
+      <pubDate>Tue, 28 Apr 2026 09:23:35 +0000</pubDate>
+      <guid>https://ftxj.github.io/posts/2026-04-28/</guid>
+      <description>&lt;p&gt;&lt;strong&gt;206&lt;/strong&gt; arXiv papers on agent / LLM / AI infra submitted that day matched our topic filter. &lt;strong&gt;10&lt;/strong&gt; were hand-picked by Claude — using title + authors + affiliations — and received a full Claude-generated analysis; the remaining &lt;strong&gt;196&lt;/strong&gt; are listed at the bottom.&lt;/p&gt;&#xA;&lt;h3 id=&#34;1-flashoverlap-minimizing-tail-latency-in-communication-overlap-for-distributed-llm-training&#34;&gt;1. FlashOverlap: Minimizing Tail Latency in Communication Overlap for Distributed LLM Training&lt;/h3&gt;&#xA;&lt;p&gt;&lt;em&gt;arXiv: &lt;a href=&#34;https://arxiv.org/abs/2604.24013v1&#34;&gt;2604.24013&lt;/a&gt; · &lt;code&gt;cs.LG&lt;/code&gt; · Claude pick&lt;/em&gt;&lt;/p&gt;&#xA;&lt;p&gt;FlashOverlap replaces collective reduce-scatter and all-gather with decomposed peer-to-peer communication interleaved with partitioned compute, eliminating the tail-latency step that plagues existing slicing-based overlap schemes in distributed LLM training and inference across TP, TPSP, UP, and DP.&lt;/p&gt;</description>
+    </item>
+    <item>
+      <title>2026-04-27 Paper Digest</title>
+      <link>https://ftxj.github.io/posts/2026-04-27/</link>
+      <pubDate>Mon, 27 Apr 2026 15:55:43 +0000</pubDate>
+      <guid>https://ftxj.github.io/posts/2026-04-27/</guid>
+      <description>&lt;p&gt;&lt;strong&gt;307&lt;/strong&gt; arXiv papers on agent / LLM / AI infra submitted that day matched our topic filter. &lt;strong&gt;10&lt;/strong&gt; received a full Claude-generated analysis; the remaining &lt;strong&gt;297&lt;/strong&gt; are listed at the bottom.&lt;/p&gt;&#xA;&lt;h3 id=&#34;1-guess-verify-refine-data-aware-top-k-for-sparse-attention-decoding-on-blackwell-via-temporal-correlation&#34;&gt;1. Guess-Verify-Refine: Data-Aware Top-K for Sparse-Attention Decoding on Blackwell via Temporal Correlation&lt;/h3&gt;&#xA;&lt;p&gt;&lt;em&gt;arXiv: &lt;a href=&#34;https://arxiv.org/abs/2604.22312v1&#34;&gt;2604.22312&lt;/a&gt; · &lt;code&gt;cs.DC&lt;/code&gt; · relevance score &lt;strong&gt;27&lt;/strong&gt;&lt;/em&gt;&lt;/p&gt;&#xA;&lt;p&gt;GVR is a data-aware exact Top-K kernel for sparse-attention decoding on NVIDIA Blackwell. By exploiting temporal correlation of consecutive decode steps in DeepSeek Sparse Attention, it delivers 1.88× average (up to 2.42×) speedup over TensorRT-LLM&amp;rsquo;s radix-select kernel while preserving bit-exact outputs.&lt;/p&gt;</description>
+    </item>
+    <item>
+      <title>2026-04-24 Paper Digest</title>
+      <link>https://ftxj.github.io/posts/2026-04-24/</link>
+      <pubDate>Mon, 27 Apr 2026 08:09:20 +0000</pubDate>
+      <guid>https://ftxj.github.io/posts/2026-04-24/</guid>
+      <description>&lt;p&gt;Automated digest of &lt;strong&gt;10&lt;/strong&gt; arXiv papers on agent / LLM / AI infra submitted in the last 24h, analysed with Claude Code.&lt;/p&gt;&#xA;&lt;h3 id=&#34;1-preference-heads-in-large-language-models-a-mechanistic-framework-for-interpretable-personalization&#34;&gt;1. Preference Heads in Large Language Models: A Mechanistic Framework for Interpretable Personalization&lt;/h3&gt;&#xA;&lt;p&gt;&lt;em&gt;arXiv: &lt;a href=&#34;https://arxiv.org/abs/2604.22345v1&#34;&gt;2604.22345&lt;/a&gt; · &lt;code&gt;cs.CL&lt;/code&gt; · relevance score &lt;strong&gt;22&lt;/strong&gt;&lt;/em&gt;&lt;/p&gt;&#xA;&lt;p&gt;The paper hypothesizes that LLM personalization is driven by a sparse set of &amp;ldquo;Preference Heads&amp;rdquo; — specific attention heads encoding user style/topic preferences. It introduces Differential Preference Steering (DPS), a training-free decoding method that identifies these heads via causal masking and amplifies their effect at inference.&lt;/p&gt;</description>
+    </item>
+    <item>
+      <title>2026-04-20 Paper Digest</title>
+      <link>https://ftxj.github.io/posts/2026-04-20/</link>
+      <pubDate>Mon, 27 Apr 2026 05:28:59 +0000</pubDate>
+      <guid>https://ftxj.github.io/posts/2026-04-20/</guid>
+      <description>&lt;p&gt;Automated digest of &lt;strong&gt;10&lt;/strong&gt; arXiv papers on agent / LLM / AI infra submitted in the last 24h, analysed with Claude Code.&lt;/p&gt;&#xA;&lt;h3 id=&#34;1-first-do-no-harm-with-llms-mitigating-racial-bias-via-agentic-workflows&#34;&gt;1. First, Do No Harm (With LLMs): Mitigating Racial Bias via Agentic Workflows&lt;/h3&gt;&#xA;&lt;p&gt;&lt;em&gt;arXiv: &lt;a href=&#34;https://arxiv.org/abs/2604.18038v1&#34;&gt;2604.18038&lt;/a&gt; · &lt;code&gt;cs.CY&lt;/code&gt; · relevance score &lt;strong&gt;27&lt;/strong&gt;&lt;/em&gt;&lt;/p&gt;&#xA;&lt;p&gt;This study evaluates racial bias in five LLMs across synthetic patient-case generation and differential diagnosis tasks, finding all deviate from US epidemiological distributions. Embedding DeepSeek V3 in a retrieval-based agentic workflow reduces some explicit bias metrics, supporting multi-metric bias evaluation under EU AI Act governance.&lt;/p&gt;</description>
+    </item>
+    <item>
+      <title>2026-04-21 Paper Digest</title>
+      <link>https://ftxj.github.io/posts/2026-04-21/</link>
+      <pubDate>Mon, 27 Apr 2026 05:22:58 +0000</pubDate>
+      <guid>https://ftxj.github.io/posts/2026-04-21/</guid>
+      <description>&lt;p&gt;Automated digest of &lt;strong&gt;10&lt;/strong&gt; arXiv papers on agent / LLM / AI infra submitted in the last 24h, analysed with Claude Code.&lt;/p&gt;&#xA;&lt;h3 id=&#34;1-chipcraftbrain-validation-first-rtl-generation-via-multi-agent-orchestration&#34;&gt;1. ChipCraftBrain: Validation-First RTL Generation via Multi-Agent Orchestration&lt;/h3&gt;&#xA;&lt;p&gt;&lt;em&gt;arXiv: &lt;a href=&#34;https://arxiv.org/abs/2604.19856v1&#34;&gt;2604.19856&lt;/a&gt; · &lt;code&gt;cs.AR&lt;/code&gt; · relevance score &lt;strong&gt;27&lt;/strong&gt;&lt;/em&gt;&lt;/p&gt;&#xA;&lt;p&gt;ChipCraftBrain is a multi-agent RTL generation framework combining PPO-driven orchestration, symbolic-neural reasoning, and knowledge retrieval. It hits 97.2% pass@1 on VerilogEval-Human and 94.7% on a 302-problem CVDP subset, outperforming MAGE and matching ChipAgents while using far fewer attempts than NVIDIA&amp;rsquo;s ACE-RTL.&lt;/p&gt;</description>
+    </item>
+    <item>
+      <title>2026-04-22 Paper Digest</title>
+      <link>https://ftxj.github.io/posts/2026-04-22/</link>
+      <pubDate>Mon, 27 Apr 2026 05:17:17 +0000</pubDate>
+      <guid>https://ftxj.github.io/posts/2026-04-22/</guid>
+      <description>&lt;p&gt;Automated digest of &lt;strong&gt;10&lt;/strong&gt; arXiv papers on agent / LLM / AI infra submitted in the last 24h, analysed with Claude Code.&lt;/p&gt;&#xA;&lt;h3 id=&#34;1-sake-self-aware-knowledge-exploitation-exploration-for-grounded-multimodal-named-entity-recognition&#34;&gt;1. SAKE: Self-aware Knowledge Exploitation-Exploration for Grounded Multimodal Named Entity Recognition&lt;/h3&gt;&#xA;&lt;p&gt;&lt;em&gt;arXiv: &lt;a href=&#34;https://arxiv.org/abs/2604.20146v1&#34;&gt;2604.20146&lt;/a&gt; · &lt;code&gt;cs.IR&lt;/code&gt; · relevance score &lt;strong&gt;32&lt;/strong&gt;&lt;/em&gt;&lt;/p&gt;&#xA;&lt;p&gt;SAKE is an end-to-end agentic framework for Grounded Multimodal Named Entity Recognition (GMNER) that blends internal MLLM knowledge with external retrieval via self-aware reasoning, deciding when to invoke search tools to handle long-tailed and unseen entities on social media.&lt;/p&gt;</description>
+    </item>
+    <item>
+      <title>2026-04-23 Paper Digest</title>
+      <link>https://ftxj.github.io/posts/2026-04-23/</link>
+      <pubDate>Mon, 27 Apr 2026 05:11:16 +0000</pubDate>
+      <guid>https://ftxj.github.io/posts/2026-04-23/</guid>
+      <description>&lt;p&gt;Automated digest of &lt;strong&gt;10&lt;/strong&gt; arXiv papers on agent / LLM / AI infra submitted in the last 24h, analysed with Claude Code.&lt;/p&gt;&#xA;&lt;h3 id=&#34;1-nemobot-games-crafting-strategic-ai-gaming-agents-for-interactive-learning-with-large-language-models&#34;&gt;1. Nemobot Games: Crafting Strategic AI Gaming Agents for Interactive Learning with Large Language Models&lt;/h3&gt;&#xA;&lt;p&gt;&lt;em&gt;arXiv: &lt;a href=&#34;https://arxiv.org/abs/2604.21896v1&#34;&gt;2604.21896&lt;/a&gt; · &lt;code&gt;cs.AI&lt;/code&gt; · relevance score &lt;strong&gt;23&lt;/strong&gt;&lt;/em&gt;&lt;/p&gt;&#xA;&lt;p&gt;Nemobot is an interactive agentic environment that uses LLMs to build and deploy game-playing agents across Shannon&amp;rsquo;s taxonomy, spanning dictionary-based, solvable, heuristic, and learning-based games, aiming toward self-programming AI.&lt;/p&gt;</description>
+    </item>
+  </channel>
+</rss>

@@ -1,0 +1,369 @@
+<!DOCTYPE html>
+<html lang="zh">
+
+<head>
+  <title>
+  StepPO: Step-Aligned Policy Optimization for Agentic Reinforcement Learning · JXIN&#39;s Home
+</title>
+  <meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="color-scheme" content="light dark">
+
+
+
+
+<meta name="author" content="Jie Xin">
+<meta name="description" content="arXiv: 2604.18401 · PDF
+作者: Daoyu Wang, Qingchuan Li, Mingyue Cheng, Jie Ouyang, Shuo Yu, Qi Liu, Enhong Chen
+主分类: cs.CL · 全部: cs.CL
+命中关键词: large language model, llm, agent, agentic, tool use, reasoning, post-train, rlhf
+
+TL;DR
+StepPO 主张把 Agentic RL 从 token 级 MDP 升级为 step 级 MDP，以 step 作为 LLM agent 的动作粒度，并提出相应的 step-level credit assignment 来对齐策略优化与 agent 决策。
+核心观点
+
+传统 token 级 RL（RLHF/RLVR）不足以刻画多轮交互的 agent 行为。
+应将 MDP 粒度从 token 提升到 step，把一个 step（决策/工具调用）视为 agent 的动作。
+与此配套，奖励传播与信用分配也应在 step 级完成。
+Agentic RL 面临奖励稀疏延迟、上下文长而变动等新挑战，step 级抽象更自然。
+提出 StepPO 作为 step-aligned policy optimization 的立场论文（position paper）。
+
+方法
+作者重新表述 agent 交互为 step-level MDP：每个 step 封装模型一次推理 &#43; 一次工具/环境交互，作为策略的动作单位。在此基础上定义 step-level credit assignment，把延迟奖励回传到对应 step 而非 token，使策略梯度、价值估计与 agent 的决策粒度对齐。论文还讨论了实现 step 级 Agentic RL 所需的系统设计（轨迹组织、reward shaping、长上下文支持等）。">
+<meta name="keywords" content="blog,developer,personal">
+
+
+
+  <meta name="twitter:card" content="summary">
+  <meta name="twitter:title" content="StepPO: Step-Aligned Policy Optimization for Agentic Reinforcement Learning">
+  <meta name="twitter:description" content="arXiv: 2604.18401 · PDF
+作者: Daoyu Wang, Qingchuan Li, Mingyue Cheng, Jie Ouyang, Shuo Yu, Qi Liu, Enhong Chen
+主分类: cs.CL · 全部: cs.CL
+命中关键词: large language model, llm, agent, agentic, tool use, reasoning, post-train, rlhf
+TL;DR StepPO 主张把 Agentic RL 从 token 级 MDP 升级为 step 级 MDP，以 step 作为 LLM agent 的动作粒度，并提出相应的 step-level credit assignment 来对齐策略优化与 agent 决策。
+核心观点 传统 token 级 RL（RLHF/RLVR）不足以刻画多轮交互的 agent 行为。 应将 MDP 粒度从 token 提升到 step，把一个 step（决策/工具调用）视为 agent 的动作。 与此配套，奖励传播与信用分配也应在 step 级完成。 Agentic RL 面临奖励稀疏延迟、上下文长而变动等新挑战，step 级抽象更自然。 提出 StepPO 作为 step-aligned policy optimization 的立场论文（position paper）。 方法 作者重新表述 agent 交互为 step-level MDP：每个 step 封装模型一次推理 &#43; 一次工具/环境交互，作为策略的动作单位。在此基础上定义 step-level credit assignment，把延迟奖励回传到对应 step 而非 token，使策略梯度、价值估计与 agent 的决策粒度对齐。论文还讨论了实现 step 级 Agentic RL 所需的系统设计（轨迹组织、reward shaping、长上下文支持等）。">
+
+<meta property="og:url" content="https://ftxj.github.io/zh/posts/2026-04-20/03-steppo-step-aligned-policy-optimization-for-agentic-reinforc/">
+  <meta property="og:site_name" content="JXIN&#39;s Home">
+  <meta property="og:title" content="StepPO: Step-Aligned Policy Optimization for Agentic Reinforcement Learning">
+  <meta property="og:description" content="arXiv: 2604.18401 · PDF
+作者: Daoyu Wang, Qingchuan Li, Mingyue Cheng, Jie Ouyang, Shuo Yu, Qi Liu, Enhong Chen
+主分类: cs.CL · 全部: cs.CL
+命中关键词: large language model, llm, agent, agentic, tool use, reasoning, post-train, rlhf
+TL;DR StepPO 主张把 Agentic RL 从 token 级 MDP 升级为 step 级 MDP，以 step 作为 LLM agent 的动作粒度，并提出相应的 step-level credit assignment 来对齐策略优化与 agent 决策。
+核心观点 传统 token 级 RL（RLHF/RLVR）不足以刻画多轮交互的 agent 行为。 应将 MDP 粒度从 token 提升到 step，把一个 step（决策/工具调用）视为 agent 的动作。 与此配套，奖励传播与信用分配也应在 step 级完成。 Agentic RL 面临奖励稀疏延迟、上下文长而变动等新挑战，step 级抽象更自然。 提出 StepPO 作为 step-aligned policy optimization 的立场论文（position paper）。 方法 作者重新表述 agent 交互为 step-level MDP：每个 step 封装模型一次推理 &#43; 一次工具/环境交互，作为策略的动作单位。在此基础上定义 step-level credit assignment，把延迟奖励回传到对应 step 而非 token，使策略梯度、价值估计与 agent 的决策粒度对齐。论文还讨论了实现 step 级 Agentic RL 所需的系统设计（轨迹组织、reward shaping、长上下文支持等）。">
+  <meta property="og:locale" content="zh">
+  <meta property="og:type" content="article">
+    <meta property="article:section" content="posts">
+    <meta property="article:published_time" content="2026-04-27T05:24:33+00:00">
+    <meta property="article:modified_time" content="2026-04-27T05:24:33+00:00">
+
+
+
+
+<link rel="canonical" href="https://ftxj.github.io/zh/posts/2026-04-20/03-steppo-step-aligned-policy-optimization-for-agentic-reinforc/">
+
+
+<link rel="preload" href="/fonts/fa-brands-400.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="/fonts/fa-regular-400.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="/fonts/fa-solid-900.woff2" as="font" type="font/woff2" crossorigin>
+
+
+  
+  
+  <link rel="stylesheet" href="/css/coder.min.5e94c1acf7aa2066035cf2764ae3e4fe39db101d68b870f919966100d51fb861.css" integrity="sha256-XpTBrPeqIGYDXPJ2SuPk/jnbEB1ouHD5GZZhANUfuGE=" crossorigin="anonymous" media="screen" />
+
+
+
+
+
+
+  
+    
+    
+    <link rel="stylesheet" href="/css/coder-dark.min.a00e6364bacbc8266ad1cc81230774a1397198f8cfb7bcba29b7d6fcb54ce57f.css" integrity="sha256-oA5jZLrLyCZq0cyBIwd0oTlxmPjPt7y6KbfW/LVM5X8=" crossorigin="anonymous" media="screen" />
+  
+
+
+
+ 
+
+
+
+
+<link rel="icon" type="image/svg+xml" href="/images/favicon.svg" sizes="any">
+<link rel="icon" type="image/png" href="/images/favicon-32x32.png" sizes="32x32">
+<link rel="icon" type="image/png" href="/images/favicon-16x16.png" sizes="16x16">
+
+<link rel="apple-touch-icon" href="/images/apple-touch-icon.png">
+<link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon.png">
+
+<link rel="manifest" href="/site.webmanifest">
+<link rel="mask-icon" href="/images/safari-pinned-tab.svg" color="#5bbad5">
+
+
+
+
+
+
+<style>
+.content article ul {
+  list-style: disc !important;
+  padding-left: 2.5rem !important;
+}
+
+.content article ul li {
+  display: list-item !important;
+}
+</style>
+
+
+
+
+  
+</head>
+
+
+
+
+
+
+<body class="preload-transitions colorscheme-auto">
+  
+<div class="float-container">
+    <a id="dark-mode-toggle" class="colorscheme-toggle">
+        <i class="fa-solid fa-adjust fa-fw" aria-hidden="true"></i>
+    </a>
+</div>
+
+
+  <main class="wrapper">
+    <nav class="navigation">
+  <section class="container">
+    
+    <a class="navigation-title" href="https://ftxj.github.io/zh/">
+      JXIN&#39;s Home
+    </a>
+    
+    
+      <input type="checkbox" id="menu-toggle" />
+      <label class="menu-button float-right" for="menu-toggle">
+        <i class="fa-solid fa-bars fa-fw" aria-hidden="true"></i>
+      </label>
+      <ul class="navigation-list">
+        
+          
+            <li class="navigation-item">
+              <a class="navigation-link " href="/zh/about/">关于</a>
+            </li>
+          
+            <li class="navigation-item">
+              <a class="navigation-link " href="/zh/travel/">旅行</a>
+            </li>
+          
+            <li class="navigation-item">
+              <a class="navigation-link " href="/zh/posts/">博客</a>
+            </li>
+          
+            <li class="navigation-item">
+              <a class="navigation-link " href="https://ftxj.github.io/cv/cv_zh.pdf">简历</a>
+            </li>
+          
+        
+        
+          
+          
+          
+            
+              
+                <li class="navigation-item menu-separator">
+                  <span>|</span>
+                </li>
+                
+              
+              <li class="navigation-item">
+                <a href="/posts/2026-04-20/03-steppo-step-aligned-policy-optimization-for-agentic-reinforc/">EN</a>
+              </li>
+            
+          
+        
+      </ul>
+    
+  </section>
+</nav>
+
+
+    <div class="content">
+      
+  <section class="container post">
+    <article>
+      <header>
+        <div class="post-title">
+          <h1 class="title">
+            <a class="title-link" href="https://ftxj.github.io/zh/posts/2026-04-20/03-steppo-step-aligned-policy-optimization-for-agentic-reinforc/">
+              StepPO: Step-Aligned Policy Optimization for Agentic Reinforcement Learning
+            </a>
+          </h1>
+        </div>
+        <div class="post-meta">
+          <div class="date">
+            <span class="posted-on">
+              <i class="fa-solid fa-calendar" aria-hidden="true"></i>
+              <time datetime="2026-04-27T05:24:33Z">
+                四月 27, 2026
+              </time>
+            </span>
+            <span class="reading-time">
+              <i class="fa-solid fa-clock" aria-hidden="true"></i>
+              3-minute read
+            </span>
+          </div>
+          
+          <div class="categories">
+  <i class="fa-solid fa-folder" aria-hidden="true"></i>
+    <a href="/zh/categories/paper-digest/">Paper-Digest</a>
+      <span class="separator">•</span>
+    <a href="/zh/categories/2026-04-20/">2026-04-20</a></div>
+
+          
+        </div>
+      </header>
+
+      
+
+
+      <div class="post-content">
+        
+        <p><strong>arXiv:</strong> <a href="https://arxiv.org/abs/2604.18401v1">2604.18401</a> · <a href="https://arxiv.org/pdf/2604.18401v1">PDF</a></p>
+<p><strong>作者:</strong> Daoyu Wang, Qingchuan Li, Mingyue Cheng, Jie Ouyang, Shuo Yu, Qi Liu, Enhong Chen</p>
+<p><strong>主分类:</strong> <code>cs.CL</code> · 全部: cs.CL</p>
+<p><strong>命中关键词:</strong> large language model, llm, agent, agentic, tool use, reasoning, post-train, rlhf</p>
+<hr>
+<h2 id="tldr">TL;DR</h2>
+<p>StepPO 主张把 Agentic RL 从 token 级 MDP 升级为 step 级 MDP，以 step 作为 LLM agent 的动作粒度，并提出相应的 step-level credit assignment 来对齐策略优化与 agent 决策。</p>
+<h2 id="核心观点">核心观点</h2>
+<ul>
+<li>传统 token 级 RL（RLHF/RLVR）不足以刻画多轮交互的 agent 行为。</li>
+<li>应将 MDP 粒度从 token 提升到 step，把一个 step（决策/工具调用）视为 agent 的动作。</li>
+<li>与此配套，奖励传播与信用分配也应在 step 级完成。</li>
+<li>Agentic RL 面临奖励稀疏延迟、上下文长而变动等新挑战，step 级抽象更自然。</li>
+<li>提出 StepPO 作为 step-aligned policy optimization 的立场论文（position paper）。</li>
+</ul>
+<h2 id="方法">方法</h2>
+<p>作者重新表述 agent 交互为 step-level MDP：每个 step 封装模型一次推理 + 一次工具/环境交互，作为策略的动作单位。在此基础上定义 step-level credit assignment，把延迟奖励回传到对应 step 而非 token，使策略梯度、价值估计与 agent 的决策粒度对齐。论文还讨论了实现 step 级 Agentic RL 所需的系统设计（轨迹组织、reward shaping、长上下文支持等）。</p>
+<h2 id="实验">实验</h2>
+<p>摘要仅提到&quot;preliminary experiments&quot;提供初步证据，未披露具体数据集、基线或指标细节。</p>
+<h2 id="结果">结果</h2>
+<p>摘要未给出定量数字，仅声称初步实验支持 step 级视角的有效性；严格的结论需查阅正文。</p>
+<h2 id="为什么重要">为什么重要</h2>
+<p>对 agent harness（如 Claude Code 类系统）的后训练链路而言，step 级建模让 RL 目标与真实 agent 行为对齐，有望缓解稀疏/延迟奖励下的训练难题，并为工具使用、多轮决策等核心能力提供更可扩展的优化框架。</p>
+<h2 id="与已有工作的关系">与已有工作的关系</h2>
+<ul>
+<li>承接 RLHF、RLVR 等 token 级 LLM RL 脉络。</li>
+<li>与 ReAct、ToolLLM 等多轮 agent 训练方法互补。</li>
+<li>呼应 hierarchical RL、option/macro-action 思想在 LLM agent 上的再表达。</li>
+<li>与近期 agentic RL / trajectory-level 优化研究（如 ArCHer 风格方法）同向。</li>
+</ul>
+<h2 id="尚未回答的问题">尚未回答的问题</h2>
+<ul>
+<li>&ldquo;step&rdquo; 的精确边界如何自动、鲁棒地切分？</li>
+<li>step 级 credit assignment 的具体算法形式与收敛性质？</li>
+<li>在真实 benchmark（SWE-bench、WebArena 等）上相对 token 级基线的量化收益？</li>
+<li>如何与长上下文、KV cache、并行 rollout 等系统层协同工程化？</li>
+</ul>
+<hr>
+<h2 id="论文图表">论文图表</h2>
+<p><strong>图 1:</strong> Figure 1 (extracted from PDF)</p>
+<p><img alt="图 1" src="/images/papers/2604.18401/fig1.png"></p>
+<p><strong>图 2:</strong> Figure 2 (extracted from PDF)</p>
+<p><img alt="图 2" src="/images/papers/2604.18401/fig2.png"></p>
+<hr>
+<h2 id="原始摘要">原始摘要</h2>
+<p>General agents have given rise to phenomenal applications such as OpenClaw and Claude Code. As these agent systems (a.k.a. Harnesses) strive for bolder goals, they demand increasingly stronger agentic capabilities from foundation Large Language Models (LLMs). Agentic Reinforcement Learning (RL) is emerging as a central post-training paradigm for empowering LLMs with these capabilities and is playing an increasingly pivotal role in agent training. Unlike single-turn token-level alignment or reasoning enhancement, as in RLHF and RLVR, Agentic RL targets multi-turn interactive settings, where the goal is to optimize core agentic capabilities such as decision making and tool use while addressing new challenges including delayed and sparse rewards, as well as long and variable context. As a result, the token-centric modeling and optimization paradigm inherited from traditional LLM RL is becoming increasingly inadequate for capturing real LLM agent behavior. In this paper, we present StepPO as a position on step-level Agentic RL. We argue that the conventional token-level Markov Decision Process (MDP) should be advanced to a step-level MDP formulation, and that the step, rather than the token, should be regarded as the proper action representation for LLM agents. We then propose step-level credit assignment as the natural optimization counterpart of this formulation, thereby aligning policy optimization and reward propagation with the granularity of agent decisions. Finally, we discuss the key systems designs required to realize step-level Agentic RL in practice and preliminary experiments provide initial evidence for the effectiveness of this perspective. We hope that the step-aligned, step-level paradigm embodied in StepPO offers the Agentic RL community a useful lens for understanding agent behavior and helps advance LLMs toward stronger general-agent capabilities.</p>
+
+      </div>
+
+
+      <footer>
+        
+
+
+        
+        
+        
+        
+        
+        
+        
+      </footer>
+    </article>
+
+    
+  </section>
+
+    </div>
+
+    <footer class="footer">
+  <section class="container">
+    ©
+    
+      2019 -
+    
+    2026
+     Jie Xin 
+    ·
+    
+    Powered by <a href="https://gohugo.io/" target="_blank" rel="noopener">Hugo</a> & <a href="https://github.com/luizdepra/hugo-coder/" target="_blank" rel="noopener">Coder</a>.
+    
+  </section>
+</footer>
+
+  </main>
+
+  
+
+  
+  
+  <script src="/js/coder.min.6ae284be93d2d19dad1f02b0039508d9aab3180a12a06dcc71b0b0ef7825a317.js" integrity="sha256-auKEvpPS0Z2tHwKwA5UI2aqzGAoSoG3McbCw73gloxc="></script>
+  
+
+  
+
+  
+
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+</body>
+</html>

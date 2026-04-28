@@ -1,0 +1,424 @@
+<!DOCTYPE html>
+<html lang="zh">
+
+<head>
+  <title>
+  First, Do No Harm (With LLMs): Mitigating Racial Bias via Agentic Workflows · JXIN&#39;s Home
+</title>
+  <meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="color-scheme" content="light dark">
+
+
+
+
+<meta name="author" content="Jie Xin">
+<meta name="description" content="arXiv: 2604.18038 · PDF
+作者: Sihao Xing, Zaur Gouliev
+主分类: cs.CY · 全部: cs.AI, cs.CY
+命中关键词: large language model, llm, agent, agentic, retrieval, reasoning, attention, ai system
+
+TL;DR
+以 EU AI Act 为治理视角，评估 5 个主流 LLM 在合成病例生成与鉴别诊断中的种族偏见，发现 retrieval-based agentic workflow 可缓解 DeepSeek V3 的显性偏见。
+核心观点
+
+医学 LLM 普遍偏离美国种族流行病学分布，存在隐性与显性种族偏见。
+单一指标不足以刻画偏见，主张多指标联合评估。
+将 LLM 嵌入 retrieval-based agentic workflow 可在部分指标上降低显性偏见。
+以 EU AI Act 为治理框架为医学 AI 偏见评估提供合规对齐参照。
+
+方法
+
+选取 5 个常用 LLM，覆盖两类任务：synthetic patient-case generation 与 differential diagnosis ranking。
+基准：美国种族分层流行病学分布 &#43; 专家鉴别诊断列表。
+使用 structured prompt templates，采取两部分评估设计，分别探测隐性与显性种族偏见。
+对 DeepSeek V3 额外构建 agentic workflow（含检索组件），对比 standalone 版本的指标变化。
+
+实验
+
+数据集：race-stratified 美国流行病学分布数据；专家编制的鉴别诊断列表。
+模型：5 个主流 LLM，其中报告了 GPT-4.1 与 DeepSeek V3 的具体数值。
+指标：合成生成任务看与真实分布的偏离；诊断排序任务用 p-value（mean/median）及 mean difference 等。
+
+结果
+
+合成病例：所有模型均偏离真实种族分布，GPT-4.1 整体偏离最小。
+鉴别诊断：DeepSeek V3 综合表现最好。
+Agentic workflow 对 DeepSeek V3：mean p-value &#43;0.0348，median p-value &#43;0.1166，mean difference &#43;0.0949，但并非所有指标都改善。
+
+为什么重要
+
+为临床 LLM 部署提供可操作的偏见评估范式，兼顾 EU AI Act 合规维度。
+说明 agentic &#43; retrieval 架构不仅能提升准确率，还能作为 bias mitigation 手段，对医疗 AI 基础设施选型有指导意义。
+
+与已有工作的关系
+
+延续 medical LLM bias 评测线（如 Omiye et al. 对 GPT 系列的偏见研究）。
+借用 agentic workflow / retrieval-augmented generation 思路，把 mitigation 从 fine-tuning 扩展到推理期。
+以 EU AI Act 为治理锚点，呼应 responsible AI、AI governance 方向的工作。
+
+尚未回答的问题
+
+改善幅度较小且不均衡，在真实临床决策中是否具备统计与临床显著性？
+方法能否推广到性别、年龄、社经地位等其他受保护属性？
+未比较不同检索语料/检索策略对 bias 的差异化影响。
+未进入真实 EHR 与前瞻临床评估，外部效度待验证。
+对隐性偏见（模型内部表征层面）是否真正缓解仍不清楚。
+
+
+论文图表
+图 1: Figure 1 (extracted from PDF)">
+<meta name="keywords" content="blog,developer,personal">
+
+
+
+  <meta name="twitter:card" content="summary">
+  <meta name="twitter:title" content="First, Do No Harm (With LLMs): Mitigating Racial Bias via Agentic Workflows">
+  <meta name="twitter:description" content="arXiv: 2604.18038 · PDF
+作者: Sihao Xing, Zaur Gouliev
+主分类: cs.CY · 全部: cs.AI, cs.CY
+命中关键词: large language model, llm, agent, agentic, retrieval, reasoning, attention, ai system
+TL;DR 以 EU AI Act 为治理视角，评估 5 个主流 LLM 在合成病例生成与鉴别诊断中的种族偏见，发现 retrieval-based agentic workflow 可缓解 DeepSeek V3 的显性偏见。
+核心观点 医学 LLM 普遍偏离美国种族流行病学分布，存在隐性与显性种族偏见。 单一指标不足以刻画偏见，主张多指标联合评估。 将 LLM 嵌入 retrieval-based agentic workflow 可在部分指标上降低显性偏见。 以 EU AI Act 为治理框架为医学 AI 偏见评估提供合规对齐参照。 方法 选取 5 个常用 LLM，覆盖两类任务：synthetic patient-case generation 与 differential diagnosis ranking。 基准：美国种族分层流行病学分布 &#43; 专家鉴别诊断列表。 使用 structured prompt templates，采取两部分评估设计，分别探测隐性与显性种族偏见。 对 DeepSeek V3 额外构建 agentic workflow（含检索组件），对比 standalone 版本的指标变化。 实验 数据集：race-stratified 美国流行病学分布数据；专家编制的鉴别诊断列表。 模型：5 个主流 LLM，其中报告了 GPT-4.1 与 DeepSeek V3 的具体数值。 指标：合成生成任务看与真实分布的偏离；诊断排序任务用 p-value（mean/median）及 mean difference 等。 结果 合成病例：所有模型均偏离真实种族分布，GPT-4.1 整体偏离最小。 鉴别诊断：DeepSeek V3 综合表现最好。 Agentic workflow 对 DeepSeek V3：mean p-value &#43;0.0348，median p-value &#43;0.1166，mean difference &#43;0.0949，但并非所有指标都改善。 为什么重要 为临床 LLM 部署提供可操作的偏见评估范式，兼顾 EU AI Act 合规维度。 说明 agentic &#43; retrieval 架构不仅能提升准确率，还能作为 bias mitigation 手段，对医疗 AI 基础设施选型有指导意义。 与已有工作的关系 延续 medical LLM bias 评测线（如 Omiye et al. 对 GPT 系列的偏见研究）。 借用 agentic workflow / retrieval-augmented generation 思路，把 mitigation 从 fine-tuning 扩展到推理期。 以 EU AI Act 为治理锚点，呼应 responsible AI、AI governance 方向的工作。 尚未回答的问题 改善幅度较小且不均衡，在真实临床决策中是否具备统计与临床显著性？ 方法能否推广到性别、年龄、社经地位等其他受保护属性？ 未比较不同检索语料/检索策略对 bias 的差异化影响。 未进入真实 EHR 与前瞻临床评估，外部效度待验证。 对隐性偏见（模型内部表征层面）是否真正缓解仍不清楚。 论文图表 图 1: Figure 1 (extracted from PDF)">
+
+<meta property="og:url" content="https://ftxj.github.io/zh/posts/2026-04-20/01-first-do-no-harm-with-llms-mitigating-racial-bias-via-agenti/">
+  <meta property="og:site_name" content="JXIN&#39;s Home">
+  <meta property="og:title" content="First, Do No Harm (With LLMs): Mitigating Racial Bias via Agentic Workflows">
+  <meta property="og:description" content="arXiv: 2604.18038 · PDF
+作者: Sihao Xing, Zaur Gouliev
+主分类: cs.CY · 全部: cs.AI, cs.CY
+命中关键词: large language model, llm, agent, agentic, retrieval, reasoning, attention, ai system
+TL;DR 以 EU AI Act 为治理视角，评估 5 个主流 LLM 在合成病例生成与鉴别诊断中的种族偏见，发现 retrieval-based agentic workflow 可缓解 DeepSeek V3 的显性偏见。
+核心观点 医学 LLM 普遍偏离美国种族流行病学分布，存在隐性与显性种族偏见。 单一指标不足以刻画偏见，主张多指标联合评估。 将 LLM 嵌入 retrieval-based agentic workflow 可在部分指标上降低显性偏见。 以 EU AI Act 为治理框架为医学 AI 偏见评估提供合规对齐参照。 方法 选取 5 个常用 LLM，覆盖两类任务：synthetic patient-case generation 与 differential diagnosis ranking。 基准：美国种族分层流行病学分布 &#43; 专家鉴别诊断列表。 使用 structured prompt templates，采取两部分评估设计，分别探测隐性与显性种族偏见。 对 DeepSeek V3 额外构建 agentic workflow（含检索组件），对比 standalone 版本的指标变化。 实验 数据集：race-stratified 美国流行病学分布数据；专家编制的鉴别诊断列表。 模型：5 个主流 LLM，其中报告了 GPT-4.1 与 DeepSeek V3 的具体数值。 指标：合成生成任务看与真实分布的偏离；诊断排序任务用 p-value（mean/median）及 mean difference 等。 结果 合成病例：所有模型均偏离真实种族分布，GPT-4.1 整体偏离最小。 鉴别诊断：DeepSeek V3 综合表现最好。 Agentic workflow 对 DeepSeek V3：mean p-value &#43;0.0348，median p-value &#43;0.1166，mean difference &#43;0.0949，但并非所有指标都改善。 为什么重要 为临床 LLM 部署提供可操作的偏见评估范式，兼顾 EU AI Act 合规维度。 说明 agentic &#43; retrieval 架构不仅能提升准确率，还能作为 bias mitigation 手段，对医疗 AI 基础设施选型有指导意义。 与已有工作的关系 延续 medical LLM bias 评测线（如 Omiye et al. 对 GPT 系列的偏见研究）。 借用 agentic workflow / retrieval-augmented generation 思路，把 mitigation 从 fine-tuning 扩展到推理期。 以 EU AI Act 为治理锚点，呼应 responsible AI、AI governance 方向的工作。 尚未回答的问题 改善幅度较小且不均衡，在真实临床决策中是否具备统计与临床显著性？ 方法能否推广到性别、年龄、社经地位等其他受保护属性？ 未比较不同检索语料/检索策略对 bias 的差异化影响。 未进入真实 EHR 与前瞻临床评估，外部效度待验证。 对隐性偏见（模型内部表征层面）是否真正缓解仍不清楚。 论文图表 图 1: Figure 1 (extracted from PDF)">
+  <meta property="og:locale" content="zh">
+  <meta property="og:type" content="article">
+    <meta property="article:section" content="posts">
+    <meta property="article:published_time" content="2026-04-27T05:23:29+00:00">
+    <meta property="article:modified_time" content="2026-04-27T05:23:29+00:00">
+
+
+
+
+<link rel="canonical" href="https://ftxj.github.io/zh/posts/2026-04-20/01-first-do-no-harm-with-llms-mitigating-racial-bias-via-agenti/">
+
+
+<link rel="preload" href="/fonts/fa-brands-400.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="/fonts/fa-regular-400.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="/fonts/fa-solid-900.woff2" as="font" type="font/woff2" crossorigin>
+
+
+  
+  
+  <link rel="stylesheet" href="/css/coder.min.5e94c1acf7aa2066035cf2764ae3e4fe39db101d68b870f919966100d51fb861.css" integrity="sha256-XpTBrPeqIGYDXPJ2SuPk/jnbEB1ouHD5GZZhANUfuGE=" crossorigin="anonymous" media="screen" />
+
+
+
+
+
+
+  
+    
+    
+    <link rel="stylesheet" href="/css/coder-dark.min.a00e6364bacbc8266ad1cc81230774a1397198f8cfb7bcba29b7d6fcb54ce57f.css" integrity="sha256-oA5jZLrLyCZq0cyBIwd0oTlxmPjPt7y6KbfW/LVM5X8=" crossorigin="anonymous" media="screen" />
+  
+
+
+
+ 
+
+
+
+
+<link rel="icon" type="image/svg+xml" href="/images/favicon.svg" sizes="any">
+<link rel="icon" type="image/png" href="/images/favicon-32x32.png" sizes="32x32">
+<link rel="icon" type="image/png" href="/images/favicon-16x16.png" sizes="16x16">
+
+<link rel="apple-touch-icon" href="/images/apple-touch-icon.png">
+<link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon.png">
+
+<link rel="manifest" href="/site.webmanifest">
+<link rel="mask-icon" href="/images/safari-pinned-tab.svg" color="#5bbad5">
+
+
+
+
+
+
+<style>
+.content article ul {
+  list-style: disc !important;
+  padding-left: 2.5rem !important;
+}
+
+.content article ul li {
+  display: list-item !important;
+}
+</style>
+
+
+
+
+  
+</head>
+
+
+
+
+
+
+<body class="preload-transitions colorscheme-auto">
+  
+<div class="float-container">
+    <a id="dark-mode-toggle" class="colorscheme-toggle">
+        <i class="fa-solid fa-adjust fa-fw" aria-hidden="true"></i>
+    </a>
+</div>
+
+
+  <main class="wrapper">
+    <nav class="navigation">
+  <section class="container">
+    
+    <a class="navigation-title" href="https://ftxj.github.io/zh/">
+      JXIN&#39;s Home
+    </a>
+    
+    
+      <input type="checkbox" id="menu-toggle" />
+      <label class="menu-button float-right" for="menu-toggle">
+        <i class="fa-solid fa-bars fa-fw" aria-hidden="true"></i>
+      </label>
+      <ul class="navigation-list">
+        
+          
+            <li class="navigation-item">
+              <a class="navigation-link " href="/zh/about/">关于</a>
+            </li>
+          
+            <li class="navigation-item">
+              <a class="navigation-link " href="/zh/travel/">旅行</a>
+            </li>
+          
+            <li class="navigation-item">
+              <a class="navigation-link " href="/zh/posts/">博客</a>
+            </li>
+          
+            <li class="navigation-item">
+              <a class="navigation-link " href="https://ftxj.github.io/cv/cv_zh.pdf">简历</a>
+            </li>
+          
+        
+        
+          
+          
+          
+            
+              
+                <li class="navigation-item menu-separator">
+                  <span>|</span>
+                </li>
+                
+              
+              <li class="navigation-item">
+                <a href="/posts/2026-04-20/01-first-do-no-harm-with-llms-mitigating-racial-bias-via-agenti/">EN</a>
+              </li>
+            
+          
+        
+      </ul>
+    
+  </section>
+</nav>
+
+
+    <div class="content">
+      
+  <section class="container post">
+    <article>
+      <header>
+        <div class="post-title">
+          <h1 class="title">
+            <a class="title-link" href="https://ftxj.github.io/zh/posts/2026-04-20/01-first-do-no-harm-with-llms-mitigating-racial-bias-via-agenti/">
+              First, Do No Harm (With LLMs): Mitigating Racial Bias via Agentic Workflows
+            </a>
+          </h1>
+        </div>
+        <div class="post-meta">
+          <div class="date">
+            <span class="posted-on">
+              <i class="fa-solid fa-calendar" aria-hidden="true"></i>
+              <time datetime="2026-04-27T05:23:29Z">
+                四月 27, 2026
+              </time>
+            </span>
+            <span class="reading-time">
+              <i class="fa-solid fa-clock" aria-hidden="true"></i>
+              2-minute read
+            </span>
+          </div>
+          
+          <div class="categories">
+  <i class="fa-solid fa-folder" aria-hidden="true"></i>
+    <a href="/zh/categories/paper-digest/">Paper-Digest</a>
+      <span class="separator">•</span>
+    <a href="/zh/categories/2026-04-20/">2026-04-20</a></div>
+
+          
+        </div>
+      </header>
+
+      
+
+
+      <div class="post-content">
+        
+        <p><strong>arXiv:</strong> <a href="https://arxiv.org/abs/2604.18038v1">2604.18038</a> · <a href="https://arxiv.org/pdf/2604.18038v1">PDF</a></p>
+<p><strong>作者:</strong> Sihao Xing, Zaur Gouliev</p>
+<p><strong>主分类:</strong> <code>cs.CY</code> · 全部: cs.AI, cs.CY</p>
+<p><strong>命中关键词:</strong> large language model, llm, agent, agentic, retrieval, reasoning, attention, ai system</p>
+<hr>
+<h2 id="tldr">TL;DR</h2>
+<p>以 EU AI Act 为治理视角，评估 5 个主流 LLM 在合成病例生成与鉴别诊断中的种族偏见，发现 retrieval-based agentic workflow 可缓解 DeepSeek V3 的显性偏见。</p>
+<h2 id="核心观点">核心观点</h2>
+<ul>
+<li>医学 LLM 普遍偏离美国种族流行病学分布，存在隐性与显性种族偏见。</li>
+<li>单一指标不足以刻画偏见，主张多指标联合评估。</li>
+<li>将 LLM 嵌入 retrieval-based agentic workflow 可在部分指标上降低显性偏见。</li>
+<li>以 EU AI Act 为治理框架为医学 AI 偏见评估提供合规对齐参照。</li>
+</ul>
+<h2 id="方法">方法</h2>
+<ul>
+<li>选取 5 个常用 LLM，覆盖两类任务：synthetic patient-case generation 与 differential diagnosis ranking。</li>
+<li>基准：美国种族分层流行病学分布 + 专家鉴别诊断列表。</li>
+<li>使用 structured prompt templates，采取两部分评估设计，分别探测隐性与显性种族偏见。</li>
+<li>对 DeepSeek V3 额外构建 agentic workflow（含检索组件），对比 standalone 版本的指标变化。</li>
+</ul>
+<h2 id="实验">实验</h2>
+<ul>
+<li>数据集：race-stratified 美国流行病学分布数据；专家编制的鉴别诊断列表。</li>
+<li>模型：5 个主流 LLM，其中报告了 GPT-4.1 与 DeepSeek V3 的具体数值。</li>
+<li>指标：合成生成任务看与真实分布的偏离；诊断排序任务用 p-value（mean/median）及 mean difference 等。</li>
+</ul>
+<h2 id="结果">结果</h2>
+<ul>
+<li>合成病例：所有模型均偏离真实种族分布，GPT-4.1 整体偏离最小。</li>
+<li>鉴别诊断：DeepSeek V3 综合表现最好。</li>
+<li>Agentic workflow 对 DeepSeek V3：mean p-value +0.0348，median p-value +0.1166，mean difference +0.0949，但并非所有指标都改善。</li>
+</ul>
+<h2 id="为什么重要">为什么重要</h2>
+<ul>
+<li>为临床 LLM 部署提供可操作的偏见评估范式，兼顾 EU AI Act 合规维度。</li>
+<li>说明 agentic + retrieval 架构不仅能提升准确率，还能作为 bias mitigation 手段，对医疗 AI 基础设施选型有指导意义。</li>
+</ul>
+<h2 id="与已有工作的关系">与已有工作的关系</h2>
+<ul>
+<li>延续 medical LLM bias 评测线（如 Omiye et al. 对 GPT 系列的偏见研究）。</li>
+<li>借用 agentic workflow / retrieval-augmented generation 思路，把 mitigation 从 fine-tuning 扩展到推理期。</li>
+<li>以 EU AI Act 为治理锚点，呼应 responsible AI、AI governance 方向的工作。</li>
+</ul>
+<h2 id="尚未回答的问题">尚未回答的问题</h2>
+<ul>
+<li>改善幅度较小且不均衡，在真实临床决策中是否具备统计与临床显著性？</li>
+<li>方法能否推广到性别、年龄、社经地位等其他受保护属性？</li>
+<li>未比较不同检索语料/检索策略对 bias 的差异化影响。</li>
+<li>未进入真实 EHR 与前瞻临床评估，外部效度待验证。</li>
+<li>对隐性偏见（模型内部表征层面）是否真正缓解仍不清楚。</li>
+</ul>
+<hr>
+<h2 id="论文图表">论文图表</h2>
+<p><strong>图 1:</strong> Figure 1 (extracted from PDF)</p>
+<p><img alt="图 1" src="/images/papers/2604.18038/fig1.png"></p>
+<p><strong>图 2:</strong> Figure 2 (extracted from PDF)</p>
+<p><img alt="图 2" src="/images/papers/2604.18038/fig2.png"></p>
+<p><strong>图 3:</strong> Figure 3 (extracted from PDF)</p>
+<p><img alt="图 3" src="/images/papers/2604.18038/fig3.png"></p>
+<hr>
+<h2 id="原始摘要">原始摘要</h2>
+<p>Large language models (LLMs) are increasingly used in clinical settings, raising concerns about racial bias in both generated medical text and clinical reasoning. Existing studies have identified bias in medical LLMs, but many focus on single models and give less attention to mitigation. This study uses the EU AI Act as a governance lens to evaluate five widely used LLMs across two tasks, namely synthetic patient-case generation and differential diagnosis ranking. Using race-stratified epidemiological distributions in the United States and expert differential diagnosis lists as benchmarks, we apply structured prompt templates and a two-part evaluation design to examine implicit and explicit racial bias. All models deviated from observed racial distributions in the synthetic case generation task, with GPT-4.1 showing the smallest overall deviation. In the differential diagnosis task, DeepSeek V3 produced the strongest overall results across the reported metrics. When embedded in an agentic workflow, DeepSeek V3 showed an improvement of 0.0348 in mean p-value, 0.1166 in median p-value, and 0.0949 in mean difference relative to the standalone model, although improvement was not uniform across every metric. These findings support multi-metric bias evaluation for AI systems used in medical settings and suggest that retrieval-based agentic workflows may reduce some forms of explicit bias in benchmarked diagnostic tasks. Detailed prompt templates, experimental datasets, and code pipelines are available on our GitHub.</p>
+
+      </div>
+
+
+      <footer>
+        
+
+
+        
+        
+        
+        
+        
+        
+        
+      </footer>
+    </article>
+
+    
+  </section>
+
+    </div>
+
+    <footer class="footer">
+  <section class="container">
+    ©
+    
+      2019 -
+    
+    2026
+     Jie Xin 
+    ·
+    
+    Powered by <a href="https://gohugo.io/" target="_blank" rel="noopener">Hugo</a> & <a href="https://github.com/luizdepra/hugo-coder/" target="_blank" rel="noopener">Coder</a>.
+    
+  </section>
+</footer>
+
+  </main>
+
+  
+
+  
+  
+  <script src="/js/coder.min.6ae284be93d2d19dad1f02b0039508d9aab3180a12a06dcc71b0b0ef7825a317.js" integrity="sha256-auKEvpPS0Z2tHwKwA5UI2aqzGAoSoG3McbCw73gloxc="></script>
+  
+
+  
+
+  
+
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+</body>
+</html>

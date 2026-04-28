@@ -1,0 +1,394 @@
+<!DOCTYPE html>
+<html lang="zh">
+
+<head>
+  <title>
+  LayerBoost: Layer-Aware Attention Reduction for Efficient LLMs · JXIN&#39;s Home
+</title>
+  <meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="color-scheme" content="light dark">
+
+
+
+
+<meta name="author" content="Jie Xin">
+<meta name="description" content="arXiv: 2604.22050 · PDF
+作者: Mohamed Ali Souibgui, Jan Fostier, Rodrigo Abadía-Heredia, Bohdan Denysenko, Christian Marschke, Igor Peric
+主分类: cs.LG · 全部: cs.CL, cs.LG
+命中关键词: llm, inference, serving, attention, transformer, throughput, latency
+
+TL;DR
+LayerBoost 基于各层敏感度对 transformer attention 做差异化替换（softmax/线性滑窗/删除），配合轻量蒸馏 healing，在高并发下吞吐提升最多 68%。
+核心观点
+
+Uniform 替换 softmax attention 会伤精度；不同层对 attention 的敏感度差异显著。
+提出 layer-aware 三档策略：敏感层保留 softmax、中等层换线性滑窗、低敏感层直接去掉 attention。
+仅用 10M token 的蒸馏 healing 即可恢复精度，无需大规模重训。
+
+方法
+
+在预训练模型上做系统性敏感度分析，给每层打分。
+按敏感度划三档：
+
+高敏感：保留 standard softmax attention。
+中敏感：替换为 linear sliding window attention。
+低敏感：直接移除 attention 模块。
+
+
+架构改动后进行 distillation-based healing，只需额外 10M tokens 训练。
+
+实验
+摘要未列出具体数据集、基线模型与指标名称，仅提到与 SOTA attention linearization 方法对比，并在&quot;若干 benchmark&quot;上评估质量与延迟、吞吐。">
+<meta name="keywords" content="blog,developer,personal">
+
+
+
+  <meta name="twitter:card" content="summary">
+  <meta name="twitter:title" content="LayerBoost: Layer-Aware Attention Reduction for Efficient LLMs">
+  <meta name="twitter:description" content="arXiv: 2604.22050 · PDF
+作者: Mohamed Ali Souibgui, Jan Fostier, Rodrigo Abadía-Heredia, Bohdan Denysenko, Christian Marschke, Igor Peric
+主分类: cs.LG · 全部: cs.CL, cs.LG
+命中关键词: llm, inference, serving, attention, transformer, throughput, latency
+TL;DR LayerBoost 基于各层敏感度对 transformer attention 做差异化替换（softmax/线性滑窗/删除），配合轻量蒸馏 healing，在高并发下吞吐提升最多 68%。
+核心观点 Uniform 替换 softmax attention 会伤精度；不同层对 attention 的敏感度差异显著。 提出 layer-aware 三档策略：敏感层保留 softmax、中等层换线性滑窗、低敏感层直接去掉 attention。 仅用 10M token 的蒸馏 healing 即可恢复精度，无需大规模重训。 方法 在预训练模型上做系统性敏感度分析，给每层打分。 按敏感度划三档： 高敏感：保留 standard softmax attention。 中敏感：替换为 linear sliding window attention。 低敏感：直接移除 attention 模块。 架构改动后进行 distillation-based healing，只需额外 10M tokens 训练。 实验 摘要未列出具体数据集、基线模型与指标名称，仅提到与 SOTA attention linearization 方法对比，并在&#34;若干 benchmark&#34;上评估质量与延迟、吞吐。">
+
+<meta property="og:url" content="https://ftxj.github.io/zh/posts/2026-04-23/09-layerboost-layer-aware-attention-reduction-for-efficient-llm/">
+  <meta property="og:site_name" content="JXIN&#39;s Home">
+  <meta property="og:title" content="LayerBoost: Layer-Aware Attention Reduction for Efficient LLMs">
+  <meta property="og:description" content="arXiv: 2604.22050 · PDF
+作者: Mohamed Ali Souibgui, Jan Fostier, Rodrigo Abadía-Heredia, Bohdan Denysenko, Christian Marschke, Igor Peric
+主分类: cs.LG · 全部: cs.CL, cs.LG
+命中关键词: llm, inference, serving, attention, transformer, throughput, latency
+TL;DR LayerBoost 基于各层敏感度对 transformer attention 做差异化替换（softmax/线性滑窗/删除），配合轻量蒸馏 healing，在高并发下吞吐提升最多 68%。
+核心观点 Uniform 替换 softmax attention 会伤精度；不同层对 attention 的敏感度差异显著。 提出 layer-aware 三档策略：敏感层保留 softmax、中等层换线性滑窗、低敏感层直接去掉 attention。 仅用 10M token 的蒸馏 healing 即可恢复精度，无需大规模重训。 方法 在预训练模型上做系统性敏感度分析，给每层打分。 按敏感度划三档： 高敏感：保留 standard softmax attention。 中敏感：替换为 linear sliding window attention。 低敏感：直接移除 attention 模块。 架构改动后进行 distillation-based healing，只需额外 10M tokens 训练。 实验 摘要未列出具体数据集、基线模型与指标名称，仅提到与 SOTA attention linearization 方法对比，并在&#34;若干 benchmark&#34;上评估质量与延迟、吞吐。">
+  <meta property="og:locale" content="zh">
+  <meta property="og:type" content="article">
+    <meta property="article:section" content="posts">
+    <meta property="article:published_time" content="2026-04-27T05:10:41+00:00">
+    <meta property="article:modified_time" content="2026-04-27T05:10:41+00:00">
+
+
+
+
+<link rel="canonical" href="https://ftxj.github.io/zh/posts/2026-04-23/09-layerboost-layer-aware-attention-reduction-for-efficient-llm/">
+
+
+<link rel="preload" href="/fonts/fa-brands-400.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="/fonts/fa-regular-400.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="/fonts/fa-solid-900.woff2" as="font" type="font/woff2" crossorigin>
+
+
+  
+  
+  <link rel="stylesheet" href="/css/coder.min.5e94c1acf7aa2066035cf2764ae3e4fe39db101d68b870f919966100d51fb861.css" integrity="sha256-XpTBrPeqIGYDXPJ2SuPk/jnbEB1ouHD5GZZhANUfuGE=" crossorigin="anonymous" media="screen" />
+
+
+
+
+
+
+  
+    
+    
+    <link rel="stylesheet" href="/css/coder-dark.min.a00e6364bacbc8266ad1cc81230774a1397198f8cfb7bcba29b7d6fcb54ce57f.css" integrity="sha256-oA5jZLrLyCZq0cyBIwd0oTlxmPjPt7y6KbfW/LVM5X8=" crossorigin="anonymous" media="screen" />
+  
+
+
+
+ 
+
+
+
+
+<link rel="icon" type="image/svg+xml" href="/images/favicon.svg" sizes="any">
+<link rel="icon" type="image/png" href="/images/favicon-32x32.png" sizes="32x32">
+<link rel="icon" type="image/png" href="/images/favicon-16x16.png" sizes="16x16">
+
+<link rel="apple-touch-icon" href="/images/apple-touch-icon.png">
+<link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon.png">
+
+<link rel="manifest" href="/site.webmanifest">
+<link rel="mask-icon" href="/images/safari-pinned-tab.svg" color="#5bbad5">
+
+
+
+
+
+
+<style>
+.content article ul {
+  list-style: disc !important;
+  padding-left: 2.5rem !important;
+}
+
+.content article ul li {
+  display: list-item !important;
+}
+</style>
+
+
+
+
+  
+</head>
+
+
+
+
+
+
+<body class="preload-transitions colorscheme-auto">
+  
+<div class="float-container">
+    <a id="dark-mode-toggle" class="colorscheme-toggle">
+        <i class="fa-solid fa-adjust fa-fw" aria-hidden="true"></i>
+    </a>
+</div>
+
+
+  <main class="wrapper">
+    <nav class="navigation">
+  <section class="container">
+    
+    <a class="navigation-title" href="https://ftxj.github.io/zh/">
+      JXIN&#39;s Home
+    </a>
+    
+    
+      <input type="checkbox" id="menu-toggle" />
+      <label class="menu-button float-right" for="menu-toggle">
+        <i class="fa-solid fa-bars fa-fw" aria-hidden="true"></i>
+      </label>
+      <ul class="navigation-list">
+        
+          
+            <li class="navigation-item">
+              <a class="navigation-link " href="/zh/about/">关于</a>
+            </li>
+          
+            <li class="navigation-item">
+              <a class="navigation-link " href="/zh/travel/">旅行</a>
+            </li>
+          
+            <li class="navigation-item">
+              <a class="navigation-link " href="/zh/posts/">博客</a>
+            </li>
+          
+            <li class="navigation-item">
+              <a class="navigation-link " href="https://ftxj.github.io/cv/cv_zh.pdf">简历</a>
+            </li>
+          
+        
+        
+          
+          
+          
+            
+              
+                <li class="navigation-item menu-separator">
+                  <span>|</span>
+                </li>
+                
+              
+              <li class="navigation-item">
+                <a href="/posts/2026-04-23/09-layerboost-layer-aware-attention-reduction-for-efficient-llm/">EN</a>
+              </li>
+            
+          
+        
+      </ul>
+    
+  </section>
+</nav>
+
+
+    <div class="content">
+      
+  <section class="container post">
+    <article>
+      <header>
+        <div class="post-title">
+          <h1 class="title">
+            <a class="title-link" href="https://ftxj.github.io/zh/posts/2026-04-23/09-layerboost-layer-aware-attention-reduction-for-efficient-llm/">
+              LayerBoost: Layer-Aware Attention Reduction for Efficient LLMs
+            </a>
+          </h1>
+        </div>
+        <div class="post-meta">
+          <div class="date">
+            <span class="posted-on">
+              <i class="fa-solid fa-calendar" aria-hidden="true"></i>
+              <time datetime="2026-04-27T05:10:41Z">
+                四月 27, 2026
+              </time>
+            </span>
+            <span class="reading-time">
+              <i class="fa-solid fa-clock" aria-hidden="true"></i>
+              2-minute read
+            </span>
+          </div>
+          
+          <div class="categories">
+  <i class="fa-solid fa-folder" aria-hidden="true"></i>
+    <a href="/zh/categories/paper-digest/">Paper-Digest</a>
+      <span class="separator">•</span>
+    <a href="/zh/categories/2026-04-23/">2026-04-23</a></div>
+
+          
+        </div>
+      </header>
+
+      
+
+
+      <div class="post-content">
+        
+        <p><strong>arXiv:</strong> <a href="https://arxiv.org/abs/2604.22050v1">2604.22050</a> · <a href="https://arxiv.org/pdf/2604.22050v1">PDF</a></p>
+<p><strong>作者:</strong> Mohamed Ali Souibgui, Jan Fostier, Rodrigo Abadía-Heredia, Bohdan Denysenko, Christian Marschke, Igor Peric</p>
+<p><strong>主分类:</strong> <code>cs.LG</code> · 全部: cs.CL, cs.LG</p>
+<p><strong>命中关键词:</strong> llm, inference, serving, attention, transformer, throughput, latency</p>
+<hr>
+<h2 id="tldr">TL;DR</h2>
+<p>LayerBoost 基于各层敏感度对 transformer attention 做差异化替换（softmax/线性滑窗/删除），配合轻量蒸馏 healing，在高并发下吞吐提升最多 68%。</p>
+<h2 id="核心观点">核心观点</h2>
+<ul>
+<li>Uniform 替换 softmax attention 会伤精度；不同层对 attention 的敏感度差异显著。</li>
+<li>提出 layer-aware 三档策略：敏感层保留 softmax、中等层换线性滑窗、低敏感层直接去掉 attention。</li>
+<li>仅用 10M token 的蒸馏 healing 即可恢复精度，无需大规模重训。</li>
+</ul>
+<h2 id="方法">方法</h2>
+<ol>
+<li>在预训练模型上做系统性敏感度分析，给每层打分。</li>
+<li>按敏感度划三档：
+<ul>
+<li>高敏感：保留 standard softmax attention。</li>
+<li>中敏感：替换为 linear sliding window attention。</li>
+<li>低敏感：直接移除 attention 模块。</li>
+</ul>
+</li>
+<li>架构改动后进行 distillation-based healing，只需额外 10M tokens 训练。</li>
+</ol>
+<h2 id="实验">实验</h2>
+<p>摘要未列出具体数据集、基线模型与指标名称，仅提到与 SOTA attention linearization 方法对比，并在&quot;若干 benchmark&quot;上评估质量与延迟、吞吐。</p>
+<h2 id="结果">结果</h2>
+<ul>
+<li>高并发场景下 inference latency 降低、throughput 提升最多 68%。</li>
+<li>多个 benchmark 上持平 base model，少数有轻微下降。</li>
+<li>明显优于现有 attention 线性化方法。</li>
+</ul>
+<h2 id="为什么重要">为什么重要</h2>
+<p>对 LLM serving 与硬件受限部署很实用：在几乎不损精度、训练成本极低（10M tokens）的前提下，大幅降低 attention 的推理开销，特别适合高并发在线服务与边缘部署。</p>
+<h2 id="与已有工作的关系">与已有工作的关系</h2>
+<ul>
+<li>接续 Linear Attention、Performer、Mamba/SSM 等线性/次二次 attention 路线，但反对&quot;全层统一替换&quot;。</li>
+<li>与 Sliding Window Attention（Longformer、Mistral）思路相近，用作中敏感层替代。</li>
+<li>Layer-wise 敏感度分析与 pruning/quantization 文献（如 LLM-Pruner、SparseGPT）思想一致。</li>
+<li>Distillation healing 继承 MiniLM、DistilBERT 等小样本蒸馏思路。</li>
+</ul>
+<h2 id="尚未回答的问题">尚未回答的问题</h2>
+<ul>
+<li>敏感度度量的具体定义与跨模型/规模的稳定性？</li>
+<li>10M tokens healing 对更大模型（70B+）是否依然足够？</li>
+<li>长上下文任务（&gt;32k）上线性滑窗档的精度损失？</li>
+<li>与 KV cache 压缩、quantization 等其他优化的组合效果？</li>
+<li>删除 attention 的层如何处理位置/全局信息传递，长期训练会否退化？</li>
+</ul>
+<hr>
+<h2 id="论文图表">论文图表</h2>
+<p><strong>图 1:</strong> Figure 1 (extracted from PDF)</p>
+<p><img alt="图 1" src="/images/papers/2604.22050/fig1.png"></p>
+<p><strong>图 2:</strong> Figure 2 (extracted from PDF)</p>
+<p><img alt="图 2" src="/images/papers/2604.22050/fig2.png"></p>
+<p><strong>图 3:</strong> Figure 3 (extracted from PDF)</p>
+<p><img alt="图 3" src="/images/papers/2604.22050/fig3.png"></p>
+<hr>
+<h2 id="原始摘要">原始摘要</h2>
+<p>Transformers are mostly relying on softmax attention, which introduces quadratic complexity with respect to sequence length and remains a major bottleneck for efficient inference. Prior work on linear or hybrid attention typically replaces softmax attention uniformly across all layers, often leading to significant performance degradation or requiring extensive retraining to recover model quality. This work proposes LayerBoost, a layer-aware attention reduction method that selectively modifies the attention mechanism based on the sensitivity of individual transformer layers. It first performs a systematic sensitivity analysis on a pretrained model to identify layers that are critical for maintaining performance. Guided by this analysis, three distinct strategies can be applied: retaining standard softmax attention in highly sensitive layers, replacing it with linear sliding window attention in moderately sensitive layers, and removing attention entirely in layers that exhibit low sensitivity. To recover performance after these architectural modifications, we introduce a lightweight distillation-based healing phase requiring only 10M additional training tokens. LayerBoost reduces inference latency and improves throughput by up to 68% at high concurrency, while maintaining competitive model quality. It matches base model performance on several benchmarks, exhibits only minor degradations on others, and significantly outperforms state-of-the-art attention linearization methods. These efficiency gains make our method particularly well-suited for high-concurrency serving and hardware-constrained deployment scenarios, where inference cost and memory footprint are critical bottlenecks.</p>
+
+      </div>
+
+
+      <footer>
+        
+
+
+        
+        
+        
+        
+        
+        
+        
+      </footer>
+    </article>
+
+    
+  </section>
+
+    </div>
+
+    <footer class="footer">
+  <section class="container">
+    ©
+    
+      2019 -
+    
+    2026
+     Jie Xin 
+    ·
+    
+    Powered by <a href="https://gohugo.io/" target="_blank" rel="noopener">Hugo</a> & <a href="https://github.com/luizdepra/hugo-coder/" target="_blank" rel="noopener">Coder</a>.
+    
+  </section>
+</footer>
+
+  </main>
+
+  
+
+  
+  
+  <script src="/js/coder.min.6ae284be93d2d19dad1f02b0039508d9aab3180a12a06dcc71b0b0ef7825a317.js" integrity="sha256-auKEvpPS0Z2tHwKwA5UI2aqzGAoSoG3McbCw73gloxc="></script>
+  
+
+  
+
+  
+
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+</body>
+</html>

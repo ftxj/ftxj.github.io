@@ -1,0 +1,369 @@
+<!DOCTYPE html>
+<html lang="zh">
+
+<head>
+  <title>
+  Stabilizing Efficient Reasoning with Step-Level Advantage Selection · JXIN&#39;s Home
+</title>
+  <meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="color-scheme" content="light dark">
+
+
+
+
+<meta name="author" content="Jie Xin">
+<meta name="description" content="arXiv: 2604.24003 · PDF
+作者: Han Wang, Xiaodong Yu, Jialian Wu, Jiang Liu, Ximeng Sun, Mohit Bansal, Zicheng Liu
+单位: UNC Chapel Hill, Advanced Micro Devices, Inc
+主分类: cs.CL · 全部: cs.CL, cs.LG
+命中关键词: large language model, llm, rag, reasoning, inference, post-train
+
+TL;DR
+短上下文 post-training 能压缩推理长度但破坏稳定性，SAS 通过按步置零低置信正样本和高置信负样本的 advantage，在提升 0.86 Pass@1 的同时减少 16.3% 长度。
+Motivation
+LLM 推理质量很大程度来自推理时花大量算力生成冗长 trace，推理代价高。已有的 efficient reasoning 工作用 length-based reward 或剪枝来压缩长度，但普遍在远短于 base model 原训练窗口的 context 上做 post-training，而这一前置条件本身的影响从未被系统剥离出来。作者先做了一个关键观察：仅仅把 GRPO 放到短 context 上跑，不加任何 length reward，就已经能显著压短推理——但代价是训练越来越不稳、准确率下降。对于今天在做 reasoning 模型压缩的团队（蒸馏小模型、RLHF 组、要部署长思维链但预算有限的 serving 团队），这是个被忽视的陷阱：你以为是 length reward 起作用，其实是短 context 在做隐式压缩，同时悄悄破坏训练动力学。现有 workaround 是再加各种 length-aware loss，但这掩盖了根因。作者认为真正需要修的是 GRPO 在短 context 下的 advantage 传播机制：truncation 或 verifier 误判会把&quot;其实思路对的 rollout&quot;整体打成负样本，而正确 rollout 里低质量步又被一起奖励，这才是不稳定的源头。">
+<meta name="keywords" content="blog,developer,personal">
+
+
+
+  <meta name="twitter:card" content="summary">
+  <meta name="twitter:title" content="Stabilizing Efficient Reasoning with Step-Level Advantage Selection">
+  <meta name="twitter:description" content="arXiv: 2604.24003 · PDF
+作者: Han Wang, Xiaodong Yu, Jialian Wu, Jiang Liu, Ximeng Sun, Mohit Bansal, Zicheng Liu
+单位: UNC Chapel Hill, Advanced Micro Devices, Inc
+主分类: cs.CL · 全部: cs.CL, cs.LG
+命中关键词: large language model, llm, rag, reasoning, inference, post-train
+TL;DR 短上下文 post-training 能压缩推理长度但破坏稳定性，SAS 通过按步置零低置信正样本和高置信负样本的 advantage，在提升 0.86 Pass@1 的同时减少 16.3% 长度。
+Motivation LLM 推理质量很大程度来自推理时花大量算力生成冗长 trace，推理代价高。已有的 efficient reasoning 工作用 length-based reward 或剪枝来压缩长度，但普遍在远短于 base model 原训练窗口的 context 上做 post-training，而这一前置条件本身的影响从未被系统剥离出来。作者先做了一个关键观察：仅仅把 GRPO 放到短 context 上跑，不加任何 length reward，就已经能显著压短推理——但代价是训练越来越不稳、准确率下降。对于今天在做 reasoning 模型压缩的团队（蒸馏小模型、RLHF 组、要部署长思维链但预算有限的 serving 团队），这是个被忽视的陷阱：你以为是 length reward 起作用，其实是短 context 在做隐式压缩，同时悄悄破坏训练动力学。现有 workaround 是再加各种 length-aware loss，但这掩盖了根因。作者认为真正需要修的是 GRPO 在短 context 下的 advantage 传播机制：truncation 或 verifier 误判会把&#34;其实思路对的 rollout&#34;整体打成负样本，而正确 rollout 里低质量步又被一起奖励，这才是不稳定的源头。">
+
+<meta property="og:url" content="https://ftxj.github.io/zh/posts/2026-04-28/04-stabilizing-efficient-reasoning-with-step-level-advantage-se/">
+  <meta property="og:site_name" content="JXIN&#39;s Home">
+  <meta property="og:title" content="Stabilizing Efficient Reasoning with Step-Level Advantage Selection">
+  <meta property="og:description" content="arXiv: 2604.24003 · PDF
+作者: Han Wang, Xiaodong Yu, Jialian Wu, Jiang Liu, Ximeng Sun, Mohit Bansal, Zicheng Liu
+单位: UNC Chapel Hill, Advanced Micro Devices, Inc
+主分类: cs.CL · 全部: cs.CL, cs.LG
+命中关键词: large language model, llm, rag, reasoning, inference, post-train
+TL;DR 短上下文 post-training 能压缩推理长度但破坏稳定性，SAS 通过按步置零低置信正样本和高置信负样本的 advantage，在提升 0.86 Pass@1 的同时减少 16.3% 长度。
+Motivation LLM 推理质量很大程度来自推理时花大量算力生成冗长 trace，推理代价高。已有的 efficient reasoning 工作用 length-based reward 或剪枝来压缩长度，但普遍在远短于 base model 原训练窗口的 context 上做 post-training，而这一前置条件本身的影响从未被系统剥离出来。作者先做了一个关键观察：仅仅把 GRPO 放到短 context 上跑，不加任何 length reward，就已经能显著压短推理——但代价是训练越来越不稳、准确率下降。对于今天在做 reasoning 模型压缩的团队（蒸馏小模型、RLHF 组、要部署长思维链但预算有限的 serving 团队），这是个被忽视的陷阱：你以为是 length reward 起作用，其实是短 context 在做隐式压缩，同时悄悄破坏训练动力学。现有 workaround 是再加各种 length-aware loss，但这掩盖了根因。作者认为真正需要修的是 GRPO 在短 context 下的 advantage 传播机制：truncation 或 verifier 误判会把&#34;其实思路对的 rollout&#34;整体打成负样本，而正确 rollout 里低质量步又被一起奖励，这才是不稳定的源头。">
+  <meta property="og:locale" content="zh">
+  <meta property="og:type" content="article">
+    <meta property="article:section" content="posts">
+    <meta property="article:published_time" content="2026-04-28T08:43:03+00:00">
+    <meta property="article:modified_time" content="2026-04-28T08:43:03+00:00">
+
+
+
+
+<link rel="canonical" href="https://ftxj.github.io/zh/posts/2026-04-28/04-stabilizing-efficient-reasoning-with-step-level-advantage-se/">
+
+
+<link rel="preload" href="/fonts/fa-brands-400.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="/fonts/fa-regular-400.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="/fonts/fa-solid-900.woff2" as="font" type="font/woff2" crossorigin>
+
+
+  
+  
+  <link rel="stylesheet" href="/css/coder.min.5e94c1acf7aa2066035cf2764ae3e4fe39db101d68b870f919966100d51fb861.css" integrity="sha256-XpTBrPeqIGYDXPJ2SuPk/jnbEB1ouHD5GZZhANUfuGE=" crossorigin="anonymous" media="screen" />
+
+
+
+
+
+
+  
+    
+    
+    <link rel="stylesheet" href="/css/coder-dark.min.a00e6364bacbc8266ad1cc81230774a1397198f8cfb7bcba29b7d6fcb54ce57f.css" integrity="sha256-oA5jZLrLyCZq0cyBIwd0oTlxmPjPt7y6KbfW/LVM5X8=" crossorigin="anonymous" media="screen" />
+  
+
+
+
+ 
+
+
+
+
+<link rel="icon" type="image/svg+xml" href="/images/favicon.svg" sizes="any">
+<link rel="icon" type="image/png" href="/images/favicon-32x32.png" sizes="32x32">
+<link rel="icon" type="image/png" href="/images/favicon-16x16.png" sizes="16x16">
+
+<link rel="apple-touch-icon" href="/images/apple-touch-icon.png">
+<link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon.png">
+
+<link rel="manifest" href="/site.webmanifest">
+<link rel="mask-icon" href="/images/safari-pinned-tab.svg" color="#5bbad5">
+
+
+
+
+
+
+<style>
+.content article ul {
+  list-style: disc !important;
+  padding-left: 2.5rem !important;
+}
+
+.content article ul li {
+  display: list-item !important;
+}
+</style>
+
+
+
+
+  
+</head>
+
+
+
+
+
+
+<body class="preload-transitions colorscheme-auto">
+  
+<div class="float-container">
+    <a id="dark-mode-toggle" class="colorscheme-toggle">
+        <i class="fa-solid fa-adjust fa-fw" aria-hidden="true"></i>
+    </a>
+</div>
+
+
+  <main class="wrapper">
+    <nav class="navigation">
+  <section class="container">
+    
+    <a class="navigation-title" href="https://ftxj.github.io/zh/">
+      JXIN&#39;s Home
+    </a>
+    
+    
+      <input type="checkbox" id="menu-toggle" />
+      <label class="menu-button float-right" for="menu-toggle">
+        <i class="fa-solid fa-bars fa-fw" aria-hidden="true"></i>
+      </label>
+      <ul class="navigation-list">
+        
+          
+            <li class="navigation-item">
+              <a class="navigation-link " href="/zh/about/">关于</a>
+            </li>
+          
+            <li class="navigation-item">
+              <a class="navigation-link " href="/zh/travel/">旅行</a>
+            </li>
+          
+            <li class="navigation-item">
+              <a class="navigation-link " href="/zh/posts/">博客</a>
+            </li>
+          
+            <li class="navigation-item">
+              <a class="navigation-link " href="https://ftxj.github.io/cv/cv_zh.pdf">简历</a>
+            </li>
+          
+        
+        
+          
+          
+          
+            
+              
+                <li class="navigation-item menu-separator">
+                  <span>|</span>
+                </li>
+                
+              
+              <li class="navigation-item">
+                <a href="/posts/2026-04-28/04-stabilizing-efficient-reasoning-with-step-level-advantage-se/">EN</a>
+              </li>
+            
+          
+        
+      </ul>
+    
+  </section>
+</nav>
+
+
+    <div class="content">
+      
+  <section class="container post">
+    <article>
+      <header>
+        <div class="post-title">
+          <h1 class="title">
+            <a class="title-link" href="https://ftxj.github.io/zh/posts/2026-04-28/04-stabilizing-efficient-reasoning-with-step-level-advantage-se/">
+              Stabilizing Efficient Reasoning with Step-Level Advantage Selection
+            </a>
+          </h1>
+        </div>
+        <div class="post-meta">
+          <div class="date">
+            <span class="posted-on">
+              <i class="fa-solid fa-calendar" aria-hidden="true"></i>
+              <time datetime="2026-04-28T08:43:03Z">
+                四月 28, 2026
+              </time>
+            </span>
+            <span class="reading-time">
+              <i class="fa-solid fa-clock" aria-hidden="true"></i>
+              3-minute read
+            </span>
+          </div>
+          
+          <div class="categories">
+  <i class="fa-solid fa-folder" aria-hidden="true"></i>
+    <a href="/zh/categories/paper-digest/">Paper-Digest</a>
+      <span class="separator">•</span>
+    <a href="/zh/categories/2026-04-28/">2026-04-28</a></div>
+
+          
+        </div>
+      </header>
+
+      
+
+
+      <div class="post-content">
+        
+        <p><strong>arXiv:</strong> <a href="https://arxiv.org/abs/2604.24003v1">2604.24003</a> · <a href="https://arxiv.org/pdf/2604.24003v1">PDF</a></p>
+<p><strong>作者:</strong> Han Wang, Xiaodong Yu, Jialian Wu, Jiang Liu, Ximeng Sun, Mohit Bansal, Zicheng Liu</p>
+<p><strong>单位:</strong> UNC Chapel Hill, Advanced Micro Devices, Inc</p>
+<p><strong>主分类:</strong> <code>cs.CL</code> · 全部: cs.CL, cs.LG</p>
+<p><strong>命中关键词:</strong> large language model, llm, rag, reasoning, inference, post-train</p>
+<hr>
+<h2 id="tldr">TL;DR</h2>
+<p>短上下文 post-training 能压缩推理长度但破坏稳定性，SAS 通过按步置零低置信正样本和高置信负样本的 advantage，在提升 0.86 Pass@1 的同时减少 16.3% 长度。</p>
+<h2 id="motivation">Motivation</h2>
+<p>LLM 推理质量很大程度来自推理时花大量算力生成冗长 trace，推理代价高。已有的 efficient reasoning 工作用 length-based reward 或剪枝来压缩长度，但普遍在远短于 base model 原训练窗口的 context 上做 post-training，而这一前置条件本身的影响从未被系统剥离出来。作者先做了一个关键观察：仅仅把 GRPO 放到短 context 上跑，不加任何 length reward，就已经能显著压短推理——但代价是训练越来越不稳、准确率下降。对于今天在做 reasoning 模型压缩的团队（蒸馏小模型、RLHF 组、要部署长思维链但预算有限的 serving 团队），这是个被忽视的陷阱：你以为是 length reward 起作用，其实是短 context 在做隐式压缩，同时悄悄破坏训练动力学。现有 workaround 是再加各种 length-aware loss，但这掩盖了根因。作者认为真正需要修的是 GRPO 在短 context 下的 advantage 传播机制：truncation 或 verifier 误判会把&quot;其实思路对的 rollout&quot;整体打成负样本，而正确 rollout 里低质量步又被一起奖励，这才是不稳定的源头。</p>
+<h2 id="核心观点">核心观点</h2>
+<ul>
+<li>仅短 context post-training（不带任何 length 目标）就能显著压缩推理长度，但牺牲训练稳定性和精度——此前没被单独量化过。</li>
+<li>GRPO 把 rollout 级 verifier 结果均匀传播到每一步，是短 context 下失稳的主因：truncation / verifier 误判会惩罚到其实正确的中间步。</li>
+<li>提出 Step-level Advantage Selection (SAS)：在 step 粒度挑选性地把某些步的 advantage 置零。</li>
+<li>正确 rollout 中的低置信步不拿正 advantage；verifier 失败 rollout 中的高置信步不拿负 advantage。</li>
+<li>在多个数学与通用 reasoning benchmark 上，SAS 比最强 length-aware 基线 Pass@1 平均再高 0.86，长度再降 16.3%。</li>
+<li>训练过程中 policy entropy 保持更高，说明探索更稳健。</li>
+</ul>
+<h2 id="方法">方法</h2>
+<p>SAS 改造的是 GRPO 的 advantage 分配，不动 reward 本身。标准 GRPO 在 group-relative 归一化后把 rollout 的最终 verifier 结果均匀摊到每个 token/step 上：正确 rollout 所有步都拿正 advantage，失败 rollout 所有步都拿负 advantage。SAS 转到 step 粒度，用 policy 自身对每一步的置信度做筛选：(1) 对正确 rollout 中低置信的步，置零 advantage——这些步往往是运气蒙对或冗余填充，奖励它们会鼓励啰嗦；(2) 对 verifier 失败 rollout 中高置信的步，置零 advantage——这些失败很多是 context 截断或 verifier 本身判错，不是推理错，盲目惩罚会打掉有用行为。剩下的步仍按原 GRPO 更新。整个机制作用于短 context post-training 场景，相当于给 GRPO 加一层 step-level 选择性掩码。</p>
+<p><img alt="图 1" src="/images/papers/2604.24003/fig1.png"></p>
+<p>图 1 正是用来支撑 SAS 的核心机制设计：左边画出 GRPO 把 rollout-level 结果均摊到每一步（correct rollout 全正、verifier-failed rollout 全负），右边画出 SAS 在 step 级根据置信度把两类&quot;误伤&quot;步的 advantage 置零。看完这张图不用看公式就能抓住本文做的唯一一件事——把 advantage 从 rollout 粒度收紧到 step 粒度。</p>
+<h2 id="实验">实验</h2>
+<p>在数学推理以及更一般的 reasoning benchmark 上评测，指标为 Pass@1 准确率与平均推理长度，并追踪训练过程中的 policy entropy。基线包括纯短 context GRPO（GRPO-4K）以及当时最强的 length-aware efficient-reasoning 方法。摘要未点名具体 benchmark 列表。</p>
+<h2 id="结果">结果</h2>
+<p>对比&quot;最强 length-aware 基线&quot;，SAS 平均 Pass@1 +0.86 分，同时平均推理长度再降 16.3%，即同时拿到更高精度和更短输出，accuracy-efficiency trade-off 改善。训练动态方面，纯 GRPO-4K 出现 entropy 快速坍塌，而 SAS 全程维持更高 entropy，对应更稳健的探索。</p>
+<p><img alt="图 2" src="/images/papers/2604.24003/fig2.png"></p>
+<p>图 2 支撑&quot;长度被压缩且比基线更短&quot;这一主张：横轴 training step，纵轴 output length，SAS 曲线相对 GRPO-4K 等基线持续位于更低位置，对应整体 -16.3% 的长度收益。</p>
+<p><img alt="图 3" src="/images/papers/2604.24003/fig3.png"></p>
+<p>图 3 支撑&quot;精度没掉反而更好&quot;这一主张：同样横轴 training step、纵轴 accuracy，SAS 在训练过程中始终不落后于 length-aware 基线，最终平均 Pass@1 高出 0.86。配合图 2 可以直观看出它在同一训练轨迹上同时赢了长度和精度。</p>
+<p><img alt="图 4" src="/images/papers/2604.24003/fig4.png"></p>
+<p>图 4 支撑&quot;稳定性来自更充分的探索&quot;这一机制解释：纯 GRPO-4K 的 policy entropy 迅速坍塌（这就是作者说的短 context post-training 副作用），而 SAS 曲线明显更高、下降更缓，说明 step-level 选择性置零避免了过早收敛到单一模式。</p>
+<h2 id="结论">结论</h2>
+<p>实践者该带走的一条 takeaway：要做 efficient reasoning，不要盲目加 length reward，先承认&quot;短 context post-training 本身已经在压长度并破坏训练&quot;，然后在 step 粒度修掉 GRPO 把 rollout-level 信号均摊到每一步带来的误伤，就能同时拿到更短推理（-16.3%）和更高精度（+0.86 Pass@1）。边界：结果是在数学与通用 reasoning benchmark 上的平均值，摘要没披露具体 benchmark 清单与模型规模，也没给 verifier 误判率的单独 ablation，跨领域（代码、多步 agent）是否仍然成立未验证。</p>
+<h2 id="是否新瓶装旧酒">是否新瓶装旧酒</h2>
+<ul>
+<li>与 rollout-level RLHF/GRPO 下的 credit assignment 工作（如 step-level reward shaping、process reward model PRM、token-level DPO 等）思路同源：都在试图把最终标量奖励拆到中间步。SAS 的差别在于它不训练额外 PRM，直接用 policy 自身置信度做选择性掩码，而且针对 verifier 失败来自 truncation 这个具体场景设计。</li>
+<li>与 length-aware efficient-reasoning 基线（length penalty、truncation-based pruning）相比，本文结论恰好是反过来的：作者指出&quot;短 context 本身就在压长度&quot;，把焦点从 reward 改造转到 advantage 分配修正，这是真正的新视角，不是换 loss。</li>
+<li>与 GRPO variants（DAPO、step-level GRPO 等）在形式上相近，但 SAS 的判据（低置信正样本 + 高置信负样本都置零）在摘要描述里是具体且有针对性的，不确定是否已有完全相同的掩码规则；倾向认为是增量但机制本身非空。</li>
+</ul>
+<h2 id="尚未回答的问题">尚未回答的问题</h2>
+<ul>
+<li>verifier 失败中到底有多少比例真的是 truncation / verifier 误判？需要单独 ablation。</li>
+<li>&ldquo;低置信 / 高置信&quot;的阈值怎么定、对结果有多敏感？</li>
+<li>是否在代码生成、agent 多轮调用等非数学推理场景仍然有效？</li>
+<li>和现成 PRM 以及 token-level RL 方法放在一起做正面对比会如何？</li>
+<li>模型规模放大后，entropy collapse 是否依然是主要失败模式？</li>
+</ul>
+<h2 id="原始摘要中文翻译">原始摘要（中文翻译）</h2>
+<p>大语言模型（LLM）通过在推理时分配大量计算量来取得强大的推理表现，常常生成冗长啰嗦的推理轨迹。尽管近期的 efficient reasoning 工作通过 length-based reward 或剪枝来降低这一开销，许多方法是在远短于 base model 训练时所用的 context window 下进行 post-training 的，而这一因素的影响此前并未被系统性地单独剥离分析。我们首先证明：仅仅进行 short-context post-training，哪怕使用标准 GRPO 且不加入任何 length-aware 目标，就已经能导致相当程度的推理压缩——但代价是训练动态越来越不稳定以及准确率下降。为了解决这一点，我们提出 Step-level Advantage Selection (SAS)，它在推理步（reasoning-step）层面操作，将正确 rollout 中低置信度的步、以及 verifier 失败 rollout 中高置信度的步，赋予为零的 advantage，因为 verifier 失败往往源自 truncation 或 verifier 本身的问题，而非推理错误。在多种数学与通用推理 benchmark 上，SAS 相比最强的 length-aware 基线将平均 Pass@1 准确率提升 0.86 个百分点，同时将平均推理长度减少 16.3%，从而取得更好的 accuracy-efficiency 权衡。</p>
+
+      </div>
+
+
+      <footer>
+        
+
+
+        
+        
+        
+        
+        
+        
+        
+      </footer>
+    </article>
+
+    
+  </section>
+
+    </div>
+
+    <footer class="footer">
+  <section class="container">
+    ©
+    
+      2019 -
+    
+    2026
+     Jie Xin 
+    ·
+    
+    Powered by <a href="https://gohugo.io/" target="_blank" rel="noopener">Hugo</a> & <a href="https://github.com/luizdepra/hugo-coder/" target="_blank" rel="noopener">Coder</a>.
+    
+  </section>
+</footer>
+
+  </main>
+
+  
+
+  
+  
+  <script src="/js/coder.min.6ae284be93d2d19dad1f02b0039508d9aab3180a12a06dcc71b0b0ef7825a317.js" integrity="sha256-auKEvpPS0Z2tHwKwA5UI2aqzGAoSoG3McbCw73gloxc="></script>
+  
+
+  
+
+  
+
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+</body>
+</html>

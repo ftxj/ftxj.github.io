@@ -1,0 +1,368 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <title>
+  GR-Evolve: Design-Adaptive Global Routing via LLM-Driven Algorithm Evolution · JXIN&#39;s Home
+</title>
+  <meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="color-scheme" content="light dark">
+
+
+
+
+<meta name="author" content="Jie Xin">
+<meta name="description" content="arXiv: 2604.22234 · PDF
+Authors: Taizun Jafri, Vidya A. Chhabria
+Primary category: cs.AR · all: cs.AR
+Matched keywords: large language model, llm, agent, agentic, rag
+
+TL;DR
+GR-Evolve 用 agentic LLM 迭代修改全局布线器源码，以 QoR 反馈驱动&quot;设计自适应&quot;EDA：让算法本身针对具体芯片设计特化，而非仅调超参。
+
+Key Ideas
+
+提出 design-adaptive EDA 范式：工具内部算法针对每个 design 自动特化。
+用 LLM 演化 global router 源码，而非只调 hyperparameter。
+以 QoR 指标作为进化反馈信号形成闭环。
+在 OpenROAD 基础设施上集成 QoR 评估工具链。
+
+Approach
+LLM agent 持有开源 global router 的持久化上下文知识，迭代修改源代码；每轮在 OpenROAD 中跑 detailed routing 得到 QoR，并将结果回馈给 LLM 指导下一轮代码变更。等价于把代码进化 &#43; 评估循环封装成自动化流水线。">
+<meta name="keywords" content="blog,developer,personal">
+
+
+
+  <meta name="twitter:card" content="summary">
+  <meta name="twitter:title" content="GR-Evolve: Design-Adaptive Global Routing via LLM-Driven Algorithm Evolution">
+  <meta name="twitter:description" content="arXiv: 2604.22234 · PDF
+Authors: Taizun Jafri, Vidya A. Chhabria
+Primary category: cs.AR · all: cs.AR
+Matched keywords: large language model, llm, agent, agentic, rag
+TL;DR GR-Evolve 用 agentic LLM 迭代修改全局布线器源码，以 QoR 反馈驱动&#34;设计自适应&#34;EDA：让算法本身针对具体芯片设计特化，而非仅调超参。
+Key Ideas 提出 design-adaptive EDA 范式：工具内部算法针对每个 design 自动特化。 用 LLM 演化 global router 源码，而非只调 hyperparameter。 以 QoR 指标作为进化反馈信号形成闭环。 在 OpenROAD 基础设施上集成 QoR 评估工具链。 Approach LLM agent 持有开源 global router 的持久化上下文知识，迭代修改源代码；每轮在 OpenROAD 中跑 detailed routing 得到 QoR，并将结果回馈给 LLM 指导下一轮代码变更。等价于把代码进化 &#43; 评估循环封装成自动化流水线。">
+
+<meta property="og:url" content="https://ftxj.github.io/posts/2026-04-24/04-gr-evolve-design-adaptive-global-routing-via-llm-driven-algo/">
+  <meta property="og:site_name" content="JXIN&#39;s Home">
+  <meta property="og:title" content="GR-Evolve: Design-Adaptive Global Routing via LLM-Driven Algorithm Evolution">
+  <meta property="og:description" content="arXiv: 2604.22234 · PDF
+Authors: Taizun Jafri, Vidya A. Chhabria
+Primary category: cs.AR · all: cs.AR
+Matched keywords: large language model, llm, agent, agentic, rag
+TL;DR GR-Evolve 用 agentic LLM 迭代修改全局布线器源码，以 QoR 反馈驱动&#34;设计自适应&#34;EDA：让算法本身针对具体芯片设计特化，而非仅调超参。
+Key Ideas 提出 design-adaptive EDA 范式：工具内部算法针对每个 design 自动特化。 用 LLM 演化 global router 源码，而非只调 hyperparameter。 以 QoR 指标作为进化反馈信号形成闭环。 在 OpenROAD 基础设施上集成 QoR 评估工具链。 Approach LLM agent 持有开源 global router 的持久化上下文知识，迭代修改源代码；每轮在 OpenROAD 中跑 detailed routing 得到 QoR，并将结果回馈给 LLM 指导下一轮代码变更。等价于把代码进化 &#43; 评估循环封装成自动化流水线。">
+  <meta property="og:locale" content="en">
+  <meta property="og:type" content="article">
+    <meta property="article:section" content="posts">
+    <meta property="article:published_time" content="2026-04-27T07:58:19+00:00">
+    <meta property="article:modified_time" content="2026-04-27T07:58:19+00:00">
+
+
+
+
+<link rel="canonical" href="https://ftxj.github.io/posts/2026-04-24/04-gr-evolve-design-adaptive-global-routing-via-llm-driven-algo/">
+
+
+<link rel="preload" href="/fonts/fa-brands-400.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="/fonts/fa-regular-400.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="/fonts/fa-solid-900.woff2" as="font" type="font/woff2" crossorigin>
+
+
+  
+  
+  <link rel="stylesheet" href="/css/coder.min.5e94c1acf7aa2066035cf2764ae3e4fe39db101d68b870f919966100d51fb861.css" integrity="sha256-XpTBrPeqIGYDXPJ2SuPk/jnbEB1ouHD5GZZhANUfuGE=" crossorigin="anonymous" media="screen" />
+
+
+
+
+
+
+  
+    
+    
+    <link rel="stylesheet" href="/css/coder-dark.min.a00e6364bacbc8266ad1cc81230774a1397198f8cfb7bcba29b7d6fcb54ce57f.css" integrity="sha256-oA5jZLrLyCZq0cyBIwd0oTlxmPjPt7y6KbfW/LVM5X8=" crossorigin="anonymous" media="screen" />
+  
+
+
+
+ 
+
+
+
+
+<link rel="icon" type="image/svg+xml" href="/images/favicon.svg" sizes="any">
+<link rel="icon" type="image/png" href="/images/favicon-32x32.png" sizes="32x32">
+<link rel="icon" type="image/png" href="/images/favicon-16x16.png" sizes="16x16">
+
+<link rel="apple-touch-icon" href="/images/apple-touch-icon.png">
+<link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon.png">
+
+<link rel="manifest" href="/site.webmanifest">
+<link rel="mask-icon" href="/images/safari-pinned-tab.svg" color="#5bbad5">
+
+
+
+
+
+
+<style>
+.content article ul {
+  list-style: disc !important;
+  padding-left: 2.5rem !important;
+}
+
+.content article ul li {
+  display: list-item !important;
+}
+</style>
+
+
+
+
+  
+</head>
+
+
+
+
+
+
+<body class="preload-transitions colorscheme-auto">
+  
+<div class="float-container">
+    <a id="dark-mode-toggle" class="colorscheme-toggle">
+        <i class="fa-solid fa-adjust fa-fw" aria-hidden="true"></i>
+    </a>
+</div>
+
+
+  <main class="wrapper">
+    <nav class="navigation">
+  <section class="container">
+    
+    <a class="navigation-title" href="https://ftxj.github.io/">
+      JXIN&#39;s Home
+    </a>
+    
+    
+      <input type="checkbox" id="menu-toggle" />
+      <label class="menu-button float-right" for="menu-toggle">
+        <i class="fa-solid fa-bars fa-fw" aria-hidden="true"></i>
+      </label>
+      <ul class="navigation-list">
+        
+          
+            <li class="navigation-item">
+              <a class="navigation-link " href="/about/">About</a>
+            </li>
+          
+            <li class="navigation-item">
+              <a class="navigation-link " href="/travel/">Travel</a>
+            </li>
+          
+            <li class="navigation-item">
+              <a class="navigation-link " href="/posts/">Blog</a>
+            </li>
+          
+            <li class="navigation-item">
+              <a class="navigation-link " href="https://ftxj.github.io/cv/cv.pdf">CV</a>
+            </li>
+          
+        
+        
+          
+          
+          
+            
+              
+                <li class="navigation-item menu-separator">
+                  <span>|</span>
+                </li>
+                
+              
+              <li class="navigation-item">
+                <a href="/zh/posts/2026-04-24/04-gr-evolve-design-adaptive-global-routing-via-llm-driven-algo/">中文</a>
+              </li>
+            
+          
+        
+      </ul>
+    
+  </section>
+</nav>
+
+
+    <div class="content">
+      
+  <section class="container post">
+    <article>
+      <header>
+        <div class="post-title">
+          <h1 class="title">
+            <a class="title-link" href="https://ftxj.github.io/posts/2026-04-24/04-gr-evolve-design-adaptive-global-routing-via-llm-driven-algo/">
+              GR-Evolve: Design-Adaptive Global Routing via LLM-Driven Algorithm Evolution
+            </a>
+          </h1>
+        </div>
+        <div class="post-meta">
+          <div class="date">
+            <span class="posted-on">
+              <i class="fa-solid fa-calendar" aria-hidden="true"></i>
+              <time datetime="2026-04-27T07:58:19Z">
+                April 27, 2026
+              </time>
+            </span>
+            <span class="reading-time">
+              <i class="fa-solid fa-clock" aria-hidden="true"></i>
+              2-minute read
+            </span>
+          </div>
+          
+          <div class="categories">
+  <i class="fa-solid fa-folder" aria-hidden="true"></i>
+    <a href="/categories/paper-digest/">Paper-Digest</a>
+      <span class="separator">•</span>
+    <a href="/categories/2026-04-24/">2026-04-24</a></div>
+
+          
+        </div>
+      </header>
+
+      
+
+
+      <div class="post-content">
+        
+        <p><strong>arXiv:</strong> <a href="https://arxiv.org/abs/2604.22234v1">2604.22234</a> · <a href="https://arxiv.org/pdf/2604.22234v1">PDF</a></p>
+<p><strong>Authors:</strong> Taizun Jafri, Vidya A. Chhabria</p>
+<p><strong>Primary category:</strong> <code>cs.AR</code> · all: cs.AR</p>
+<p><strong>Matched keywords:</strong> large language model, llm, agent, agentic, rag</p>
+<hr>
+<h2 id="tldr">TL;DR</h2>
+<p>GR-Evolve 用 agentic LLM 迭代修改全局布线器源码，以 QoR 反馈驱动&quot;设计自适应&quot;EDA：让算法本身针对具体芯片设计特化，而非仅调超参。</p>
+<p><img alt="Figure 1" src="/images/papers/2604.22234/fig1.jpg"></p>
+<h2 id="key-ideas">Key Ideas</h2>
+<ul>
+<li>提出 design-adaptive EDA 范式：工具内部算法针对每个 design 自动特化。</li>
+<li>用 LLM 演化 global router 源码，而非只调 hyperparameter。</li>
+<li>以 QoR 指标作为进化反馈信号形成闭环。</li>
+<li>在 OpenROAD 基础设施上集成 QoR 评估工具链。</li>
+</ul>
+<h2 id="approach">Approach</h2>
+<p>LLM agent 持有开源 global router 的持久化上下文知识，迭代修改源代码；每轮在 OpenROAD 中跑 detailed routing 得到 QoR，并将结果回馈给 LLM 指导下一轮代码变更。等价于把代码进化 + 评估循环封装成自动化流水线。</p>
+<p><img alt="Figure 2" src="/images/papers/2604.22234/fig2.png"></p>
+<h2 id="experiments">Experiments</h2>
+<ul>
+<li>7 个 benchmark designs，覆盖 3 个工艺节点。</li>
+<li>Baseline：现有开源 global router。</li>
+<li>Metric：post-detailed-routing wirelength（及隐含的 QoR 指标）。</li>
+</ul>
+<p><img alt="Figure 3" src="/images/papers/2604.22234/fig3.png"></p>
+<h2 id="results">Results</h2>
+<p>相对 baseline router，post-detailed-routing wirelength 最多降低 <strong>8.72%</strong>。摘要未报告 runtime、DRC violation、congestion 等其它 QoR 维度，也未说明是否所有 7 个 design 都获得收益。</p>
+<h2 id="why-it-matters">Why It Matters</h2>
+<p>对 EDA/AI-infra 从业者：说明 LLM 不仅能调参或生成脚本，还能改写工具内核代码以适配具体设计，开启&quot;针对每颗芯片编译一个专属 router&quot;的新自动化维度，可能压缩人工算法调优成本。</p>
+<h2 id="connections-to-prior-work">Connections to Prior Work</h2>
+<ul>
+<li>FunSearch / AlphaEvolve 等 LLM 代码进化工作的 EDA 落地实例。</li>
+<li>ML-for-EDA 中 hyperparameter tuning（如 AutoTuner）与 RL-for-routing 的延伸。</li>
+<li>OpenROAD 开源 EDA 栈及其 global router（FastRoute/CUGR 等）。</li>
+</ul>
+<h2 id="open-questions">Open Questions</h2>
+<ul>
+<li>进化后的代码在未见过的 design 上泛化性如何，还是 one-design-one-router？</li>
+<li>进化开销（LLM token、routing 评估次数）是否值得 8.72% WL？</li>
+<li>是否出现 DRC/timing 退化或 reward hacking？</li>
+<li>能否扩展到 placement、CTS、detailed routing 等其它 EDA 环节？</li>
+</ul>
+<hr>
+<h2 id="original-abstract">Original abstract</h2>
+<p>Modern ASIC design is becoming increasingly complex, driving up design costs while limiting productivity gains from existing EDA tools. Despite decades of progress, current tools rely on fixed heuristics and offer limited control via tool hyperparameters, requiring extensive manual tuning to achieve an acceptable quality of results (QoR). While prior work has explored learning-based optimization and design-specific hyperparameter tuning, these approaches operate within the constraints of static tool algorithm implementations and do not adapt the underlying algorithms to individual designs. To address this limitation, we introduce the concept of design-adaptive EDA tooling, in which the internal algorithms of EDA tools are automatically specialized to the characteristics of a given design. We instantiate this paradigm through GR-Evolve, a code evolution framework that leverages an agentic large language model (LLM) to iteratively modify global routing source code using QoR-driven feedback. The framework equips the LLM with persistent contextual knowledge of open-source global routers along with an integrated toolchain for QoR evaluation within the OpenROAD infrastructure. We evaluate GR-Evolve across seven benchmark designs across three technology nodes and demonstrate up to 8.72% reduction in post-detailed-routing wirelength over existing baseline routers, highlighting the potential of LLM-driven EDA code evolution for design-adaptive global routing.</p>
+
+      </div>
+
+
+      <footer>
+        
+
+
+        
+        
+        
+        
+        
+        
+        
+      </footer>
+    </article>
+
+    
+  </section>
+
+    </div>
+
+    <footer class="footer">
+  <section class="container">
+    ©
+    
+      2019 -
+    
+    2026
+     Jie Xin 
+    ·
+    
+    Powered by <a href="https://gohugo.io/" target="_blank" rel="noopener">Hugo</a> & <a href="https://github.com/luizdepra/hugo-coder/" target="_blank" rel="noopener">Coder</a>.
+    
+  </section>
+</footer>
+
+  </main>
+
+  
+
+  
+  
+  <script src="/js/coder.min.6ae284be93d2d19dad1f02b0039508d9aab3180a12a06dcc71b0b0ef7825a317.js" integrity="sha256-auKEvpPS0Z2tHwKwA5UI2aqzGAoSoG3McbCw73gloxc="></script>
+  
+
+  
+
+  
+
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+</body>
+</html>

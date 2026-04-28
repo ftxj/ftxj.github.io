@@ -1,0 +1,380 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <title>
+  ChipCraftBrain: Validation-First RTL Generation via Multi-Agent Orchestration · JXIN&#39;s Home
+</title>
+  <meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="color-scheme" content="light dark">
+
+
+
+
+<meta name="author" content="Jie Xin">
+<meta name="description" content="arXiv: 2604.19856 · PDF
+Authors: Cagri Eryilmaz
+Primary category: cs.AR · all: cs.AI, cs.AR, cs.LG
+Matched keywords: large language model, llm, agent, agentic, multi-agent, retrieval, rag, reasoning
+
+TL;DR
+ChipCraftBrain is a multi-agent RTL generation framework combining PPO-driven orchestration, symbolic-neural reasoning, and knowledge retrieval. It hits 97.2% pass@1 on VerilogEval-Human and 94.7% on a 302-problem CVDP subset, outperforming MAGE and matching ChipAgents while using far fewer attempts than NVIDIA&rsquo;s ACE-RTL.
+Key Ideas
+
+Adaptive orchestration of six specialized agents via a PPO policy over a 168-dim state (with an MPC world-model alternative).
+Hybrid symbolic-neural architecture: algorithmic solvers for K-maps/truth tables, neural agents for waveforms and general RTL.
+Knowledge-augmented retrieval from 321 patterns &#43; 971 open-source reference implementations with focus-aware lookup.
+Hierarchical spec decomposition into dependency-ordered sub-modules with interface synchronization.
+
+Approach
+A controller learns (PPO) to route tasks among six agents depending on problem state. Symbolic solvers handle combinational logic exactly; neural agents handle timing/waveforms. A retrieval module injects reference patterns. Complex specs are decomposed hierarchically with cross-module interface synchronization before code generation and validation.">
+<meta name="keywords" content="blog,developer,personal">
+
+
+
+  <meta name="twitter:card" content="summary">
+  <meta name="twitter:title" content="ChipCraftBrain: Validation-First RTL Generation via Multi-Agent Orchestration">
+  <meta name="twitter:description" content="arXiv: 2604.19856 · PDF
+Authors: Cagri Eryilmaz
+Primary category: cs.AR · all: cs.AI, cs.AR, cs.LG
+Matched keywords: large language model, llm, agent, agentic, multi-agent, retrieval, rag, reasoning
+TL;DR ChipCraftBrain is a multi-agent RTL generation framework combining PPO-driven orchestration, symbolic-neural reasoning, and knowledge retrieval. It hits 97.2% pass@1 on VerilogEval-Human and 94.7% on a 302-problem CVDP subset, outperforming MAGE and matching ChipAgents while using far fewer attempts than NVIDIA’s ACE-RTL.
+Key Ideas Adaptive orchestration of six specialized agents via a PPO policy over a 168-dim state (with an MPC world-model alternative). Hybrid symbolic-neural architecture: algorithmic solvers for K-maps/truth tables, neural agents for waveforms and general RTL. Knowledge-augmented retrieval from 321 patterns &#43; 971 open-source reference implementations with focus-aware lookup. Hierarchical spec decomposition into dependency-ordered sub-modules with interface synchronization. Approach A controller learns (PPO) to route tasks among six agents depending on problem state. Symbolic solvers handle combinational logic exactly; neural agents handle timing/waveforms. A retrieval module injects reference patterns. Complex specs are decomposed hierarchically with cross-module interface synchronization before code generation and validation.">
+
+<meta property="og:url" content="https://ftxj.github.io/posts/2026-04-21/01-chipcraftbrain-validation-first-rtl-generation-via-multi-age/">
+  <meta property="og:site_name" content="JXIN&#39;s Home">
+  <meta property="og:title" content="ChipCraftBrain: Validation-First RTL Generation via Multi-Agent Orchestration">
+  <meta property="og:description" content="arXiv: 2604.19856 · PDF
+Authors: Cagri Eryilmaz
+Primary category: cs.AR · all: cs.AI, cs.AR, cs.LG
+Matched keywords: large language model, llm, agent, agentic, multi-agent, retrieval, rag, reasoning
+TL;DR ChipCraftBrain is a multi-agent RTL generation framework combining PPO-driven orchestration, symbolic-neural reasoning, and knowledge retrieval. It hits 97.2% pass@1 on VerilogEval-Human and 94.7% on a 302-problem CVDP subset, outperforming MAGE and matching ChipAgents while using far fewer attempts than NVIDIA’s ACE-RTL.
+Key Ideas Adaptive orchestration of six specialized agents via a PPO policy over a 168-dim state (with an MPC world-model alternative). Hybrid symbolic-neural architecture: algorithmic solvers for K-maps/truth tables, neural agents for waveforms and general RTL. Knowledge-augmented retrieval from 321 patterns &#43; 971 open-source reference implementations with focus-aware lookup. Hierarchical spec decomposition into dependency-ordered sub-modules with interface synchronization. Approach A controller learns (PPO) to route tasks among six agents depending on problem state. Symbolic solvers handle combinational logic exactly; neural agents handle timing/waveforms. A retrieval module injects reference patterns. Complex specs are decomposed hierarchically with cross-module interface synchronization before code generation and validation.">
+  <meta property="og:locale" content="en">
+  <meta property="og:type" content="article">
+    <meta property="article:section" content="posts">
+    <meta property="article:published_time" content="2026-04-27T05:17:33+00:00">
+    <meta property="article:modified_time" content="2026-04-27T05:17:33+00:00">
+
+
+
+
+<link rel="canonical" href="https://ftxj.github.io/posts/2026-04-21/01-chipcraftbrain-validation-first-rtl-generation-via-multi-age/">
+
+
+<link rel="preload" href="/fonts/fa-brands-400.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="/fonts/fa-regular-400.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="/fonts/fa-solid-900.woff2" as="font" type="font/woff2" crossorigin>
+
+
+  
+  
+  <link rel="stylesheet" href="/css/coder.min.5e94c1acf7aa2066035cf2764ae3e4fe39db101d68b870f919966100d51fb861.css" integrity="sha256-XpTBrPeqIGYDXPJ2SuPk/jnbEB1ouHD5GZZhANUfuGE=" crossorigin="anonymous" media="screen" />
+
+
+
+
+
+
+  
+    
+    
+    <link rel="stylesheet" href="/css/coder-dark.min.a00e6364bacbc8266ad1cc81230774a1397198f8cfb7bcba29b7d6fcb54ce57f.css" integrity="sha256-oA5jZLrLyCZq0cyBIwd0oTlxmPjPt7y6KbfW/LVM5X8=" crossorigin="anonymous" media="screen" />
+  
+
+
+
+ 
+
+
+
+
+<link rel="icon" type="image/svg+xml" href="/images/favicon.svg" sizes="any">
+<link rel="icon" type="image/png" href="/images/favicon-32x32.png" sizes="32x32">
+<link rel="icon" type="image/png" href="/images/favicon-16x16.png" sizes="16x16">
+
+<link rel="apple-touch-icon" href="/images/apple-touch-icon.png">
+<link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon.png">
+
+<link rel="manifest" href="/site.webmanifest">
+<link rel="mask-icon" href="/images/safari-pinned-tab.svg" color="#5bbad5">
+
+
+
+
+
+
+<style>
+.content article ul {
+  list-style: disc !important;
+  padding-left: 2.5rem !important;
+}
+
+.content article ul li {
+  display: list-item !important;
+}
+</style>
+
+
+
+
+  
+</head>
+
+
+
+
+
+
+<body class="preload-transitions colorscheme-auto">
+  
+<div class="float-container">
+    <a id="dark-mode-toggle" class="colorscheme-toggle">
+        <i class="fa-solid fa-adjust fa-fw" aria-hidden="true"></i>
+    </a>
+</div>
+
+
+  <main class="wrapper">
+    <nav class="navigation">
+  <section class="container">
+    
+    <a class="navigation-title" href="https://ftxj.github.io/">
+      JXIN&#39;s Home
+    </a>
+    
+    
+      <input type="checkbox" id="menu-toggle" />
+      <label class="menu-button float-right" for="menu-toggle">
+        <i class="fa-solid fa-bars fa-fw" aria-hidden="true"></i>
+      </label>
+      <ul class="navigation-list">
+        
+          
+            <li class="navigation-item">
+              <a class="navigation-link " href="/about/">About</a>
+            </li>
+          
+            <li class="navigation-item">
+              <a class="navigation-link " href="/travel/">Travel</a>
+            </li>
+          
+            <li class="navigation-item">
+              <a class="navigation-link " href="/posts/">Blog</a>
+            </li>
+          
+            <li class="navigation-item">
+              <a class="navigation-link " href="https://ftxj.github.io/cv/cv.pdf">CV</a>
+            </li>
+          
+        
+        
+          
+          
+          
+            
+              
+                <li class="navigation-item menu-separator">
+                  <span>|</span>
+                </li>
+                
+              
+              <li class="navigation-item">
+                <a href="/zh/posts/2026-04-21/01-chipcraftbrain-validation-first-rtl-generation-via-multi-age/">中文</a>
+              </li>
+            
+          
+        
+      </ul>
+    
+  </section>
+</nav>
+
+
+    <div class="content">
+      
+  <section class="container post">
+    <article>
+      <header>
+        <div class="post-title">
+          <h1 class="title">
+            <a class="title-link" href="https://ftxj.github.io/posts/2026-04-21/01-chipcraftbrain-validation-first-rtl-generation-via-multi-age/">
+              ChipCraftBrain: Validation-First RTL Generation via Multi-Agent Orchestration
+            </a>
+          </h1>
+        </div>
+        <div class="post-meta">
+          <div class="date">
+            <span class="posted-on">
+              <i class="fa-solid fa-calendar" aria-hidden="true"></i>
+              <time datetime="2026-04-27T05:17:33Z">
+                April 27, 2026
+              </time>
+            </span>
+            <span class="reading-time">
+              <i class="fa-solid fa-clock" aria-hidden="true"></i>
+              4-minute read
+            </span>
+          </div>
+          
+          <div class="categories">
+  <i class="fa-solid fa-folder" aria-hidden="true"></i>
+    <a href="/categories/paper-digest/">Paper-Digest</a>
+      <span class="separator">•</span>
+    <a href="/categories/2026-04-21/">2026-04-21</a></div>
+
+          
+        </div>
+      </header>
+
+      
+
+
+      <div class="post-content">
+        
+        <p><strong>arXiv:</strong> <a href="https://arxiv.org/abs/2604.19856v1">2604.19856</a> · <a href="https://arxiv.org/pdf/2604.19856v1">PDF</a></p>
+<p><strong>Authors:</strong> Cagri Eryilmaz</p>
+<p><strong>Primary category:</strong> <code>cs.AR</code> · all: cs.AI, cs.AR, cs.LG</p>
+<p><strong>Matched keywords:</strong> large language model, llm, agent, agentic, multi-agent, retrieval, rag, reasoning</p>
+<hr>
+<h2 id="tldr">TL;DR</h2>
+<p>ChipCraftBrain is a multi-agent RTL generation framework combining PPO-driven orchestration, symbolic-neural reasoning, and knowledge retrieval. It hits 97.2% pass@1 on VerilogEval-Human and 94.7% on a 302-problem CVDP subset, outperforming MAGE and matching ChipAgents while using far fewer attempts than NVIDIA&rsquo;s ACE-RTL.</p>
+<h2 id="key-ideas">Key Ideas</h2>
+<ul>
+<li>Adaptive orchestration of six specialized agents via a PPO policy over a 168-dim state (with an MPC world-model alternative).</li>
+<li>Hybrid symbolic-neural architecture: algorithmic solvers for K-maps/truth tables, neural agents for waveforms and general RTL.</li>
+<li>Knowledge-augmented retrieval from 321 patterns + 971 open-source reference implementations with focus-aware lookup.</li>
+<li>Hierarchical spec decomposition into dependency-ordered sub-modules with interface synchronization.</li>
+</ul>
+<h2 id="approach">Approach</h2>
+<p>A controller learns (PPO) to route tasks among six agents depending on problem state. Symbolic solvers handle combinational logic exactly; neural agents handle timing/waveforms. A retrieval module injects reference patterns. Complex specs are decomposed hierarchically with cross-module interface synchronization before code generation and validation.</p>
+<h2 id="experiments">Experiments</h2>
+<ul>
+<li><strong>VerilogEval-Human</strong>: pass@1, 7 runs.</li>
+<li><strong>CVDP non-agentic subset</strong>: 302 problems, 5 task categories, 3 runs; compared with single-shot baseline and NVIDIA&rsquo;s ACE-RTL.</li>
+<li><strong>RISC-V SoC case study</strong>: 8-module hierarchical decomposition, lint + FPGA validation.</li>
+<li>Baselines: MAGE, ChipAgents (self-reported), ACE-RTL, published single-shot.</li>
+</ul>
+<h2 id="results">Results</h2>
+<ul>
+<li>VerilogEval-Human: 97.2% mean pass@1 (96.15-98.72%), best 154/156; ties ChipAgents, beats MAGE 95.9%.</li>
+<li>CVDP subset: 94.7% (286/302), +36-60 pp per category over single-shot; leads 3/4 shared categories with ACE-RTL at ~30× fewer attempts.</li>
+<li>RISC-V SoC: 8/8 lint-passing modules (689 LOC), FPGA-validated; monolithic baseline fails outright.</li>
+</ul>
+<h2 id="why-it-matters">Why It Matters</h2>
+<p>Pushes LLM-driven RTL design from toy benchmarks toward industrial viability (CVDP, real SoC), showing that symbolic offloading plus RL-based orchestration can both raise accuracy and cut API cost—relevant for agent designers budgeting compute and infra teams exploring chip design automation.</p>
+<h2 id="connections-to-prior-work">Connections to Prior Work</h2>
+<ul>
+<li>Multi-agent RTL: MAGE, ChipAgents, NVIDIA ACE-RTL.</li>
+<li>Benchmarks: VerilogEval, CVDP.</li>
+<li>Symbolic-neural hybrids for program synthesis.</li>
+<li>PPO-based agent orchestration and MPC/world-model planning.</li>
+<li>Retrieval-augmented code generation.</li>
+</ul>
+<h2 id="open-questions">Open Questions</h2>
+<ul>
+<li>How robust is the PPO policy under distribution shift to unseen IP styles?</li>
+<li>Performance on agentic CVDP tasks (explicitly excluded here) and larger SoCs beyond RISC-V.</li>
+<li>Cost/latency breakdown vs. MAGE and ChipAgents at equal budgets.</li>
+<li>Sensitivity to the 321+971 knowledge base—does it generalize without curated patterns?</li>
+<li>Independent reproduction of ChipAgents&rsquo; self-reported 97.4%.</li>
+</ul>
+<hr>
+<h2 id="figures">Figures</h2>
+<p><strong>Figure 1:</strong> Page 2 (rendered)</p>
+<p><img alt="Figure 1" src="/images/papers/2604.19856/page1.png"></p>
+<p><strong>Figure 2:</strong> Page 3 (rendered)</p>
+<p><img alt="Figure 2" src="/images/papers/2604.19856/page2.png"></p>
+<p><strong>Figure 3:</strong> Page 4 (rendered)</p>
+<p><img alt="Figure 3" src="/images/papers/2604.19856/page3.png"></p>
+<hr>
+<h2 id="original-abstract">Original abstract</h2>
+<p>Large Language Models (LLMs) show promise for generating Register-Transfer Level (RTL) code from natural language specifications, but single-shot generation achieves only 60-65% functional correctness on standard benchmarks. Multi-agent approaches such as MAGE reach 95.9% on VerilogEval yet remain untested on harder industrial benchmarks such as NVIDIA&rsquo;s CVDP, lack synthesis awareness, and incur high API costs. We present ChipCraftBrain, a framework combining symbolic-neural reasoning with adaptive multi-agent orchestration for automated RTL generation. Four innovations drive the system: (1) adaptive orchestration over six specialized agents via a PPO policy over a 168-dim state (an alternative world-model MPC planner is also evaluated); (2) a hybrid symbolic-neural architecture that solves K-map and truth-table problems algorithmically while specialized agents handle waveform timing and general RTL; (3) knowledge-augmented generation from a 321-pattern base plus 971 open-source reference implementations with focus-aware retrieval; and (4) hierarchical specification decomposition into dependency-ordered sub-modules with interface synchronization. On VerilogEval-Human, ChipCraftBrain achieves 97.2% mean pass@1 (range 96.15-98.72% across 7 runs, best 154/156), on par with ChipAgents (97.4%, self-reported) and ahead of MAGE (95.9%). On a 302-problem non-agentic subset of CVDP spanning five task categories, we reach 94.7% mean pass@1 (286/302, averaged over 3 runs), a 36-60 percentage-point lift per category over the published single-shot baseline; we additionally lead three of four categories shared with NVIDIA&rsquo;s ACE-RTL despite using roughly 30x fewer per-problem attempts. A RISC-V SoC case study demonstrates hierarchical decomposition generating 8/8 lint-passing modules (689 LOC) validated on FPGA, where monolithic generation fails entirely.</p>
+
+      </div>
+
+
+      <footer>
+        
+
+
+        
+        
+        
+        
+        
+        
+        
+      </footer>
+    </article>
+
+    
+  </section>
+
+    </div>
+
+    <footer class="footer">
+  <section class="container">
+    ©
+    
+      2019 -
+    
+    2026
+     Jie Xin 
+    ·
+    
+    Powered by <a href="https://gohugo.io/" target="_blank" rel="noopener">Hugo</a> & <a href="https://github.com/luizdepra/hugo-coder/" target="_blank" rel="noopener">Coder</a>.
+    
+  </section>
+</footer>
+
+  </main>
+
+  
+
+  
+  
+  <script src="/js/coder.min.6ae284be93d2d19dad1f02b0039508d9aab3180a12a06dcc71b0b0ef7825a317.js" integrity="sha256-auKEvpPS0Z2tHwKwA5UI2aqzGAoSoG3McbCw73gloxc="></script>
+  
+
+  
+
+  
+
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+</body>
+</html>

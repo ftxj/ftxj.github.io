@@ -1,0 +1,360 @@
+<!DOCTYPE html>
+<html lang="zh">
+
+<head>
+  <title>
+  QuantClaw: Precision Where It Matters for OpenClaw · JXIN&#39;s Home
+</title>
+  <meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="color-scheme" content="light dark">
+
+
+
+
+<meta name="author" content="Jie Xin">
+<meta name="description" content="arXiv: 2604.22577 · PDF
+作者: Manyi Zhang, Ji-Fu Li, Zhongao Sun, Xiaohao Liu, Zhenhua Dong, Xianzhi Yu, Haoli Bai, Xiaobo Xia
+单位: Huawei Technologies, National University of Singapore, University of Science and Technology of China
+主分类: cs.AI · 全部: cs.AI, cs.CL
+命中关键词: agent, reasoning, inference, serving, quantization, latency
+
+TL;DR
+QuantClaw 是针对 OpenClaw 智能体系统的即插即用精度路由插件，依据任务特征动态分配量化精度，在 GLM-5 的 FP8 基线上最多节省 21.4% 成本、降低 15.7% 延迟。
+核心观点
+
+OpenClaw 这类自主 agent 系统因长上下文与多轮推理面临高昂的算力与金钱成本。
+量化对 agent 性能的影响随任务不同而差异显著，精度需求是 task-dependent 的。
+将精度视为动态资源，用路由策略按需分配，可在不牺牲性能的前提下显著降本增效。
+
+方法
+作者先系统分析 OpenClaw 在多种复杂工作流下的量化敏感度，观察到不同任务对精度的耐受度差异很大。基于此提出 QuantClaw：一个 plug-and-play 的 precision routing plugin，按任务特征把轻量任务路由到更低精度的配置，把高要求工作负载保留更高精度，对用户无额外复杂度。">
+<meta name="keywords" content="blog,developer,personal">
+
+
+
+  <meta name="twitter:card" content="summary">
+  <meta name="twitter:title" content="QuantClaw: Precision Where It Matters for OpenClaw">
+  <meta name="twitter:description" content="arXiv: 2604.22577 · PDF
+作者: Manyi Zhang, Ji-Fu Li, Zhongao Sun, Xiaohao Liu, Zhenhua Dong, Xianzhi Yu, Haoli Bai, Xiaobo Xia
+单位: Huawei Technologies, National University of Singapore, University of Science and Technology of China
+主分类: cs.AI · 全部: cs.AI, cs.CL
+命中关键词: agent, reasoning, inference, serving, quantization, latency
+TL;DR QuantClaw 是针对 OpenClaw 智能体系统的即插即用精度路由插件，依据任务特征动态分配量化精度，在 GLM-5 的 FP8 基线上最多节省 21.4% 成本、降低 15.7% 延迟。
+核心观点 OpenClaw 这类自主 agent 系统因长上下文与多轮推理面临高昂的算力与金钱成本。 量化对 agent 性能的影响随任务不同而差异显著，精度需求是 task-dependent 的。 将精度视为动态资源，用路由策略按需分配，可在不牺牲性能的前提下显著降本增效。 方法 作者先系统分析 OpenClaw 在多种复杂工作流下的量化敏感度，观察到不同任务对精度的耐受度差异很大。基于此提出 QuantClaw：一个 plug-and-play 的 precision routing plugin，按任务特征把轻量任务路由到更低精度的配置，把高要求工作负载保留更高精度，对用户无额外复杂度。">
+
+<meta property="og:url" content="https://ftxj.github.io/zh/posts/2026-04-27/08-quantclaw-precision-where-it-matters-for-openclaw/">
+  <meta property="og:site_name" content="JXIN&#39;s Home">
+  <meta property="og:title" content="QuantClaw: Precision Where It Matters for OpenClaw">
+  <meta property="og:description" content="arXiv: 2604.22577 · PDF
+作者: Manyi Zhang, Ji-Fu Li, Zhongao Sun, Xiaohao Liu, Zhenhua Dong, Xianzhi Yu, Haoli Bai, Xiaobo Xia
+单位: Huawei Technologies, National University of Singapore, University of Science and Technology of China
+主分类: cs.AI · 全部: cs.AI, cs.CL
+命中关键词: agent, reasoning, inference, serving, quantization, latency
+TL;DR QuantClaw 是针对 OpenClaw 智能体系统的即插即用精度路由插件，依据任务特征动态分配量化精度，在 GLM-5 的 FP8 基线上最多节省 21.4% 成本、降低 15.7% 延迟。
+核心观点 OpenClaw 这类自主 agent 系统因长上下文与多轮推理面临高昂的算力与金钱成本。 量化对 agent 性能的影响随任务不同而差异显著，精度需求是 task-dependent 的。 将精度视为动态资源，用路由策略按需分配，可在不牺牲性能的前提下显著降本增效。 方法 作者先系统分析 OpenClaw 在多种复杂工作流下的量化敏感度，观察到不同任务对精度的耐受度差异很大。基于此提出 QuantClaw：一个 plug-and-play 的 precision routing plugin，按任务特征把轻量任务路由到更低精度的配置，把高要求工作负载保留更高精度，对用户无额外复杂度。">
+  <meta property="og:locale" content="zh">
+  <meta property="og:type" content="article">
+    <meta property="article:section" content="posts">
+    <meta property="article:published_time" content="2026-04-27T15:52:26+00:00">
+    <meta property="article:modified_time" content="2026-04-27T15:52:26+00:00">
+
+
+
+
+<link rel="canonical" href="https://ftxj.github.io/zh/posts/2026-04-27/08-quantclaw-precision-where-it-matters-for-openclaw/">
+
+
+<link rel="preload" href="/fonts/fa-brands-400.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="/fonts/fa-regular-400.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="/fonts/fa-solid-900.woff2" as="font" type="font/woff2" crossorigin>
+
+
+  
+  
+  <link rel="stylesheet" href="/css/coder.min.5e94c1acf7aa2066035cf2764ae3e4fe39db101d68b870f919966100d51fb861.css" integrity="sha256-XpTBrPeqIGYDXPJ2SuPk/jnbEB1ouHD5GZZhANUfuGE=" crossorigin="anonymous" media="screen" />
+
+
+
+
+
+
+  
+    
+    
+    <link rel="stylesheet" href="/css/coder-dark.min.a00e6364bacbc8266ad1cc81230774a1397198f8cfb7bcba29b7d6fcb54ce57f.css" integrity="sha256-oA5jZLrLyCZq0cyBIwd0oTlxmPjPt7y6KbfW/LVM5X8=" crossorigin="anonymous" media="screen" />
+  
+
+
+
+ 
+
+
+
+
+<link rel="icon" type="image/svg+xml" href="/images/favicon.svg" sizes="any">
+<link rel="icon" type="image/png" href="/images/favicon-32x32.png" sizes="32x32">
+<link rel="icon" type="image/png" href="/images/favicon-16x16.png" sizes="16x16">
+
+<link rel="apple-touch-icon" href="/images/apple-touch-icon.png">
+<link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon.png">
+
+<link rel="manifest" href="/site.webmanifest">
+<link rel="mask-icon" href="/images/safari-pinned-tab.svg" color="#5bbad5">
+
+
+
+
+
+
+<style>
+.content article ul {
+  list-style: disc !important;
+  padding-left: 2.5rem !important;
+}
+
+.content article ul li {
+  display: list-item !important;
+}
+</style>
+
+
+
+
+  
+</head>
+
+
+
+
+
+
+<body class="preload-transitions colorscheme-auto">
+  
+<div class="float-container">
+    <a id="dark-mode-toggle" class="colorscheme-toggle">
+        <i class="fa-solid fa-adjust fa-fw" aria-hidden="true"></i>
+    </a>
+</div>
+
+
+  <main class="wrapper">
+    <nav class="navigation">
+  <section class="container">
+    
+    <a class="navigation-title" href="https://ftxj.github.io/zh/">
+      JXIN&#39;s Home
+    </a>
+    
+    
+      <input type="checkbox" id="menu-toggle" />
+      <label class="menu-button float-right" for="menu-toggle">
+        <i class="fa-solid fa-bars fa-fw" aria-hidden="true"></i>
+      </label>
+      <ul class="navigation-list">
+        
+          
+            <li class="navigation-item">
+              <a class="navigation-link " href="/zh/about/">关于</a>
+            </li>
+          
+            <li class="navigation-item">
+              <a class="navigation-link " href="/zh/travel/">旅行</a>
+            </li>
+          
+            <li class="navigation-item">
+              <a class="navigation-link " href="/zh/posts/">博客</a>
+            </li>
+          
+            <li class="navigation-item">
+              <a class="navigation-link " href="https://ftxj.github.io/cv/cv_zh.pdf">简历</a>
+            </li>
+          
+        
+        
+          
+          
+          
+            
+              
+                <li class="navigation-item menu-separator">
+                  <span>|</span>
+                </li>
+                
+              
+              <li class="navigation-item">
+                <a href="/posts/2026-04-27/08-quantclaw-precision-where-it-matters-for-openclaw/">EN</a>
+              </li>
+            
+          
+        
+      </ul>
+    
+  </section>
+</nav>
+
+
+    <div class="content">
+      
+  <section class="container post">
+    <article>
+      <header>
+        <div class="post-title">
+          <h1 class="title">
+            <a class="title-link" href="https://ftxj.github.io/zh/posts/2026-04-27/08-quantclaw-precision-where-it-matters-for-openclaw/">
+              QuantClaw: Precision Where It Matters for OpenClaw
+            </a>
+          </h1>
+        </div>
+        <div class="post-meta">
+          <div class="date">
+            <span class="posted-on">
+              <i class="fa-solid fa-calendar" aria-hidden="true"></i>
+              <time datetime="2026-04-27T15:52:26Z">
+                四月 27, 2026
+              </time>
+            </span>
+            <span class="reading-time">
+              <i class="fa-solid fa-clock" aria-hidden="true"></i>
+              One-minute read
+            </span>
+          </div>
+          
+          <div class="categories">
+  <i class="fa-solid fa-folder" aria-hidden="true"></i>
+    <a href="/zh/categories/paper-digest/">Paper-Digest</a>
+      <span class="separator">•</span>
+    <a href="/zh/categories/2026-04-27/">2026-04-27</a></div>
+
+          
+        </div>
+      </header>
+
+      
+
+
+      <div class="post-content">
+        
+        <p><strong>arXiv:</strong> <a href="https://arxiv.org/abs/2604.22577v1">2604.22577</a> · <a href="https://arxiv.org/pdf/2604.22577v1">PDF</a></p>
+<p><strong>作者:</strong> Manyi Zhang, Ji-Fu Li, Zhongao Sun, Xiaohao Liu, Zhenhua Dong, Xianzhi Yu, Haoli Bai, Xiaobo Xia</p>
+<p><strong>单位:</strong> Huawei Technologies, National University of Singapore, University of Science and Technology of China</p>
+<p><strong>主分类:</strong> <code>cs.AI</code> · 全部: cs.AI, cs.CL</p>
+<p><strong>命中关键词:</strong> agent, reasoning, inference, serving, quantization, latency</p>
+<hr>
+<h2 id="tldr">TL;DR</h2>
+<p>QuantClaw 是针对 OpenClaw 智能体系统的即插即用精度路由插件，依据任务特征动态分配量化精度，在 GLM-5 的 FP8 基线上最多节省 21.4% 成本、降低 15.7% 延迟。</p>
+<h2 id="核心观点">核心观点</h2>
+<ul>
+<li>OpenClaw 这类自主 agent 系统因长上下文与多轮推理面临高昂的算力与金钱成本。</li>
+<li>量化对 agent 性能的影响随任务不同而差异显著，精度需求是 task-dependent 的。</li>
+<li>将精度视为<strong>动态资源</strong>，用路由策略按需分配，可在不牺牲性能的前提下显著降本增效。</li>
+</ul>
+<h2 id="方法">方法</h2>
+<p>作者先系统分析 OpenClaw 在多种复杂工作流下的量化敏感度，观察到不同任务对精度的耐受度差异很大。基于此提出 QuantClaw：一个 plug-and-play 的 precision routing plugin，按任务特征把轻量任务路由到更低精度的配置，把高要求工作负载保留更高精度，对用户无额外复杂度。</p>
+<p>下图展示了其核心机制——自动适配模块整合任务检测器，配合智能路由在推理时 on-the-fly 地做精度决策。</p>
+<p><img alt="图 2" src="/images/papers/2604.22577/fig2.png"></p>
+<h2 id="实验">实验</h2>
+<p>在 OpenClaw 平台上覆盖多样化的 agent 任务工作流，以 GLM-5 FP8 为基线，衡量任务性能、推理延迟与计算/金钱成本。</p>
+<h2 id="结果">结果</h2>
+<p>QuantClaw 在保持甚至提升任务性能的同时，实现最高 <strong>21.4% 成本节省</strong> 与 <strong>15.7% 延迟下降</strong>。此外，作者观察到 NVFP4 量化退化随模型规模呈幂律衰减 Δ ∝ N^(−0.293)，说明更大的模型对低精度更鲁棒，这为按模型规模分配精度提供了依据。</p>
+<p><img alt="图 1" src="/images/papers/2604.22577/fig1.png"></p>
+<h2 id="为什么重要">为什么重要</h2>
+<p>对 agent / LLM 基础设施团队，这项工作把&quot;精度&quot;从静态部署参数变成可调度的动态资源，给长上下文、多轮 agent 系统提供了一条不需要重新训练、不增加用户复杂度的降本路径。</p>
+<h2 id="与已有工作的关系">与已有工作的关系</h2>
+<p>延续 OpenClaw 等 autonomous agent 框架在效率优化上的讨论，并把 LLM 量化（如 FP8、NVFP4 等低精度格式）从静态压缩推广到 task-aware 的动态路由，与 mixture-of-precision / adaptive inference 的思路相通。</p>
+<h2 id="尚未回答的问题">尚未回答的问题</h2>
+<ul>
+<li>task detector 的泛化性：面对未见过或对抗性任务分布时，路由决策是否仍稳健？</li>
+<li>除 GLM-5 FP8 外，在其他模型家族（如更小模型、MoE、推理型模型）上是否仍有同等收益？</li>
+<li>幂律关系 Δ ∝ N^(−0.293) 是否跨架构、跨量化格式普遍成立？</li>
+<li>在线路由本身的开销、误路由造成的质量回退如何量化与兜底？</li>
+</ul>
+<h2 id="原始摘要中文翻译">原始摘要（中文翻译）</h2>
+<p>诸如 OpenClaw 之类的自主 agent 系统，由于长上下文输入和多轮推理，带来了显著的效率挑战。这在真实开发中造成了高得令人却步的计算与金钱成本。虽然量化是降低成本与延迟的标准手段，但它在真实场景下对 agent 性能的影响仍不清楚。在本工作中，我们在 OpenClaw 上跨多种复杂工作流分析了量化敏感性，并表明精度需求高度依赖于任务。基于这一观察，我们提出 QuantClaw——一个即插即用的精度路由插件，根据任务特征动态分配精度。QuantClaw 将轻量任务路由到更低成本的配置，同时为高要求的工作负载保留更高精度，在不增加用户复杂度的情况下节约成本并加速推理。实验表明，我们的 QuantClaw 能够保持甚至提升任务性能，同时降低延迟与计算成本。在一系列 agent 任务上，它在 GLM-5（FP8 基线）上实现了最高 21.4% 的成本节省与 15.7% 的延迟降低。这些结果凸显了在 agent 系统中将精度视为动态资源的收益。</p>
+
+      </div>
+
+
+      <footer>
+        
+
+
+        
+        
+        
+        
+        
+        
+        
+      </footer>
+    </article>
+
+    
+  </section>
+
+    </div>
+
+    <footer class="footer">
+  <section class="container">
+    ©
+    
+      2019 -
+    
+    2026
+     Jie Xin 
+    ·
+    
+    Powered by <a href="https://gohugo.io/" target="_blank" rel="noopener">Hugo</a> & <a href="https://github.com/luizdepra/hugo-coder/" target="_blank" rel="noopener">Coder</a>.
+    
+  </section>
+</footer>
+
+  </main>
+
+  
+
+  
+  
+  <script src="/js/coder.min.6ae284be93d2d19dad1f02b0039508d9aab3180a12a06dcc71b0b0ef7825a317.js" integrity="sha256-auKEvpPS0Z2tHwKwA5UI2aqzGAoSoG3McbCw73gloxc="></script>
+  
+
+  
+
+  
+
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+</body>
+</html>

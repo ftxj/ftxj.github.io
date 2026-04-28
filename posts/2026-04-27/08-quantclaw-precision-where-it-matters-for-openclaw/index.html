@@ -1,0 +1,353 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <title>
+  QuantClaw: Precision Where It Matters for OpenClaw · JXIN&#39;s Home
+</title>
+  <meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="color-scheme" content="light dark">
+
+
+
+
+<meta name="author" content="Jie Xin">
+<meta name="description" content="arXiv: 2604.22577 · PDF
+Authors: Manyi Zhang, Ji-Fu Li, Zhongao Sun, Xiaohao Liu, Zhenhua Dong, Xianzhi Yu, Haoli Bai, Xiaobo Xia
+Affiliations: Huawei Technologies, National University of Singapore, University of Science and Technology of China
+Primary category: cs.AI · all: cs.AI, cs.CL
+Matched keywords: agent, reasoning, inference, serving, quantization, latency
+
+TL;DR
+QuantClaw is a plug-and-play precision-routing plugin for the OpenClaw agent system that dynamically assigns quantization precision per task, achieving up to 21.4% cost savings and 15.7% latency reduction on GLM-5 (FP8 baseline) without degrading task performance.">
+<meta name="keywords" content="blog,developer,personal">
+
+
+
+  <meta name="twitter:card" content="summary">
+  <meta name="twitter:title" content="QuantClaw: Precision Where It Matters for OpenClaw">
+  <meta name="twitter:description" content="arXiv: 2604.22577 · PDF
+Authors: Manyi Zhang, Ji-Fu Li, Zhongao Sun, Xiaohao Liu, Zhenhua Dong, Xianzhi Yu, Haoli Bai, Xiaobo Xia
+Affiliations: Huawei Technologies, National University of Singapore, University of Science and Technology of China
+Primary category: cs.AI · all: cs.AI, cs.CL
+Matched keywords: agent, reasoning, inference, serving, quantization, latency
+TL;DR QuantClaw is a plug-and-play precision-routing plugin for the OpenClaw agent system that dynamically assigns quantization precision per task, achieving up to 21.4% cost savings and 15.7% latency reduction on GLM-5 (FP8 baseline) without degrading task performance.">
+
+<meta property="og:url" content="https://ftxj.github.io/posts/2026-04-27/08-quantclaw-precision-where-it-matters-for-openclaw/">
+  <meta property="og:site_name" content="JXIN&#39;s Home">
+  <meta property="og:title" content="QuantClaw: Precision Where It Matters for OpenClaw">
+  <meta property="og:description" content="arXiv: 2604.22577 · PDF
+Authors: Manyi Zhang, Ji-Fu Li, Zhongao Sun, Xiaohao Liu, Zhenhua Dong, Xianzhi Yu, Haoli Bai, Xiaobo Xia
+Affiliations: Huawei Technologies, National University of Singapore, University of Science and Technology of China
+Primary category: cs.AI · all: cs.AI, cs.CL
+Matched keywords: agent, reasoning, inference, serving, quantization, latency
+TL;DR QuantClaw is a plug-and-play precision-routing plugin for the OpenClaw agent system that dynamically assigns quantization precision per task, achieving up to 21.4% cost savings and 15.7% latency reduction on GLM-5 (FP8 baseline) without degrading task performance.">
+  <meta property="og:locale" content="en">
+  <meta property="og:type" content="article">
+    <meta property="article:section" content="posts">
+    <meta property="article:published_time" content="2026-04-27T15:52:00+00:00">
+    <meta property="article:modified_time" content="2026-04-27T15:52:00+00:00">
+
+
+
+
+<link rel="canonical" href="https://ftxj.github.io/posts/2026-04-27/08-quantclaw-precision-where-it-matters-for-openclaw/">
+
+
+<link rel="preload" href="/fonts/fa-brands-400.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="/fonts/fa-regular-400.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="/fonts/fa-solid-900.woff2" as="font" type="font/woff2" crossorigin>
+
+
+  
+  
+  <link rel="stylesheet" href="/css/coder.min.5e94c1acf7aa2066035cf2764ae3e4fe39db101d68b870f919966100d51fb861.css" integrity="sha256-XpTBrPeqIGYDXPJ2SuPk/jnbEB1ouHD5GZZhANUfuGE=" crossorigin="anonymous" media="screen" />
+
+
+
+
+
+
+  
+    
+    
+    <link rel="stylesheet" href="/css/coder-dark.min.a00e6364bacbc8266ad1cc81230774a1397198f8cfb7bcba29b7d6fcb54ce57f.css" integrity="sha256-oA5jZLrLyCZq0cyBIwd0oTlxmPjPt7y6KbfW/LVM5X8=" crossorigin="anonymous" media="screen" />
+  
+
+
+
+ 
+
+
+
+
+<link rel="icon" type="image/svg+xml" href="/images/favicon.svg" sizes="any">
+<link rel="icon" type="image/png" href="/images/favicon-32x32.png" sizes="32x32">
+<link rel="icon" type="image/png" href="/images/favicon-16x16.png" sizes="16x16">
+
+<link rel="apple-touch-icon" href="/images/apple-touch-icon.png">
+<link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon.png">
+
+<link rel="manifest" href="/site.webmanifest">
+<link rel="mask-icon" href="/images/safari-pinned-tab.svg" color="#5bbad5">
+
+
+
+
+
+
+<style>
+.content article ul {
+  list-style: disc !important;
+  padding-left: 2.5rem !important;
+}
+
+.content article ul li {
+  display: list-item !important;
+}
+</style>
+
+
+
+
+  
+</head>
+
+
+
+
+
+
+<body class="preload-transitions colorscheme-auto">
+  
+<div class="float-container">
+    <a id="dark-mode-toggle" class="colorscheme-toggle">
+        <i class="fa-solid fa-adjust fa-fw" aria-hidden="true"></i>
+    </a>
+</div>
+
+
+  <main class="wrapper">
+    <nav class="navigation">
+  <section class="container">
+    
+    <a class="navigation-title" href="https://ftxj.github.io/">
+      JXIN&#39;s Home
+    </a>
+    
+    
+      <input type="checkbox" id="menu-toggle" />
+      <label class="menu-button float-right" for="menu-toggle">
+        <i class="fa-solid fa-bars fa-fw" aria-hidden="true"></i>
+      </label>
+      <ul class="navigation-list">
+        
+          
+            <li class="navigation-item">
+              <a class="navigation-link " href="/about/">About</a>
+            </li>
+          
+            <li class="navigation-item">
+              <a class="navigation-link " href="/travel/">Travel</a>
+            </li>
+          
+            <li class="navigation-item">
+              <a class="navigation-link " href="/posts/">Blog</a>
+            </li>
+          
+            <li class="navigation-item">
+              <a class="navigation-link " href="https://ftxj.github.io/cv/cv.pdf">CV</a>
+            </li>
+          
+        
+        
+          
+          
+          
+            
+              
+                <li class="navigation-item menu-separator">
+                  <span>|</span>
+                </li>
+                
+              
+              <li class="navigation-item">
+                <a href="/zh/posts/2026-04-27/08-quantclaw-precision-where-it-matters-for-openclaw/">中文</a>
+              </li>
+            
+          
+        
+      </ul>
+    
+  </section>
+</nav>
+
+
+    <div class="content">
+      
+  <section class="container post">
+    <article>
+      <header>
+        <div class="post-title">
+          <h1 class="title">
+            <a class="title-link" href="https://ftxj.github.io/posts/2026-04-27/08-quantclaw-precision-where-it-matters-for-openclaw/">
+              QuantClaw: Precision Where It Matters for OpenClaw
+            </a>
+          </h1>
+        </div>
+        <div class="post-meta">
+          <div class="date">
+            <span class="posted-on">
+              <i class="fa-solid fa-calendar" aria-hidden="true"></i>
+              <time datetime="2026-04-27T15:52:00Z">
+                April 27, 2026
+              </time>
+            </span>
+            <span class="reading-time">
+              <i class="fa-solid fa-clock" aria-hidden="true"></i>
+              3-minute read
+            </span>
+          </div>
+          
+          <div class="categories">
+  <i class="fa-solid fa-folder" aria-hidden="true"></i>
+    <a href="/categories/paper-digest/">Paper-Digest</a>
+      <span class="separator">•</span>
+    <a href="/categories/2026-04-27/">2026-04-27</a></div>
+
+          
+        </div>
+      </header>
+
+      
+
+
+      <div class="post-content">
+        
+        <p><strong>arXiv:</strong> <a href="https://arxiv.org/abs/2604.22577v1">2604.22577</a> · <a href="https://arxiv.org/pdf/2604.22577v1">PDF</a></p>
+<p><strong>Authors:</strong> Manyi Zhang, Ji-Fu Li, Zhongao Sun, Xiaohao Liu, Zhenhua Dong, Xianzhi Yu, Haoli Bai, Xiaobo Xia</p>
+<p><strong>Affiliations:</strong> Huawei Technologies, National University of Singapore, University of Science and Technology of China</p>
+<p><strong>Primary category:</strong> <code>cs.AI</code> · all: cs.AI, cs.CL</p>
+<p><strong>Matched keywords:</strong> agent, reasoning, inference, serving, quantization, latency</p>
+<hr>
+<h2 id="tldr">TL;DR</h2>
+<p>QuantClaw is a plug-and-play precision-routing plugin for the OpenClaw agent system that dynamically assigns quantization precision per task, achieving up to 21.4% cost savings and 15.7% latency reduction on GLM-5 (FP8 baseline) without degrading task performance.</p>
+<h2 id="key-ideas">Key Ideas</h2>
+<ul>
+<li>Quantization sensitivity in agent workflows is highly <strong>task-dependent</strong>, not uniform.</li>
+<li>Precision should be treated as a <strong>dynamic resource</strong>, routed per task rather than fixed globally.</li>
+<li>Larger models show diminishing degradation under low-precision formats like NVFP4, following a power law.</li>
+<li>A lightweight plugin can slot into OpenClaw without increasing user-facing complexity.</li>
+</ul>
+<h2 id="approach">Approach</h2>
+<p>The authors analyze quantization sensitivity across diverse OpenClaw workflows, then build QuantClaw as a routing plugin that inspects task characteristics and dispatches lightweight tasks to lower-cost precision configurations while reserving higher precision for demanding workloads. Automatic adaptation consolidates task detectors, and an intelligent router makes on-the-fly precision decisions per request.</p>
+<p><img alt="Figure 2" src="/images/papers/2604.22577/fig2.png"></p>
+<p>As shown above, the system unifies multiple task detectors into a single adaptation layer that feeds an intelligent router capable of issuing per-request precision choices dynamically.</p>
+<h2 id="experiments">Experiments</h2>
+<p>Evaluated on a range of agent tasks within the OpenClaw system, using GLM-5 with an FP8 baseline. NVFP4 is analyzed across model sizes to characterize scaling behavior. Metrics include task performance, end-to-end latency, and computational/monetary cost.</p>
+<h2 id="results">Results</h2>
+<p>QuantClaw maintains or improves task performance while cutting both latency and cost — up to <strong>21.4% cost savings</strong> and <strong>15.7% latency reduction</strong> over the FP8 baseline on GLM-5.</p>
+<p><img alt="Figure 1" src="/images/papers/2604.22577/fig1.png"></p>
+<p>The scaling study shows that the absolute NVFP4 performance gap shrinks as model parameters grow (left, linear scale), and the log-log view (right) reveals a clean power law Δ ∝ N^(-0.293), indicating the robustness gain is systematic rather than incidental.</p>
+<h2 id="why-it-matters">Why It Matters</h2>
+<p>For agent-infra practitioners, this reframes quantization from a one-shot deployment knob into a runtime routing decision. Long-context, multi-turn agents can recover substantial cost/latency headroom without accuracy regressions, and the power-law scaling suggests the approach becomes more attractive as base models get larger.</p>
+<h2 id="connections-to-prior-work">Connections to Prior Work</h2>
+<p>Builds on LLM post-training quantization (FP8, NVFP4, mixed precision), mixture-of-experts style routing, adaptive inference / early-exit literature, and agent frameworks like OpenClaw. The scaling-law framing echoes neural scaling-law research applied to quantization robustness.</p>
+<h2 id="open-questions">Open Questions</h2>
+<ul>
+<li>How is the task detector trained, and how does it generalize to unseen tools or domains?</li>
+<li>What is the router&rsquo;s own overhead at high QPS?</li>
+<li>Does the power-law trend hold for models beyond GLM-5 and for formats below NVFP4?</li>
+<li>Failure modes when a &ldquo;lightweight&rdquo; task is misclassified as such.</li>
+</ul>
+<hr>
+<h2 id="original-abstract">Original abstract</h2>
+<p>Autonomous agent systems such as OpenClaw introduce significant efficiency challenges due to long-context inputs and multi-turn reasoning. This results in prohibitively high computational and monetary costs in real-world development. While quantization is a standard approach for reducing cost and latency, its impact on agent performance in realistic scenarios remains unclear. In this work, we analyze quantization sensitivity across diverse complex workflows over OpenClaw, and show that precision requirements are highly task-dependent. Based on this observation, we propose QuantClaw, a plug-and-play precision routing plugin that dynamically assigns precision according to task characteristics. QuantClaw routes lightweight tasks to lower-cost configurations while preserving higher precision for demanding workloads, saving cost and accelerating inference without increasing user complexity. Experiments show that our QuantClaw maintains or improves task performance while reducing both latency and computational cost. Across a range of agent tasks, it achieves up to 21.4% cost savings and 15.7% latency reduction on GLM-5 (FP8 baseline). These results highlight the benefit of treating precision as a dynamic resource in agent systems.</p>
+
+      </div>
+
+
+      <footer>
+        
+
+
+        
+        
+        
+        
+        
+        
+        
+      </footer>
+    </article>
+
+    
+  </section>
+
+    </div>
+
+    <footer class="footer">
+  <section class="container">
+    ©
+    
+      2019 -
+    
+    2026
+     Jie Xin 
+    ·
+    
+    Powered by <a href="https://gohugo.io/" target="_blank" rel="noopener">Hugo</a> & <a href="https://github.com/luizdepra/hugo-coder/" target="_blank" rel="noopener">Coder</a>.
+    
+  </section>
+</footer>
+
+  </main>
+
+  
+
+  
+  
+  <script src="/js/coder.min.6ae284be93d2d19dad1f02b0039508d9aab3180a12a06dcc71b0b0ef7825a317.js" integrity="sha256-auKEvpPS0Z2tHwKwA5UI2aqzGAoSoG3McbCw73gloxc="></script>
+  
+
+  
+
+  
+
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+</body>
+</html>

@@ -1,0 +1,375 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <title>
+  Nemobot Games: Crafting Strategic AI Gaming Agents for Interactive Learning with Large Language Models · JXIN&#39;s Home
+</title>
+  <meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="color-scheme" content="light dark">
+
+
+
+
+<meta name="author" content="Jie Xin">
+<meta name="description" content="arXiv: 2604.21896 · PDF
+Authors: Chee Wei Tan, Yuchen Wang, Shangxin Guo
+Primary category: cs.AI · all: cs.AI
+Matched keywords: large language model, llm, agent, agentic, rag, reasoning, fine-tun
+
+TL;DR
+Nemobot is an interactive agentic environment that uses LLMs to build and deploy game-playing agents across Shannon&rsquo;s taxonomy, spanning dictionary-based, solvable, heuristic, and learning-based games, aiming toward self-programming AI.
+Key Ideas
+
+Extends Shannon&rsquo;s 1950 taxonomy of game-playing machines into an LLM era paradigm.
+Four game classes handled distinctly: dictionary, solvable, heuristic, learning-based.
+Agents combine minimax, crowd-sourced data, RLHF, and self-critique.
+Programmable environment for tool-augmented generation and fine-tuning.
+Positions user-in-the-loop customization as a route to self-programming.
+
+Approach
+A chatbot-driven agentic engine routes game tasks by class: compressed state-action mappings for dictionary games; exact mathematical reasoning with human-readable explanations for solvable games; hybrid minimax-plus-crowd heuristics for heuristic games; RLHF with self-critique and imitation learning for learning-based games. Nemobot exposes these as programmable, tool-augmented workflows users can customize and fine-tune.">
+<meta name="keywords" content="blog,developer,personal">
+
+
+
+  <meta name="twitter:card" content="summary">
+  <meta name="twitter:title" content="Nemobot Games: Crafting Strategic AI Gaming Agents for Interactive Learning with Large Language Models">
+  <meta name="twitter:description" content="arXiv: 2604.21896 · PDF
+Authors: Chee Wei Tan, Yuchen Wang, Shangxin Guo
+Primary category: cs.AI · all: cs.AI
+Matched keywords: large language model, llm, agent, agentic, rag, reasoning, fine-tun
+TL;DR Nemobot is an interactive agentic environment that uses LLMs to build and deploy game-playing agents across Shannon’s taxonomy, spanning dictionary-based, solvable, heuristic, and learning-based games, aiming toward self-programming AI.
+Key Ideas Extends Shannon’s 1950 taxonomy of game-playing machines into an LLM era paradigm. Four game classes handled distinctly: dictionary, solvable, heuristic, learning-based. Agents combine minimax, crowd-sourced data, RLHF, and self-critique. Programmable environment for tool-augmented generation and fine-tuning. Positions user-in-the-loop customization as a route to self-programming. Approach A chatbot-driven agentic engine routes game tasks by class: compressed state-action mappings for dictionary games; exact mathematical reasoning with human-readable explanations for solvable games; hybrid minimax-plus-crowd heuristics for heuristic games; RLHF with self-critique and imitation learning for learning-based games. Nemobot exposes these as programmable, tool-augmented workflows users can customize and fine-tune.">
+
+<meta property="og:url" content="https://ftxj.github.io/posts/2026-04-23/01-nemobot-games-crafting-strategic-ai-gaming-agents-for-intera/">
+  <meta property="og:site_name" content="JXIN&#39;s Home">
+  <meta property="og:title" content="Nemobot Games: Crafting Strategic AI Gaming Agents for Interactive Learning with Large Language Models">
+  <meta property="og:description" content="arXiv: 2604.21896 · PDF
+Authors: Chee Wei Tan, Yuchen Wang, Shangxin Guo
+Primary category: cs.AI · all: cs.AI
+Matched keywords: large language model, llm, agent, agentic, rag, reasoning, fine-tun
+TL;DR Nemobot is an interactive agentic environment that uses LLMs to build and deploy game-playing agents across Shannon’s taxonomy, spanning dictionary-based, solvable, heuristic, and learning-based games, aiming toward self-programming AI.
+Key Ideas Extends Shannon’s 1950 taxonomy of game-playing machines into an LLM era paradigm. Four game classes handled distinctly: dictionary, solvable, heuristic, learning-based. Agents combine minimax, crowd-sourced data, RLHF, and self-critique. Programmable environment for tool-augmented generation and fine-tuning. Positions user-in-the-loop customization as a route to self-programming. Approach A chatbot-driven agentic engine routes game tasks by class: compressed state-action mappings for dictionary games; exact mathematical reasoning with human-readable explanations for solvable games; hybrid minimax-plus-crowd heuristics for heuristic games; RLHF with self-critique and imitation learning for learning-based games. Nemobot exposes these as programmable, tool-augmented workflows users can customize and fine-tune.">
+  <meta property="og:locale" content="en">
+  <meta property="og:type" content="article">
+    <meta property="article:section" content="posts">
+    <meta property="article:published_time" content="2026-04-27T05:05:47+00:00">
+    <meta property="article:modified_time" content="2026-04-27T05:05:47+00:00">
+
+
+
+
+<link rel="canonical" href="https://ftxj.github.io/posts/2026-04-23/01-nemobot-games-crafting-strategic-ai-gaming-agents-for-intera/">
+
+
+<link rel="preload" href="/fonts/fa-brands-400.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="/fonts/fa-regular-400.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="/fonts/fa-solid-900.woff2" as="font" type="font/woff2" crossorigin>
+
+
+  
+  
+  <link rel="stylesheet" href="/css/coder.min.5e94c1acf7aa2066035cf2764ae3e4fe39db101d68b870f919966100d51fb861.css" integrity="sha256-XpTBrPeqIGYDXPJ2SuPk/jnbEB1ouHD5GZZhANUfuGE=" crossorigin="anonymous" media="screen" />
+
+
+
+
+
+
+  
+    
+    
+    <link rel="stylesheet" href="/css/coder-dark.min.a00e6364bacbc8266ad1cc81230774a1397198f8cfb7bcba29b7d6fcb54ce57f.css" integrity="sha256-oA5jZLrLyCZq0cyBIwd0oTlxmPjPt7y6KbfW/LVM5X8=" crossorigin="anonymous" media="screen" />
+  
+
+
+
+ 
+
+
+
+
+<link rel="icon" type="image/svg+xml" href="/images/favicon.svg" sizes="any">
+<link rel="icon" type="image/png" href="/images/favicon-32x32.png" sizes="32x32">
+<link rel="icon" type="image/png" href="/images/favicon-16x16.png" sizes="16x16">
+
+<link rel="apple-touch-icon" href="/images/apple-touch-icon.png">
+<link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon.png">
+
+<link rel="manifest" href="/site.webmanifest">
+<link rel="mask-icon" href="/images/safari-pinned-tab.svg" color="#5bbad5">
+
+
+
+
+
+
+<style>
+.content article ul {
+  list-style: disc !important;
+  padding-left: 2.5rem !important;
+}
+
+.content article ul li {
+  display: list-item !important;
+}
+</style>
+
+
+
+
+  
+</head>
+
+
+
+
+
+
+<body class="preload-transitions colorscheme-auto">
+  
+<div class="float-container">
+    <a id="dark-mode-toggle" class="colorscheme-toggle">
+        <i class="fa-solid fa-adjust fa-fw" aria-hidden="true"></i>
+    </a>
+</div>
+
+
+  <main class="wrapper">
+    <nav class="navigation">
+  <section class="container">
+    
+    <a class="navigation-title" href="https://ftxj.github.io/">
+      JXIN&#39;s Home
+    </a>
+    
+    
+      <input type="checkbox" id="menu-toggle" />
+      <label class="menu-button float-right" for="menu-toggle">
+        <i class="fa-solid fa-bars fa-fw" aria-hidden="true"></i>
+      </label>
+      <ul class="navigation-list">
+        
+          
+            <li class="navigation-item">
+              <a class="navigation-link " href="/about/">About</a>
+            </li>
+          
+            <li class="navigation-item">
+              <a class="navigation-link " href="/travel/">Travel</a>
+            </li>
+          
+            <li class="navigation-item">
+              <a class="navigation-link " href="/posts/">Blog</a>
+            </li>
+          
+            <li class="navigation-item">
+              <a class="navigation-link " href="https://ftxj.github.io/cv/cv.pdf">CV</a>
+            </li>
+          
+        
+        
+          
+          
+          
+            
+              
+                <li class="navigation-item menu-separator">
+                  <span>|</span>
+                </li>
+                
+              
+              <li class="navigation-item">
+                <a href="/zh/posts/2026-04-23/01-nemobot-games-crafting-strategic-ai-gaming-agents-for-intera/">中文</a>
+              </li>
+            
+          
+        
+      </ul>
+    
+  </section>
+</nav>
+
+
+    <div class="content">
+      
+  <section class="container post">
+    <article>
+      <header>
+        <div class="post-title">
+          <h1 class="title">
+            <a class="title-link" href="https://ftxj.github.io/posts/2026-04-23/01-nemobot-games-crafting-strategic-ai-gaming-agents-for-intera/">
+              Nemobot Games: Crafting Strategic AI Gaming Agents for Interactive Learning with Large Language Models
+            </a>
+          </h1>
+        </div>
+        <div class="post-meta">
+          <div class="date">
+            <span class="posted-on">
+              <i class="fa-solid fa-calendar" aria-hidden="true"></i>
+              <time datetime="2026-04-27T05:05:47Z">
+                April 27, 2026
+              </time>
+            </span>
+            <span class="reading-time">
+              <i class="fa-solid fa-clock" aria-hidden="true"></i>
+              3-minute read
+            </span>
+          </div>
+          
+          <div class="categories">
+  <i class="fa-solid fa-folder" aria-hidden="true"></i>
+    <a href="/categories/paper-digest/">Paper-Digest</a>
+      <span class="separator">•</span>
+    <a href="/categories/2026-04-23/">2026-04-23</a></div>
+
+          
+        </div>
+      </header>
+
+      
+
+
+      <div class="post-content">
+        
+        <p><strong>arXiv:</strong> <a href="https://arxiv.org/abs/2604.21896v1">2604.21896</a> · <a href="https://arxiv.org/pdf/2604.21896v1">PDF</a></p>
+<p><strong>Authors:</strong> Chee Wei Tan, Yuchen Wang, Shangxin Guo</p>
+<p><strong>Primary category:</strong> <code>cs.AI</code> · all: cs.AI</p>
+<p><strong>Matched keywords:</strong> large language model, llm, agent, agentic, rag, reasoning, fine-tun</p>
+<hr>
+<h2 id="tldr">TL;DR</h2>
+<p>Nemobot is an interactive agentic environment that uses LLMs to build and deploy game-playing agents across Shannon&rsquo;s taxonomy, spanning dictionary-based, solvable, heuristic, and learning-based games, aiming toward self-programming AI.</p>
+<h2 id="key-ideas">Key Ideas</h2>
+<ul>
+<li>Extends Shannon&rsquo;s 1950 taxonomy of game-playing machines into an LLM era paradigm.</li>
+<li>Four game classes handled distinctly: dictionary, solvable, heuristic, learning-based.</li>
+<li>Agents combine minimax, crowd-sourced data, RLHF, and self-critique.</li>
+<li>Programmable environment for tool-augmented generation and fine-tuning.</li>
+<li>Positions user-in-the-loop customization as a route to self-programming.</li>
+</ul>
+<h2 id="approach">Approach</h2>
+<p>A chatbot-driven agentic engine routes game tasks by class: compressed state-action mappings for dictionary games; exact mathematical reasoning with human-readable explanations for solvable games; hybrid minimax-plus-crowd heuristics for heuristic games; RLHF with self-critique and imitation learning for learning-based games. Nemobot exposes these as programmable, tool-augmented workflows users can customize and fine-tune.</p>
+<h2 id="experiments">Experiments</h2>
+<p>The abstract does not specify datasets, baselines, or quantitative metrics. It only claims demonstrations across the four game classes and mentions strategic and role-playing games as illustrative domains. Evaluation details are thin.</p>
+<h2 id="results">Results</h2>
+<p>No headline numbers are reported in the abstract. Claims are qualitative: the system &ldquo;demonstrates&rdquo; capabilities across game classes and shows iterative refinement via human feedback. Strength of evidence cannot be judged from the abstract alone.</p>
+<h2 id="why-it-matters">Why It Matters</h2>
+<p>For agent and LLM practitioners, it offers a unifying mental model for matching LLM techniques (retrieval, symbolic reasoning, heuristic search, RLHF) to problem structure. The programmable sandbox could become a teaching tool for strategy design and a testbed for tool-augmented agents and self-improving pipelines.</p>
+<h2 id="connections-to-prior-work">Connections to Prior Work</h2>
+<ul>
+<li>Shannon&rsquo;s 1950 taxonomy of chess-playing machines.</li>
+<li>Classical minimax and alpha-beta search.</li>
+<li>AlphaGo / AlphaZero lineage of learning-based game agents.</li>
+<li>RLHF and self-critique / self-refine literature.</li>
+<li>Tool-augmented LLMs (ReAct, Toolformer) and agentic frameworks.</li>
+<li>Voyager-style self-programming and skill-library agents.</li>
+</ul>
+<h2 id="open-questions">Open Questions</h2>
+<ul>
+<li>What quantitative benchmarks validate each game class?</li>
+<li>How does Nemobot compare against specialized engines (Stockfish, AlphaZero, MuZero)?</li>
+<li>How is &ldquo;self-programming&rdquo; operationalized and measured beyond iterative refinement?</li>
+<li>Scalability to partial-information or multi-agent games?</li>
+<li>Cost, latency, and reproducibility of LLM-in-the-loop strategies?</li>
+<li>Safety and reward-hacking risks under self-critique loops?</li>
+</ul>
+<hr>
+<h2 id="figures">Figures</h2>
+<p><strong>Figure 1:</strong> Figure 1 (extracted from PDF)</p>
+<p><img alt="Figure 1" src="/images/papers/2604.21896/fig1.png"></p>
+<p><strong>Figure 2:</strong> Figure 2 (extracted from PDF)</p>
+<p><img alt="Figure 2" src="/images/papers/2604.21896/fig2.png"></p>
+<p><strong>Figure 3:</strong> Figure 3 (extracted from PDF)</p>
+<p><img alt="Figure 3" src="/images/papers/2604.21896/fig3.png"></p>
+<hr>
+<h2 id="original-abstract">Original abstract</h2>
+<p>This paper introduces a new paradigm for AI game programming, leveraging large language models (LLMs) to extend and operationalize Claude Shannon&rsquo;s taxonomy of game-playing machines. Central to this paradigm is Nemobot, an interactive agentic engineering environment that enables users to create, customize, and deploy LLM-powered game agents while actively engaging with AI-driven strategies. The LLM-based chatbot, integrated within Nemobot, demonstrates its capabilities across four distinct classes of games. For dictionary-based games, it compresses state-action mappings into efficient, generalized models for rapid adaptability. In rigorously solvable games, it employs mathematical reasoning to compute optimal strategies and generates human-readable explanations for its decisions. For heuristic-based games, it synthesizes strategies by combining insights from classical minimax algorithms (see, e.g., shannon1950chess) with crowd-sourced data. Finally, in learning-based games, it utilizes reinforcement learning with human feedback and self-critique to iteratively refine strategies through trial-and-error and imitation learning. Nemobot amplifies this framework by offering a programmable environment where users can experiment with tool-augmented generation and fine-tuning of strategic game agents. From strategic games to role-playing games, Nemobot demonstrates how AI agents can achieve a form of self-programming by integrating crowdsourced learning and human creativity to iteratively refine their own logic. This represents a step toward the long-term goal of self-programming AI.</p>
+
+      </div>
+
+
+      <footer>
+        
+
+
+        
+        
+        
+        
+        
+        
+        
+      </footer>
+    </article>
+
+    
+  </section>
+
+    </div>
+
+    <footer class="footer">
+  <section class="container">
+    ©
+    
+      2019 -
+    
+    2026
+     Jie Xin 
+    ·
+    
+    Powered by <a href="https://gohugo.io/" target="_blank" rel="noopener">Hugo</a> & <a href="https://github.com/luizdepra/hugo-coder/" target="_blank" rel="noopener">Coder</a>.
+    
+  </section>
+</footer>
+
+  </main>
+
+  
+
+  
+  
+  <script src="/js/coder.min.6ae284be93d2d19dad1f02b0039508d9aab3180a12a06dcc71b0b0ef7825a317.js" integrity="sha256-auKEvpPS0Z2tHwKwA5UI2aqzGAoSoG3McbCw73gloxc="></script>
+  
+
+  
+
+  
+
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+</body>
+</html>

@@ -1,0 +1,552 @@
+<!DOCTYPE html>
+<html lang="zh">
+
+<head>
+  <title>
+  2026-04-28 论文速递 · JXIN&#39;s Home
+</title>
+  <meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="color-scheme" content="light dark">
+
+
+
+
+<meta name="author" content="Jie Xin">
+<meta name="description" content="当日 agent / LLM / AI 基础设施方向共匹配到 206 篇 arXiv 论文，其中 10 篇由 Claude 从标题 &#43; 作者 &#43; 单位 维度挑出并生成详细分析，其余 196 篇列在文末。
+1. FlashOverlap: Minimizing Tail Latency in Communication Overlap for Distributed LLM Training
+arXiv: 2604.24013 · cs.LG · Claude 精选
+FlashOverlap 用分解的 P2P 通信替代 reduce-scatter / all-gather collective，精确消除分布式 LLM 训练中通信-计算 overlap 的 tail latency，适配 TP、DP、TPSP、UP 等多种并行策略。
+阅读完整分析 →
+
+2. Long-Context Aware Upcycling: A New Frontier for Hybrid LLM Scaling
+arXiv: 2604.24715 · cs.CL · Claude 精选">
+<meta name="keywords" content="blog,developer,personal">
+
+
+
+  <meta name="twitter:card" content="summary">
+  <meta name="twitter:title" content="2026-04-28 论文速递">
+  <meta name="twitter:description" content="当日 agent / LLM / AI 基础设施方向共匹配到 206 篇 arXiv 论文，其中 10 篇由 Claude 从标题 &#43; 作者 &#43; 单位 维度挑出并生成详细分析，其余 196 篇列在文末。
+1. FlashOverlap: Minimizing Tail Latency in Communication Overlap for Distributed LLM Training arXiv: 2604.24013 · cs.LG · Claude 精选
+FlashOverlap 用分解的 P2P 通信替代 reduce-scatter / all-gather collective，精确消除分布式 LLM 训练中通信-计算 overlap 的 tail latency，适配 TP、DP、TPSP、UP 等多种并行策略。
+阅读完整分析 →
+2. Long-Context Aware Upcycling: A New Frontier for Hybrid LLM Scaling arXiv: 2604.24715 · cs.CL · Claude 精选">
+
+<meta property="og:url" content="https://ftxj.github.io/zh/posts/2026-04-28/">
+  <meta property="og:site_name" content="JXIN&#39;s Home">
+  <meta property="og:title" content="2026-04-28 论文速递">
+  <meta property="og:description" content="当日 agent / LLM / AI 基础设施方向共匹配到 206 篇 arXiv 论文，其中 10 篇由 Claude 从标题 &#43; 作者 &#43; 单位 维度挑出并生成详细分析，其余 196 篇列在文末。
+1. FlashOverlap: Minimizing Tail Latency in Communication Overlap for Distributed LLM Training arXiv: 2604.24013 · cs.LG · Claude 精选
+FlashOverlap 用分解的 P2P 通信替代 reduce-scatter / all-gather collective，精确消除分布式 LLM 训练中通信-计算 overlap 的 tail latency，适配 TP、DP、TPSP、UP 等多种并行策略。
+阅读完整分析 →
+2. Long-Context Aware Upcycling: A New Frontier for Hybrid LLM Scaling arXiv: 2604.24715 · cs.CL · Claude 精选">
+  <meta property="og:locale" content="zh">
+  <meta property="og:type" content="website">
+
+
+
+
+<link rel="canonical" href="https://ftxj.github.io/zh/posts/2026-04-28/">
+
+
+<link rel="preload" href="/fonts/fa-brands-400.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="/fonts/fa-regular-400.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="/fonts/fa-solid-900.woff2" as="font" type="font/woff2" crossorigin>
+
+
+  
+  
+  <link rel="stylesheet" href="/css/coder.min.5e94c1acf7aa2066035cf2764ae3e4fe39db101d68b870f919966100d51fb861.css" integrity="sha256-XpTBrPeqIGYDXPJ2SuPk/jnbEB1ouHD5GZZhANUfuGE=" crossorigin="anonymous" media="screen" />
+
+
+
+
+
+
+  
+    
+    
+    <link rel="stylesheet" href="/css/coder-dark.min.a00e6364bacbc8266ad1cc81230774a1397198f8cfb7bcba29b7d6fcb54ce57f.css" integrity="sha256-oA5jZLrLyCZq0cyBIwd0oTlxmPjPt7y6KbfW/LVM5X8=" crossorigin="anonymous" media="screen" />
+  
+
+
+
+ 
+
+
+
+
+<link rel="icon" type="image/svg+xml" href="/images/favicon.svg" sizes="any">
+<link rel="icon" type="image/png" href="/images/favicon-32x32.png" sizes="32x32">
+<link rel="icon" type="image/png" href="/images/favicon-16x16.png" sizes="16x16">
+
+<link rel="apple-touch-icon" href="/images/apple-touch-icon.png">
+<link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon.png">
+
+<link rel="manifest" href="/site.webmanifest">
+<link rel="mask-icon" href="/images/safari-pinned-tab.svg" color="#5bbad5">
+
+
+<link rel="alternate" type="application/rss+xml" href="/zh/posts/2026-04-28/index.xml" title="JXIN's Home" />
+
+
+
+
+<style>
+.content article ul {
+  list-style: disc !important;
+  padding-left: 2.5rem !important;
+}
+
+.content article ul li {
+  display: list-item !important;
+}
+</style>
+
+
+
+
+  
+</head>
+
+
+
+
+
+
+<body class="preload-transitions colorscheme-auto">
+  
+<div class="float-container">
+    <a id="dark-mode-toggle" class="colorscheme-toggle">
+        <i class="fa-solid fa-adjust fa-fw" aria-hidden="true"></i>
+    </a>
+</div>
+
+
+  <main class="wrapper">
+    <nav class="navigation">
+  <section class="container">
+    
+    <a class="navigation-title" href="https://ftxj.github.io/zh/">
+      JXIN&#39;s Home
+    </a>
+    
+    
+      <input type="checkbox" id="menu-toggle" />
+      <label class="menu-button float-right" for="menu-toggle">
+        <i class="fa-solid fa-bars fa-fw" aria-hidden="true"></i>
+      </label>
+      <ul class="navigation-list">
+        
+          
+            <li class="navigation-item">
+              <a class="navigation-link " href="/zh/about/">关于</a>
+            </li>
+          
+            <li class="navigation-item">
+              <a class="navigation-link " href="/zh/travel/">旅行</a>
+            </li>
+          
+            <li class="navigation-item">
+              <a class="navigation-link " href="/zh/posts/">博客</a>
+            </li>
+          
+            <li class="navigation-item">
+              <a class="navigation-link " href="https://ftxj.github.io/cv/cv_zh.pdf">简历</a>
+            </li>
+          
+        
+        
+          
+          
+          
+            
+              
+                <li class="navigation-item menu-separator">
+                  <span>|</span>
+                </li>
+                
+              
+              <li class="navigation-item">
+                <a href="/posts/2026-04-28/">EN</a>
+              </li>
+            
+          
+        
+      </ul>
+    
+  </section>
+</nav>
+
+
+    <div class="content">
+      
+  <section class="container list">
+    <header>
+      <h1 class="title">
+        <a class="title-link" href="https://ftxj.github.io/zh/posts/2026-04-28/">
+          2026-04-28 论文速递
+        </a>
+      </h1>
+    </header>
+    <p>当日 agent / LLM / AI 基础设施方向共匹配到 <strong>206</strong> 篇 arXiv 论文，其中 <strong>10</strong> 篇由 Claude 从标题 + 作者 + 单位 维度挑出并生成详细分析，其余 <strong>196</strong> 篇列在文末。</p>
+<h3 id="1-flashoverlap-minimizing-tail-latency-in-communication-overlap-for-distributed-llm-training">1. FlashOverlap: Minimizing Tail Latency in Communication Overlap for Distributed LLM Training</h3>
+<p><em>arXiv: <a href="https://arxiv.org/abs/2604.24013v1">2604.24013</a> · <code>cs.LG</code> · Claude 精选</em></p>
+<p>FlashOverlap 用分解的 P2P 通信替代 reduce-scatter / all-gather collective，精确消除分布式 LLM 训练中通信-计算 overlap 的 tail latency，适配 TP、DP、TPSP、UP 等多种并行策略。</p>
+<p><a href="/zh/posts/2026-04-28/01-flashoverlap-minimizing-tail-latency-in-communication-overla/">阅读完整分析 →</a></p>
+<hr>
+<h3 id="2-long-context-aware-upcycling-a-new-frontier-for-hybrid-llm-scaling">2. Long-Context Aware Upcycling: A New Frontier for Hybrid LLM Scaling</h3>
+<p><em>arXiv: <a href="https://arxiv.org/abs/2604.24715v1">2604.24715</a> · <code>cs.CL</code> · Claude 精选</em></p>
+<p>HyLo 提出一套 long-context upcycling 配方，把预训练 Transformer LLM 改造成 MLA + Mamba2/GatedDeltaNet 混合架构，上下文扩展最高 32×、KV cache 降 90%+，vLLM 上可跑 2M token。</p>
+<p><a href="/zh/posts/2026-04-28/02-long-context-aware-upcycling-a-new-frontier-for-hybrid-llm-s/">阅读完整分析 →</a></p>
+<hr>
+<h3 id="3-the-chameleons-limit-investigating-persona-collapse-and-homogenization-in-large-language-models">3. The Chameleon&rsquo;s Limit: Investigating Persona Collapse and Homogenization in Large Language Models</h3>
+<p><em>arXiv: <a href="https://arxiv.org/abs/2604.24698v1">2604.24698</a> · <code>cs.CL</code> · Claude 精选</em></p>
+<p>Applications based on large language models (LLMs), such as multi-agent simulations, require population diversity among agents. We identify a pervasive failure mode we term \emph{Persona Collapse}: agents each assigned a distinct profile nonetheless converge into a narrow behavioral mode, producing a homogeneous simulated population.</p>
+<p><a href="/zh/posts/2026-04-28/03-the-chameleon-s-limit-investigating-persona-collapse-and-hom/">阅读完整分析 →</a></p>
+<hr>
+<h3 id="4-stabilizing-efficient-reasoning-with-step-level-advantage-selection">4. Stabilizing Efficient Reasoning with Step-Level Advantage Selection</h3>
+<p><em>arXiv: <a href="https://arxiv.org/abs/2604.24003v1">2604.24003</a> · <code>cs.CL</code> · Claude 精选</em></p>
+<p>短上下文 post-training 能压缩推理长度但破坏稳定性，SAS 通过按步置零低置信正样本和高置信负样本的 advantage，在提升 0.86 Pass@1 的同时减少 16.3% 长度。</p>
+<p><a href="/zh/posts/2026-04-28/04-stabilizing-efficient-reasoning-with-step-level-advantage-se/">阅读完整分析 →</a></p>
+<hr>
+<h3 id="5-physnote-self-knowledge-notes-for-evolvable-physical-reasoning-in-vision-language-model">5. PhysNote: Self-Knowledge Notes for Evolvable Physical Reasoning in Vision-Language Model</h3>
+<p><em>arXiv: <a href="https://arxiv.org/abs/2604.24443v1">2604.24443</a> · <code>cs.AI</code> · Claude 精选</em></p>
+<p>PhysNote 通过&quot;自生成知识笔记&quot;让 VLM 在动态物理推理中沉淀并复用洞见，在 PhysBench 上达 56.68% 准确率，比最佳多智能体基线高 4.96%。</p>
+<p><a href="/zh/posts/2026-04-28/05-physnote-self-knowledge-notes-for-evolvable-physical-reasoni/">阅读完整分析 →</a></p>
+<hr>
+<h3 id="6-grounding-before-generalizing-how-ai-differs-from-humans-in-causal-transfer">6. Grounding Before Generalizing: How AI Differs from Humans in Causal Transfer</h3>
+<p><em>arXiv: <a href="https://arxiv.org/abs/2604.24062v1">2604.24062</a> · <code>cs.AI</code> · Claude 精选</em></p>
+<p>在 OpenLock 因果结构迁移任务上，LLM/VLM 必须先做环境特定的 grounding 才能获得迁移收益，而人类从第一次尝试就能用上先验结构；视觉信息反而拖累表现。</p>
+<p><a href="/zh/posts/2026-04-28/06-grounding-before-generalizing-how-ai-differs-from-humans-in/">阅读完整分析 →</a></p>
+<hr>
+<h3 id="7-beyond-the-attention-stability-boundary-agentic-self-synthesizing-reasoning-protocols">7. Beyond the Attention Stability Boundary: Agentic Self-Synthesizing Reasoning Protocols</h3>
+<p><em>arXiv: <a href="https://arxiv.org/abs/2604.24512v1">2604.24512</a> · <code>cs.AI</code> · Claude 精选</em></p>
+<p>论文把 decoder-only LLM agent 在多轮对话中&quot;锁死在旧约束上&quot;的现象形式化为 Attention Latch，提出 SSRP 元认知框架（Architect + Executive 双角色），在 MultiWOZ 2.2 上把 GPT 5.4 的 0.1% 成功率抬到 715× 的 Resilience Lift。</p>
+<p><a href="/zh/posts/2026-04-28/07-beyond-the-attention-stability-boundary-agentic-self-synthes/">阅读完整分析 →</a></p>
+<hr>
+<h3 id="8-depthkv-layer-dependent-kv-cache-pruning-for-long-context-llm-inference">8. DepthKV: Layer-Dependent KV Cache Pruning for Long-Context LLM Inference</h3>
+<p><em>arXiv: <a href="https://arxiv.org/abs/2604.24647v1">2604.24647</a> · <code>cs.CL</code> · Claude 精选</em></p>
+<p>DepthKV 提出按层敏感度分配 KV cache 预算的剪枝框架，在相同全局剪枝率下持续优于均匀分配，更有效利用 KV 缓存。</p>
+<p><a href="/zh/posts/2026-04-28/08-depthkv-layer-dependent-kv-cache-pruning-for-long-context-ll/">阅读完整分析 →</a></p>
+<hr>
+<h3 id="9-bitrl-reinforcement-learning-with-1-bit-quantized-language-models-for-resource-constrained-edge-deployment">9. BitRL: Reinforcement Learning with 1-bit Quantized Language Models for Resource-Constrained Edge Deployment</h3>
+<p><em>arXiv: <a href="https://arxiv.org/abs/2604.24273v1">2604.24273</a> · <code>cs.LG</code> · Claude 精选</em></p>
+<p>BitRL 用 1-bit 量化（BitNet b1.58，三值权重）的语言模型做 RL agent 的冻结 backbone，内存降 10–16×、能效升 3–5×，仍保留 85–98% 任务性能，能在边缘设备上跑。</p>
+<p><a href="/zh/posts/2026-04-28/09-bitrl-reinforcement-learning-with-1-bit-quantized-language-m/">阅读完整分析 →</a></p>
+<hr>
+<h3 id="10-rewarding-the-scientific-process-process-level-reward-modeling-for-agentic-data-analysis">10. Rewarding the Scientific Process: Process-Level Reward Modeling for Agentic Data Analysis</h3>
+<p><em>arXiv: <a href="https://arxiv.org/abs/2604.24198v1">2604.24198</a> · <code>cs.CL</code> · Claude 精选</em></p>
+<p>DataPRM 是一个环境感知的生成式过程奖励模型，通过主动交互探测中间执行状态和三值反思奖励，解决通用 PRM 在数据分析 agent 上漏判静默错误、误罚探索行为的问题，仅 4B 参数即可在 ScienceAgentBench 上带来 7.21% 提升。</p>
+<p><a href="/zh/posts/2026-04-28/10-rewarding-the-scientific-process-process-level-reward-modeli/">阅读完整分析 →</a></p>
+<hr>
+<h2 id="其他当日匹配论文">其他当日匹配论文</h2>
+<p>这些论文命中了同样的主题关键词，但未被 Claude 选入 top-N 深度分析。</p>
+<ol start="11">
+<li><strong><a href="https://arxiv.org/abs/2604.24700v1">Green Shielding: A User-Centric Approach Towards Trustworthy AI</a></strong> · <code>cs.CL</code> · arXiv <a href="https://arxiv.org/abs/2604.24700v1">2604.24700</a> · score <strong>27</strong> — <code>large language model, llm, agent, agentic, rag, serving</code></li>
+<li><strong><a href="https://arxiv.org/abs/2604.23993v1">EPM-RL: Reinforcement Learning for On-Premise Product Mapping in E-Commerce</a></strong> · <code>cs.CL</code> · arXiv <a href="https://arxiv.org/abs/2604.23993v1">2604.23993</a> · score <strong>27</strong> — <code>llm, agent, agentic, multi-agent, retrieval, reasoning</code></li>
+<li><strong><a href="https://arxiv.org/abs/2604.24039v1">AgenticCache: Cache-Driven Asynchronous Planning for Embodied AI Agents</a></strong> · <code>cs.LG</code> · arXiv <a href="https://arxiv.org/abs/2604.24039v1">2604.24039</a> · score <strong>33</strong> — <code>large language model, llm, agent, agentic, multi-agent, rag</code></li>
+<li><strong><a href="https://arxiv.org/abs/2604.23838v1">JigsawRL: Assembling RL Pipelines for Efficient LLM Post-Training</a></strong> · <code>cs.LG</code> · arXiv <a href="https://arxiv.org/abs/2604.23838v1">2604.23838</a> · score <strong>25</strong> — <code>llm, agent, agentic, rag, parallelism, gpu</code></li>
+<li><strong><a href="https://arxiv.org/abs/2604.24432v1">Kwai Summary Attention Technical Report</a></strong> · <code>cs.CL</code> · arXiv <a href="https://arxiv.org/abs/2604.24432v1">2604.24432</a> · score <strong>24</strong> — <code>large language model, agent, agentic, reasoning, inference, kv cache</code></li>
+<li><strong><a href="https://arxiv.org/abs/2604.24162v1">Defusing the Trigger: Plug-and-Play Defense for Backdoored LLMs via Tail-Risk Intrinsic Geometric Smoothing</a></strong> · <code>cs.CR</code> · arXiv <a href="https://arxiv.org/abs/2604.24162v1">2604.24162</a> · score <strong>24</strong> — <code>large language model, llm, rag, reasoning, inference, serving</code></li>
+<li><strong><a href="https://arxiv.org/abs/2604.24218v1">RefEvo: Agentic Design with Co-Evolutionary Verification for Agile Reference Model Generation</a></strong> · <code>cs.SE</code> · arXiv <a href="https://arxiv.org/abs/2604.24218v1">2604.24218</a> · score <strong>23</strong> — <code>large language model, llm, agent, agentic, multi-agent, rag</code></li>
+<li><strong><a href="https://arxiv.org/abs/2604.23940v1">Constraint-Guided Multi-Agent Decompilation for Executable Binary Recovery</a></strong> · <code>cs.SE</code> · arXiv <a href="https://arxiv.org/abs/2604.23940v1">2604.23940</a> · score <strong>21</strong> — <code>llm, agent, agentic, multi-agent, rag, compiler</code></li>
+<li><strong><a href="https://arxiv.org/abs/2604.24477v1">GAMMAF: A Common Framework for Graph-Based Anomaly Monitoring Benchmarking in LLM Multi-Agent Systems</a></strong> · <code>cs.CR</code> · arXiv <a href="https://arxiv.org/abs/2604.24477v1">2604.24477</a> · score <strong>20</strong> — <code>large language model, llm, agent, multi-agent, inference</code></li>
+<li><strong><a href="https://arxiv.org/abs/2604.24203v1">Agentic Witnessing: Pragmatic and Scalable TEE-Enabled Privacy-Preserving Auditing</a></strong> · <code>cs.CR</code> · arXiv <a href="https://arxiv.org/abs/2604.24203v1">2604.24203</a> · score <strong>20</strong> — <code>llm, agent, agentic, rag, reasoning, serving</code></li>
+<li><strong><a href="https://arxiv.org/abs/2604.24594v1">Skill Retrieval Augmentation for Agentic AI</a></strong> · <code>cs.CL</code> · arXiv <a href="https://arxiv.org/abs/2604.24594v1">2604.24594</a> · score <strong>27</strong> — <code>large language model, llm, agent, agentic, retrieval</code></li>
+<li><strong><a href="https://arxiv.org/abs/2604.24320v1">DPEPO: Diverse Parallel Exploration Policy Optimization for LLM-based Agents</a></strong> · <code>cs.CL</code> · arXiv <a href="https://arxiv.org/abs/2604.24320v1">2604.24320</a> · score <strong>19</strong> — <code>large language model, llm, agent, rag, reasoning, fine-tun</code></li>
+<li><strong><a href="https://arxiv.org/abs/2604.24572v1">FastOMOP: A Foundational Architecture for Reliable Agentic Real-World Evidence Generation on OMOP CDM data</a></strong> · <code>cs.AI</code> · arXiv <a href="https://arxiv.org/abs/2604.24572v1">2604.24572</a> · score <strong>18</strong> — <code>llm, agent, agentic, multi-agent, reasoning</code></li>
+<li><strong><a href="https://arxiv.org/abs/2604.24473v1">Agentic clinical reasoning over longitudinal myeloma records: a retrospective evaluation against expert consensus</a></strong> · <code>cs.AI</code> · arXiv <a href="https://arxiv.org/abs/2604.24473v1">2604.24473</a> · score <strong>26</strong> — <code>llm, agent, agentic, retrieval, rag, reasoning</code></li>
+<li><strong><a href="https://arxiv.org/abs/2604.24678v1">Leveraging LLMs for Multi-File DSL Code Generation: An Industrial Case Study</a></strong> · <code>cs.SE</code> · arXiv <a href="https://arxiv.org/abs/2604.24678v1">2604.24678</a> · score <strong>21</strong> — <code>large language model, llm, rag, serving, fine-tun</code></li>
+<li><strong><a href="https://arxiv.org/abs/2604.24156v1">Strategic Bidding in 6G Spectrum Auctions with Large Language Models</a></strong> · <code>cs.GT</code> · arXiv <a href="https://arxiv.org/abs/2604.24156v1">2604.24156</a> · score <strong>17</strong> — <code>large language model, llm, agent, rag, reasoning</code></li>
+<li><strong><a href="https://arxiv.org/abs/2604.24222v1">MEMCoder: Multi-dimensional Evolving Memory for Private-Library-Oriented Code Generation</a></strong> · <code>cs.SE</code> · arXiv <a href="https://arxiv.org/abs/2604.24222v1">2604.24222</a> · score <strong>24</strong> — <code>large language model, llm, retrieval, rag, inference</code></li>
+<li><strong><a href="https://arxiv.org/abs/2604.24110v1">Latency and Cost of Multi-Agent Intelligent Tutoring at Scale</a></strong> · <code>cs.CY</code> · arXiv <a href="https://arxiv.org/abs/2604.24110v1">2604.24110</a> · score <strong>16</strong> — <code>llm, agent, multi-agent, throughput, latency</code></li>
+<li><strong><a href="https://arxiv.org/abs/2604.24079v1">The Pragmatic Persona: Discovering LLM Persona through Bridging Inference</a></strong> · <code>cs.CL</code> · arXiv <a href="https://arxiv.org/abs/2604.24079v1">2604.24079</a> · score <strong>20</strong> — <code>large language model, llm, rag, reasoning, inference</code></li>
+<li><strong><a href="https://arxiv.org/abs/2604.23970v1">LLM-Guided Agentic Floor Plan Parsing for Accessible Indoor Navigation of Blind and Low-Vision People</a></strong> · <code>cs.AI</code> · arXiv <a href="https://arxiv.org/abs/2604.23970v1">2604.23970</a> · score <strong>16</strong> — <code>llm, agent, agentic, multi-agent</code></li>
+<li><strong><a href="https://arxiv.org/abs/2604.24623v1">XGRAG: A Graph-Native Framework for Explaining KG-based Retrieval-Augmented Generation</a></strong> · <code>cs.AI</code> · arXiv <a href="https://arxiv.org/abs/2604.24623v1">2604.24623</a> · score <strong>15</strong> — <code>large language model, llm, retrieval, rag, reasoning</code></li>
+<li><strong><a href="https://arxiv.org/abs/2604.24515v1">SEARCH-R: Structured Entity-Aware Retrieval with Chain-of-Reasoning Navigator for Multi-hop Question Answering</a></strong> · <code>cs.CL</code> · arXiv <a href="https://arxiv.org/abs/2604.24515v1">2604.24515</a> · score <strong>15</strong> — <code>large language model, llm, retrieval, reasoning, fine-tun</code></li>
+<li><strong><a href="https://arxiv.org/abs/2604.24348v1">OS-SPEAR: A Toolkit for the Safety, Performance,Efficiency, and Robustness Analysis of OS Agents</a></strong> · <code>cs.CL</code> · arXiv <a href="https://arxiv.org/abs/2604.24348v1">2604.24348</a> · score <strong>15</strong> — <code>large language model, llm, agent, latency</code></li>
+<li><strong><a href="https://arxiv.org/abs/2604.24536v1">Generating Place-Based Compromises Between Two Points of View</a></strong> · <code>cs.CL</code> · arXiv <a href="https://arxiv.org/abs/2604.24536v1">2604.24536</a> · score <strong>14</strong> — <code>large language model, llm, reasoning, inference</code></li>
+<li><strong><a href="https://arxiv.org/abs/2604.24372v1">SeaEvo: Advancing Algorithm Discovery with Strategy Space Evolution</a></strong> · <code>cs.CL</code> · arXiv <a href="https://arxiv.org/abs/2604.24372v1">2604.24372</a> · score <strong>14</strong> — <code>llm, agent, retrieval, ai system</code></li>
+<li><strong><a href="https://arxiv.org/abs/2604.23878v1">ZenBrain: A Neuroscience-Inspired 7-Layer Memory Architecture for Autonomous AI Systems</a></strong> · <code>cs.AI</code> · arXiv <a href="https://arxiv.org/abs/2604.23878v1">2604.23878</a> · score <strong>14</strong> — <code>llm, agent, rag, ai system</code></li>
+<li><strong><a href="https://arxiv.org/abs/2604.24608v1">Learning to Route Queries to Heads for Attention-based Re-ranking with Large Language Models</a></strong> · <code>cs.IR</code> · arXiv <a href="https://arxiv.org/abs/2604.24608v1">2604.24608</a> · score <strong>13</strong> — <code>large language model, llm, rag, attention</code></li>
+<li><strong><a href="https://arxiv.org/abs/2604.24564v1">MEG-RAG: Quantifying Multi-modal Evidence Grounding for Evidence Selection in RAG</a></strong> · <code>cs.CL</code> · arXiv <a href="https://arxiv.org/abs/2604.24564v1">2604.24564</a> · score <strong>13</strong> — <code>large language model, llm, retrieval, rag</code></li>
+<li><strong><a href="https://arxiv.org/abs/2604.24562v1">Towards Lawful Autonomous Driving: Deriving Scenario-Aware Driving Requirements from Traffic Laws and Regulations</a></strong> · <code>cs.AI</code> · arXiv <a href="https://arxiv.org/abs/2604.24562v1">2604.24562</a> · score <strong>13</strong> — <code>large language model, llm, rag, reasoning</code></li>
+<li><strong><a href="https://arxiv.org/abs/2604.24519v1">Why AI Harms Can&rsquo;t Be Fixed One Identity at a Time: What 5300 Incident Reports Reveal About Intersectionality</a></strong> · <code>cs.CY</code> · arXiv <a href="https://arxiv.org/abs/2604.24519v1">2604.24519</a> · score <strong>13</strong> — <code>large language model, llm, ai system</code></li>
+<li><strong><a href="https://arxiv.org/abs/2604.24429v1">A Multi-Dimensional Audit of Politically Aligned Large Language Models</a></strong> · <code>cs.CL</code> · arXiv <a href="https://arxiv.org/abs/2604.24429v1">2604.24429</a> · score <strong>13</strong> — <code>large language model, llm, reasoning, fine-tun</code></li>
+<li><strong><a href="https://arxiv.org/abs/2604.24351v1">Diffusion Templates: A Unified Plugin Framework for Controllable Diffusion</a></strong> · <code>cs.LG</code> · arXiv <a href="https://arxiv.org/abs/2604.24351v1">2604.24351</a> · score <strong>13</strong> — <code>rag, inference, serving, kv-cache</code></li>
+<li><strong><a href="https://arxiv.org/abs/2604.24186v1">MultiDx: A Multi-Source Knowledge Integration Framework towards Diagnostic Reasoning</a></strong> · <code>cs.CL</code> · arXiv <a href="https://arxiv.org/abs/2604.24186v1">2604.24186</a> · score <strong>13</strong> — <code>large language model, llm, rag, reasoning</code></li>
+<li><strong><a href="https://arxiv.org/abs/2604.24008v1">Coverage-Based Calibration for Post-Training Quantization via Weighted Set Cover over Outlier Channels</a></strong> · <code>cs.LG</code> · arXiv <a href="https://arxiv.org/abs/2604.24008v1">2604.24008</a> · score <strong>13</strong> — <code>large language model, rag, quantization, gpu, post-train</code></li>
+<li><strong><a href="https://arxiv.org/abs/2604.23987v1">Continual Calibration: Coverage Can Collapse Before Accuracy in Lifelong LLM Fine-Tuning</a></strong> · <code>cs.LG</code> · arXiv <a href="https://arxiv.org/abs/2604.23987v1">2604.23987</a> · score <strong>13</strong> — <code>large language model, llm, rag, fine-tun</code></li>
+<li><strong><a href="https://arxiv.org/abs/2604.23942v1">What Did They Mean? How LLMs Resolve Ambiguous Social Situations across Perspectives and Roles</a></strong> · <code>cs.HC</code> · arXiv <a href="https://arxiv.org/abs/2604.23942v1">2604.23942</a> · score <strong>13</strong> — <code>large language model, llm, serving</code></li>
+<li><strong><a href="https://arxiv.org/abs/2604.23904v1">Generative Synthetic Data for Causal Inference: Pitfalls, Remedies, and Opportunities</a></strong> · <code>stat.ME</code> · arXiv <a href="https://arxiv.org/abs/2604.23904v1">2604.23904</a> · score <strong>13</strong> — <code>llm, rag, inference, serving</code></li>
+<li><strong><a href="https://arxiv.org/abs/2604.23887v1">Evaluation of Prompt Injection Defenses in Large Language Models</a></strong> · <code>cs.CR</code> · arXiv <a href="https://arxiv.org/abs/2604.23887v1">2604.23887</a> · score <strong>13</strong> — <code>large language model, llm, ai system</code></li>
+<li><strong><a href="https://arxiv.org/abs/2604.23877v1">Knowledge Vector of Logical Reasoning in Large Language Models</a></strong> · <code>cs.CL</code> · arXiv <a href="https://arxiv.org/abs/2604.23877v1">2604.23877</a> · score <strong>13</strong> — <code>large language model, llm, rag, reasoning</code></li>
+<li><strong><a href="https://arxiv.org/abs/2604.24708v1">Scalable Hyperparameter-Divergent Ensemble Training with Automatic Learning Rate Exploration for Large Models</a></strong> · <code>cs.LG</code> · arXiv <a href="https://arxiv.org/abs/2604.24708v1">2604.24708</a> · score <strong>12</strong> — <code>rag, serving, attention, gpu, scheduler</code></li>
+<li><strong><a href="https://arxiv.org/abs/2604.24697v1">Can Current Agents Close the Discovery-to-Application Gap? A Case Study in Minecraft</a></strong> · <code>cs.AI</code> · arXiv <a href="https://arxiv.org/abs/2604.24697v1">2604.24697</a> · score <strong>12</strong> — <code>llm, agent, ai system</code></li>
+<li><strong><a href="https://arxiv.org/abs/2604.24668v1">The Price of Agreement: Measuring LLM Sycophancy in Agentic Financial Applications</a></strong> · <code>cs.AI</code> · arXiv <a href="https://arxiv.org/abs/2604.24668v1">2604.24668</a> · score <strong>12</strong> — <code>llm, agent, agentic</code></li>
+<li><strong><a href="https://arxiv.org/abs/2604.24618v1">Evaluating whether AI models would sabotage AI safety research</a></strong> · <code>cs.AI</code> · arXiv <a href="https://arxiv.org/abs/2604.24618v1">2604.24618</a> · score <strong>12</strong> — <code>llm, agent, rag, reasoning</code></li>
+<li><strong><a href="https://arxiv.org/abs/2604.24542v1">Layerwise Convergence Fingerprints for Runtime Misbehavior Detection in Large Language Models</a></strong> · <code>cs.CR</code> · arXiv <a href="https://arxiv.org/abs/2604.24542v1">2604.24542</a> · score <strong>12</strong> — <code>large language model, llm, inference</code></li>
+<li><strong><a href="https://arxiv.org/abs/2604.24026v1">From Skill Text to Skill Structure: The Scheduling-Structural-Logical Representation for Agent Skills</a></strong> · <code>cs.CL</code> · arXiv <a href="https://arxiv.org/abs/2604.24026v1">2604.24026</a> · score <strong>12</strong> — <code>llm, agent, rag, reasoning</code></li>
+<li><strong><a href="https://arxiv.org/abs/2604.24021v1">QED: An Open-Source Multi-Agent System for Generating Mathematical Proofs on Open Problems</a></strong> · <code>cs.AI</code> · arXiv <a href="https://arxiv.org/abs/2604.24021v1">2604.24021</a> · score <strong>12</strong> — <code>llm, multi-agent, ai system</code></li>
+<li><strong><a href="https://arxiv.org/abs/2604.23989v1">Fix Initial Codes and Iteratively Refine Textual Directions Toward Safe Multi-Turn Code Correction</a></strong> · <code>cs.LG</code> · arXiv <a href="https://arxiv.org/abs/2604.23989v1">2604.23989</a> · score <strong>12</strong> — <code>large language model, llm, inference</code></li>
+<li><strong><a href="https://arxiv.org/abs/2604.23938v1">TSAssistant: A Human-in-the-Loop Agentic Framework for Automated Target Safety Assessment</a></strong> · <code>cs.CL</code> · arXiv <a href="https://arxiv.org/abs/2604.23938v1">2604.23938</a> · score <strong>12</strong> — <code>agent, agentic, multi-agent</code></li>
+<li><strong><a href="https://arxiv.org/abs/2604.23865v1">Inverting Foundation Models of Brain Function with Simulation-Based Inference</a></strong> · <code>cs.LG</code> · arXiv <a href="https://arxiv.org/abs/2604.23865v1">2604.23865</a> · score <strong>12</strong> — <code>large language model, llm, inference</code></li>
+<li><strong><a href="https://arxiv.org/abs/2604.24690v1">Can LLMs Act as Historians? Evaluating Historical Research Capabilities of LLMs via the Chinese Imperial Examination</a></strong> · <code>cs.CL</code> · arXiv <a href="https://arxiv.org/abs/2604.24690v1">2604.24690</a> · score <strong>11</strong> — <code>large language model, llm, reasoning</code></li>
+<li><strong><a href="https://arxiv.org/abs/2604.24665v1">Benchmarking Source-Sensitive Reasoning in Turkish: Humans and LLMs under Evidential Trust Manipulation</a></strong> · <code>cs.CL</code> · arXiv <a href="https://arxiv.org/abs/2604.24665v1">2604.24665</a> · score <strong>11</strong> — <code>large language model, llm, reasoning</code></li>
+<li><strong><a href="https://arxiv.org/abs/2604.24645v1">K-MetBench: A Multi-Dimensional Benchmark for Fine-Grained Evaluation of Expert Reasoning, Locality, and Multimodality in Meteorology</a></strong> · <code>cs.CL</code> · arXiv <a href="https://arxiv.org/abs/2604.24645v1">2604.24645</a> · score <strong>11</strong> — <code>large language model, agent, reasoning</code></li>
+<li><strong><a href="https://arxiv.org/abs/2604.24544v1">STELLAR-E: a Synthetic, Tailored, End-to-end LLM Application Rigorous Evaluator</a></strong> · <code>cs.AI</code> · arXiv <a href="https://arxiv.org/abs/2604.24544v1">2604.24544</a> · score <strong>11</strong> — <code>large language model, llm, rag</code></li>
+<li><strong><a href="https://arxiv.org/abs/2604.24468v1">A Survey on Split Learning for LLM Fine-Tuning: Models, Systems, and Privacy Optimizations</a></strong> · <code>cs.CR</code> · arXiv <a href="https://arxiv.org/abs/2604.24468v1">2604.24468</a> · score <strong>11</strong> — <code>large language model, llm, fine-tun</code></li>
+<li><strong><a href="https://arxiv.org/abs/2604.24361v1">Culture-Aware Machine Translation in Large Language Models: Benchmarking and Investigation</a></strong> · <code>cs.CL</code> · arXiv <a href="https://arxiv.org/abs/2604.24361v1">2604.24361</a> · score <strong>11</strong> — <code>large language model, llm, rag</code></li>
+<li><strong><a href="https://arxiv.org/abs/2604.24175v1">AdapTime: Enabling Adaptive Temporal Reasoning in Large Language Models</a></strong> · <code>cs.CL</code> · arXiv <a href="https://arxiv.org/abs/2604.24175v1">2604.24175</a> · score <strong>11</strong> — <code>large language model, llm, reasoning</code></li>
+<li><strong><a href="https://arxiv.org/abs/2604.24088v1">TACO: Efficient Communication Compression of Intermediate Tensors for Scalable Tensor-Parallel LLM Training</a></strong> · <code>cs.DC</code> · arXiv <a href="https://arxiv.org/abs/2604.24088v1">2604.24088</a> · score <strong>11</strong> — <code>llm, parallelism, quantization, throughput</code></li>
+<li><strong><a href="https://arxiv.org/abs/2604.24052v1">QEVA: A Reference-Free Evaluation Metric for Narrative Video Summarization with Multimodal Question Answering</a></strong> · <code>cs.CV</code> · arXiv <a href="https://arxiv.org/abs/2604.24052v1">2604.24052</a> · score <strong>11</strong> — <code>large language model, llm, rag</code></li>
+<li><strong><a href="https://arxiv.org/abs/2604.23949v1">Context-Aware Hospitalization Forecasting Evaluations for Decision Support using LLMs</a></strong> · <code>cs.AI</code> · arXiv <a href="https://arxiv.org/abs/2604.23949v1">2604.23949</a> · score <strong>11</strong> — <code>large language model, llm, rag</code></li>
+<li><strong><a href="https://arxiv.org/abs/2604.23905v1">SMSI: System Model Security Inference: Automated Threat Modeling for Cyber-Physical Systems</a></strong> · <code>cs.CR</code> · arXiv <a href="https://arxiv.org/abs/2604.23905v1">2604.23905</a> · score <strong>11</strong> — <code>llm, retrieval, inference, fine-tun</code></li>
+<li><strong><a href="https://arxiv.org/abs/2604.23902v1">LLM-Augmented Traffic Signal Control with LSTM-Based Traffic State Prediction and Safety-Constrained Decision Support</a></strong> · <code>cs.AI</code> · arXiv <a href="https://arxiv.org/abs/2604.23902v1">2604.23902</a> · score <strong>11</strong> — <code>large language model, llm, reasoning</code></li>
+<li><strong><a href="https://arxiv.org/abs/2604.23853v1">ClawTrace: Cost-Aware Tracing for LLM Agent Skill Distillation</a></strong> · <code>cs.AI</code> · arXiv <a href="https://arxiv.org/abs/2604.23853v1">2604.23853</a> · score <strong>11</strong> — <code>llm, agent, tool use</code></li>
+<li><strong><a href="https://arxiv.org/abs/2604.23837v1">One Size Fits None: Heuristic Collapse in LLM Investment Advice</a></strong> · <code>cs.CL</code> · arXiv <a href="https://arxiv.org/abs/2604.23837v1">2604.23837</a> · score <strong>11</strong> — <code>large language model, llm, reasoning</code></li>
+<li><strong><a href="https://arxiv.org/abs/2604.23824v1">Resource-Lean Lexicon Induction for German Dialects</a></strong> · <code>cs.CL</code> · arXiv <a href="https://arxiv.org/abs/2604.23824v1">2604.23824</a> · score <strong>11</strong> — <code>large language model, llm, retrieval</code></li>
+<li><strong><a href="https://arxiv.org/abs/2604.24710v1">Case-Specific Rubrics for Clinical AI Evaluation: Methodology, Validation, and LLM-Clinician Agreement Across 823 Encounters</a></strong> · <code>cs.AI</code> · arXiv <a href="https://arxiv.org/abs/2604.24710v1">2604.24710</a> · score <strong>10</strong> — <code>llm, agent, rag</code></li>
+<li><strong><a href="https://arxiv.org/abs/2604.24549v1">GradMAP: Gradient-Based Multi-Agent Proximal Learning for Grid-Edge Flexibility</a></strong> · <code>cs.LG</code> · arXiv <a href="https://arxiv.org/abs/2604.24549v1">2604.24549</a> · score <strong>10</strong> — <code>agent, multi-agent, gpu</code></li>
+<li><strong><a href="https://arxiv.org/abs/2604.24357v1">DPRM: A Plug-in Doob h transform-induced Token-Ordering Module for Diffusion Language Models</a></strong> · <code>cs.LG</code> · arXiv <a href="https://arxiv.org/abs/2604.24357v1">2604.24357</a> · score <strong>10</strong> — <code>llm, rag, reasoning, post-train</code></li>
+<li><strong><a href="https://arxiv.org/abs/2604.24155v1">The Alignment Target Problem: Divergent Moral Judgments of Humans, AI Systems, and Their Designers</a></strong> · <code>cs.CY</code> · arXiv <a href="https://arxiv.org/abs/2604.24155v1">2604.24155</a> · score <strong>10</strong> — <code>agent, reasoning, ai system</code></li>
+<li><strong><a href="https://arxiv.org/abs/2604.24040v1">Improving Robustness of Tabular Retrieval via Representational Stability</a></strong> · <code>cs.CL</code> · arXiv <a href="https://arxiv.org/abs/2604.24040v1">2604.24040</a> · score <strong>10</strong> — <code>retrieval, rag, serving, transformer</code></li>
+<li><strong><a href="https://arxiv.org/abs/2604.23990v1">Failure-Centered Runtime Evaluation for Deployed Trilingual Public-Space Agents</a></strong> · <code>cs.AI</code> · arXiv <a href="https://arxiv.org/abs/2604.23990v1">2604.23990</a> · score <strong>10</strong> — <code>agent, rag, serving</code></li>
+<li><strong><a href="https://arxiv.org/abs/2604.23947v1">GAMED.AI: A Hierarchical Multi-Agent Framework for Automated Educational Game Generation</a></strong> · <code>cs.AI</code> · arXiv <a href="https://arxiv.org/abs/2604.23947v1">2604.23947</a> · score <strong>10</strong> — <code>agent, multi-agent, reasoning</code></li>
+<li><strong><a href="https://arxiv.org/abs/2604.24703v1">Defective Task Descriptions in LLM-Based Code Generation: Detection and Analysis</a></strong> · <code>cs.SE</code> · arXiv <a href="https://arxiv.org/abs/2604.24703v1">2604.24703</a> · score <strong>9</strong> — <code>large language model, llm</code></li>
+<li><strong><a href="https://arxiv.org/abs/2604.24657v1">AgentWard: A Lifecycle Security Architecture for Autonomous AI Agents</a></strong> · <code>cs.CR</code> · arXiv <a href="https://arxiv.org/abs/2604.24657v1">2604.24657</a> · score <strong>9</strong> — <code>large language model, agent</code></li>
+<li><strong><a href="https://arxiv.org/abs/2604.24470v1">Zero-shot Large Language Models for Automatic Readability Assessment</a></strong> · <code>cs.CL</code> · arXiv <a href="https://arxiv.org/abs/2604.24470v1">2604.24470</a> · score <strong>9</strong> — <code>large language model, llm</code></li>
+<li><strong><a href="https://arxiv.org/abs/2604.24444v1">Can You Make It Sound Like You? Post-Editing LLM-Generated Text for Personal Style</a></strong> · <code>cs.CL</code> · arXiv <a href="https://arxiv.org/abs/2604.24444v1">2604.24444</a> · score <strong>9</strong> — <code>large language model, llm</code></li>
+<li><strong><a href="https://arxiv.org/abs/2604.24178v1">Meta-Aligner: Bidirectional Preference-Policy Optimization for Multi-Objective LLMs Alignment</a></strong> · <code>cs.LG</code> · arXiv <a href="https://arxiv.org/abs/2604.24178v1">2604.24178</a> · score <strong>9</strong> — <code>large language model, llm</code></li>
+<li><strong><a href="https://arxiv.org/abs/2604.24154v1">Progressive Approximation in Deep Residual Networks: Theory and Validation</a></strong> · <code>cs.LG</code> · arXiv <a href="https://arxiv.org/abs/2604.24154v1">2604.24154</a> · score <strong>9</strong> — <code>llm, inference, transformer</code></li>
+<li><strong><a href="https://arxiv.org/abs/2604.24076v1">An Information-Geometric Framework for Stability Analysis of Large Language Models under Entropic Stress</a></strong> · <code>cs.AI</code> · arXiv <a href="https://arxiv.org/abs/2604.24076v1">2604.24076</a> · score <strong>9</strong> — <code>large language model, llm</code></li>
+<li><strong><a href="https://arxiv.org/abs/2604.24043v1">A2DEPT: Large Language Model-Driven Automated Algorithm Design via Evolutionary Program Trees</a></strong> · <code>cs.AI</code> · arXiv <a href="https://arxiv.org/abs/2604.24043v1">2604.24043</a> · score <strong>9</strong> — <code>large language model, llm</code></li>
+<li><strong><a href="https://arxiv.org/abs/2604.24020v1">Poster: ClawdGo: Endogenous Security Awareness Training for Autonomous AI Agents</a></strong> · <code>cs.CR</code> · arXiv <a href="https://arxiv.org/abs/2604.24020v1">2604.24020</a> · score <strong>9</strong> — <code>agent, rag, inference</code></li>
+<li><strong><a href="https://arxiv.org/abs/2604.24002v1">IntentVLM: Open-Vocabulary Intention Recognition through Forward-Inverse Modeling with Video-Language Models</a></strong> · <code>cs.HC</code> · arXiv <a href="https://arxiv.org/abs/2604.24002v1">2604.24002</a> · score <strong>9</strong> — <code>agent, reasoning, inference</code></li>
+<li><strong><a href="https://arxiv.org/abs/2604.23994v1">When to Commit? Towards Variable-Size Self-Contained Blocks for Discrete Diffusion Language Models</a></strong> · <code>cs.LG</code> · arXiv <a href="https://arxiv.org/abs/2604.23994v1">2604.23994</a> · score <strong>9</strong> — <code>llm, inference, attention</code></li>
+<li><strong><a href="https://arxiv.org/abs/2604.23985v1">Representational Curvature Modulates Behavioral Uncertainty in Large Language Models</a></strong> · <code>cs.AI</code> · arXiv <a href="https://arxiv.org/abs/2604.23985v1">2604.23985</a> · score <strong>9</strong> — <code>large language model, llm</code></li>
+<li><strong><a href="https://arxiv.org/abs/2604.23844v1">Translate or Simplify First: An Analysis of Cross-lingual Text Simplification in English and French</a></strong> · <code>cs.CL</code> · arXiv <a href="https://arxiv.org/abs/2604.23844v1">2604.23844</a> · score <strong>9</strong> — <code>large language model, llm</code></li>
+<li><strong><a href="https://arxiv.org/abs/2604.23841v1">Scalable Production Scheduling: Linear Complexity via Unified Homogeneous Graphs</a></strong> · <code>cs.LG</code> · arXiv <a href="https://arxiv.org/abs/2604.23841v1">2604.23841</a> · score <strong>9</strong> — <code>agent, inference, latency</code></li>
+<li><strong><a href="https://arxiv.org/abs/2604.24636v1">Less Is More: Engineering Challenges of On-Device Small Language Model Integration in a Mobile Application</a></strong> · <code>cs.SE</code> · arXiv <a href="https://arxiv.org/abs/2604.24636v1">2604.24636</a> · score <strong>8</strong> — <code>llm, rag, latency</code></li>
+<li><strong><a href="https://arxiv.org/abs/2604.24527v1">Interoceptive machine framework: Toward interoception-inspired regulatory architectures in artificial intelligence</a></strong> · <code>cs.AI</code> · arXiv <a href="https://arxiv.org/abs/2604.24527v1">2604.24527</a> · score <strong>8</strong> — <code>agent, ai system</code></li>
+<li><strong><a href="https://arxiv.org/abs/2604.24461v1">Measuring Successful Cooperation in Human-AI Teamwork: Development and Validation of the Perceived Cooperativity and Teaming Perception Scales</a></strong> · <code>cs.HC</code> · arXiv <a href="https://arxiv.org/abs/2604.24461v1">2604.24461</a> · score <strong>8</strong> — <code>llm, agent</code></li>
+<li><strong><a href="https://arxiv.org/abs/2604.24447v1">Characterizing Vision-Language-Action Models across XPUs: Constraints and Acceleration for On-Robot Deployment</a></strong> · <code>cs.RO</code> · arXiv <a href="https://arxiv.org/abs/2604.24447v1">2604.24447</a> · score <strong>8</strong> — <code>inference, parallelism, gpu</code></li>
+<li><strong><a href="https://arxiv.org/abs/2604.24334v1">Reducing Redundancy in Retrieval-Augmented Generation through Chunk Filtering</a></strong> · <code>cs.CL</code> · arXiv <a href="https://arxiv.org/abs/2604.24334v1">2604.24334</a> · score <strong>8</strong> — <code>retrieval, rag, serving</code></li>
+<li><strong><a href="https://arxiv.org/abs/2604.24219v1">Adaptive ToR: Complexity-Aware Tree-Based Retrieval for Pareto-Optimal Multi-Intent NLU</a></strong> · <code>cs.AI</code> · arXiv <a href="https://arxiv.org/abs/2604.24219v1">2604.24219</a> · score <strong>8</strong> — <code>llm, retrieval, latency</code></li>
+<li><strong><a href="https://arxiv.org/abs/2604.24153v1">Right-to-Act: A Pre-Execution Non-Compensatory Decision Protocol for AI Systems</a></strong> · <code>cs.AI</code> · arXiv <a href="https://arxiv.org/abs/2604.24153v1">2604.24153</a> · score <strong>8</strong> — <code>serving, ai system</code></li>
+<li><strong><a href="https://arxiv.org/abs/2604.24117v1">An Analysis of the Coordination Gap between Joint and Modular Learning for Job Shop Scheduling with Transportation Resources</a></strong> · <code>cs.AI</code> · arXiv <a href="https://arxiv.org/abs/2604.24117v1">2604.24117</a> · score <strong>8</strong> — <code>agent, multi-agent</code></li>
+<li><strong><a href="https://arxiv.org/abs/2604.24073v1">FreeScale: Distributed Training for Sequence Recommendation Models with Minimal Scaling Cost</a></strong> · <code>cs.LG</code> · arXiv <a href="https://arxiv.org/abs/2604.24073v1">2604.24073</a> · score <strong>8</strong> — <code>rag, distributed training, gpu</code></li>
+<li><strong><a href="https://arxiv.org/abs/2604.24029v1">DeepTaxon: An Interpretable Retrieval-Augmented Multimodal Framework for Unified Species Identification and Discovery</a></strong> · <code>cs.CV</code> · arXiv <a href="https://arxiv.org/abs/2604.24029v1">2604.24029</a> · score <strong>8</strong> — <code>retrieval, reasoning, chain-of-thought, fine-tun</code></li>
+<li><strong><a href="https://arxiv.org/abs/2604.23924v1">Agentic AI platforms for autonomous training and rule induction of human-human and virus-human protein-protein interactions</a></strong> · <code>cs.AI</code> · arXiv <a href="https://arxiv.org/abs/2604.23924v1">2604.23924</a> · score <strong>8</strong> — <code>agent, agentic</code></li>
+<li><strong><a href="https://arxiv.org/abs/2604.23897v1">MarketBench: Evaluating AI Agents as Market Participants</a></strong> · <code>cs.AI</code> · arXiv <a href="https://arxiv.org/abs/2604.23897v1">2604.23897</a> · score <strong>8</strong> — <code>llm, agent</code></li>
+<li><strong><a href="https://arxiv.org/abs/2604.23888v1">Geometry Preserving Loss Functions Promote Improved Adaptation of Blackbox Generative Model</a></strong> · <code>cs.LG</code> · arXiv <a href="https://arxiv.org/abs/2604.23888v1">2604.23888</a> · score <strong>8</strong> — <code>rag, serving, fine-tun</code></li>
+<li><strong><a href="https://arxiv.org/abs/2604.23862v1">Graph Memory Transformer (GMT)</a></strong> · <code>cs.LG</code> · arXiv <a href="https://arxiv.org/abs/2604.23862v1">2604.23862</a> · score <strong>8</strong> — <code>serving, attention, transformer</code></li>
+<li><strong><a href="https://arxiv.org/abs/2604.23854v1">Does Machine Unlearning Preserve Clinical Safety? A Risk Analysis for Medical Image Classification</a></strong> · <code>cs.AI</code> · arXiv <a href="https://arxiv.org/abs/2604.23854v1">2604.23854</a> · score <strong>8</strong> — <code>serving, attention, fine-tun</code></li>
+<li><strong><a href="https://arxiv.org/abs/2604.24658v1">The Last Human-Written Paper: Agent-Native Research Artifacts</a></strong> · <code>cs.LG</code> · arXiv <a href="https://arxiv.org/abs/2604.24658v1">2604.24658</a> · score <strong>7</strong> — <code>agent, compiler</code></li>
+<li><strong><a href="https://arxiv.org/abs/2604.24622v1">CF-VLA: Efficient Coarse-to-Fine Action Generation for Vision-Language-Action Policies</a></strong> · <code>cs.CV</code> · arXiv <a href="https://arxiv.org/abs/2604.24622v1">2604.24622</a> · score <strong>7</strong> — <code>rag, inference, latency</code></li>
+<li><strong><a href="https://arxiv.org/abs/2604.24396v1">Global Context or Local Detail? Adaptive Visual Grounding for Hallucination Mitigation</a></strong> · <code>cs.CV</code> · arXiv <a href="https://arxiv.org/abs/2604.24396v1">2604.24396</a> · score <strong>7</strong> — <code>rag, inference, attention</code></li>
+<li><strong><a href="https://arxiv.org/abs/2604.24086v1">AsyncShield: A Plug-and-Play Edge Adapter for Asynchronous Cloud-based VLA Navigation</a></strong> · <code>cs.RO</code> · arXiv <a href="https://arxiv.org/abs/2604.24086v1">2604.24086</a> · score <strong>7</strong> — <code>inference, latency, fine-tun</code></li>
+<li><strong><a href="https://arxiv.org/abs/2604.23831v1">Architectural Isolation as a Timing Safety Primitive for Edge AI Medical Devices: Controlled Experimental Evidence on a Shared-Silicon Platform</a></strong> · <code>cs.AR</code> · arXiv <a href="https://arxiv.org/abs/2604.23831v1">2604.23831</a> · score <strong>7</strong> — <code>inference, gpu, latency</code></li>
+<li><strong><a href="https://arxiv.org/abs/2604.24686v1">Governing What You Cannot Observe: Adaptive Runtime Governance for Autonomous AI Agents</a></strong> · <code>cs.AI</code> · arXiv <a href="https://arxiv.org/abs/2604.24686v1">2604.24686</a> · score <strong>6</strong> — <code>agent, rag</code></li>
+<li><strong><a href="https://arxiv.org/abs/2604.24625v1">Meta-CoT: Enhancing Granularity and Generalization in Image Editing</a></strong> · <code>cs.CV</code> · arXiv <a href="https://arxiv.org/abs/2604.24625v1">2604.24625</a> · score <strong>6</strong> — <code>rag, reasoning, chain-of-thought</code></li>
+<li><strong><a href="https://arxiv.org/abs/2604.24551v1">GSC-QEMit: A Telemetry-Driven Hierarchical Forecast-and-Bandit Framework for Adaptive Quantum Error Mitigation</a></strong> · <code>quant-ph</code> · arXiv <a href="https://arxiv.org/abs/2604.24551v1">2604.24551</a> · score <strong>6</strong> — <code>rag, serving</code></li>
+<li><strong><a href="https://arxiv.org/abs/2604.24492v1">Deployment-Aligned Low-Precision Neural Architecture Search for Spaceborne Edge AI</a></strong> · <code>cs.CV</code> · arXiv <a href="https://arxiv.org/abs/2604.24492v1">2604.24492</a> · score <strong>6</strong> — <code>latency, fine-tun, post-train</code></li>
+<li><strong><a href="https://arxiv.org/abs/2604.24464v1">Incisor: Ex Ante Cloud Instance Selection for HPC Jobs</a></strong> · <code>cs.DC</code> · arXiv <a href="https://arxiv.org/abs/2604.24464v1">2604.24464</a> · score <strong>6</strong> — <code>llm, reasoning</code></li>
+<li><strong><a href="https://arxiv.org/abs/2604.24379v1">Certified geometric robustness &ndash; Super-DeepG</a></strong> · <code>cs.AI</code> · arXiv <a href="https://arxiv.org/abs/2604.24379v1">2604.24379</a> · score <strong>6</strong> — <code>rag, reasoning, gpu</code></li>
+<li><strong><a href="https://arxiv.org/abs/2604.24376v1">Learning Evidence of Depression Symptoms via Prompt Induction</a></strong> · <code>cs.CL</code> · arXiv <a href="https://arxiv.org/abs/2604.24376v1">2604.24376</a> · score <strong>6</strong> — <code>llm, fine-tun</code></li>
+<li><strong><a href="https://arxiv.org/abs/2604.24368v1">SAGE: Sparse Adaptive Guidance for Dependency-Aware Tabular Data Generation</a></strong> · <code>cs.LG</code> · arXiv <a href="https://arxiv.org/abs/2604.24368v1">2604.24368</a> · score <strong>6</strong> — <code>llm, rag</code></li>
+<li><strong><a href="https://arxiv.org/abs/2604.24306v1">SolarTformer: A Transformer Based Deep Learning Approach for Short Term Solar Power Forecasting</a></strong> · <code>cs.LG</code> · arXiv <a href="https://arxiv.org/abs/2604.24306v1">2604.24306</a> · score <strong>6</strong> — <code>rag, attention, transformer</code></li>
+<li><strong><a href="https://arxiv.org/abs/2604.24158v1">Multi-Dimensional Evaluation of Sustainable City Trips with LLM-as-a-Judge and Human-in-the-Loop</a></strong> · <code>cs.AI</code> · arXiv <a href="https://arxiv.org/abs/2604.24158v1">2604.24158</a> · score <strong>6</strong> — <code>llm, reasoning</code></li>
+<li><strong><a href="https://arxiv.org/abs/2604.24127v1">Leveraging Human Feedback for Semantically-Relevant Skill Discovery</a></strong> · <code>cs.LG</code> · arXiv <a href="https://arxiv.org/abs/2604.24127v1">2604.24127</a> · score <strong>6</strong> — <code>agent, rag</code></li>
+<li><strong><a href="https://arxiv.org/abs/2604.24126v1">Psychologically-Grounded Graph Modeling for Interpretable Depression Detection</a></strong> · <code>cs.CL</code> · arXiv <a href="https://arxiv.org/abs/2604.24126v1">2604.24126</a> · score <strong>6</strong> — <code>llm, attention</code></li>
+<li><strong><a href="https://arxiv.org/abs/2604.24104v1">Factual and Edit-Sensitive Graph-to-Sequence Generation via Graph-Aware Adaptive Noising</a></strong> · <code>cs.CL</code> · arXiv <a href="https://arxiv.org/abs/2604.24104v1">2604.24104</a> · score <strong>6</strong> — <code>llm, fine-tun</code></li>
+<li><strong><a href="https://arxiv.org/abs/2604.24070v1">Distilling Self-Consistency into Verbal Confidence: A Pre-Registered Negative Result and Post-Hoc Rescue on Gemma 3 4B</a></strong> · <code>cs.CL</code> · arXiv <a href="https://arxiv.org/abs/2604.24070v1">2604.24070</a> · score <strong>6</strong> — <code>llm, fine-tun</code></li>
+<li><strong><a href="https://arxiv.org/abs/2604.24005v1">TCOD: Exploring Temporal Curriculum in On-Policy Distillation for Multi-turn Autonomous Agents</a></strong> · <code>cs.LG</code> · arXiv <a href="https://arxiv.org/abs/2604.24005v1">2604.24005</a> · score <strong>6</strong> — <code>agent, reasoning</code></li>
+<li><strong><a href="https://arxiv.org/abs/2604.23988v1">Hindsight Preference Optimization for Financial Time Series Advisory</a></strong> · <code>cs.LG</code> · arXiv <a href="https://arxiv.org/abs/2604.23988v1">2604.23988</a> · score <strong>6</strong> — <code>llm, reasoning</code></li>
+<li><strong><a href="https://arxiv.org/abs/2604.23972v1">Quantum Knowledge Graph: Modeling Context-Dependent Triplet Validity</a></strong> · <code>cs.CL</code> · arXiv <a href="https://arxiv.org/abs/2604.23972v1">2604.23972</a> · score <strong>6</strong> — <code>llm, reasoning</code></li>
+<li><strong><a href="https://arxiv.org/abs/2604.23931v1">Do Quantum Transformers Help? A Systematic VQC Architecture Comparison on Tabular Benchmarks</a></strong> · <code>quant-ph</code> · arXiv <a href="https://arxiv.org/abs/2604.23931v1">2604.23931</a> · score <strong>6</strong> — <code>rag, attention, transformer</code></li>
+<li><strong><a href="https://arxiv.org/abs/2604.23912v1">Gromov-Wasserstein Methods for Multi-View Relational Embedding and Clustering</a></strong> · <code>cs.LG</code> · arXiv <a href="https://arxiv.org/abs/2604.23912v1">2604.23912</a> · score <strong>6</strong> — <code>rag, serving</code></li>
+<li><strong><a href="https://arxiv.org/abs/2604.23855v1">Learning Selective LLM Autonomy from Copilot Feedback in Enterprise Customer Support Workflows</a></strong> · <code>cs.CL</code> · arXiv <a href="https://arxiv.org/abs/2604.23855v1">2604.23855</a> · score <strong>6</strong> — <code>llm, rag</code></li>
+<li><strong><a href="https://arxiv.org/abs/2604.24693v1">Contextual Linear Activation Steering of Language Models</a></strong> · <code>cs.CL</code> · arXiv <a href="https://arxiv.org/abs/2604.24693v1">2604.24693</a> · score <strong>5</strong> — <code>large language model</code></li>
+<li><strong><a href="https://arxiv.org/abs/2604.24374v1">MIPIC: Matryoshka Representation Learning via Self-Distilled Intra-Relational and Progressive Information Chaining</a></strong> · <code>cs.CL</code> · arXiv <a href="https://arxiv.org/abs/2604.24374v1">2604.24374</a> · score <strong>5</strong> — <code>inference, attention</code></li>
+<li><strong><a href="https://arxiv.org/abs/2604.24143v1">Machine-Learning-Based Classification of Radio Frequency Building Loss</a></strong> · <code>cs.LG</code> · arXiv <a href="https://arxiv.org/abs/2604.24143v1">2604.24143</a> · score <strong>5</strong> — <code>rag, inference</code></li>
+<li><strong><a href="https://arxiv.org/abs/2604.24071v1">PeeriScope: A Multi-Faceted Framework for Evaluating Peer Review Quality</a></strong> · <code>cs.CL</code> · arXiv <a href="https://arxiv.org/abs/2604.24071v1">2604.24071</a> · score <strong>5</strong> — <code>large language model</code></li>
+<li><strong><a href="https://arxiv.org/abs/2604.23903v1">Integrative neurocybernetic modeling in the era of large-scale neuroscience</a></strong> · <code>q-bio.NC</code> · arXiv <a href="https://arxiv.org/abs/2604.23903v1">2604.23903</a> · score <strong>5</strong> — <code>rag, inference</code></li>
+<li><strong><a href="https://arxiv.org/abs/2604.24745v1">Conflict-Aware Harmonized Rotational Gradient for Multiscale Kinetic Regimes</a></strong> · <code>cs.LG</code> · arXiv <a href="https://arxiv.org/abs/2604.24745v1">2604.24745</a> · score <strong>4</strong> — <code>serving</code></li>
+<li><strong><a href="https://arxiv.org/abs/2604.24717v1">Learning to Rotate: Temporal and Semantic Rotary Encoding for Sequential Modeling</a></strong> · <code>cs.AI</code> · arXiv <a href="https://arxiv.org/abs/2604.24717v1">2604.24717</a> · score <strong>4</strong> — <code>attention, transformer</code></li>
+<li><strong><a href="https://arxiv.org/abs/2604.24590v1">Fraud Detection in Cryptocurrency Markets with Spatio-Temporal Graph Neural Networks</a></strong> · <code>cs.LG</code> · arXiv <a href="https://arxiv.org/abs/2604.24590v1">2604.24590</a> · score <strong>4</strong> — <code>attention, transformer</code></li>
+<li><strong><a href="https://arxiv.org/abs/2604.24589v1">A systematic evaluation of vision-language models for observational astronomical reasoning tasks</a></strong> · <code>cs.AI</code> · arXiv <a href="https://arxiv.org/abs/2604.24589v1">2604.24589</a> · score <strong>4</strong> — <code>reasoning, attention</code></li>
+<li><strong><a href="https://arxiv.org/abs/2604.24547v1">Dialysis Risk Prediction and Treatment Effect Estimation for AKI patients using Longitudinal Electronic Health Records</a></strong> · <code>cs.LG</code> · arXiv <a href="https://arxiv.org/abs/2604.24547v1">2604.24547</a> · score <strong>4</strong> — <code>rag, transformer</code></li>
+<li><strong><a href="https://arxiv.org/abs/2604.24525v1">Understanding the Limits of Automated Evaluation for Code Review Bots in Practice</a></strong> · <code>cs.SE</code> · arXiv <a href="https://arxiv.org/abs/2604.24525v1">2604.24525</a> · score <strong>4</strong> — <code>llm</code></li>
+<li><strong><a href="https://arxiv.org/abs/2604.24353v1">ARETE: Attention-based Rasterized Encoding for Topology Estimation using HSV-transformed Crowdsourced Vehicle Fleet Data</a></strong> · <code>cs.CV</code> · arXiv <a href="https://arxiv.org/abs/2604.24353v1">2604.24353</a> · score <strong>4</strong> — <code>attention, transformer</code></li>
+<li><strong><a href="https://arxiv.org/abs/2604.24350v1">Unveiling the Backdoor Mechanism Hidden Behind Catastrophic Overfitting in Fast Adversarial Training</a></strong> · <code>cs.LG</code> · arXiv <a href="https://arxiv.org/abs/2604.24350v1">2604.24350</a> · score <strong>4</strong> — <code>rag, attention</code></li>
+<li><strong><a href="https://arxiv.org/abs/2604.24347v1">Semantic Segmentation for Histopathology using Learned Regularization based on Global Proportions</a></strong> · <code>eess.IV</code> · arXiv <a href="https://arxiv.org/abs/2604.24347v1">2604.24347</a> · score <strong>4</strong> — <code>rag, transformer</code></li>
+<li><strong><a href="https://arxiv.org/abs/2604.24340v1">Exact, Efficient, and Reliable Multi-Objective and Multi-Constrained IoT Workflow Scheduling in Edge-Hub-Cloud Cyber-Physical Systems</a></strong> · <code>cs.DC</code> · arXiv <a href="https://arxiv.org/abs/2604.24340v1">2604.24340</a> · score <strong>4</strong> — <code>rag, latency</code></li>
+<li><strong><a href="https://arxiv.org/abs/2604.24338v1">Perfecting Aircraft Maneuvers with Reinforcement Learning</a></strong> · <code>cs.LG</code> · arXiv <a href="https://arxiv.org/abs/2604.24338v1">2604.24338</a> · score <strong>4</strong> — <code>agent</code></li>
+<li><strong><a href="https://arxiv.org/abs/2604.24326v1">X-NegoBox: An Explainable Privacy-Budget Negotiation Framework for Secure Peer-to-Peer Energy Data Exchange</a></strong> · <code>cs.CR</code> · arXiv <a href="https://arxiv.org/abs/2604.24326v1">2604.24326</a> · score <strong>4</strong> — <code>serving</code></li>
+<li><strong><a href="https://arxiv.org/abs/2604.24302v1">Differentiable Faithfulness Alignment for Cross-Model Circuit Transfer</a></strong> · <code>cs.CL</code> · arXiv <a href="https://arxiv.org/abs/2604.24302v1">2604.24302</a> · score <strong>4</strong> — <code>retrieval, reasoning</code></li>
+<li><strong><a href="https://arxiv.org/abs/2604.24293v1">Latent-Hysteresis Graph ODEs: Modeling Coupled Topology-Feature Evolution via Continuous Phase Transitions</a></strong> · <code>cs.LG</code> · arXiv <a href="https://arxiv.org/abs/2604.24293v1">2604.24293</a> · score <strong>4</strong> — <code>serving</code></li>
+<li><strong><a href="https://arxiv.org/abs/2604.24287v1">RowHammer Vulnerability Counter (RVC): Redefining RowHammer Detection with Victim-Centric Tracking</a></strong> · <code>cs.CR</code> · arXiv <a href="https://arxiv.org/abs/2604.24287v1">2604.24287</a> · score <strong>4</strong> — <code>rag, latency</code></li>
+<li><strong><a href="https://arxiv.org/abs/2604.24236v1">Deep Learning-Enabled Dissolved Oxygen Sensing in Biofouling Environments for Ocean Monitoring</a></strong> · <code>eess.IV</code> · arXiv <a href="https://arxiv.org/abs/2604.24236v1">2604.24236</a> · score <strong>4</strong> — <code>rag, transformer</code></li>
+<li><strong><a href="https://arxiv.org/abs/2604.24201v1">CMGL: Confidence-guided Multi-omics Graph Learning for Cancer Subtype Classification</a></strong> · <code>cs.LG</code> · arXiv <a href="https://arxiv.org/abs/2604.24201v1">2604.24201</a> · score <strong>4</strong> — <code>rag, fine-tun</code></li>
+<li><strong><a href="https://arxiv.org/abs/2604.24114v1">IRIS: Interleaved Reinforcement with Incremental Staged Curriculum for Cross-Lingual Mathematical Reasoning</a></strong> · <code>cs.CL</code> · arXiv <a href="https://arxiv.org/abs/2604.24114v1">2604.24114</a> · score <strong>4</strong> — <code>reasoning, fine-tun</code></li>
+<li><strong><a href="https://arxiv.org/abs/2604.24089v1">BiMol-Diff: A Unified Diffusion Framework for Molecular Generation and Captioning</a></strong> · <code>cs.CL</code> · arXiv <a href="https://arxiv.org/abs/2604.24089v1">2604.24089</a> · score <strong>4</strong> — <code>serving</code></li>
+<li><strong><a href="https://arxiv.org/abs/2604.24074v1">How Sensitive Are Safety Benchmarks to Judge Configuration Choices?</a></strong> · <code>cs.CL</code> · arXiv <a href="https://arxiv.org/abs/2604.24074v1">2604.24074</a> · score <strong>4</strong> — <code>llm</code></li>
+<li><strong><a href="https://arxiv.org/abs/2604.24038v1">AgentPulse: A Continuous Multi-Signal Framework for Evaluating AI Agents in Deployment</a></strong> · <code>cs.AI</code> · arXiv <a href="https://arxiv.org/abs/2604.24038v1">2604.24038</a> · score <strong>4</strong> — <code>agent</code></li>
+<li><strong><a href="https://arxiv.org/abs/2604.24012v1">FedSLoP: Memory-Efficient Federated Learning with Low-Rank Gradient Projection</a></strong> · <code>cs.LG</code> · arXiv <a href="https://arxiv.org/abs/2604.24012v1">2604.24012</a> · score <strong>4</strong> — <code>serving</code></li>
+<li><strong><a href="https://arxiv.org/abs/2604.23999v1">Adaptive-Distribution Randomized Neural Networks for PDEs: A Low-Dimensional Distribution-Learning Framework</a></strong> · <code>math.NA</code> · arXiv <a href="https://arxiv.org/abs/2604.23999v1">2604.23999</a> · score <strong>4</strong> — <code>serving</code></li>
+<li><strong><a href="https://arxiv.org/abs/2604.23968v1">DecompKAN: Decomposed Patch-KAN for Long-Term Time Series Forecasting</a></strong> · <code>cs.LG</code> · arXiv <a href="https://arxiv.org/abs/2604.23968v1">2604.23968</a> · score <strong>4</strong> — <code>attention, transformer</code></li>
+<li><strong><a href="https://arxiv.org/abs/2604.23921v1">Crystal structure prediction using graph neural combinatorial optimization</a></strong> · <code>cs.LG</code> · arXiv <a href="https://arxiv.org/abs/2604.23921v1">2604.23921</a> · score <strong>4</strong> — <code>rag, gpu</code></li>
+<li><strong><a href="https://arxiv.org/abs/2604.23876v1">Cardiac Stability Theory: An Axiomatically Grounded Framework for Continuous Cardiac Health Monitoring via Smartphone Photoplethysmography</a></strong> · <code>cs.LG</code> · arXiv <a href="https://arxiv.org/abs/2604.23876v1">2604.23876</a> · score <strong>4</strong> — <code>transformer, latency</code></li>
+<li><strong><a href="https://arxiv.org/abs/2604.23860v1">Exploring Audio Hallucination in Egocentric Video Understanding</a></strong> · <code>cs.CV</code> · arXiv <a href="https://arxiv.org/abs/2604.23860v1">2604.23860</a> · score <strong>4</strong> — <code>llm</code></li>
+<li><strong><a href="https://arxiv.org/abs/2604.23839v1">Focus on What Matters: Two-Stage ROI-Aware Refinement for Anatomy-Preserving Fetal Ultrasound Reconstruction</a></strong> · <code>cs.CV</code> · arXiv <a href="https://arxiv.org/abs/2604.23839v1">2604.23839</a> · score <strong>4</strong> — <code>serving</code></li>
+<li><strong><a href="https://arxiv.org/abs/2604.24637v1">Cortex-Inspired Continual Learning: Unsupervised Instantiation and Recovery of Functional Task Networks</a></strong> · <code>cs.LG</code> · arXiv <a href="https://arxiv.org/abs/2604.24637v1">2604.24637</a> · score <strong>3</strong> — <code>inference</code></li>
+<li><strong><a href="https://arxiv.org/abs/2604.24506v1">MIMIC: A Generative Multimodal Foundation Model for Biomolecules</a></strong> · <code>cs.AI</code> · arXiv <a href="https://arxiv.org/abs/2604.24506v1">2604.24506</a> · score <strong>3</strong> — <code>inference</code></li>
+<li><strong><a href="https://arxiv.org/abs/2604.24455v1">Compilation and Execution of an Embeddable YOLO-NAS on the VTA</a></strong> · <code>cs.AR</code> · arXiv <a href="https://arxiv.org/abs/2604.24455v1">2604.24455</a> · score <strong>3</strong> — <code>compiler</code></li>
+<li><strong><a href="https://arxiv.org/abs/2604.24449v1">SPLIT: Separating Physical-Contact via Latent Arithmetic in Image-Based Tactile Sensors</a></strong> · <code>cs.RO</code> · arXiv <a href="https://arxiv.org/abs/2604.24449v1">2604.24449</a> · score <strong>3</strong> — <code>inference</code></li>
+<li><strong><a href="https://arxiv.org/abs/2604.24416v1">Scaling Properties of Continuous Diffusion Spoken Language Models</a></strong> · <code>cs.CL</code> · arXiv <a href="https://arxiv.org/abs/2604.24416v1">2604.24416</a> · score <strong>3</strong> — <code>inference</code></li>
+<li><strong><a href="https://arxiv.org/abs/2604.24280v1">Model-Free Inference of Investor Preferences: A Relative Entropy IRL Approach</a></strong> · <code>cs.LG</code> · arXiv <a href="https://arxiv.org/abs/2604.24280v1">2604.24280</a> · score <strong>3</strong> — <code>inference</code></li>
+<li><strong><a href="https://arxiv.org/abs/2604.24199v1">Speech Enhancement Based on Drifting Models</a></strong> · <code>cs.SD</code> · arXiv <a href="https://arxiv.org/abs/2604.24199v1">2604.24199</a> · score <strong>3</strong> — <code>inference</code></li>
+<li><strong><a href="https://arxiv.org/abs/2604.24737v1">Learning to Think from Multiple Thinkers</a></strong> · <code>cs.LG</code> · arXiv <a href="https://arxiv.org/abs/2604.24737v1">2604.24737</a> · score <strong>2</strong> — <code>chain-of-thought</code></li>
+<li><strong><a href="https://arxiv.org/abs/2604.24649v1">Déjà Vu Packing: Optimizing FPGA Logic Clustering Runtime via Pattern Memoization</a></strong> · <code>cs.AR</code> · arXiv <a href="https://arxiv.org/abs/2604.24649v1">2604.24649</a> · score <strong>2</strong> — <code>rag</code></li>
+<li><strong><a href="https://arxiv.org/abs/2604.24612v1">NeSyCat: A Monad-Based Categorical Semantics of the Neurosymbolic ULLER Framework</a></strong> · <code>cs.AI</code> · arXiv <a href="https://arxiv.org/abs/2604.24612v1">2604.24612</a> · score <strong>2</strong> — <code>reasoning</code></li>
+<li><strong><a href="https://arxiv.org/abs/2604.24558v1">Hierarchical Behaviour Spaces</a></strong> · <code>cs.AI</code> · arXiv <a href="https://arxiv.org/abs/2604.24558v1">2604.24558</a> · score <strong>2</strong> — <code>reasoning</code></li>
+<li><strong><a href="https://arxiv.org/abs/2604.24548v1">SpotVista: Availability-Aware Recommendation System for Reliable and Cost-Efficient Multi-Node Spot Instances</a></strong> · <code>cs.DC</code> · arXiv <a href="https://arxiv.org/abs/2604.24548v1">2604.24548</a> · score <strong>2</strong> — <code>rag</code></li>
+<li><strong><a href="https://arxiv.org/abs/2604.24532v1">A Reward-Free Viewpoint on Multi-Objective Reinforcement Learning</a></strong> · <code>cs.LG</code> · arXiv <a href="https://arxiv.org/abs/2604.24532v1">2604.24532</a> · score <strong>2</strong> — <code>rag</code></li>
+<li><strong><a href="https://arxiv.org/abs/2604.24514v1">SceneSelect: Selective Learning for Trajectory Scene Classification and Expert Scheduling</a></strong> · <code>cs.LG</code> · arXiv <a href="https://arxiv.org/abs/2604.24514v1">2604.24514</a> · score <strong>2</strong> — <code>rag</code></li>
+<li><strong><a href="https://arxiv.org/abs/2604.24472v1">Modeling Behavioral Intensity and Transitions for Generative Recommendation</a></strong> · <code>cs.IR</code> · arXiv <a href="https://arxiv.org/abs/2604.24472v1">2604.24472</a> · score <strong>2</strong> — <code>attention</code></li>
+<li><strong><a href="https://arxiv.org/abs/2604.24401v1">All That Glitters Is Not Audio: Rethinking Text Priors and Audio Reliance in Audio-Language Evaluation</a></strong> · <code>cs.SD</code> · arXiv <a href="https://arxiv.org/abs/2604.24401v1">2604.24401</a> · score <strong>2</strong> — <code>rag</code></li>
+<li><strong><a href="https://arxiv.org/abs/2604.24397v1">Few-Shot Cross-Device Transfer for Quantum Noise Modeling on Real Hardware</a></strong> · <code>quant-ph</code> · arXiv <a href="https://arxiv.org/abs/2604.24397v1">2604.24397</a> · score <strong>2</strong> — <code>fine-tun</code></li>
+<li><strong><a href="https://arxiv.org/abs/2604.24371v1">PathMoG: A Pathway-Centric Modular Graph Neural Network for Multi-Omics Survival Prediction</a></strong> · <code>cs.LG</code> · arXiv <a href="https://arxiv.org/abs/2604.24371v1">2604.24371</a> · score <strong>2</strong> — <code>attention</code></li>
+<li><strong><a href="https://arxiv.org/abs/2604.24339v1">See Further, Think Deeper: Advancing VLM&rsquo;s Reasoning Ability with Low-level Visual Cues and Reflection</a></strong> · <code>cs.CV</code> · arXiv <a href="https://arxiv.org/abs/2604.24339v1">2604.24339</a> · score <strong>2</strong> — <code>reasoning</code></li>
+<li><strong><a href="https://arxiv.org/abs/2604.24332v1">Mitigating Error Amplification in Fast Adversarial Training</a></strong> · <code>cs.LG</code> · arXiv <a href="https://arxiv.org/abs/2604.24332v1">2604.24332</a> · score <strong>2</strong> — <code>rag</code></li>
+<li><strong><a href="https://arxiv.org/abs/2604.24312v1">Unconstrained Multi-view Human Pose Estimation with Algebraic Priors</a></strong> · <code>cs.CV</code> · arXiv <a href="https://arxiv.org/abs/2604.24312v1">2604.24312</a> · score <strong>2</strong> — <code>transformer</code></li>
+<li><strong><a href="https://arxiv.org/abs/2604.24224v1">IMPA-Net: Meteorology-Aware Multi-Scale Attention and Dynamic Loss for Extreme Convective Radar Nowcasting</a></strong> · <code>cs.LG</code> · arXiv <a href="https://arxiv.org/abs/2604.24224v1">2604.24224</a> · score <strong>2</strong> — <code>attention</code></li>
+<li><strong><a href="https://arxiv.org/abs/2604.24197v1">Seeing Is No Longer Believing: Frontier Image Generation Models, Synthetic Visual Evidence, and Real-World Risk</a></strong> · <code>cs.CL</code> · arXiv <a href="https://arxiv.org/abs/2604.24197v1">2604.24197</a> · score <strong>2</strong> — <code>reasoning</code></li>
+<li><strong><a href="https://arxiv.org/abs/2604.24179v1">MemeScouts@LT-EDI 2026: Asking the Right Questions &ndash; Prompted Weak Supervision for Meme Hate Speech Detection</a></strong> · <code>cs.CL</code> · arXiv <a href="https://arxiv.org/abs/2604.24179v1">2604.24179</a> · score <strong>2</strong> — <code>reasoning</code></li>
+<li><strong><a href="https://arxiv.org/abs/2604.24172v1">A Divergence-Based Method for Weighting and Averaging Model Predictions</a></strong> · <code>stat.ML</code> · arXiv <a href="https://arxiv.org/abs/2604.24172v1">2604.24172</a> · score <strong>2</strong> — <code>rag</code></li>
+<li><strong><a href="https://arxiv.org/abs/2604.24091v1">Unfolding an Atomistic World: Atomistic Simulation of Reactor Pressure Vessel Steel Across Year-and-Meter Scales</a></strong> · <code>cs.DC</code> · arXiv <a href="https://arxiv.org/abs/2604.24091v1">2604.24091</a> · score <strong>2</strong> — <code>rag</code></li>
+<li><strong><a href="https://arxiv.org/abs/2604.24037v1">A Limit Theory of Foundation Models: A Mathematical Approach to Understanding Emergent Intelligence and Scaling Laws</a></strong> · <code>cs.LG</code> · arXiv <a href="https://arxiv.org/abs/2604.24037v1">2604.24037</a> · score <strong>2</strong> — <code>rag</code></li>
+<li><strong><a href="https://arxiv.org/abs/2604.24027v1">KubePACS: Kubernetes Cluster Using Performant, Highly Available, and Cost Efficient Spot Instances</a></strong> · <code>cs.DC</code> · arXiv <a href="https://arxiv.org/abs/2604.24027v1">2604.24027</a> · score <strong>2</strong> — <code>rag</code></li>
+<li><strong><a href="https://arxiv.org/abs/2604.24016v1">Geometry-Aware Offline-to-Online Learning in Linear Contextual Bandits</a></strong> · <code>cs.LG</code> · arXiv <a href="https://arxiv.org/abs/2604.24016v1">2604.24016</a> · score <strong>2</strong> — <code>rag</code></li>
+<li><strong><a href="https://arxiv.org/abs/2604.23979v1">SDSL-Solver: Scalable Distributed Sparse Linear Solvers for Large-Scale Interior Point Methods</a></strong> · <code>cs.DC</code> · arXiv <a href="https://arxiv.org/abs/2604.23979v1">2604.23979</a> · score <strong>2</strong> — <code>rag</code></li>
+<li><strong><a href="https://arxiv.org/abs/2604.23964v1">Task-guided Spatiotemporal Network with Diffusion Augmentation for EEG-based Dementia Diagnosis and MMSE Prediction</a></strong> · <code>cs.LG</code> · arXiv <a href="https://arxiv.org/abs/2604.23964v1">2604.23964</a> · score <strong>2</strong> — <code>attention</code></li>
+<li><strong><a href="https://arxiv.org/abs/2604.23953v1">Viewport-Unaware Blind Omnidirectional Image Quality Assessment: A Unified and Generalized Approach</a></strong> · <code>cs.CV</code> · arXiv <a href="https://arxiv.org/abs/2604.23953v1">2604.23953</a> · score <strong>2</strong> — <code>rag</code></li>
+<li><strong><a href="https://arxiv.org/abs/2604.23948v1">KOMBO: Korean Character Representations Based on the Combination Rules of Subcharacters</a></strong> · <code>cs.CL</code> · arXiv <a href="https://arxiv.org/abs/2604.23948v1">2604.23948</a> · score <strong>2</strong> — <code>rag</code></li>
+<li><strong><a href="https://arxiv.org/abs/2604.23944v1">Sliced-Regularized Optimal Transport</a></strong> · <code>stat.ML</code> · arXiv <a href="https://arxiv.org/abs/2604.23944v1">2604.23944</a> · score <strong>2</strong> — <code>rag</code></li>
+<li><strong><a href="https://arxiv.org/abs/2604.23922v1">Quasi-Quadratic Gradient: A New Direction for Accelerating the BFGS Method in Quasi-Newton Optimization</a></strong> · <code>math.OC</code> · arXiv <a href="https://arxiv.org/abs/2604.23922v1">2604.23922</a> · score <strong>2</strong> — <code>rag</code></li>
+<li><strong><a href="https://arxiv.org/abs/2604.23908v1">Machine Learning and Deep Learning Models for Short Term Electricity Price Forecasting in Australia&rsquo;s National Electricity Market</a></strong> · <code>cs.LG</code> · arXiv <a href="https://arxiv.org/abs/2604.23908v1">2604.23908</a> · score <strong>2</strong> — <code>transformer</code></li>
+<li><strong><a href="https://arxiv.org/abs/2604.23867v1">Learning Interpretable PDE Representations for Generative Reconstructions with Structured Sparsity</a></strong> · <code>cs.LG</code> · arXiv <a href="https://arxiv.org/abs/2604.23867v1">2604.23867</a> · score <strong>2</strong> — <code>rag</code></li>
+<li><strong><a href="https://arxiv.org/abs/2604.23829v1">Domain-Filtered Knowledge Graphs from Sparse Autoencoder Features</a></strong> · <code>cs.AI</code> · arXiv <a href="https://arxiv.org/abs/2604.23829v1">2604.23829</a> · score <strong>2</strong> — <code>reasoning</code></li>
+</ol>
+
+    <ul>
+      <li>
+          <span class="date">四月 28, 2026</span>
+          <a class="title" href="/zh/posts/2026-04-28/10-rewarding-the-scientific-process-process-level-reward-modeli/">Rewarding the Scientific Process: Process-Level Reward Modeling for Agentic Data Analysis</a>
+        </li><li>
+          <span class="date">四月 28, 2026</span>
+          <a class="title" href="/zh/posts/2026-04-28/09-bitrl-reinforcement-learning-with-1-bit-quantized-language-m/">BitRL: Reinforcement Learning with 1-bit Quantized Language Models for Resource-Constrained Edge Deployment</a>
+        </li><li>
+          <span class="date">四月 28, 2026</span>
+          <a class="title" href="/zh/posts/2026-04-28/08-depthkv-layer-dependent-kv-cache-pruning-for-long-context-ll/">DepthKV: Layer-Dependent KV Cache Pruning for Long-Context LLM Inference</a>
+        </li><li>
+          <span class="date">四月 28, 2026</span>
+          <a class="title" href="/zh/posts/2026-04-28/07-beyond-the-attention-stability-boundary-agentic-self-synthes/">Beyond the Attention Stability Boundary: Agentic Self-Synthesizing Reasoning Protocols</a>
+        </li><li>
+          <span class="date">四月 28, 2026</span>
+          <a class="title" href="/zh/posts/2026-04-28/06-grounding-before-generalizing-how-ai-differs-from-humans-in/">Grounding Before Generalizing: How AI Differs from Humans in Causal Transfer</a>
+        </li><li>
+          <span class="date">四月 28, 2026</span>
+          <a class="title" href="/zh/posts/2026-04-28/05-physnote-self-knowledge-notes-for-evolvable-physical-reasoni/">PhysNote: Self-Knowledge Notes for Evolvable Physical Reasoning in Vision-Language Model</a>
+        </li><li>
+          <span class="date">四月 28, 2026</span>
+          <a class="title" href="/zh/posts/2026-04-28/04-stabilizing-efficient-reasoning-with-step-level-advantage-se/">Stabilizing Efficient Reasoning with Step-Level Advantage Selection</a>
+        </li><li>
+          <span class="date">四月 28, 2026</span>
+          <a class="title" href="/zh/posts/2026-04-28/03-the-chameleon-s-limit-investigating-persona-collapse-and-hom/">The Chameleon&#39;s Limit: Investigating Persona Collapse and Homogenization in Large Language Models</a>
+        </li><li>
+          <span class="date">四月 28, 2026</span>
+          <a class="title" href="/zh/posts/2026-04-28/02-long-context-aware-upcycling-a-new-frontier-for-hybrid-llm-s/">Long-Context Aware Upcycling: A New Frontier for Hybrid LLM Scaling</a>
+        </li><li>
+          <span class="date">四月 28, 2026</span>
+          <a class="title" href="/zh/posts/2026-04-28/01-flashoverlap-minimizing-tail-latency-in-communication-overla/">FlashOverlap: Minimizing Tail Latency in Communication Overlap for Distributed LLM Training</a>
+        </li></ul>
+
+    
+
+
+
+
+
+
+  </section>
+
+    </div>
+
+    <footer class="footer">
+  <section class="container">
+    ©
+    
+      2019 -
+    
+    2026
+     Jie Xin 
+    ·
+    
+    Powered by <a href="https://gohugo.io/" target="_blank" rel="noopener">Hugo</a> & <a href="https://github.com/luizdepra/hugo-coder/" target="_blank" rel="noopener">Coder</a>.
+    
+  </section>
+</footer>
+
+  </main>
+
+  
+
+  
+  
+  <script src="/js/coder.min.6ae284be93d2d19dad1f02b0039508d9aab3180a12a06dcc71b0b0ef7825a317.js" integrity="sha256-auKEvpPS0Z2tHwKwA5UI2aqzGAoSoG3McbCw73gloxc="></script>
+  
+
+  
+
+  
+
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+</body>
+</html>

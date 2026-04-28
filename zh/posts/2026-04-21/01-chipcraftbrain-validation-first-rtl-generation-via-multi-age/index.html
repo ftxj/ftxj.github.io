@@ -1,0 +1,382 @@
+<!DOCTYPE html>
+<html lang="zh">
+
+<head>
+  <title>
+  ChipCraftBrain: Validation-First RTL Generation via Multi-Agent Orchestration · JXIN&#39;s Home
+</title>
+  <meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="color-scheme" content="light dark">
+
+
+
+
+<meta name="author" content="Jie Xin">
+<meta name="description" content="arXiv: 2604.19856 · PDF
+作者: Cagri Eryilmaz
+主分类: cs.AR · 全部: cs.AI, cs.AR, cs.LG
+命中关键词: large language model, llm, agent, agentic, multi-agent, retrieval, rag, reasoning
+
+TL;DR
+ChipCraftBrain 用多 agent 编排加符号-神经混合推理做 RTL 生成，在 VerilogEval-Human 达到 97.2% pass@1，在 CVDP 子集达 94.7%，并成功跑通 RISC-V SoC 分层生成。
+核心观点
+
+单次生成 RTL 正确率仅 60-65%，现有多 agent（MAGE）在更难的工业基准 CVDP 上未验证且成本高。
+提出 validation-first 的多 agent 框架，结合 PPO 自适应编排、符号-神经混合、知识检索与层次化分解。
+在 VerilogEval-Human 和 CVDP 非 agentic 子集上均取得 SOTA 级结果，且 per-problem 调用次数比 ACE-RTL 少约 30 倍。
+
+方法
+四项创新：">
+<meta name="keywords" content="blog,developer,personal">
+
+
+
+  <meta name="twitter:card" content="summary">
+  <meta name="twitter:title" content="ChipCraftBrain: Validation-First RTL Generation via Multi-Agent Orchestration">
+  <meta name="twitter:description" content="arXiv: 2604.19856 · PDF
+作者: Cagri Eryilmaz
+主分类: cs.AR · 全部: cs.AI, cs.AR, cs.LG
+命中关键词: large language model, llm, agent, agentic, multi-agent, retrieval, rag, reasoning
+TL;DR ChipCraftBrain 用多 agent 编排加符号-神经混合推理做 RTL 生成，在 VerilogEval-Human 达到 97.2% pass@1，在 CVDP 子集达 94.7%，并成功跑通 RISC-V SoC 分层生成。
+核心观点 单次生成 RTL 正确率仅 60-65%，现有多 agent（MAGE）在更难的工业基准 CVDP 上未验证且成本高。 提出 validation-first 的多 agent 框架，结合 PPO 自适应编排、符号-神经混合、知识检索与层次化分解。 在 VerilogEval-Human 和 CVDP 非 agentic 子集上均取得 SOTA 级结果，且 per-problem 调用次数比 ACE-RTL 少约 30 倍。 方法 四项创新：">
+
+<meta property="og:url" content="https://ftxj.github.io/zh/posts/2026-04-21/01-chipcraftbrain-validation-first-rtl-generation-via-multi-age/">
+  <meta property="og:site_name" content="JXIN&#39;s Home">
+  <meta property="og:title" content="ChipCraftBrain: Validation-First RTL Generation via Multi-Agent Orchestration">
+  <meta property="og:description" content="arXiv: 2604.19856 · PDF
+作者: Cagri Eryilmaz
+主分类: cs.AR · 全部: cs.AI, cs.AR, cs.LG
+命中关键词: large language model, llm, agent, agentic, multi-agent, retrieval, rag, reasoning
+TL;DR ChipCraftBrain 用多 agent 编排加符号-神经混合推理做 RTL 生成，在 VerilogEval-Human 达到 97.2% pass@1，在 CVDP 子集达 94.7%，并成功跑通 RISC-V SoC 分层生成。
+核心观点 单次生成 RTL 正确率仅 60-65%，现有多 agent（MAGE）在更难的工业基准 CVDP 上未验证且成本高。 提出 validation-first 的多 agent 框架，结合 PPO 自适应编排、符号-神经混合、知识检索与层次化分解。 在 VerilogEval-Human 和 CVDP 非 agentic 子集上均取得 SOTA 级结果，且 per-problem 调用次数比 ACE-RTL 少约 30 倍。 方法 四项创新：">
+  <meta property="og:locale" content="zh">
+  <meta property="og:type" content="article">
+    <meta property="article:section" content="posts">
+    <meta property="article:published_time" content="2026-04-27T05:17:55+00:00">
+    <meta property="article:modified_time" content="2026-04-27T05:17:55+00:00">
+
+
+
+
+<link rel="canonical" href="https://ftxj.github.io/zh/posts/2026-04-21/01-chipcraftbrain-validation-first-rtl-generation-via-multi-age/">
+
+
+<link rel="preload" href="/fonts/fa-brands-400.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="/fonts/fa-regular-400.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="/fonts/fa-solid-900.woff2" as="font" type="font/woff2" crossorigin>
+
+
+  
+  
+  <link rel="stylesheet" href="/css/coder.min.5e94c1acf7aa2066035cf2764ae3e4fe39db101d68b870f919966100d51fb861.css" integrity="sha256-XpTBrPeqIGYDXPJ2SuPk/jnbEB1ouHD5GZZhANUfuGE=" crossorigin="anonymous" media="screen" />
+
+
+
+
+
+
+  
+    
+    
+    <link rel="stylesheet" href="/css/coder-dark.min.a00e6364bacbc8266ad1cc81230774a1397198f8cfb7bcba29b7d6fcb54ce57f.css" integrity="sha256-oA5jZLrLyCZq0cyBIwd0oTlxmPjPt7y6KbfW/LVM5X8=" crossorigin="anonymous" media="screen" />
+  
+
+
+
+ 
+
+
+
+
+<link rel="icon" type="image/svg+xml" href="/images/favicon.svg" sizes="any">
+<link rel="icon" type="image/png" href="/images/favicon-32x32.png" sizes="32x32">
+<link rel="icon" type="image/png" href="/images/favicon-16x16.png" sizes="16x16">
+
+<link rel="apple-touch-icon" href="/images/apple-touch-icon.png">
+<link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon.png">
+
+<link rel="manifest" href="/site.webmanifest">
+<link rel="mask-icon" href="/images/safari-pinned-tab.svg" color="#5bbad5">
+
+
+
+
+
+
+<style>
+.content article ul {
+  list-style: disc !important;
+  padding-left: 2.5rem !important;
+}
+
+.content article ul li {
+  display: list-item !important;
+}
+</style>
+
+
+
+
+  
+</head>
+
+
+
+
+
+
+<body class="preload-transitions colorscheme-auto">
+  
+<div class="float-container">
+    <a id="dark-mode-toggle" class="colorscheme-toggle">
+        <i class="fa-solid fa-adjust fa-fw" aria-hidden="true"></i>
+    </a>
+</div>
+
+
+  <main class="wrapper">
+    <nav class="navigation">
+  <section class="container">
+    
+    <a class="navigation-title" href="https://ftxj.github.io/zh/">
+      JXIN&#39;s Home
+    </a>
+    
+    
+      <input type="checkbox" id="menu-toggle" />
+      <label class="menu-button float-right" for="menu-toggle">
+        <i class="fa-solid fa-bars fa-fw" aria-hidden="true"></i>
+      </label>
+      <ul class="navigation-list">
+        
+          
+            <li class="navigation-item">
+              <a class="navigation-link " href="/zh/about/">关于</a>
+            </li>
+          
+            <li class="navigation-item">
+              <a class="navigation-link " href="/zh/travel/">旅行</a>
+            </li>
+          
+            <li class="navigation-item">
+              <a class="navigation-link " href="/zh/posts/">博客</a>
+            </li>
+          
+            <li class="navigation-item">
+              <a class="navigation-link " href="https://ftxj.github.io/cv/cv_zh.pdf">简历</a>
+            </li>
+          
+        
+        
+          
+          
+          
+            
+              
+                <li class="navigation-item menu-separator">
+                  <span>|</span>
+                </li>
+                
+              
+              <li class="navigation-item">
+                <a href="/posts/2026-04-21/01-chipcraftbrain-validation-first-rtl-generation-via-multi-age/">EN</a>
+              </li>
+            
+          
+        
+      </ul>
+    
+  </section>
+</nav>
+
+
+    <div class="content">
+      
+  <section class="container post">
+    <article>
+      <header>
+        <div class="post-title">
+          <h1 class="title">
+            <a class="title-link" href="https://ftxj.github.io/zh/posts/2026-04-21/01-chipcraftbrain-validation-first-rtl-generation-via-multi-age/">
+              ChipCraftBrain: Validation-First RTL Generation via Multi-Agent Orchestration
+            </a>
+          </h1>
+        </div>
+        <div class="post-meta">
+          <div class="date">
+            <span class="posted-on">
+              <i class="fa-solid fa-calendar" aria-hidden="true"></i>
+              <time datetime="2026-04-27T05:17:55Z">
+                四月 27, 2026
+              </time>
+            </span>
+            <span class="reading-time">
+              <i class="fa-solid fa-clock" aria-hidden="true"></i>
+              3-minute read
+            </span>
+          </div>
+          
+          <div class="categories">
+  <i class="fa-solid fa-folder" aria-hidden="true"></i>
+    <a href="/zh/categories/paper-digest/">Paper-Digest</a>
+      <span class="separator">•</span>
+    <a href="/zh/categories/2026-04-21/">2026-04-21</a></div>
+
+          
+        </div>
+      </header>
+
+      
+
+
+      <div class="post-content">
+        
+        <p><strong>arXiv:</strong> <a href="https://arxiv.org/abs/2604.19856v1">2604.19856</a> · <a href="https://arxiv.org/pdf/2604.19856v1">PDF</a></p>
+<p><strong>作者:</strong> Cagri Eryilmaz</p>
+<p><strong>主分类:</strong> <code>cs.AR</code> · 全部: cs.AI, cs.AR, cs.LG</p>
+<p><strong>命中关键词:</strong> large language model, llm, agent, agentic, multi-agent, retrieval, rag, reasoning</p>
+<hr>
+<h2 id="tldr">TL;DR</h2>
+<p>ChipCraftBrain 用多 agent 编排加符号-神经混合推理做 RTL 生成，在 VerilogEval-Human 达到 97.2% pass@1，在 CVDP 子集达 94.7%，并成功跑通 RISC-V SoC 分层生成。</p>
+<h2 id="核心观点">核心观点</h2>
+<ul>
+<li>单次生成 RTL 正确率仅 60-65%，现有多 agent（MAGE）在更难的工业基准 CVDP 上未验证且成本高。</li>
+<li>提出 validation-first 的多 agent 框架，结合 PPO 自适应编排、符号-神经混合、知识检索与层次化分解。</li>
+<li>在 VerilogEval-Human 和 CVDP 非 agentic 子集上均取得 SOTA 级结果，且 per-problem 调用次数比 ACE-RTL 少约 30 倍。</li>
+</ul>
+<h2 id="方法">方法</h2>
+<p>四项创新：</p>
+<ol>
+<li>自适应编排：168 维状态上用 PPO 策略调度 6 个专用 agent，另外评估了 world-model MPC planner 作为替代。</li>
+<li>符号-神经混合：K-map、真值表等用算法精确求解，波形时序和通用 RTL 交给专用 agent。</li>
+<li>知识增强生成：321 个模式 + 971 个开源参考实现，使用 focus-aware retrieval。</li>
+<li>层次化规格分解：依赖排序的子模块 + 接口同步，支持大型 SoC。</li>
+</ol>
+<h2 id="实验">实验</h2>
+<ul>
+<li>基准：VerilogEval-Human（156 题，7 次运行）；NVIDIA CVDP 的 302 题非 agentic 子集（5 类任务，3 次运行）；RISC-V SoC 案例。</li>
+<li>基线：MAGE、ChipAgents（自报）、CVDP 单次基线、NVIDIA ACE-RTL。</li>
+<li>指标：pass@1、lint、FPGA 验证、per-problem 尝试次数。</li>
+</ul>
+<h2 id="结果">结果</h2>
+<ul>
+<li>VerilogEval-Human：mean pass@1 = 97.2%（96.15-98.72%，最佳 154/156），与 ChipAgents 97.4% 持平，高于 MAGE 95.9%。</li>
+<li>CVDP 子集：94.7%（286/302），每类比单次基线提升 36-60 百分点；在与 ACE-RTL 共享的 4 类中赢 3 类，调用次数约 1/30。</li>
+<li>RISC-V SoC：分层分解生成 8/8 模块（689 LOC）lint 通过，FPGA 验证成功；单体生成完全失败。</li>
+</ul>
+<h2 id="为什么重要">为什么重要</h2>
+<p>为硬件 EDA 提供了首个在 CVDP 这类工业级基准上站得住脚、成本更低的 agentic RTL 生成方案，显示符号求解 + LLM 混合和分层规格分解能把 LLM 推向真实芯片设计流程。</p>
+<h2 id="与已有工作的关系">与已有工作的关系</h2>
+<ul>
+<li>多 agent RTL：MAGE、ChipAgents。</li>
+<li>工业基准：NVIDIA CVDP、ACE-RTL。</li>
+<li>LLM for HDL：VerilogEval 系列、单次生成基线。</li>
+<li>方法学：PPO 编排、world-model MPC、RAG、程序分解。</li>
+</ul>
+<h2 id="尚未回答的问题">尚未回答的问题</h2>
+<ul>
+<li>在 CVDP 的 agentic（需交互/testbench）子集与完整集上的表现如何。</li>
+<li>PPO 编排相对固定流水线的消融收益、以及 MPC planner 的优劣对比。</li>
+<li>321 模式 + 971 参考的覆盖偏差与污染风险，是否能推广到非公开 IP。</li>
+<li>FPGA 验证仅限小型 RISC-V SoC，扩展到多核、缓存、异步域等是否仍可行。</li>
+<li>综合、时序收敛、功耗感知仍未纳入闭环。</li>
+</ul>
+<hr>
+<h2 id="论文图表">论文图表</h2>
+<p><strong>图 1:</strong> Page 2 (rendered)</p>
+<p><img alt="图 1" src="/images/papers/2604.19856/page1.png"></p>
+<p><strong>图 2:</strong> Page 3 (rendered)</p>
+<p><img alt="图 2" src="/images/papers/2604.19856/page2.png"></p>
+<p><strong>图 3:</strong> Page 4 (rendered)</p>
+<p><img alt="图 3" src="/images/papers/2604.19856/page3.png"></p>
+<hr>
+<h2 id="原始摘要">原始摘要</h2>
+<p>Large Language Models (LLMs) show promise for generating Register-Transfer Level (RTL) code from natural language specifications, but single-shot generation achieves only 60-65% functional correctness on standard benchmarks. Multi-agent approaches such as MAGE reach 95.9% on VerilogEval yet remain untested on harder industrial benchmarks such as NVIDIA&rsquo;s CVDP, lack synthesis awareness, and incur high API costs. We present ChipCraftBrain, a framework combining symbolic-neural reasoning with adaptive multi-agent orchestration for automated RTL generation. Four innovations drive the system: (1) adaptive orchestration over six specialized agents via a PPO policy over a 168-dim state (an alternative world-model MPC planner is also evaluated); (2) a hybrid symbolic-neural architecture that solves K-map and truth-table problems algorithmically while specialized agents handle waveform timing and general RTL; (3) knowledge-augmented generation from a 321-pattern base plus 971 open-source reference implementations with focus-aware retrieval; and (4) hierarchical specification decomposition into dependency-ordered sub-modules with interface synchronization. On VerilogEval-Human, ChipCraftBrain achieves 97.2% mean pass@1 (range 96.15-98.72% across 7 runs, best 154/156), on par with ChipAgents (97.4%, self-reported) and ahead of MAGE (95.9%). On a 302-problem non-agentic subset of CVDP spanning five task categories, we reach 94.7% mean pass@1 (286/302, averaged over 3 runs), a 36-60 percentage-point lift per category over the published single-shot baseline; we additionally lead three of four categories shared with NVIDIA&rsquo;s ACE-RTL despite using roughly 30x fewer per-problem attempts. A RISC-V SoC case study demonstrates hierarchical decomposition generating 8/8 lint-passing modules (689 LOC) validated on FPGA, where monolithic generation fails entirely.</p>
+
+      </div>
+
+
+      <footer>
+        
+
+
+        
+        
+        
+        
+        
+        
+        
+      </footer>
+    </article>
+
+    
+  </section>
+
+    </div>
+
+    <footer class="footer">
+  <section class="container">
+    ©
+    
+      2019 -
+    
+    2026
+     Jie Xin 
+    ·
+    
+    Powered by <a href="https://gohugo.io/" target="_blank" rel="noopener">Hugo</a> & <a href="https://github.com/luizdepra/hugo-coder/" target="_blank" rel="noopener">Coder</a>.
+    
+  </section>
+</footer>
+
+  </main>
+
+  
+
+  
+  
+  <script src="/js/coder.min.6ae284be93d2d19dad1f02b0039508d9aab3180a12a06dcc71b0b0ef7825a317.js" integrity="sha256-auKEvpPS0Z2tHwKwA5UI2aqzGAoSoG3McbCw73gloxc="></script>
+  
+
+  
+
+  
+
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+</body>
+</html>

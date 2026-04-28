@@ -1,0 +1,374 @@
+<!DOCTYPE html>
+<html lang="zh">
+
+<head>
+  <title>
+  Copy-as-Decode: Grammar-Constrained Parallel Prefill for LLM Editing · JXIN&#39;s Home
+</title>
+  <meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="color-scheme" content="light dark">
+
+
+
+
+<meta name="author" content="Jie Xin">
+<meta name="description" content="arXiv: 2604.18170 · PDF
+作者: Ziyang Liu
+主分类: cs.CL · 全部: cs.AI, cs.CL
+命中关键词: llm, rag, serving, kv cache, speculative decoding, fine-tun
+
+TL;DR
+Copy-as-Decode 把 LLM 编辑任务重写为 &lt;copy&gt;/&lt;gen&gt; 两原语的语法约束解码，让拷贝段走并行 prefill 而非逐 token 自回归，在 Qwen2.5 上给出最高 303× 的内核加速与 13× 端到端上界。
+核心观点
+
+编辑输出大部分 token 与输入逐字相同，自回归重解码是浪费。
+引入双原语语法：&lt;copy lines=&quot;i-j&quot;/&gt; 引用输入行区间，&lt;gen&gt; 发射新内容。
+token 级 FSM 保证语法合法；服务层用一次并行 prefill 更新拷贝段 KV cache，取代 N 步自回归。
+与 speculative decoding 共享并行 forward kernel，但以输入 token 为 draft、程序强制接受取代概率验证。
+
+方法
+在解码层把编辑过程变成 structured decoding：模型输出遵循 grammar 的 copy/gen 混合序列。拷贝跨度通过单次 parallel-prefill forward 填充 KV cache，生成跨度保持常规自回归。作者给出无需端到端训练的上界分析，并做了一次 fine-tuning pilot 作为可学习性信号。">
+<meta name="keywords" content="blog,developer,personal">
+
+
+
+  <meta name="twitter:card" content="summary">
+  <meta name="twitter:title" content="Copy-as-Decode: Grammar-Constrained Parallel Prefill for LLM Editing">
+  <meta name="twitter:description" content="arXiv: 2604.18170 · PDF
+作者: Ziyang Liu
+主分类: cs.CL · 全部: cs.AI, cs.CL
+命中关键词: llm, rag, serving, kv cache, speculative decoding, fine-tun
+TL;DR Copy-as-Decode 把 LLM 编辑任务重写为 &lt;copy&gt;/&lt;gen&gt; 两原语的语法约束解码，让拷贝段走并行 prefill 而非逐 token 自回归，在 Qwen2.5 上给出最高 303× 的内核加速与 13× 端到端上界。
+核心观点 编辑输出大部分 token 与输入逐字相同，自回归重解码是浪费。 引入双原语语法：&lt;copy lines=&#34;i-j&#34;/&gt; 引用输入行区间，&lt;gen&gt; 发射新内容。 token 级 FSM 保证语法合法；服务层用一次并行 prefill 更新拷贝段 KV cache，取代 N 步自回归。 与 speculative decoding 共享并行 forward kernel，但以输入 token 为 draft、程序强制接受取代概率验证。 方法 在解码层把编辑过程变成 structured decoding：模型输出遵循 grammar 的 copy/gen 混合序列。拷贝跨度通过单次 parallel-prefill forward 填充 KV cache，生成跨度保持常规自回归。作者给出无需端到端训练的上界分析，并做了一次 fine-tuning pilot 作为可学习性信号。">
+
+<meta property="og:url" content="https://ftxj.github.io/zh/posts/2026-04-20/09-copy-as-decode-grammar-constrained-parallel-prefill-for-llm/">
+  <meta property="og:site_name" content="JXIN&#39;s Home">
+  <meta property="og:title" content="Copy-as-Decode: Grammar-Constrained Parallel Prefill for LLM Editing">
+  <meta property="og:description" content="arXiv: 2604.18170 · PDF
+作者: Ziyang Liu
+主分类: cs.CL · 全部: cs.AI, cs.CL
+命中关键词: llm, rag, serving, kv cache, speculative decoding, fine-tun
+TL;DR Copy-as-Decode 把 LLM 编辑任务重写为 &lt;copy&gt;/&lt;gen&gt; 两原语的语法约束解码，让拷贝段走并行 prefill 而非逐 token 自回归，在 Qwen2.5 上给出最高 303× 的内核加速与 13× 端到端上界。
+核心观点 编辑输出大部分 token 与输入逐字相同，自回归重解码是浪费。 引入双原语语法：&lt;copy lines=&#34;i-j&#34;/&gt; 引用输入行区间，&lt;gen&gt; 发射新内容。 token 级 FSM 保证语法合法；服务层用一次并行 prefill 更新拷贝段 KV cache，取代 N 步自回归。 与 speculative decoding 共享并行 forward kernel，但以输入 token 为 draft、程序强制接受取代概率验证。 方法 在解码层把编辑过程变成 structured decoding：模型输出遵循 grammar 的 copy/gen 混合序列。拷贝跨度通过单次 parallel-prefill forward 填充 KV cache，生成跨度保持常规自回归。作者给出无需端到端训练的上界分析，并做了一次 fine-tuning pilot 作为可学习性信号。">
+  <meta property="og:locale" content="zh">
+  <meta property="og:type" content="article">
+    <meta property="article:section" content="posts">
+    <meta property="article:published_time" content="2026-04-27T05:28:25+00:00">
+    <meta property="article:modified_time" content="2026-04-27T05:28:25+00:00">
+
+
+
+
+<link rel="canonical" href="https://ftxj.github.io/zh/posts/2026-04-20/09-copy-as-decode-grammar-constrained-parallel-prefill-for-llm/">
+
+
+<link rel="preload" href="/fonts/fa-brands-400.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="/fonts/fa-regular-400.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="/fonts/fa-solid-900.woff2" as="font" type="font/woff2" crossorigin>
+
+
+  
+  
+  <link rel="stylesheet" href="/css/coder.min.5e94c1acf7aa2066035cf2764ae3e4fe39db101d68b870f919966100d51fb861.css" integrity="sha256-XpTBrPeqIGYDXPJ2SuPk/jnbEB1ouHD5GZZhANUfuGE=" crossorigin="anonymous" media="screen" />
+
+
+
+
+
+
+  
+    
+    
+    <link rel="stylesheet" href="/css/coder-dark.min.a00e6364bacbc8266ad1cc81230774a1397198f8cfb7bcba29b7d6fcb54ce57f.css" integrity="sha256-oA5jZLrLyCZq0cyBIwd0oTlxmPjPt7y6KbfW/LVM5X8=" crossorigin="anonymous" media="screen" />
+  
+
+
+
+ 
+
+
+
+
+<link rel="icon" type="image/svg+xml" href="/images/favicon.svg" sizes="any">
+<link rel="icon" type="image/png" href="/images/favicon-32x32.png" sizes="32x32">
+<link rel="icon" type="image/png" href="/images/favicon-16x16.png" sizes="16x16">
+
+<link rel="apple-touch-icon" href="/images/apple-touch-icon.png">
+<link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon.png">
+
+<link rel="manifest" href="/site.webmanifest">
+<link rel="mask-icon" href="/images/safari-pinned-tab.svg" color="#5bbad5">
+
+
+
+
+
+
+<style>
+.content article ul {
+  list-style: disc !important;
+  padding-left: 2.5rem !important;
+}
+
+.content article ul li {
+  display: list-item !important;
+}
+</style>
+
+
+
+
+  
+</head>
+
+
+
+
+
+
+<body class="preload-transitions colorscheme-auto">
+  
+<div class="float-container">
+    <a id="dark-mode-toggle" class="colorscheme-toggle">
+        <i class="fa-solid fa-adjust fa-fw" aria-hidden="true"></i>
+    </a>
+</div>
+
+
+  <main class="wrapper">
+    <nav class="navigation">
+  <section class="container">
+    
+    <a class="navigation-title" href="https://ftxj.github.io/zh/">
+      JXIN&#39;s Home
+    </a>
+    
+    
+      <input type="checkbox" id="menu-toggle" />
+      <label class="menu-button float-right" for="menu-toggle">
+        <i class="fa-solid fa-bars fa-fw" aria-hidden="true"></i>
+      </label>
+      <ul class="navigation-list">
+        
+          
+            <li class="navigation-item">
+              <a class="navigation-link " href="/zh/about/">关于</a>
+            </li>
+          
+            <li class="navigation-item">
+              <a class="navigation-link " href="/zh/travel/">旅行</a>
+            </li>
+          
+            <li class="navigation-item">
+              <a class="navigation-link " href="/zh/posts/">博客</a>
+            </li>
+          
+            <li class="navigation-item">
+              <a class="navigation-link " href="https://ftxj.github.io/cv/cv_zh.pdf">简历</a>
+            </li>
+          
+        
+        
+          
+          
+          
+            
+              
+                <li class="navigation-item menu-separator">
+                  <span>|</span>
+                </li>
+                
+              
+              <li class="navigation-item">
+                <a href="/posts/2026-04-20/09-copy-as-decode-grammar-constrained-parallel-prefill-for-llm/">EN</a>
+              </li>
+            
+          
+        
+      </ul>
+    
+  </section>
+</nav>
+
+
+    <div class="content">
+      
+  <section class="container post">
+    <article>
+      <header>
+        <div class="post-title">
+          <h1 class="title">
+            <a class="title-link" href="https://ftxj.github.io/zh/posts/2026-04-20/09-copy-as-decode-grammar-constrained-parallel-prefill-for-llm/">
+              Copy-as-Decode: Grammar-Constrained Parallel Prefill for LLM Editing
+            </a>
+          </h1>
+        </div>
+        <div class="post-meta">
+          <div class="date">
+            <span class="posted-on">
+              <i class="fa-solid fa-calendar" aria-hidden="true"></i>
+              <time datetime="2026-04-27T05:28:25Z">
+                四月 27, 2026
+              </time>
+            </span>
+            <span class="reading-time">
+              <i class="fa-solid fa-clock" aria-hidden="true"></i>
+              3-minute read
+            </span>
+          </div>
+          
+          <div class="categories">
+  <i class="fa-solid fa-folder" aria-hidden="true"></i>
+    <a href="/zh/categories/paper-digest/">Paper-Digest</a>
+      <span class="separator">•</span>
+    <a href="/zh/categories/2026-04-20/">2026-04-20</a></div>
+
+          
+        </div>
+      </header>
+
+      
+
+
+      <div class="post-content">
+        
+        <p><strong>arXiv:</strong> <a href="https://arxiv.org/abs/2604.18170v1">2604.18170</a> · <a href="https://arxiv.org/pdf/2604.18170v1">PDF</a></p>
+<p><strong>作者:</strong> Ziyang Liu</p>
+<p><strong>主分类:</strong> <code>cs.CL</code> · 全部: cs.AI, cs.CL</p>
+<p><strong>命中关键词:</strong> llm, rag, serving, kv cache, speculative decoding, fine-tun</p>
+<hr>
+<h2 id="tldr">TL;DR</h2>
+<p>Copy-as-Decode 把 LLM 编辑任务重写为 <code>&lt;copy&gt;</code>/<code>&lt;gen&gt;</code> 两原语的语法约束解码，让拷贝段走并行 prefill 而非逐 token 自回归，在 Qwen2.5 上给出最高 303× 的内核加速与 13× 端到端上界。</p>
+<h2 id="核心观点">核心观点</h2>
+<ul>
+<li>编辑输出大部分 token 与输入逐字相同，自回归重解码是浪费。</li>
+<li>引入双原语语法：<code>&lt;copy lines=&quot;i-j&quot;/&gt;</code> 引用输入行区间，<code>&lt;gen&gt;</code> 发射新内容。</li>
+<li>token 级 FSM 保证语法合法；服务层用一次并行 prefill 更新拷贝段 KV cache，取代 N 步自回归。</li>
+<li>与 speculative decoding 共享并行 forward kernel，但以输入 token 为 draft、程序强制接受取代概率验证。</li>
+</ul>
+<h2 id="方法">方法</h2>
+<p>在解码层把编辑过程变成 structured decoding：模型输出遵循 grammar 的 copy/gen 混合序列。拷贝跨度通过单次 parallel-prefill forward 填充 KV cache，生成跨度保持常规自回归。作者给出无需端到端训练的上界分析，并做了一次 fine-tuning pilot 作为可学习性信号。</p>
+<h2 id="实验">实验</h2>
+<ul>
+<li>模型：Qwen2.5-1.5B/7B，Qwen2.5-Coder-1.5B；硬件 A100 80GB bf16。</li>
+<li>数据集：ProbeEdit、HumanEvalPack-Fix（Python/JS），共 482 案例。</li>
+<li>指标：kernel speedup、copy coverage、端到端 wall-clock 上界、EM、扰动鲁棒性。</li>
+</ul>
+<h2 id="结果">结果</h2>
+<ul>
+<li>Kernel：拷贝 N∈[8,512] token 比自回归快 6.8×–303×。</li>
+<li>Copy ceiling：行级原语覆盖 74–98% gold token；合成得到 29.0× / 3.4× / 4.2× 三语料上界，pooled 13.0×；token 级扩展覆盖 91–99%，加速下界 4.5×–6.5×。</li>
+<li>Pipeline：oracle program 在所有 482 case 上无损 round-trip。</li>
+<li>鲁棒性：off-by-one 扰动下 pooled EM 从 100% 降至 15.48%。</li>
+<li>Fine-tune pilot：HEvalFix-Py EM 从 0/33 提升到 12–17%。</li>
+</ul>
+<h2 id="为什么重要">为什么重要</h2>
+<p>为代码/文本编辑类 agent 提供了一条不依赖新模型的推理加速路径：把 diff-style 编辑显式交给 serving 层并行 prefill，可直接叠加现有 speculative decoding kernel，潜在 10× 级端到端吞吐提升。</p>
+<h2 id="与已有工作的关系">与已有工作的关系</h2>
+<p>延续 speculative decoding 的并行 forward 思路，但用程序化接受替代概率验证；与 constrained/grammar decoding、copy mechanism、edit-as-diff 生成（如 CodeEditor、Grace）以及 KV cache reuse/prefill 优化一脉相承。</p>
+<h2 id="尚未回答的问题">尚未回答的问题</h2>
+<ul>
+<li>如何让模型稳定生成正确 span 选择，避免 off-by-one 崩盘。</li>
+<li>Batched serving 与多文件编辑场景的实际收益。</li>
+<li>更大模型、非代码长文档编辑上的覆盖率与加速是否保持。</li>
+<li>与 speculative decoding、prefix caching 叠加时的交互与上限。</li>
+</ul>
+<hr>
+<h2 id="论文图表">论文图表</h2>
+<p><strong>图 1:</strong> Figure 1 (extracted from PDF)</p>
+<p><img alt="图 1" src="/images/papers/2604.18170/fig1.jpg"></p>
+<p><strong>图 2:</strong> Figure 2 (extracted from PDF)</p>
+<p><img alt="图 2" src="/images/papers/2604.18170/fig2.jpg"></p>
+<p><strong>图 3:</strong> Figure 3 (extracted from PDF)</p>
+<p><img alt="图 3" src="/images/papers/2604.18170/fig3.jpg"></p>
+<hr>
+<h2 id="原始摘要">原始摘要</h2>
+<p>LLMs edit text and code by autoregressively regenerating the full output, even when most tokens appear verbatim in the input. We study Copy-as-Decode, a decoding-layer mechanism that recasts edit generation as structured decoding over a two-primitive grammar: <copy lines="i-j"/> references an input line range, <gen>&hellip;</gen> emits new content. A token-level FSM guarantees syntactic validity, and a serving-layer primitive updates the KV cache for each copy span via a single parallel-prefill forward rather than $N$ autoregressive steps &ndash; sharing the parallel-forward kernel of speculative decoding but with input tokens as the draft and program-enforced acceptance replacing probabilistic verification. We report an upper-bound analysis that requires no end-to-end training. (i) Kernel speedup: on Qwen2.5-{1.5B, 7B}, copying $N$ tokens via parallel prefill is $6.8\times$&ndash;$303\times$ faster than autoregressive ($N \in [8, 512]$, A100 80GB bf16). (ii) Copy ceiling: on ProbeEdit and HumanEvalPack-Fix (Py/JS), $74$&ndash;$98%$ of gold tokens are reachable under the line-level primitive; composed with the empirical kernel over each corpus&rsquo;s span histogram this yields a closed-form wall-clock bound of $29.0\times / 3.4\times / 4.2\times$ ($13.0\times$ pooled). A token-level extension reaches $91$&ndash;$99%$ coverage with $4.5\times$&ndash;$6.5\times$ floors. (iii) Pipeline losslessness: oracle programs round-trip through the deterministic resolver on all $482$ cases, localizing any downstream failure to span selection rather than the mechanism. A perturbation study shows pooled EM drops from $100%$ to $15.48%$ under off-by-one noise. A fine-tuning pilot on Qwen2.5-Coder-1.5B lifts HEvalFix-Py EM from $0/33$ (untrained) to $12$&ndash;$17%$, a learnability signal, not a production selector. Batched-serving integration and multi-file coverage are scoped as follow-up.</p>
+
+      </div>
+
+
+      <footer>
+        
+
+
+        
+        
+        
+        
+        
+        
+        
+      </footer>
+    </article>
+
+    
+  </section>
+
+    </div>
+
+    <footer class="footer">
+  <section class="container">
+    ©
+    
+      2019 -
+    
+    2026
+     Jie Xin 
+    ·
+    
+    Powered by <a href="https://gohugo.io/" target="_blank" rel="noopener">Hugo</a> & <a href="https://github.com/luizdepra/hugo-coder/" target="_blank" rel="noopener">Coder</a>.
+    
+  </section>
+</footer>
+
+  </main>
+
+  
+
+  
+  
+  <script src="/js/coder.min.6ae284be93d2d19dad1f02b0039508d9aab3180a12a06dcc71b0b0ef7825a317.js" integrity="sha256-auKEvpPS0Z2tHwKwA5UI2aqzGAoSoG3McbCw73gloxc="></script>
+  
+
+  
+
+  
+
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+</body>
+</html>

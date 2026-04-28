@@ -1,0 +1,384 @@
+<!DOCTYPE html>
+<html lang="zh">
+
+<head>
+  <title>
+  Preference Heads in Large Language Models: A Mechanistic Framework for Interpretable Personalization · JXIN&#39;s Home
+</title>
+  <meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="color-scheme" content="light dark">
+
+
+
+
+<meta name="author" content="Jie Xin">
+<meta name="description" content="arXiv: 2604.22345 · PDF
+作者: Weixu Zhang, Ye Yuan, Changjiang Han, Yuxing Tian, Zipeng Sun, Linfeng Du, Jikun Kang, Hong Kang, Xue Liu, Haolun Wu
+单位: McGill University, Mila - Quebec AI Institute, MBZUAI, University of Montreal, Salesforce
+主分类: cs.CL · 全部: cs.CL
+命中关键词: large language model, llm, rag, inference, serving, attention, transformer
+
+TL;DR
+论文提出 Differential Preference Steering (DPS)，通过因果分析定位 LLM 中稀疏的 Preference Heads，并在推理时对比有无这些头的 logits 来实现无需训练的可解释个性化。
+核心观点
+
+假设 LLM 内部存在一组稀疏的 Preference Heads，编码用户特定的风格与主题偏好，并对生成结果具有因果影响。
+提出 DPS 框架：免训练，先通过因果 masking 识别 Preference Heads，再在解码阶段利用它们做可控个性化。
+引入 Preference Contribution Score (PCS) 量化每个 attention head 对用户对齐输出的因果贡献。
+从机制可解释性视角解释了 Transformer 中个性化&quot;在哪、如何&quot;涌现。
+
+方法
+
+识别阶段：对每个 attention head 做因果 masking 消融，计算 PCS，衡量该头被遮蔽后输出与用户偏好对齐程度的变化，筛出高 PCS 的 Preference Heads。
+引导阶段 (DPS)：解码时并行跑两次前向——含 Preference Heads 与屏蔽它们——对比两份 logits，放大&quot;个性化 vs 通用&quot;的差异，从而选择性增强偏好对齐的续写。
+整个流程无需微调，低计算开销，可解释性强。
+
+实验
+
+在多个主流 LLM 上，于广泛使用的 personalization benchmarks 上评估。
+基线为常规 prompt / 无引导解码；指标覆盖个性化保真度与内容连贯性。
+额外分析：跨用户 Preference Head 的重叠度、逐用户 PCS 分布、选取头数 K 的敏感性。
+
+结果
+Per-user PCS 热图显示高 PCS 的 head 在层和头维度都非常稀疏且分布不均，说明个性化信号由少量 head 承载。">
+<meta name="keywords" content="blog,developer,personal">
+
+
+
+  <meta name="twitter:card" content="summary">
+  <meta name="twitter:title" content="Preference Heads in Large Language Models: A Mechanistic Framework for Interpretable Personalization">
+  <meta name="twitter:description" content="arXiv: 2604.22345 · PDF
+作者: Weixu Zhang, Ye Yuan, Changjiang Han, Yuxing Tian, Zipeng Sun, Linfeng Du, Jikun Kang, Hong Kang, Xue Liu, Haolun Wu
+单位: McGill University, Mila - Quebec AI Institute, MBZUAI, University of Montreal, Salesforce
+主分类: cs.CL · 全部: cs.CL
+命中关键词: large language model, llm, rag, inference, serving, attention, transformer
+TL;DR 论文提出 Differential Preference Steering (DPS)，通过因果分析定位 LLM 中稀疏的 Preference Heads，并在推理时对比有无这些头的 logits 来实现无需训练的可解释个性化。
+核心观点 假设 LLM 内部存在一组稀疏的 Preference Heads，编码用户特定的风格与主题偏好，并对生成结果具有因果影响。 提出 DPS 框架：免训练，先通过因果 masking 识别 Preference Heads，再在解码阶段利用它们做可控个性化。 引入 Preference Contribution Score (PCS) 量化每个 attention head 对用户对齐输出的因果贡献。 从机制可解释性视角解释了 Transformer 中个性化&#34;在哪、如何&#34;涌现。 方法 识别阶段：对每个 attention head 做因果 masking 消融，计算 PCS，衡量该头被遮蔽后输出与用户偏好对齐程度的变化，筛出高 PCS 的 Preference Heads。 引导阶段 (DPS)：解码时并行跑两次前向——含 Preference Heads 与屏蔽它们——对比两份 logits，放大&#34;个性化 vs 通用&#34;的差异，从而选择性增强偏好对齐的续写。 整个流程无需微调，低计算开销，可解释性强。 实验 在多个主流 LLM 上，于广泛使用的 personalization benchmarks 上评估。 基线为常规 prompt / 无引导解码；指标覆盖个性化保真度与内容连贯性。 额外分析：跨用户 Preference Head 的重叠度、逐用户 PCS 分布、选取头数 K 的敏感性。 结果 Per-user PCS 热图显示高 PCS 的 head 在层和头维度都非常稀疏且分布不均，说明个性化信号由少量 head 承载。">
+
+<meta property="og:url" content="https://ftxj.github.io/zh/posts/2026-04-27/05-preference-heads-in-large-language-models-a-mechanistic-fram/">
+  <meta property="og:site_name" content="JXIN&#39;s Home">
+  <meta property="og:title" content="Preference Heads in Large Language Models: A Mechanistic Framework for Interpretable Personalization">
+  <meta property="og:description" content="arXiv: 2604.22345 · PDF
+作者: Weixu Zhang, Ye Yuan, Changjiang Han, Yuxing Tian, Zipeng Sun, Linfeng Du, Jikun Kang, Hong Kang, Xue Liu, Haolun Wu
+单位: McGill University, Mila - Quebec AI Institute, MBZUAI, University of Montreal, Salesforce
+主分类: cs.CL · 全部: cs.CL
+命中关键词: large language model, llm, rag, inference, serving, attention, transformer
+TL;DR 论文提出 Differential Preference Steering (DPS)，通过因果分析定位 LLM 中稀疏的 Preference Heads，并在推理时对比有无这些头的 logits 来实现无需训练的可解释个性化。
+核心观点 假设 LLM 内部存在一组稀疏的 Preference Heads，编码用户特定的风格与主题偏好，并对生成结果具有因果影响。 提出 DPS 框架：免训练，先通过因果 masking 识别 Preference Heads，再在解码阶段利用它们做可控个性化。 引入 Preference Contribution Score (PCS) 量化每个 attention head 对用户对齐输出的因果贡献。 从机制可解释性视角解释了 Transformer 中个性化&#34;在哪、如何&#34;涌现。 方法 识别阶段：对每个 attention head 做因果 masking 消融，计算 PCS，衡量该头被遮蔽后输出与用户偏好对齐程度的变化，筛出高 PCS 的 Preference Heads。 引导阶段 (DPS)：解码时并行跑两次前向——含 Preference Heads 与屏蔽它们——对比两份 logits，放大&#34;个性化 vs 通用&#34;的差异，从而选择性增强偏好对齐的续写。 整个流程无需微调，低计算开销，可解释性强。 实验 在多个主流 LLM 上，于广泛使用的 personalization benchmarks 上评估。 基线为常规 prompt / 无引导解码；指标覆盖个性化保真度与内容连贯性。 额外分析：跨用户 Preference Head 的重叠度、逐用户 PCS 分布、选取头数 K 的敏感性。 结果 Per-user PCS 热图显示高 PCS 的 head 在层和头维度都非常稀疏且分布不均，说明个性化信号由少量 head 承载。">
+  <meta property="og:locale" content="zh">
+  <meta property="og:type" content="article">
+    <meta property="article:section" content="posts">
+    <meta property="article:published_time" content="2026-04-27T15:47:53+00:00">
+    <meta property="article:modified_time" content="2026-04-27T15:47:53+00:00">
+
+
+
+
+<link rel="canonical" href="https://ftxj.github.io/zh/posts/2026-04-27/05-preference-heads-in-large-language-models-a-mechanistic-fram/">
+
+
+<link rel="preload" href="/fonts/fa-brands-400.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="/fonts/fa-regular-400.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="/fonts/fa-solid-900.woff2" as="font" type="font/woff2" crossorigin>
+
+
+  
+  
+  <link rel="stylesheet" href="/css/coder.min.5e94c1acf7aa2066035cf2764ae3e4fe39db101d68b870f919966100d51fb861.css" integrity="sha256-XpTBrPeqIGYDXPJ2SuPk/jnbEB1ouHD5GZZhANUfuGE=" crossorigin="anonymous" media="screen" />
+
+
+
+
+
+
+  
+    
+    
+    <link rel="stylesheet" href="/css/coder-dark.min.a00e6364bacbc8266ad1cc81230774a1397198f8cfb7bcba29b7d6fcb54ce57f.css" integrity="sha256-oA5jZLrLyCZq0cyBIwd0oTlxmPjPt7y6KbfW/LVM5X8=" crossorigin="anonymous" media="screen" />
+  
+
+
+
+ 
+
+
+
+
+<link rel="icon" type="image/svg+xml" href="/images/favicon.svg" sizes="any">
+<link rel="icon" type="image/png" href="/images/favicon-32x32.png" sizes="32x32">
+<link rel="icon" type="image/png" href="/images/favicon-16x16.png" sizes="16x16">
+
+<link rel="apple-touch-icon" href="/images/apple-touch-icon.png">
+<link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon.png">
+
+<link rel="manifest" href="/site.webmanifest">
+<link rel="mask-icon" href="/images/safari-pinned-tab.svg" color="#5bbad5">
+
+
+
+
+
+
+<style>
+.content article ul {
+  list-style: disc !important;
+  padding-left: 2.5rem !important;
+}
+
+.content article ul li {
+  display: list-item !important;
+}
+</style>
+
+
+
+
+  
+</head>
+
+
+
+
+
+
+<body class="preload-transitions colorscheme-auto">
+  
+<div class="float-container">
+    <a id="dark-mode-toggle" class="colorscheme-toggle">
+        <i class="fa-solid fa-adjust fa-fw" aria-hidden="true"></i>
+    </a>
+</div>
+
+
+  <main class="wrapper">
+    <nav class="navigation">
+  <section class="container">
+    
+    <a class="navigation-title" href="https://ftxj.github.io/zh/">
+      JXIN&#39;s Home
+    </a>
+    
+    
+      <input type="checkbox" id="menu-toggle" />
+      <label class="menu-button float-right" for="menu-toggle">
+        <i class="fa-solid fa-bars fa-fw" aria-hidden="true"></i>
+      </label>
+      <ul class="navigation-list">
+        
+          
+            <li class="navigation-item">
+              <a class="navigation-link " href="/zh/about/">关于</a>
+            </li>
+          
+            <li class="navigation-item">
+              <a class="navigation-link " href="/zh/travel/">旅行</a>
+            </li>
+          
+            <li class="navigation-item">
+              <a class="navigation-link " href="/zh/posts/">博客</a>
+            </li>
+          
+            <li class="navigation-item">
+              <a class="navigation-link " href="https://ftxj.github.io/cv/cv_zh.pdf">简历</a>
+            </li>
+          
+        
+        
+          
+          
+          
+            
+              
+                <li class="navigation-item menu-separator">
+                  <span>|</span>
+                </li>
+                
+              
+              <li class="navigation-item">
+                <a href="/posts/2026-04-27/05-preference-heads-in-large-language-models-a-mechanistic-fram/">EN</a>
+              </li>
+            
+          
+        
+      </ul>
+    
+  </section>
+</nav>
+
+
+    <div class="content">
+      
+  <section class="container post">
+    <article>
+      <header>
+        <div class="post-title">
+          <h1 class="title">
+            <a class="title-link" href="https://ftxj.github.io/zh/posts/2026-04-27/05-preference-heads-in-large-language-models-a-mechanistic-fram/">
+              Preference Heads in Large Language Models: A Mechanistic Framework for Interpretable Personalization
+            </a>
+          </h1>
+        </div>
+        <div class="post-meta">
+          <div class="date">
+            <span class="posted-on">
+              <i class="fa-solid fa-calendar" aria-hidden="true"></i>
+              <time datetime="2026-04-27T15:47:53Z">
+                四月 27, 2026
+              </time>
+            </span>
+            <span class="reading-time">
+              <i class="fa-solid fa-clock" aria-hidden="true"></i>
+              2-minute read
+            </span>
+          </div>
+          
+          <div class="categories">
+  <i class="fa-solid fa-folder" aria-hidden="true"></i>
+    <a href="/zh/categories/paper-digest/">Paper-Digest</a>
+      <span class="separator">•</span>
+    <a href="/zh/categories/2026-04-27/">2026-04-27</a></div>
+
+          
+        </div>
+      </header>
+
+      
+
+
+      <div class="post-content">
+        
+        <p><strong>arXiv:</strong> <a href="https://arxiv.org/abs/2604.22345v1">2604.22345</a> · <a href="https://arxiv.org/pdf/2604.22345v1">PDF</a></p>
+<p><strong>作者:</strong> Weixu Zhang, Ye Yuan, Changjiang Han, Yuxing Tian, Zipeng Sun, Linfeng Du, Jikun Kang, Hong Kang, Xue Liu, Haolun Wu</p>
+<p><strong>单位:</strong> McGill University, Mila - Quebec AI Institute, MBZUAI, University of Montreal, Salesforce</p>
+<p><strong>主分类:</strong> <code>cs.CL</code> · 全部: cs.CL</p>
+<p><strong>命中关键词:</strong> large language model, llm, rag, inference, serving, attention, transformer</p>
+<hr>
+<h2 id="tldr">TL;DR</h2>
+<p>论文提出 Differential Preference Steering (DPS)，通过因果分析定位 LLM 中稀疏的 Preference Heads，并在推理时对比有无这些头的 logits 来实现无需训练的可解释个性化。</p>
+<h2 id="核心观点">核心观点</h2>
+<ul>
+<li>假设 LLM 内部存在一组稀疏的 Preference Heads，编码用户特定的风格与主题偏好，并对生成结果具有因果影响。</li>
+<li>提出 DPS 框架：免训练，先通过因果 masking 识别 Preference Heads，再在解码阶段利用它们做可控个性化。</li>
+<li>引入 Preference Contribution Score (PCS) 量化每个 attention head 对用户对齐输出的因果贡献。</li>
+<li>从机制可解释性视角解释了 Transformer 中个性化&quot;在哪、如何&quot;涌现。</li>
+</ul>
+<h2 id="方法">方法</h2>
+<ul>
+<li><strong>识别阶段</strong>：对每个 attention head 做因果 masking 消融，计算 PCS，衡量该头被遮蔽后输出与用户偏好对齐程度的变化，筛出高 PCS 的 Preference Heads。</li>
+<li><strong>引导阶段 (DPS)</strong>：解码时并行跑两次前向——含 Preference Heads 与屏蔽它们——对比两份 logits，放大&quot;个性化 vs 通用&quot;的差异，从而选择性增强偏好对齐的续写。</li>
+<li>整个流程无需微调，低计算开销，可解释性强。</li>
+</ul>
+<h2 id="实验">实验</h2>
+<ul>
+<li>在多个主流 LLM 上，于广泛使用的 personalization benchmarks 上评估。</li>
+<li>基线为常规 prompt / 无引导解码；指标覆盖个性化保真度与内容连贯性。</li>
+<li>额外分析：跨用户 Preference Head 的重叠度、逐用户 PCS 分布、选取头数 K 的敏感性。</li>
+</ul>
+<h2 id="结果">结果</h2>
+<p>Per-user PCS 热图显示高 PCS 的 head 在层和头维度都非常稀疏且分布不均，说明个性化信号由少量 head 承载。</p>
+<p><img alt="图 2" src="/images/papers/2604.22345/fig2.png"></p>
+<p>跨用户 Jaccard 重叠几乎为零，表明不同用户的 Preference Head 集合差异很大，需要按用户（或 cluster）单独发现。</p>
+<p><img alt="图 1" src="/images/papers/2604.22345/fig1.png"></p>
+<p>K 值扫描显示 Accuracy 与 F1 在中等 K 处即饱和，佐证偏好信号集中在少数 head。</p>
+<p><img alt="图 3" src="/images/papers/2604.22345/fig3.png"></p>
+<p>整体上 DPS 在多 LLM 上一致提升个性化保真度，同时保持内容连贯性与低开销。</p>
+<h2 id="为什么重要">为什么重要</h2>
+<p>为 LLM 个性化从&quot;黑盒 prompt/微调&quot;转向机制可解释的路径：无需训练、推理期可控、可解释到具体 head，对做 agent memory、个性化助手和对齐审计的人尤其有用。</p>
+<h2 id="与已有工作的关系">与已有工作的关系</h2>
+<p>延续 mechanistic interpretability（circuit / induction head 系列）与 attention head 归因研究；在个性化方向上与 prompt engineering、PEFT/LoRA 微调、RLHF 个性化形成对照；解码端与 contrastive decoding、DoLa、activation steering 等引导式推理方法同脉。</p>
+<h2 id="尚未回答的问题">尚未回答的问题</h2>
+<ul>
+<li>Preference Heads 是否在更大模型或多语种场景下仍然稀疏且稳定？</li>
+<li>用户量级扩大后如何高效发现与缓存 head 集合（cluster-aware 发现尚待设计）？</li>
+<li>与长期记忆、RAG 的组合效果，以及是否易被对抗样本操纵。</li>
+</ul>
+<h2 id="原始摘要中文翻译">原始摘要（中文翻译）</h2>
+<p>大语言模型（LLMs）表现出很强的隐式个性化能力，但现有方法大多将这种行为视为黑箱，依赖 prompt engineering 或在用户数据上做 fine tuning。本工作采用 mechanistic interpretability 视角，假设存在一组稀疏的 Preference Heads——这些 attention heads 编码了用户特定的风格与主题偏好，并对生成施加因果影响。我们提出 Differential Preference Steering (DPS)，一个免训练框架，它 (1) 通过 causal masking 分析识别 Preference Heads，(2) 在推理时利用它们实现可控、可解释的个性化。DPS 为每个 attention head 计算一个 Preference Contribution Score (PCS)，直接衡量其对用户对齐输出的因果影响。在解码过程中，我们对比模型在有无 Preference Heads 情况下的预测，放大个性化 logits 与通用 logits 之间的差异，从而有选择地增强与偏好对齐的续写。在多种 LLM 上对广泛使用的个性化 benchmark 的实验表明，在保持内容连贯性和低计算开销的同时，个性化保真度有一致提升。除了实证改进之外，DPS 还为 transformer 架构中个性化在何处、以何种方式涌现提供了机制性解释。我们的实现已公开。</p>
+
+      </div>
+
+
+      <footer>
+        
+
+
+        
+        
+        
+        
+        
+        
+        
+      </footer>
+    </article>
+
+    
+  </section>
+
+    </div>
+
+    <footer class="footer">
+  <section class="container">
+    ©
+    
+      2019 -
+    
+    2026
+     Jie Xin 
+    ·
+    
+    Powered by <a href="https://gohugo.io/" target="_blank" rel="noopener">Hugo</a> & <a href="https://github.com/luizdepra/hugo-coder/" target="_blank" rel="noopener">Coder</a>.
+    
+  </section>
+</footer>
+
+  </main>
+
+  
+
+  
+  
+  <script src="/js/coder.min.6ae284be93d2d19dad1f02b0039508d9aab3180a12a06dcc71b0b0ef7825a317.js" integrity="sha256-auKEvpPS0Z2tHwKwA5UI2aqzGAoSoG3McbCw73gloxc="></script>
+  
+
+  
+
+  
+
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+</body>
+</html>

@@ -1,0 +1,370 @@
+<!DOCTYPE html>
+<html lang="zh">
+
+<head>
+  <title>
+  How Do AI Agents Spend Your Money? Analyzing and Predicting Token Consumption in Agentic Coding Tasks · JXIN&#39;s Home
+</title>
+  <meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="color-scheme" content="light dark">
+
+
+
+
+<meta name="author" content="Jie Xin">
+<meta name="description" content="arXiv: 2604.22750 · PDF
+作者: Longju Bai, Zhemin Huang, Xingyao Wang, Jiao Sun, Rada Mihalcea, Erik Brynjolfsson, Alex Pentland, Jiaxin Pei
+单位: University of Michigan, Stanford University, All Hands AI, Google DeepMind, Microsoft AI, MIT
+主分类: cs.CL · 全部: cs.CL, cs.CY, cs.HC, cs.SE
+命中关键词: llm, agent, agentic, rag, reasoning
+
+TL;DR
+首个系统研究 agentic coding 任务 token 消耗的工作：在 SWE-bench Verified 上分析 8 个前沿 LLM，发现 agent 任务耗 token 是普通代码任务的 1000 倍，且模型无法准确预测自身消耗。
+核心观点
+
+Agentic 任务 token 消耗远超 code reasoning / code chat，高出约 1000 倍，且 input token 而非 output token 才是主要成本驱动。
+Token 使用高度随机：同一任务不同运行最多相差 30 倍；更多 token ≠ 更高准确率，准确率常在中等成本处达峰后饱和。
+模型间 token 效率差异显著：Kimi-K2 与 Claude-Sonnet-4.5 平均比 GPT-5 多耗 150 万&#43; token。
+人类专家标注的任务难度与实际 token 成本只有弱相关，揭示人类感知复杂度与 agent 实际算力消耗的鸿沟。
+前沿模型无法准确预测自身 token 用量（相关性 ≤ 0.39），且系统性低估真实成本。
+
+方法
+作者收集 8 个前沿 LLM 在 SWE-bench Verified 上的完整 agent trajectories，分解 input/output token 构成，按任务、模型、重复运行维度分析消耗分布。同时让模型在任务执行前自我预测 token 用量，与真实消耗做校准对比，从而评估 self-prediction 能力。">
+<meta name="keywords" content="blog,developer,personal">
+
+
+
+  <meta name="twitter:card" content="summary">
+  <meta name="twitter:title" content="How Do AI Agents Spend Your Money? Analyzing and Predicting Token Consumption in Agentic Coding Tasks">
+  <meta name="twitter:description" content="arXiv: 2604.22750 · PDF
+作者: Longju Bai, Zhemin Huang, Xingyao Wang, Jiao Sun, Rada Mihalcea, Erik Brynjolfsson, Alex Pentland, Jiaxin Pei
+单位: University of Michigan, Stanford University, All Hands AI, Google DeepMind, Microsoft AI, MIT
+主分类: cs.CL · 全部: cs.CL, cs.CY, cs.HC, cs.SE
+命中关键词: llm, agent, agentic, rag, reasoning
+TL;DR 首个系统研究 agentic coding 任务 token 消耗的工作：在 SWE-bench Verified 上分析 8 个前沿 LLM，发现 agent 任务耗 token 是普通代码任务的 1000 倍，且模型无法准确预测自身消耗。
+核心观点 Agentic 任务 token 消耗远超 code reasoning / code chat，高出约 1000 倍，且 input token 而非 output token 才是主要成本驱动。 Token 使用高度随机：同一任务不同运行最多相差 30 倍；更多 token ≠ 更高准确率，准确率常在中等成本处达峰后饱和。 模型间 token 效率差异显著：Kimi-K2 与 Claude-Sonnet-4.5 平均比 GPT-5 多耗 150 万&#43; token。 人类专家标注的任务难度与实际 token 成本只有弱相关，揭示人类感知复杂度与 agent 实际算力消耗的鸿沟。 前沿模型无法准确预测自身 token 用量（相关性 ≤ 0.39），且系统性低估真实成本。 方法 作者收集 8 个前沿 LLM 在 SWE-bench Verified 上的完整 agent trajectories，分解 input/output token 构成，按任务、模型、重复运行维度分析消耗分布。同时让模型在任务执行前自我预测 token 用量，与真实消耗做校准对比，从而评估 self-prediction 能力。">
+
+<meta property="og:url" content="https://ftxj.github.io/zh/posts/2026-04-27/02-how-do-ai-agents-spend-your-money-analyzing-and-predicting-t/">
+  <meta property="og:site_name" content="JXIN&#39;s Home">
+  <meta property="og:title" content="How Do AI Agents Spend Your Money? Analyzing and Predicting Token Consumption in Agentic Coding Tasks">
+  <meta property="og:description" content="arXiv: 2604.22750 · PDF
+作者: Longju Bai, Zhemin Huang, Xingyao Wang, Jiao Sun, Rada Mihalcea, Erik Brynjolfsson, Alex Pentland, Jiaxin Pei
+单位: University of Michigan, Stanford University, All Hands AI, Google DeepMind, Microsoft AI, MIT
+主分类: cs.CL · 全部: cs.CL, cs.CY, cs.HC, cs.SE
+命中关键词: llm, agent, agentic, rag, reasoning
+TL;DR 首个系统研究 agentic coding 任务 token 消耗的工作：在 SWE-bench Verified 上分析 8 个前沿 LLM，发现 agent 任务耗 token 是普通代码任务的 1000 倍，且模型无法准确预测自身消耗。
+核心观点 Agentic 任务 token 消耗远超 code reasoning / code chat，高出约 1000 倍，且 input token 而非 output token 才是主要成本驱动。 Token 使用高度随机：同一任务不同运行最多相差 30 倍；更多 token ≠ 更高准确率，准确率常在中等成本处达峰后饱和。 模型间 token 效率差异显著：Kimi-K2 与 Claude-Sonnet-4.5 平均比 GPT-5 多耗 150 万&#43; token。 人类专家标注的任务难度与实际 token 成本只有弱相关，揭示人类感知复杂度与 agent 实际算力消耗的鸿沟。 前沿模型无法准确预测自身 token 用量（相关性 ≤ 0.39），且系统性低估真实成本。 方法 作者收集 8 个前沿 LLM 在 SWE-bench Verified 上的完整 agent trajectories，分解 input/output token 构成，按任务、模型、重复运行维度分析消耗分布。同时让模型在任务执行前自我预测 token 用量，与真实消耗做校准对比，从而评估 self-prediction 能力。">
+  <meta property="og:locale" content="zh">
+  <meta property="og:type" content="article">
+    <meta property="article:section" content="posts">
+    <meta property="article:published_time" content="2026-04-27T15:43:11+00:00">
+    <meta property="article:modified_time" content="2026-04-27T15:43:11+00:00">
+
+
+
+
+<link rel="canonical" href="https://ftxj.github.io/zh/posts/2026-04-27/02-how-do-ai-agents-spend-your-money-analyzing-and-predicting-t/">
+
+
+<link rel="preload" href="/fonts/fa-brands-400.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="/fonts/fa-regular-400.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="/fonts/fa-solid-900.woff2" as="font" type="font/woff2" crossorigin>
+
+
+  
+  
+  <link rel="stylesheet" href="/css/coder.min.5e94c1acf7aa2066035cf2764ae3e4fe39db101d68b870f919966100d51fb861.css" integrity="sha256-XpTBrPeqIGYDXPJ2SuPk/jnbEB1ouHD5GZZhANUfuGE=" crossorigin="anonymous" media="screen" />
+
+
+
+
+
+
+  
+    
+    
+    <link rel="stylesheet" href="/css/coder-dark.min.a00e6364bacbc8266ad1cc81230774a1397198f8cfb7bcba29b7d6fcb54ce57f.css" integrity="sha256-oA5jZLrLyCZq0cyBIwd0oTlxmPjPt7y6KbfW/LVM5X8=" crossorigin="anonymous" media="screen" />
+  
+
+
+
+ 
+
+
+
+
+<link rel="icon" type="image/svg+xml" href="/images/favicon.svg" sizes="any">
+<link rel="icon" type="image/png" href="/images/favicon-32x32.png" sizes="32x32">
+<link rel="icon" type="image/png" href="/images/favicon-16x16.png" sizes="16x16">
+
+<link rel="apple-touch-icon" href="/images/apple-touch-icon.png">
+<link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon.png">
+
+<link rel="manifest" href="/site.webmanifest">
+<link rel="mask-icon" href="/images/safari-pinned-tab.svg" color="#5bbad5">
+
+
+
+
+
+
+<style>
+.content article ul {
+  list-style: disc !important;
+  padding-left: 2.5rem !important;
+}
+
+.content article ul li {
+  display: list-item !important;
+}
+</style>
+
+
+
+
+  
+</head>
+
+
+
+
+
+
+<body class="preload-transitions colorscheme-auto">
+  
+<div class="float-container">
+    <a id="dark-mode-toggle" class="colorscheme-toggle">
+        <i class="fa-solid fa-adjust fa-fw" aria-hidden="true"></i>
+    </a>
+</div>
+
+
+  <main class="wrapper">
+    <nav class="navigation">
+  <section class="container">
+    
+    <a class="navigation-title" href="https://ftxj.github.io/zh/">
+      JXIN&#39;s Home
+    </a>
+    
+    
+      <input type="checkbox" id="menu-toggle" />
+      <label class="menu-button float-right" for="menu-toggle">
+        <i class="fa-solid fa-bars fa-fw" aria-hidden="true"></i>
+      </label>
+      <ul class="navigation-list">
+        
+          
+            <li class="navigation-item">
+              <a class="navigation-link " href="/zh/about/">关于</a>
+            </li>
+          
+            <li class="navigation-item">
+              <a class="navigation-link " href="/zh/travel/">旅行</a>
+            </li>
+          
+            <li class="navigation-item">
+              <a class="navigation-link " href="/zh/posts/">博客</a>
+            </li>
+          
+            <li class="navigation-item">
+              <a class="navigation-link " href="https://ftxj.github.io/cv/cv_zh.pdf">简历</a>
+            </li>
+          
+        
+        
+          
+          
+          
+            
+              
+                <li class="navigation-item menu-separator">
+                  <span>|</span>
+                </li>
+                
+              
+              <li class="navigation-item">
+                <a href="/posts/2026-04-27/02-how-do-ai-agents-spend-your-money-analyzing-and-predicting-t/">EN</a>
+              </li>
+            
+          
+        
+      </ul>
+    
+  </section>
+</nav>
+
+
+    <div class="content">
+      
+  <section class="container post">
+    <article>
+      <header>
+        <div class="post-title">
+          <h1 class="title">
+            <a class="title-link" href="https://ftxj.github.io/zh/posts/2026-04-27/02-how-do-ai-agents-spend-your-money-analyzing-and-predicting-t/">
+              How Do AI Agents Spend Your Money? Analyzing and Predicting Token Consumption in Agentic Coding Tasks
+            </a>
+          </h1>
+        </div>
+        <div class="post-meta">
+          <div class="date">
+            <span class="posted-on">
+              <i class="fa-solid fa-calendar" aria-hidden="true"></i>
+              <time datetime="2026-04-27T15:43:11Z">
+                四月 27, 2026
+              </time>
+            </span>
+            <span class="reading-time">
+              <i class="fa-solid fa-clock" aria-hidden="true"></i>
+              2-minute read
+            </span>
+          </div>
+          
+          <div class="categories">
+  <i class="fa-solid fa-folder" aria-hidden="true"></i>
+    <a href="/zh/categories/paper-digest/">Paper-Digest</a>
+      <span class="separator">•</span>
+    <a href="/zh/categories/2026-04-27/">2026-04-27</a></div>
+
+          
+        </div>
+      </header>
+
+      
+
+
+      <div class="post-content">
+        
+        <p><strong>arXiv:</strong> <a href="https://arxiv.org/abs/2604.22750v1">2604.22750</a> · <a href="https://arxiv.org/pdf/2604.22750v1">PDF</a></p>
+<p><strong>作者:</strong> Longju Bai, Zhemin Huang, Xingyao Wang, Jiao Sun, Rada Mihalcea, Erik Brynjolfsson, Alex Pentland, Jiaxin Pei</p>
+<p><strong>单位:</strong> University of Michigan, Stanford University, All Hands AI, Google DeepMind, Microsoft AI, MIT</p>
+<p><strong>主分类:</strong> <code>cs.CL</code> · 全部: cs.CL, cs.CY, cs.HC, cs.SE</p>
+<p><strong>命中关键词:</strong> llm, agent, agentic, rag, reasoning</p>
+<hr>
+<h2 id="tldr">TL;DR</h2>
+<p>首个系统研究 agentic coding 任务 token 消耗的工作：在 SWE-bench Verified 上分析 8 个前沿 LLM，发现 agent 任务耗 token 是普通代码任务的 1000 倍，且模型无法准确预测自身消耗。</p>
+<h2 id="核心观点">核心观点</h2>
+<ul>
+<li>Agentic 任务 token 消耗远超 code reasoning / code chat，高出约 <strong>1000 倍</strong>，且 input token 而非 output token 才是主要成本驱动。</li>
+<li>Token 使用高度随机：同一任务不同运行最多相差 <strong>30 倍</strong>；更多 token ≠ 更高准确率，准确率常在中等成本处达峰后饱和。</li>
+<li>模型间 token 效率差异显著：Kimi-K2 与 Claude-Sonnet-4.5 平均比 GPT-5 多耗 <strong>150 万+</strong> token。</li>
+<li>人类专家标注的任务难度与实际 token 成本只有弱相关，揭示人类感知复杂度与 agent 实际算力消耗的鸿沟。</li>
+<li>前沿模型无法准确预测自身 token 用量（相关性 ≤ 0.39），且系统性低估真实成本。</li>
+</ul>
+<h2 id="方法">方法</h2>
+<p>作者收集 8 个前沿 LLM 在 SWE-bench Verified 上的完整 agent trajectories，分解 input/output token 构成，按任务、模型、重复运行维度分析消耗分布。同时让模型在任务执行前自我预测 token 用量，与真实消耗做校准对比，从而评估 self-prediction 能力。</p>
+<h2 id="实验">实验</h2>
+<ul>
+<li>数据集：SWE-bench Verified。</li>
+<li>模型：8 个前沿 LLM（含 GPT-5 / GPT-5.2、Claude-Sonnet-4.5、Kimi-K2 等）。</li>
+<li>对照任务类型：code reasoning、code chat vs. agentic coding。</li>
+<li>指标：总 token、input/output 拆分、跨运行方差、准确率-成本曲线、人类难度评级与 token 的相关性、self-prediction 校准（相关系数、低估程度）。</li>
+</ul>
+<h2 id="结果">结果</h2>
+<p>关键量化结论：agent 任务 ~1000× token；同任务方差 30×；Kimi-K2 / Sonnet-4.5 比 GPT-5 多耗 1.5M+ token；self-prediction 相关性最高仅 0.39，且系统性低估。</p>
+<p>即使去掉 in-context demonstration，Sonnet 4.5 与 GPT-5.2 对自身 token 消耗仍明显低估，input token 部分尤为严重，校准曲线整体偏离对角线。</p>
+<p><img alt="图 1" src="/images/papers/2604.22750/fig1.png"></p>
+<p>上图显示无示例条件下，Sonnet 4.5 的自预测点云全面落在对角线下方；GPT-5.2 也呈类似趋势，进一步佐证低估并非提示设计可补救的问题。</p>
+<p><img alt="图 2" src="/images/papers/2604.22750/fig2.png"></p>
+<h2 id="为什么重要">为什么重要</h2>
+<p>对 agent / LLM 基础设施从业者而言，本文首次量化了 agentic workloads 的经济学：预算规划不能沿用 chat 任务经验，需要为 input token、高方差和不可预测性留足空间；模型选型应把 token 效率作为与准确率并列的一级指标；同时警示&quot;让 agent 自报预算&quot;不可靠，调度与计费系统需引入外部估算。</p>
+<h2 id="与已有工作的关系">与已有工作的关系</h2>
+<p>延伸 SWE-bench / SWE-bench Verified 上的 agent 评测传统，但关注点从 accuracy 转向 cost；补充了 LLM calibration / self-knowledge 研究在 agent 场景的证据；与 scaling law、inference-time compute 的讨论形成对照——更多算力并不单调换来更高准确率。</p>
+<h2 id="尚未回答的问题">尚未回答的问题</h2>
+<ul>
+<li>如何构建可靠的外部 token 预算预测器？</li>
+<li>高方差的根因是 planning 策略、工具调用循环还是随机采样？</li>
+<li>能否通过训练或架构改动降低 input token 主导的成本？</li>
+<li>结论在非 coding agent（浏览、科研、多模态）上是否成立？</li>
+</ul>
+<h2 id="原始摘要中文翻译">原始摘要（中文翻译）</h2>
+<p>AI agent 在复杂人类工作流中的广泛采用，正推动 LLM token 消耗快速增长。当 agent 被部署到需要大量 token 的任务上时，自然出现三个问题：(1) AI agent 把 token 花在哪里？(2) 哪些模型更 token 高效？(3) agent 能否在任务执行前预测其 token 用量？本文首次系统研究 agentic coding 任务中的 token 消耗模式。我们在 SWE-bench Verified 上分析来自八个前沿 LLM 的 trajectories，并评估模型在任务执行前预测自身 token 成本的能力。我们发现：(1) agentic 任务代价独特地高昂，其 token 消耗比 code reasoning 与 code chat 高 1000 倍，且驱动整体成本的是 input token 而非 output token；(2) token 使用高度可变且本质上随机：对同一任务的运行在总 token 上最多可相差 30 倍，更高的 token 使用并不转化为更高的准确率；相反，准确率常在中等成本处达到峰值并在更高成本下饱和；(3) 模型间 token 效率差异显著：在相同任务上，Kimi-K2 与 Claude-Sonnet-4.5 平均比 GPT-5 多消耗超过 150 万 token；(4) 由人类专家评定的任务难度与实际 token 成本仅弱相关，揭示出人类感知复杂度与 agent 实际消耗的计算量之间存在根本性差距；(5) 前沿模型无法准确预测自身 token 用量（相关性弱到中等，最高 0.39），并系统性地低估真实 token 成本。本研究为 AI agent 的经济学提供了新的洞见，并可启发该方向的未来研究。</p>
+
+      </div>
+
+
+      <footer>
+        
+
+
+        
+        
+        
+        
+        
+        
+        
+      </footer>
+    </article>
+
+    
+  </section>
+
+    </div>
+
+    <footer class="footer">
+  <section class="container">
+    ©
+    
+      2019 -
+    
+    2026
+     Jie Xin 
+    ·
+    
+    Powered by <a href="https://gohugo.io/" target="_blank" rel="noopener">Hugo</a> & <a href="https://github.com/luizdepra/hugo-coder/" target="_blank" rel="noopener">Coder</a>.
+    
+  </section>
+</footer>
+
+  </main>
+
+  
+
+  
+  
+  <script src="/js/coder.min.6ae284be93d2d19dad1f02b0039508d9aab3180a12a06dcc71b0b0ef7825a317.js" integrity="sha256-auKEvpPS0Z2tHwKwA5UI2aqzGAoSoG3McbCw73gloxc="></script>
+  
+
+  
+
+  
+
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+</body>
+</html>

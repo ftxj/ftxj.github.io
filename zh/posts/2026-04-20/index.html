@@ -1,0 +1,358 @@
+<!DOCTYPE html>
+<html lang="zh">
+
+<head>
+  <title>
+  2026-04-20 论文速递 · JXIN&#39;s Home
+</title>
+  <meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="color-scheme" content="light dark">
+
+
+
+
+<meta name="author" content="Jie Xin">
+<meta name="description" content="对 agent / LLM / AI 基础设施方向共 10 篇 arXiv 论文的自动摘要，由 Claude Code 生成分析。
+1. First, Do No Harm (With LLMs): Mitigating Racial Bias via Agentic Workflows
+arXiv: 2604.18038 · cs.CY · 相关度分数 27
+以 EU AI Act 为治理视角，评估 5 个主流 LLM 在合成病例生成与鉴别诊断中的种族偏见，发现 retrieval-based agentic workflow 可缓解 DeepSeek V3 的显性偏见。
+阅读完整分析 →
+
+2. MASS-RAG: Multi-Agent Synthesis Retrieval-Augmented Generation
+arXiv: 2604.18509 · cs.CL · 相关度分数 26
+MASS-RAG 用多 agent 分工（摘要、抽取、推理）处理检索证据，再经合成阶段产出答案，在证据分散场景下稳定优于单次生成的 RAG baseline。
+阅读完整分析 →">
+<meta name="keywords" content="blog,developer,personal">
+
+
+
+  <meta name="twitter:card" content="summary">
+  <meta name="twitter:title" content="2026-04-20 论文速递">
+  <meta name="twitter:description" content="对 agent / LLM / AI 基础设施方向共 10 篇 arXiv 论文的自动摘要，由 Claude Code 生成分析。
+1. First, Do No Harm (With LLMs): Mitigating Racial Bias via Agentic Workflows arXiv: 2604.18038 · cs.CY · 相关度分数 27
+以 EU AI Act 为治理视角，评估 5 个主流 LLM 在合成病例生成与鉴别诊断中的种族偏见，发现 retrieval-based agentic workflow 可缓解 DeepSeek V3 的显性偏见。
+阅读完整分析 →
+2. MASS-RAG: Multi-Agent Synthesis Retrieval-Augmented Generation arXiv: 2604.18509 · cs.CL · 相关度分数 26
+MASS-RAG 用多 agent 分工（摘要、抽取、推理）处理检索证据，再经合成阶段产出答案，在证据分散场景下稳定优于单次生成的 RAG baseline。
+阅读完整分析 →">
+
+<meta property="og:url" content="https://ftxj.github.io/zh/posts/2026-04-20/">
+  <meta property="og:site_name" content="JXIN&#39;s Home">
+  <meta property="og:title" content="2026-04-20 论文速递">
+  <meta property="og:description" content="对 agent / LLM / AI 基础设施方向共 10 篇 arXiv 论文的自动摘要，由 Claude Code 生成分析。
+1. First, Do No Harm (With LLMs): Mitigating Racial Bias via Agentic Workflows arXiv: 2604.18038 · cs.CY · 相关度分数 27
+以 EU AI Act 为治理视角，评估 5 个主流 LLM 在合成病例生成与鉴别诊断中的种族偏见，发现 retrieval-based agentic workflow 可缓解 DeepSeek V3 的显性偏见。
+阅读完整分析 →
+2. MASS-RAG: Multi-Agent Synthesis Retrieval-Augmented Generation arXiv: 2604.18509 · cs.CL · 相关度分数 26
+MASS-RAG 用多 agent 分工（摘要、抽取、推理）处理检索证据，再经合成阶段产出答案，在证据分散场景下稳定优于单次生成的 RAG baseline。
+阅读完整分析 →">
+  <meta property="og:locale" content="zh">
+  <meta property="og:type" content="website">
+
+
+
+
+<link rel="canonical" href="https://ftxj.github.io/zh/posts/2026-04-20/">
+
+
+<link rel="preload" href="/fonts/fa-brands-400.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="/fonts/fa-regular-400.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="/fonts/fa-solid-900.woff2" as="font" type="font/woff2" crossorigin>
+
+
+  
+  
+  <link rel="stylesheet" href="/css/coder.min.5e94c1acf7aa2066035cf2764ae3e4fe39db101d68b870f919966100d51fb861.css" integrity="sha256-XpTBrPeqIGYDXPJ2SuPk/jnbEB1ouHD5GZZhANUfuGE=" crossorigin="anonymous" media="screen" />
+
+
+
+
+
+
+  
+    
+    
+    <link rel="stylesheet" href="/css/coder-dark.min.a00e6364bacbc8266ad1cc81230774a1397198f8cfb7bcba29b7d6fcb54ce57f.css" integrity="sha256-oA5jZLrLyCZq0cyBIwd0oTlxmPjPt7y6KbfW/LVM5X8=" crossorigin="anonymous" media="screen" />
+  
+
+
+
+ 
+
+
+
+
+<link rel="icon" type="image/svg+xml" href="/images/favicon.svg" sizes="any">
+<link rel="icon" type="image/png" href="/images/favicon-32x32.png" sizes="32x32">
+<link rel="icon" type="image/png" href="/images/favicon-16x16.png" sizes="16x16">
+
+<link rel="apple-touch-icon" href="/images/apple-touch-icon.png">
+<link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon.png">
+
+<link rel="manifest" href="/site.webmanifest">
+<link rel="mask-icon" href="/images/safari-pinned-tab.svg" color="#5bbad5">
+
+
+<link rel="alternate" type="application/rss+xml" href="/zh/posts/2026-04-20/index.xml" title="JXIN's Home" />
+
+
+
+
+<style>
+.content article ul {
+  list-style: disc !important;
+  padding-left: 2.5rem !important;
+}
+
+.content article ul li {
+  display: list-item !important;
+}
+</style>
+
+
+
+
+  
+</head>
+
+
+
+
+
+
+<body class="preload-transitions colorscheme-auto">
+  
+<div class="float-container">
+    <a id="dark-mode-toggle" class="colorscheme-toggle">
+        <i class="fa-solid fa-adjust fa-fw" aria-hidden="true"></i>
+    </a>
+</div>
+
+
+  <main class="wrapper">
+    <nav class="navigation">
+  <section class="container">
+    
+    <a class="navigation-title" href="https://ftxj.github.io/zh/">
+      JXIN&#39;s Home
+    </a>
+    
+    
+      <input type="checkbox" id="menu-toggle" />
+      <label class="menu-button float-right" for="menu-toggle">
+        <i class="fa-solid fa-bars fa-fw" aria-hidden="true"></i>
+      </label>
+      <ul class="navigation-list">
+        
+          
+            <li class="navigation-item">
+              <a class="navigation-link " href="/zh/about/">关于</a>
+            </li>
+          
+            <li class="navigation-item">
+              <a class="navigation-link " href="/zh/travel/">旅行</a>
+            </li>
+          
+            <li class="navigation-item">
+              <a class="navigation-link " href="/zh/posts/">博客</a>
+            </li>
+          
+            <li class="navigation-item">
+              <a class="navigation-link " href="https://ftxj.github.io/cv/cv_zh.pdf">简历</a>
+            </li>
+          
+        
+        
+          
+          
+          
+            
+              
+                <li class="navigation-item menu-separator">
+                  <span>|</span>
+                </li>
+                
+              
+              <li class="navigation-item">
+                <a href="/posts/2026-04-20/">EN</a>
+              </li>
+            
+          
+        
+      </ul>
+    
+  </section>
+</nav>
+
+
+    <div class="content">
+      
+  <section class="container list">
+    <header>
+      <h1 class="title">
+        <a class="title-link" href="https://ftxj.github.io/zh/posts/2026-04-20/">
+          2026-04-20 论文速递
+        </a>
+      </h1>
+    </header>
+    <p>对 agent / LLM / AI 基础设施方向共 <strong>10</strong> 篇 arXiv 论文的自动摘要，由 Claude Code 生成分析。</p>
+<h3 id="1-first-do-no-harm-with-llms-mitigating-racial-bias-via-agentic-workflows">1. First, Do No Harm (With LLMs): Mitigating Racial Bias via Agentic Workflows</h3>
+<p><em>arXiv: <a href="https://arxiv.org/abs/2604.18038v1">2604.18038</a> · <code>cs.CY</code> · 相关度分数 <strong>27</strong></em></p>
+<p>以 EU AI Act 为治理视角，评估 5 个主流 LLM 在合成病例生成与鉴别诊断中的种族偏见，发现 retrieval-based agentic workflow 可缓解 DeepSeek V3 的显性偏见。</p>
+<p><a href="/zh/posts/2026-04-20/01-first-do-no-harm-with-llms-mitigating-racial-bias-via-agenti/">阅读完整分析 →</a></p>
+<hr>
+<h3 id="2-mass-rag-multi-agent-synthesis-retrieval-augmented-generation">2. MASS-RAG: Multi-Agent Synthesis Retrieval-Augmented Generation</h3>
+<p><em>arXiv: <a href="https://arxiv.org/abs/2604.18509v2">2604.18509</a> · <code>cs.CL</code> · 相关度分数 <strong>26</strong></em></p>
+<p>MASS-RAG 用多 agent 分工（摘要、抽取、推理）处理检索证据，再经合成阶段产出答案，在证据分散场景下稳定优于单次生成的 RAG baseline。</p>
+<p><a href="/zh/posts/2026-04-20/02-mass-rag-multi-agent-synthesis-retrieval-augmented-generatio/">阅读完整分析 →</a></p>
+<hr>
+<h3 id="3-steppo-step-aligned-policy-optimization-for-agentic-reinforcement-learning">3. StepPO: Step-Aligned Policy Optimization for Agentic Reinforcement Learning</h3>
+<p><em>arXiv: <a href="https://arxiv.org/abs/2604.18401v1">2604.18401</a> · <code>cs.CL</code> · 相关度分数 <strong>26</strong></em></p>
+<p>StepPO 主张把 Agentic RL 从 token 级 MDP 升级为 step 级 MDP，以 step 作为 LLM agent 的动作粒度，并提出相应的 step-level credit assignment 来对齐策略优化与 agent 决策。</p>
+<p><a href="/zh/posts/2026-04-20/03-steppo-step-aligned-policy-optimization-for-agentic-reinforc/">阅读完整分析 →</a></p>
+<hr>
+<h3 id="4-aqpim-breaking-the-pim-capacity-wall-for-llms-with-in-memory-activation-quantization">4. AQPIM: Breaking the PIM Capacity Wall for LLMs with In-Memory Activation Quantization</h3>
+<p><em>arXiv: <a href="https://arxiv.org/abs/2604.18137v1">2604.18137</a> · <code>cs.AR</code> · 相关度分数 <strong>25</strong></em></p>
+<p>AQPIM 在 PIM 内部用 Product Quantization 压缩 LLM 激活/KV cache，突破 PIM 容量墙，相比 SOTA PIM 方案加速 3.4 倍。</p>
+<p><a href="/zh/posts/2026-04-20/04-aqpim-breaking-the-pim-capacity-wall-for-llms-with-in-memory/">阅读完整分析 →</a></p>
+<hr>
+<h3 id="5-training-and-agentic-inference-strategies-for-llm-based-manim-animation-generation">5. Training and Agentic Inference Strategies for LLM-based Manim Animation Generation</h3>
+<p><em>arXiv: <a href="https://arxiv.org/abs/2604.18364v1">2604.18364</a> · <code>cs.AI</code> · 相关度分数 <strong>24</strong></em></p>
+<p>提出 ManimTrainer（SFT+GRPO）与 ManimAgent（RITL/RITL-DOC）两套训练-推理管线，首次系统研究 LLM 生成 Manim 动画的 text-to-code-to-video 任务。</p>
+<p><a href="/zh/posts/2026-04-20/05-training-and-agentic-inference-strategies-for-llm-based-mani/">阅读完整分析 →</a></p>
+<hr>
+<h3 id="6-hybridgen-efficient-llm-generative-inference-via-cpu-gpu-hybrid-computing">6. HybridGen: Efficient LLM Generative Inference via CPU-GPU Hybrid Computing</h3>
+<p><em>arXiv: <a href="https://arxiv.org/abs/2604.18529v1">2604.18529</a> · <code>cs.PF</code> · 相关度分数 <strong>22</strong></em></p>
+<p>HybridGen 提出 CPU-GPU 协同 attention 框架，配合 CXL 扩展内存，针对长上下文 LLM 推理在六种 KV cache 管理基线上平均加速 1.41×–3.2×。</p>
+<p><a href="/zh/posts/2026-04-20/06-hybridgen-efficient-llm-generative-inference-via-cpu-gpu-hyb/">阅读完整分析 →</a></p>
+<hr>
+<h3 id="7-unlocking-the-edge-deployment-and-ondevice-acceleration-of-multi-lora-enabled-one-for-all-foundational-llm">7. Unlocking the Edge deployment and ondevice acceleration of multi-LoRA enabled one-for-all foundational LLM</h3>
+<p><em>arXiv: <a href="https://arxiv.org/abs/2604.18655v2">2604.18655</a> · <code>cs.DC</code> · 相关度分数 <strong>20</strong></em></p>
+<p>面向三星 Galaxy S24/S25 的端侧 LLM 部署框架：用多 LoRA 共享单一冻结推理图、多流解码与 DS2D 自推测解码，实现 4–6× 内存与时延改进。</p>
+<p><a href="/zh/posts/2026-04-20/07-unlocking-the-edge-deployment-and-ondevice-acceleration-of-m/">阅读完整分析 →</a></p>
+<hr>
+<h3 id="8-river-llm-large-language-model-seamless-exit-based-on-kv-share">8. River-LLM: Large Language Model Seamless Exit Based on KV Share</h3>
+<p><em>arXiv: <a href="https://arxiv.org/abs/2604.18396v1">2604.18396</a> · <code>cs.CL</code> · 相关度分数 <strong>20</strong></em></p>
+<p>River-LLM 提出训练无关的 token 级 Early Exit 框架，用 KV-Shared Exit River 解决 decoder-only 架构中 KV Cache 缺失问题，实现 1.71–2.16× 推理加速。</p>
+<p><a href="/zh/posts/2026-04-20/08-river-llm-large-language-model-seamless-exit-based-on-kv-sha/">阅读完整分析 →</a></p>
+<hr>
+<h3 id="9-copy-as-decode-grammar-constrained-parallel-prefill-for-llm-editing">9. Copy-as-Decode: Grammar-Constrained Parallel Prefill for LLM Editing</h3>
+<p><em>arXiv: <a href="https://arxiv.org/abs/2604.18170v1">2604.18170</a> · <code>cs.CL</code> · 相关度分数 <strong>20</strong></em></p>
+<p>Copy-as-Decode 把 LLM 编辑任务重写为 <code>&lt;copy&gt;</code>/<code>&lt;gen&gt;</code> 两原语的语法约束解码，让拷贝段走并行 prefill 而非逐 token 自回归，在 Qwen2.5 上给出最高 303× 的内核加速与 13× 端到端上界。</p>
+<p><a href="/zh/posts/2026-04-20/09-copy-as-decode-grammar-constrained-parallel-prefill-for-llm/">阅读完整分析 →</a></p>
+<hr>
+<h3 id="10-ares-adaptive-red-teaming-and-end-to-end-repair-of-policy-reward-system">10. ARES: Adaptive Red-Teaming and End-to-End Repair of Policy-Reward System</h3>
+<p><em>arXiv: <a href="https://arxiv.org/abs/2604.18789v1">2604.18789</a> · <code>cs.AI</code> · 相关度分数 <strong>19</strong></em></p>
+<p>ARES 提出一种自适应红队框架，同时攻击 policy 与 reward model，再通过两阶段微调修复二者联动的&quot;系统性弱点&quot;。</p>
+<p><a href="/zh/posts/2026-04-20/10-ares-adaptive-red-teaming-and-end-to-end-repair-of-policy-re/">阅读完整分析 →</a></p>
+<hr>
+
+    <ul>
+      <li>
+          <span class="date">四月 27, 2026</span>
+          <a class="title" href="/zh/posts/2026-04-20/10-ares-adaptive-red-teaming-and-end-to-end-repair-of-policy-re/">ARES: Adaptive Red-Teaming and End-to-End Repair of Policy-Reward System</a>
+        </li><li>
+          <span class="date">四月 27, 2026</span>
+          <a class="title" href="/zh/posts/2026-04-20/09-copy-as-decode-grammar-constrained-parallel-prefill-for-llm/">Copy-as-Decode: Grammar-Constrained Parallel Prefill for LLM Editing</a>
+        </li><li>
+          <span class="date">四月 27, 2026</span>
+          <a class="title" href="/zh/posts/2026-04-20/08-river-llm-large-language-model-seamless-exit-based-on-kv-sha/">River-LLM: Large Language Model Seamless Exit Based on KV Share</a>
+        </li><li>
+          <span class="date">四月 27, 2026</span>
+          <a class="title" href="/zh/posts/2026-04-20/07-unlocking-the-edge-deployment-and-ondevice-acceleration-of-m/">Unlocking the Edge deployment and ondevice acceleration of multi-LoRA enabled one-for-all foundational LLM</a>
+        </li><li>
+          <span class="date">四月 27, 2026</span>
+          <a class="title" href="/zh/posts/2026-04-20/06-hybridgen-efficient-llm-generative-inference-via-cpu-gpu-hyb/">HybridGen: Efficient LLM Generative Inference via CPU-GPU Hybrid Computing</a>
+        </li><li>
+          <span class="date">四月 27, 2026</span>
+          <a class="title" href="/zh/posts/2026-04-20/05-training-and-agentic-inference-strategies-for-llm-based-mani/">Training and Agentic Inference Strategies for LLM-based Manim Animation Generation</a>
+        </li><li>
+          <span class="date">四月 27, 2026</span>
+          <a class="title" href="/zh/posts/2026-04-20/04-aqpim-breaking-the-pim-capacity-wall-for-llms-with-in-memory/">AQPIM: Breaking the PIM Capacity Wall for LLMs with In-Memory Activation Quantization</a>
+        </li><li>
+          <span class="date">四月 27, 2026</span>
+          <a class="title" href="/zh/posts/2026-04-20/03-steppo-step-aligned-policy-optimization-for-agentic-reinforc/">StepPO: Step-Aligned Policy Optimization for Agentic Reinforcement Learning</a>
+        </li><li>
+          <span class="date">四月 27, 2026</span>
+          <a class="title" href="/zh/posts/2026-04-20/02-mass-rag-multi-agent-synthesis-retrieval-augmented-generatio/">MASS-RAG: Multi-Agent Synthesis Retrieval-Augmented Generation</a>
+        </li><li>
+          <span class="date">四月 27, 2026</span>
+          <a class="title" href="/zh/posts/2026-04-20/01-first-do-no-harm-with-llms-mitigating-racial-bias-via-agenti/">First, Do No Harm (With LLMs): Mitigating Racial Bias via Agentic Workflows</a>
+        </li></ul>
+
+    
+
+
+
+
+
+
+  </section>
+
+    </div>
+
+    <footer class="footer">
+  <section class="container">
+    ©
+    
+      2019 -
+    
+    2026
+     Jie Xin 
+    ·
+    
+    Powered by <a href="https://gohugo.io/" target="_blank" rel="noopener">Hugo</a> & <a href="https://github.com/luizdepra/hugo-coder/" target="_blank" rel="noopener">Coder</a>.
+    
+  </section>
+</footer>
+
+  </main>
+
+  
+
+  
+  
+  <script src="/js/coder.min.6ae284be93d2d19dad1f02b0039508d9aab3180a12a06dcc71b0b0ef7825a317.js" integrity="sha256-auKEvpPS0Z2tHwKwA5UI2aqzGAoSoG3McbCw73gloxc="></script>
+  
+
+  
+
+  
+
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+</body>
+</html>

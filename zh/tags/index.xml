@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Tags on JXIN&#39;s Home</title>
+    <link>https://ftxj.github.io/zh/tags/</link>
+    <description>Recent content in Tags on JXIN&#39;s Home</description>
+    <generator>Hugo</generator>
+    <language>zh</language>
+    <lastBuildDate>Tue, 28 Apr 2026 09:23:35 +0000</lastBuildDate>
+    <atom:link href="https://ftxj.github.io/zh/tags/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>Agent</title>
+      <link>https://ftxj.github.io/zh/tags/agent/</link>
+      <pubDate>Tue, 28 Apr 2026 09:23:35 +0000</pubDate>
+      <guid>https://ftxj.github.io/zh/tags/agent/</guid>
+      <description></description>
+    </item>
+    <item>
+      <title>Ai-Infra</title>
+      <link>https://ftxj.github.io/zh/tags/ai-infra/</link>
+      <pubDate>Tue, 28 Apr 2026 09:23:35 +0000</pubDate>
+      <guid>https://ftxj.github.io/zh/tags/ai-infra/</guid>
+      <description></description>
+    </item>
+    <item>
+      <title>Llm</title>
+      <link>https://ftxj.github.io/zh/tags/llm/</link>
+      <pubDate>Tue, 28 Apr 2026 09:23:35 +0000</pubDate>
+      <guid>https://ftxj.github.io/zh/tags/llm/</guid>
+      <description></description>
+    </item>
+    <item>
+      <title>Paper-Digest</title>
+      <link>https://ftxj.github.io/zh/tags/paper-digest/</link>
+      <pubDate>Tue, 28 Apr 2026 09:23:35 +0000</pubDate>
+      <guid>https://ftxj.github.io/zh/tags/paper-digest/</guid>
+      <description></description>
+    </item>
+  </channel>
+</rss>

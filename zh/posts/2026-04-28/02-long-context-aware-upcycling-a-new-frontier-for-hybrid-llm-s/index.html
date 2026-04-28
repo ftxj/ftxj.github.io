@@ -1,0 +1,378 @@
+<!DOCTYPE html>
+<html lang="zh">
+
+<head>
+  <title>
+  Long-Context Aware Upcycling: A New Frontier for Hybrid LLM Scaling · JXIN&#39;s Home
+</title>
+  <meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="color-scheme" content="light dark">
+
+
+
+
+<meta name="author" content="Jie Xin">
+<meta name="description" content="arXiv: 2604.24715 · PDF
+作者: Parsa Ashrafi Fashi, Utkarsh Saxena, Mehdi Rezagholizadeh, Aref Jafari, Akash Haridas, Mingyu Yang, Vansh Bhatia, Guihong Li, Vikram Appia, Emad Barsoum
+单位: AMD
+主分类: cs.CL · 全部: cs.CL, cs.LG
+命中关键词: llm, reasoning, inference, serving, kv-cache, attention, transformer, post-train
+
+TL;DR
+HyLo 提出一套 long-context upcycling 配方，把预训练 Transformer LLM 改造成 MLA &#43; Mamba2/GatedDeltaNet 混合架构，上下文扩展最高 32×、KV cache 降 90%&#43;，vLLM 上可跑 2M token。
+Motivation
+当前 hybrid sequence model（Transformer &#43; 线性序列模块）是纯 Transformer 的有力替代，但主流做法仍是&quot;从头预训练&quot;，没法复用 Llama / Qwen 这类已花重金训练好的 checkpoint，代价极高。对于需要 serve 超长上下文的团队（vLLM / SGLang 运维、RAG / agent runtime），今天能拿到的现成方案要么是继续用纯 Transformer 硬撑——64K 以上就 OOM，要么是训个新的 hybrid 从零开始，要么用已有 upcycling 方法（如 Zebra-Llama、MambaInLlama）但在 RULER 这类长上下文 benchmark 上明显掉点。真正的落差在于：长上下文能力被&quot;upcycle&quot;出来时，短上下文质量往往被破坏，且训练不稳定。作者认为前置条件变了——MLA 的成熟 KV 压缩结构 &#43; 更成熟的 staged 训练和 teacher distillation 已经可以把 upcycling 这条路走通，不再必须从头预训练。其实用价值窄而明确：把已有的 1B/3B Llama、Qwen 直接改造成可 serve 2M token 的 hybrid，而不需要 400B token 级重训。">
+<meta name="keywords" content="blog,developer,personal">
+
+
+
+  <meta name="twitter:card" content="summary">
+  <meta name="twitter:title" content="Long-Context Aware Upcycling: A New Frontier for Hybrid LLM Scaling">
+  <meta name="twitter:description" content="arXiv: 2604.24715 · PDF
+作者: Parsa Ashrafi Fashi, Utkarsh Saxena, Mehdi Rezagholizadeh, Aref Jafari, Akash Haridas, Mingyu Yang, Vansh Bhatia, Guihong Li, Vikram Appia, Emad Barsoum
+单位: AMD
+主分类: cs.CL · 全部: cs.CL, cs.LG
+命中关键词: llm, reasoning, inference, serving, kv-cache, attention, transformer, post-train
+TL;DR HyLo 提出一套 long-context upcycling 配方，把预训练 Transformer LLM 改造成 MLA &#43; Mamba2/GatedDeltaNet 混合架构，上下文扩展最高 32×、KV cache 降 90%&#43;，vLLM 上可跑 2M token。
+Motivation 当前 hybrid sequence model（Transformer &#43; 线性序列模块）是纯 Transformer 的有力替代，但主流做法仍是&#34;从头预训练&#34;，没法复用 Llama / Qwen 这类已花重金训练好的 checkpoint，代价极高。对于需要 serve 超长上下文的团队（vLLM / SGLang 运维、RAG / agent runtime），今天能拿到的现成方案要么是继续用纯 Transformer 硬撑——64K 以上就 OOM，要么是训个新的 hybrid 从零开始，要么用已有 upcycling 方法（如 Zebra-Llama、MambaInLlama）但在 RULER 这类长上下文 benchmark 上明显掉点。真正的落差在于：长上下文能力被&#34;upcycle&#34;出来时，短上下文质量往往被破坏，且训练不稳定。作者认为前置条件变了——MLA 的成熟 KV 压缩结构 &#43; 更成熟的 staged 训练和 teacher distillation 已经可以把 upcycling 这条路走通，不再必须从头预训练。其实用价值窄而明确：把已有的 1B/3B Llama、Qwen 直接改造成可 serve 2M token 的 hybrid，而不需要 400B token 级重训。">
+
+<meta property="og:url" content="https://ftxj.github.io/zh/posts/2026-04-28/02-long-context-aware-upcycling-a-new-frontier-for-hybrid-llm-s/">
+  <meta property="og:site_name" content="JXIN&#39;s Home">
+  <meta property="og:title" content="Long-Context Aware Upcycling: A New Frontier for Hybrid LLM Scaling">
+  <meta property="og:description" content="arXiv: 2604.24715 · PDF
+作者: Parsa Ashrafi Fashi, Utkarsh Saxena, Mehdi Rezagholizadeh, Aref Jafari, Akash Haridas, Mingyu Yang, Vansh Bhatia, Guihong Li, Vikram Appia, Emad Barsoum
+单位: AMD
+主分类: cs.CL · 全部: cs.CL, cs.LG
+命中关键词: llm, reasoning, inference, serving, kv-cache, attention, transformer, post-train
+TL;DR HyLo 提出一套 long-context upcycling 配方，把预训练 Transformer LLM 改造成 MLA &#43; Mamba2/GatedDeltaNet 混合架构，上下文扩展最高 32×、KV cache 降 90%&#43;，vLLM 上可跑 2M token。
+Motivation 当前 hybrid sequence model（Transformer &#43; 线性序列模块）是纯 Transformer 的有力替代，但主流做法仍是&#34;从头预训练&#34;，没法复用 Llama / Qwen 这类已花重金训练好的 checkpoint，代价极高。对于需要 serve 超长上下文的团队（vLLM / SGLang 运维、RAG / agent runtime），今天能拿到的现成方案要么是继续用纯 Transformer 硬撑——64K 以上就 OOM，要么是训个新的 hybrid 从零开始，要么用已有 upcycling 方法（如 Zebra-Llama、MambaInLlama）但在 RULER 这类长上下文 benchmark 上明显掉点。真正的落差在于：长上下文能力被&#34;upcycle&#34;出来时，短上下文质量往往被破坏，且训练不稳定。作者认为前置条件变了——MLA 的成熟 KV 压缩结构 &#43; 更成熟的 staged 训练和 teacher distillation 已经可以把 upcycling 这条路走通，不再必须从头预训练。其实用价值窄而明确：把已有的 1B/3B Llama、Qwen 直接改造成可 serve 2M token 的 hybrid，而不需要 400B token 级重训。">
+  <meta property="og:locale" content="zh">
+  <meta property="og:type" content="article">
+    <meta property="article:section" content="posts">
+    <meta property="article:published_time" content="2026-04-28T08:30:04+00:00">
+    <meta property="article:modified_time" content="2026-04-28T08:30:04+00:00">
+
+
+
+
+<link rel="canonical" href="https://ftxj.github.io/zh/posts/2026-04-28/02-long-context-aware-upcycling-a-new-frontier-for-hybrid-llm-s/">
+
+
+<link rel="preload" href="/fonts/fa-brands-400.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="/fonts/fa-regular-400.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="/fonts/fa-solid-900.woff2" as="font" type="font/woff2" crossorigin>
+
+
+  
+  
+  <link rel="stylesheet" href="/css/coder.min.5e94c1acf7aa2066035cf2764ae3e4fe39db101d68b870f919966100d51fb861.css" integrity="sha256-XpTBrPeqIGYDXPJ2SuPk/jnbEB1ouHD5GZZhANUfuGE=" crossorigin="anonymous" media="screen" />
+
+
+
+
+
+
+  
+    
+    
+    <link rel="stylesheet" href="/css/coder-dark.min.a00e6364bacbc8266ad1cc81230774a1397198f8cfb7bcba29b7d6fcb54ce57f.css" integrity="sha256-oA5jZLrLyCZq0cyBIwd0oTlxmPjPt7y6KbfW/LVM5X8=" crossorigin="anonymous" media="screen" />
+  
+
+
+
+ 
+
+
+
+
+<link rel="icon" type="image/svg+xml" href="/images/favicon.svg" sizes="any">
+<link rel="icon" type="image/png" href="/images/favicon-32x32.png" sizes="32x32">
+<link rel="icon" type="image/png" href="/images/favicon-16x16.png" sizes="16x16">
+
+<link rel="apple-touch-icon" href="/images/apple-touch-icon.png">
+<link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon.png">
+
+<link rel="manifest" href="/site.webmanifest">
+<link rel="mask-icon" href="/images/safari-pinned-tab.svg" color="#5bbad5">
+
+
+
+
+
+
+<style>
+.content article ul {
+  list-style: disc !important;
+  padding-left: 2.5rem !important;
+}
+
+.content article ul li {
+  display: list-item !important;
+}
+</style>
+
+
+
+
+  
+</head>
+
+
+
+
+
+
+<body class="preload-transitions colorscheme-auto">
+  
+<div class="float-container">
+    <a id="dark-mode-toggle" class="colorscheme-toggle">
+        <i class="fa-solid fa-adjust fa-fw" aria-hidden="true"></i>
+    </a>
+</div>
+
+
+  <main class="wrapper">
+    <nav class="navigation">
+  <section class="container">
+    
+    <a class="navigation-title" href="https://ftxj.github.io/zh/">
+      JXIN&#39;s Home
+    </a>
+    
+    
+      <input type="checkbox" id="menu-toggle" />
+      <label class="menu-button float-right" for="menu-toggle">
+        <i class="fa-solid fa-bars fa-fw" aria-hidden="true"></i>
+      </label>
+      <ul class="navigation-list">
+        
+          
+            <li class="navigation-item">
+              <a class="navigation-link " href="/zh/about/">关于</a>
+            </li>
+          
+            <li class="navigation-item">
+              <a class="navigation-link " href="/zh/travel/">旅行</a>
+            </li>
+          
+            <li class="navigation-item">
+              <a class="navigation-link " href="/zh/posts/">博客</a>
+            </li>
+          
+            <li class="navigation-item">
+              <a class="navigation-link " href="https://ftxj.github.io/cv/cv_zh.pdf">简历</a>
+            </li>
+          
+        
+        
+          
+          
+          
+            
+              
+                <li class="navigation-item menu-separator">
+                  <span>|</span>
+                </li>
+                
+              
+              <li class="navigation-item">
+                <a href="/posts/2026-04-28/02-long-context-aware-upcycling-a-new-frontier-for-hybrid-llm-s/">EN</a>
+              </li>
+            
+          
+        
+      </ul>
+    
+  </section>
+</nav>
+
+
+    <div class="content">
+      
+  <section class="container post">
+    <article>
+      <header>
+        <div class="post-title">
+          <h1 class="title">
+            <a class="title-link" href="https://ftxj.github.io/zh/posts/2026-04-28/02-long-context-aware-upcycling-a-new-frontier-for-hybrid-llm-s/">
+              Long-Context Aware Upcycling: A New Frontier for Hybrid LLM Scaling
+            </a>
+          </h1>
+        </div>
+        <div class="post-meta">
+          <div class="date">
+            <span class="posted-on">
+              <i class="fa-solid fa-calendar" aria-hidden="true"></i>
+              <time datetime="2026-04-28T08:30:04Z">
+                四月 28, 2026
+              </time>
+            </span>
+            <span class="reading-time">
+              <i class="fa-solid fa-clock" aria-hidden="true"></i>
+              3-minute read
+            </span>
+          </div>
+          
+          <div class="categories">
+  <i class="fa-solid fa-folder" aria-hidden="true"></i>
+    <a href="/zh/categories/paper-digest/">Paper-Digest</a>
+      <span class="separator">•</span>
+    <a href="/zh/categories/2026-04-28/">2026-04-28</a></div>
+
+          
+        </div>
+      </header>
+
+      
+
+
+      <div class="post-content">
+        
+        <p><strong>arXiv:</strong> <a href="https://arxiv.org/abs/2604.24715v1">2604.24715</a> · <a href="https://arxiv.org/pdf/2604.24715v1">PDF</a></p>
+<p><strong>作者:</strong> Parsa Ashrafi Fashi, Utkarsh Saxena, Mehdi Rezagholizadeh, Aref Jafari, Akash Haridas, Mingyu Yang, Vansh Bhatia, Guihong Li, Vikram Appia, Emad Barsoum</p>
+<p><strong>单位:</strong> AMD</p>
+<p><strong>主分类:</strong> <code>cs.CL</code> · 全部: cs.CL, cs.LG</p>
+<p><strong>命中关键词:</strong> llm, reasoning, inference, serving, kv-cache, attention, transformer, post-train</p>
+<hr>
+<h2 id="tldr">TL;DR</h2>
+<p>HyLo 提出一套 long-context upcycling 配方，把预训练 Transformer LLM 改造成 MLA + Mamba2/GatedDeltaNet 混合架构，上下文扩展最高 32×、KV cache 降 90%+，vLLM 上可跑 2M token。</p>
+<h2 id="motivation">Motivation</h2>
+<p>当前 hybrid sequence model（Transformer + 线性序列模块）是纯 Transformer 的有力替代，但主流做法仍是&quot;从头预训练&quot;，没法复用 Llama / Qwen 这类已花重金训练好的 checkpoint，代价极高。对于需要 serve 超长上下文的团队（vLLM / SGLang 运维、RAG / agent runtime），今天能拿到的现成方案要么是继续用纯 Transformer 硬撑——64K 以上就 OOM，要么是训个新的 hybrid 从零开始，要么用已有 upcycling 方法（如 Zebra-Llama、MambaInLlama）但在 RULER 这类长上下文 benchmark 上明显掉点。真正的落差在于：长上下文能力被&quot;upcycle&quot;出来时，短上下文质量往往被破坏，且训练不稳定。作者认为前置条件变了——MLA 的成熟 KV 压缩结构 + 更成熟的 staged 训练和 teacher distillation 已经可以把 upcycling 这条路走通，不再必须从头预训练。其实用价值窄而明确：把已有的 1B/3B Llama、Qwen 直接改造成可 serve 2M token 的 hybrid，而不需要 400B token 级重训。</p>
+<h2 id="核心观点">核心观点</h2>
+<ul>
+<li>提出 HyLo：面向长上下文的 hybrid upcycling 配方，复用已有 Transformer 权重。</li>
+<li>架构上混用 MLA（高效注意力）与 Mamba2 或 Gated DeltaNet（线性块），而非单一替换。</li>
+<li>训练上采用 staged long-context training + teacher-guided distillation，解决 upcycling 的优化不稳定。</li>
+<li>上下文最高扩展 32×，KV cache 降 &gt;90%，vLLM 上 prefill+decode 2M token，Llama baseline 在 64K 以上就 OOM。</li>
+<li>在 1B/3B（Llama、Qwen 变体）上短/长上下文均稳定，RULER 上超越现有 upcycled hybrid SOTA。</li>
+<li>HyLo-Qwen-1.7B 仅用 10B tokens 就在 GSM8K、Lm-Harness、RULER-64K 上显著优于用 400B tokens 训的 JetNemotron。</li>
+</ul>
+<h2 id="方法">方法</h2>
+<p>HyLo 的核心是&quot;架构改造 + 分阶段训练&quot;两手抓。架构侧把原 Transformer 中的部分 attention 块替换为 MLA（做 KV 低秩压缩以砍 cache），再把其余位置替换为线性序列块（Mamba2 或 Gated DeltaNet），得到类似 <code>4MLA12M2</code> 这种混编布局；MLA 的参数用原 attention 权重做初始化迁移，而非随机冷启动。</p>
+<p><img alt="图 6" src="/images/papers/2604.24715/fig6.png"></p>
+<p>图 6 展示 MLA 从预训练 Transformer attention block 做初始化的流程——这对应上面&quot;复用已有权重&quot;这条关键设计：不是扔掉再训，而是把 Q/K/V/O 投影映射到 MLA 的低秩潜变量形式，保证 upcycling 起点就接近原模型行为。</p>
+<p>训练侧分两条线：(1) staged long-context training，训练序列长度逐步拉到 64K，再配合 Yarn 做位置插值外推；(2) teacher-guided distillation，用更大的 teacher 在长上下文上引导学生，稳住优化。</p>
+<h2 id="实验">实验</h2>
+<p>backbone 使用 Llama-3.2-1B/3B 与 Qwen（1.7B 级别）变体。短上下文评测包含 GSM8K（数学）、Lm-Harness 常识推理；长上下文评测包含 RULER（8K/16K/32K/64K）与合成 needle-in-haystack。系统侧在 vLLM 上测 TTFT / TPOT 以及最长可 serve 的 context（对比 Llama baseline）。Baseline 包含 Zebra-Llama、JetNemotron 以及原 Llama / Qwen。</p>
+<h2 id="结果">结果</h2>
+<p>在短上下文数学与 RULER 平均准确率上，HyLo 与原 backbone 持平甚至略好，同时在 RULER 8K–64K 区间全面压过 upcycled baseline。</p>
+<p><img alt="图 1" src="/images/papers/2604.24715/fig1.png"></p>
+<p>图 1 把&quot;短上下文数学准确率&quot;放横轴、&ldquo;RULER 8K/16K/32K/64K 平均准确率&quot;放纵轴，HyLo 点位于右上，说明在极低 upcycling data 预算下它没有以短换长——这是支撑&quot;同时稳住短上下文、显著提升长上下文&quot;这条主张的关键证据。</p>
+<p>在 needle-in-haystack 上，<code>4MLA12M2</code> hybrid 只用 3.9% KV cache 占用就追平 Llama-3.2-1B 并超过 Zebra-Llama；若在 64K 序列上继续 finetune，还能反超原 Llama。</p>
+<p><img alt="图 2" src="/images/papers/2604.24715/fig2.png"></p>
+<p>图 2 展示这一对比热力图：KV cache 被砍到 Llama 的 ~1/25，检索准确率却没掉，支撑&quot;KV 降 &gt;90%、长上下文能力不降&quot;这条卖点。</p>
+<p>消融方面，拉长训练序列长度并套 Yarn 插值能提升长上下文能力，但常识推理会有轻微退化；另外 teacher 规模越大，长上下文收益越明显，且远大于对短上下文的收益。</p>
+<p><img alt="图 3" src="/images/papers/2604.24715/fig3.png"></p>
+<p>图 3 对应 staged training + Yarn 的消融——它证实&quot;长序列训练 + Yarn 外推&quot;是 HyLo 长上下文收益的必要组件，而不是单靠架构改造。</p>
+<p><img alt="图 4" src="/images/papers/2604.24715/fig4.png"></p>
+<p>图 4 比较不同 teacher 大小下的蒸馏效果，表明 distillation 主要在长上下文上有大幅收益，这正对应方法里&quot;teacher-guided distillation 用于稳优化&quot;的动机。</p>
+<p>系统侧 vLLM 实测，3B Llama backbone 下 HyLo 的 TTFT 与 TPOT 在长上下文区间明显低于 dense Llama，且 Llama 在 64K 以上直接 OOM，HyLo 可以顶到 2M tokens。</p>
+<p><img alt="图 5" src="/images/papers/2604.24715/fig5.png"></p>
+<p>图 5 给出 TTFT / TPOT 随 context length 的曲线——关键信号是随上下文拉长，HyLo 曲线斜率远缓于 dense baseline，这把&quot;KV cache 降 90%+&ldquo;从指标层面落到了&quot;vLLM 上真跑得动 2M token&quot;的可部署结论上。</p>
+<p>Data efficiency 上，HyLo-Qwen-1.7B 用 10B tokens 显著超过用 400B tokens 训的 JetNemotron（GSM8K、Lm-Harness、RULER-64K 均领先）。</p>
+<h2 id="结论">结论</h2>
+<p>实践者应带走的一条是：如果已经有 1B–3B 的 Llama / Qwen checkpoint，想在 vLLM 上 serve 长上下文但又不想重训一个 hybrid，HyLo 是条可走通的 upcycling 路径——代价约 10B tokens 的后训练，换来 KV cache 降 &gt;90% 和最高 2M token 的可服务上下文。边界要说清：结果集中在 1B–3B 规模和 RULER / needle / GSM8K 这类评测，更大规模 hybrid（7B+）、更长 reasoning / agent trace 场景、以及各路 baseline 在同等 token budget 下的重新对比目前都没给全，需要自己在目标工作负载上复测。</p>
+<h2 id="是否新瓶装旧酒">是否新瓶装旧酒</h2>
+<ul>
+<li><strong>Zebra-Llama / MambaInLlama</strong>：同样做 Transformer→hybrid 的 upcycling，但主要盯短上下文或用纯 Mamba 替换；HyLo 的差异在于显式加入 MLA 做 KV 压缩 + 线性块的混合布局，以及 staged long-context 训练和蒸馏，长上下文 RULER 上明显拉开。</li>
+<li><strong>JetNemotron</strong>：同样是 hybrid SSM/attention 方向，但走的是大数据量（400B token）路子；HyLo 对照的是&quot;10B token upcycling&quot;能否追平甚至超过它，定位在 data-efficient upcycling，而非从零大规模训练。</li>
+<li><strong>MLA（DeepSeek-V2/V3）+ Mamba2/Gated DeltaNet</strong>：这两个零件都是现成的。HyLo 的新点更多在&quot;怎么组合 + 怎么从 dense checkpoint 初始化 + 怎么稳训长上下文&rdquo;，而不是零件本身。不算纯换皮，但也不是全新机制，属于工程配方整合。</li>
+</ul>
+<h2 id="尚未回答的问题">尚未回答的问题</h2>
+<ul>
+<li>7B+ 或 MoE 规模是否同样有效，论文只覆盖 1B/3B。</li>
+<li>在 agentic / 多轮工具调用这种真实长 trace 上表现如何，RULER / needle 只能近似。</li>
+<li>Mamba2 与 Gated DeltaNet 两种线性块的选择标准、比例（如 <code>4MLA12M2</code> 具体 ratio）缺少完整 ablation。</li>
+<li>2M token prefill/decoding 的吞吐、端到端成本与精度 trade-off 未系统给出。</li>
+<li>与未来可能的更强 data-efficient baseline（如同样 10B token 预算下重训的 hybrid）对比仍空白。</li>
+</ul>
+<h2 id="原始摘要中文翻译">原始摘要（中文翻译）</h2>
+<p>将高效 Transformer 组件与线性序列建模块结合的 Hybrid sequence model 是纯 Transformer 的一种有前景的替代方案，但目前大多数此类模型仍是从头预训练得到的，因而无法复用已有的 Transformer checkpoint。我们研究 upcycling 作为一条实用路径，用于把预训练的 Transformer LLM 转换为 hybrid 架构，同时保留短上下文质量并提升长上下文能力。我们将方案称为 HyLo（HYbrid LOng-context）：一种长上下文 upcycling 配方，它结合了架构适配、高效 Transformer 块、Multi-Head Latent Attention（MLA）和线性块（Mamba2 或 Gated DeltaNet），并配合分阶段的长上下文训练与 teacher-guided distillation 以实现稳定优化。HyLo 通过高效的 post-training，将可用上下文长度扩展最多 32×，并将 KV-cache 内存减少超过 90%，使我们在 vLLM 推理栈中实现最高 2M token 的 prefill 与解码，而同等规模的 Llama baseline 在超过 64K 上下文时就会 OOM。在 1B 与 3B 规模设定下（基于 Llama 和 Qwen 的变体），HyLo 一致地在短上下文和长上下文上都表现强劲，并在 RULER 等长上下文评测上显著超过当前最先进的 upcycled hybrid baseline。值得注意的是，在相近规模下，仅用 10B token 训练的 HyLo-Qwen-1.7B 在 GSM8K、Lm-Harness 常识推理以及 RULER-64K 上显著超过使用 400B token 训练的 JetNemotron。</p>
+
+      </div>
+
+
+      <footer>
+        
+
+
+        
+        
+        
+        
+        
+        
+        
+      </footer>
+    </article>
+
+    
+  </section>
+
+    </div>
+
+    <footer class="footer">
+  <section class="container">
+    ©
+    
+      2019 -
+    
+    2026
+     Jie Xin 
+    ·
+    
+    Powered by <a href="https://gohugo.io/" target="_blank" rel="noopener">Hugo</a> & <a href="https://github.com/luizdepra/hugo-coder/" target="_blank" rel="noopener">Coder</a>.
+    
+  </section>
+</footer>
+
+  </main>
+
+  
+
+  
+  
+  <script src="/js/coder.min.6ae284be93d2d19dad1f02b0039508d9aab3180a12a06dcc71b0b0ef7825a317.js" integrity="sha256-auKEvpPS0Z2tHwKwA5UI2aqzGAoSoG3McbCw73gloxc="></script>
+  
+
+  
+
+  
+
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+</body>
+</html>

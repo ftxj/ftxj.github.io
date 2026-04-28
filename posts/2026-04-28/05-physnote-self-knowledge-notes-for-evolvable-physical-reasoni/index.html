@@ -1,0 +1,365 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <title>
+  PhysNote: Self-Knowledge Notes for Evolvable Physical Reasoning in Vision-Language Model · JXIN&#39;s Home
+</title>
+  <meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="color-scheme" content="light dark">
+
+
+
+
+<meta name="author" content="Jie Xin">
+<meta name="description" content="arXiv: 2604.24443 · PDF
+Authors: Sinin Zhang, Yunfei Xie, Yuxuan Cheng, Haoyu Zhang, Tong Zhang
+Affiliations: The Chinese University of Hong Kong, Shenzhen, Rice University, City University of Hong Kong, Fudan University
+Primary category: cs.AI · all: cs.AI
+Matched keywords: agent, agentic, multi-agent, reasoning, inference
+
+TL;DR
+PhysNote is an agentic VLM framework that tackles dynamic physical reasoning by canonicalizing spatio-temporal identities and maintaining self-generated &ldquo;Knowledge Notes,&rdquo; reaching 56.68% on PhysBench — a 4.96% absolute gain over the best multi-agent baseline.">
+<meta name="keywords" content="blog,developer,personal">
+
+
+
+  <meta name="twitter:card" content="summary">
+  <meta name="twitter:title" content="PhysNote: Self-Knowledge Notes for Evolvable Physical Reasoning in Vision-Language Model">
+  <meta name="twitter:description" content="arXiv: 2604.24443 · PDF
+Authors: Sinin Zhang, Yunfei Xie, Yuxuan Cheng, Haoyu Zhang, Tong Zhang
+Affiliations: The Chinese University of Hong Kong, Shenzhen, Rice University, City University of Hong Kong, Fudan University
+Primary category: cs.AI · all: cs.AI
+Matched keywords: agent, agentic, multi-agent, reasoning, inference
+TL;DR PhysNote is an agentic VLM framework that tackles dynamic physical reasoning by canonicalizing spatio-temporal identities and maintaining self-generated “Knowledge Notes,” reaching 56.68% on PhysBench — a 4.96% absolute gain over the best multi-agent baseline.">
+
+<meta property="og:url" content="https://ftxj.github.io/posts/2026-04-28/05-physnote-self-knowledge-notes-for-evolvable-physical-reasoni/">
+  <meta property="og:site_name" content="JXIN&#39;s Home">
+  <meta property="og:title" content="PhysNote: Self-Knowledge Notes for Evolvable Physical Reasoning in Vision-Language Model">
+  <meta property="og:description" content="arXiv: 2604.24443 · PDF
+Authors: Sinin Zhang, Yunfei Xie, Yuxuan Cheng, Haoyu Zhang, Tong Zhang
+Affiliations: The Chinese University of Hong Kong, Shenzhen, Rice University, City University of Hong Kong, Fudan University
+Primary category: cs.AI · all: cs.AI
+Matched keywords: agent, agentic, multi-agent, reasoning, inference
+TL;DR PhysNote is an agentic VLM framework that tackles dynamic physical reasoning by canonicalizing spatio-temporal identities and maintaining self-generated “Knowledge Notes,” reaching 56.68% on PhysBench — a 4.96% absolute gain over the best multi-agent baseline.">
+  <meta property="og:locale" content="en">
+  <meta property="og:type" content="article">
+    <meta property="article:section" content="posts">
+    <meta property="article:published_time" content="2026-04-28T08:44:57+00:00">
+    <meta property="article:modified_time" content="2026-04-28T08:44:57+00:00">
+
+
+
+
+<link rel="canonical" href="https://ftxj.github.io/posts/2026-04-28/05-physnote-self-knowledge-notes-for-evolvable-physical-reasoni/">
+
+
+<link rel="preload" href="/fonts/fa-brands-400.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="/fonts/fa-regular-400.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="/fonts/fa-solid-900.woff2" as="font" type="font/woff2" crossorigin>
+
+
+  
+  
+  <link rel="stylesheet" href="/css/coder.min.5e94c1acf7aa2066035cf2764ae3e4fe39db101d68b870f919966100d51fb861.css" integrity="sha256-XpTBrPeqIGYDXPJ2SuPk/jnbEB1ouHD5GZZhANUfuGE=" crossorigin="anonymous" media="screen" />
+
+
+
+
+
+
+  
+    
+    
+    <link rel="stylesheet" href="/css/coder-dark.min.a00e6364bacbc8266ad1cc81230774a1397198f8cfb7bcba29b7d6fcb54ce57f.css" integrity="sha256-oA5jZLrLyCZq0cyBIwd0oTlxmPjPt7y6KbfW/LVM5X8=" crossorigin="anonymous" media="screen" />
+  
+
+
+
+ 
+
+
+
+
+<link rel="icon" type="image/svg+xml" href="/images/favicon.svg" sizes="any">
+<link rel="icon" type="image/png" href="/images/favicon-32x32.png" sizes="32x32">
+<link rel="icon" type="image/png" href="/images/favicon-16x16.png" sizes="16x16">
+
+<link rel="apple-touch-icon" href="/images/apple-touch-icon.png">
+<link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon.png">
+
+<link rel="manifest" href="/site.webmanifest">
+<link rel="mask-icon" href="/images/safari-pinned-tab.svg" color="#5bbad5">
+
+
+
+
+
+
+<style>
+.content article ul {
+  list-style: disc !important;
+  padding-left: 2.5rem !important;
+}
+
+.content article ul li {
+  display: list-item !important;
+}
+</style>
+
+
+
+
+  
+</head>
+
+
+
+
+
+
+<body class="preload-transitions colorscheme-auto">
+  
+<div class="float-container">
+    <a id="dark-mode-toggle" class="colorscheme-toggle">
+        <i class="fa-solid fa-adjust fa-fw" aria-hidden="true"></i>
+    </a>
+</div>
+
+
+  <main class="wrapper">
+    <nav class="navigation">
+  <section class="container">
+    
+    <a class="navigation-title" href="https://ftxj.github.io/">
+      JXIN&#39;s Home
+    </a>
+    
+    
+      <input type="checkbox" id="menu-toggle" />
+      <label class="menu-button float-right" for="menu-toggle">
+        <i class="fa-solid fa-bars fa-fw" aria-hidden="true"></i>
+      </label>
+      <ul class="navigation-list">
+        
+          
+            <li class="navigation-item">
+              <a class="navigation-link " href="/about/">About</a>
+            </li>
+          
+            <li class="navigation-item">
+              <a class="navigation-link " href="/travel/">Travel</a>
+            </li>
+          
+            <li class="navigation-item">
+              <a class="navigation-link " href="/posts/">Blog</a>
+            </li>
+          
+            <li class="navigation-item">
+              <a class="navigation-link " href="https://ftxj.github.io/cv/cv.pdf">CV</a>
+            </li>
+          
+        
+        
+          
+          
+          
+            
+              
+                <li class="navigation-item menu-separator">
+                  <span>|</span>
+                </li>
+                
+              
+              <li class="navigation-item">
+                <a href="/zh/posts/2026-04-28/05-physnote-self-knowledge-notes-for-evolvable-physical-reasoni/">中文</a>
+              </li>
+            
+          
+        
+      </ul>
+    
+  </section>
+</nav>
+
+
+    <div class="content">
+      
+  <section class="container post">
+    <article>
+      <header>
+        <div class="post-title">
+          <h1 class="title">
+            <a class="title-link" href="https://ftxj.github.io/posts/2026-04-28/05-physnote-self-knowledge-notes-for-evolvable-physical-reasoni/">
+              PhysNote: Self-Knowledge Notes for Evolvable Physical Reasoning in Vision-Language Model
+            </a>
+          </h1>
+        </div>
+        <div class="post-meta">
+          <div class="date">
+            <span class="posted-on">
+              <i class="fa-solid fa-calendar" aria-hidden="true"></i>
+              <time datetime="2026-04-28T08:44:57Z">
+                April 28, 2026
+              </time>
+            </span>
+            <span class="reading-time">
+              <i class="fa-solid fa-clock" aria-hidden="true"></i>
+              6-minute read
+            </span>
+          </div>
+          
+          <div class="categories">
+  <i class="fa-solid fa-folder" aria-hidden="true"></i>
+    <a href="/categories/paper-digest/">Paper-Digest</a>
+      <span class="separator">•</span>
+    <a href="/categories/2026-04-28/">2026-04-28</a></div>
+
+          
+        </div>
+      </header>
+
+      
+
+
+      <div class="post-content">
+        
+        <p><strong>arXiv:</strong> <a href="https://arxiv.org/abs/2604.24443v1">2604.24443</a> · <a href="https://arxiv.org/pdf/2604.24443v1">PDF</a></p>
+<p><strong>Authors:</strong> Sinin Zhang, Yunfei Xie, Yuxuan Cheng, Haoyu Zhang, Tong Zhang</p>
+<p><strong>Affiliations:</strong> The Chinese University of Hong Kong, Shenzhen, Rice University, City University of Hong Kong, Fudan University</p>
+<p><strong>Primary category:</strong> <code>cs.AI</code> · all: cs.AI</p>
+<p><strong>Matched keywords:</strong> agent, agentic, multi-agent, reasoning, inference</p>
+<hr>
+<h2 id="tldr">TL;DR</h2>
+<p>PhysNote is an agentic VLM framework that tackles dynamic physical reasoning by canonicalizing spatio-temporal identities and maintaining self-generated &ldquo;Knowledge Notes,&rdquo; reaching 56.68% on PhysBench — a 4.96% absolute gain over the best multi-agent baseline.</p>
+<h2 id="motivation">Motivation</h2>
+<p>VLMs ace textbook physics but crumble on real-world video where objects move, collide, and deform across frames. The authors pinpoint two concrete failure modes: <strong>spatio-temporal identity drift</strong> — an object&rsquo;s identity is lost between successive frames so causal chains snap — and <strong>volatility of inference-time insights</strong> — the model may reason correctly once but forgets, never consolidating that insight for reuse. Teams deploying VLMs on embodied-AI, robotics perception, or video QA pipelines today work around this by stacking ad-hoc multi-agent debaters or bolting on external trackers, neither of which accumulates knowledge across queries. Prior multi-agent baselines on PhysBench top out well below human-level accuracy and discard all reasoning after each query. The gap is that no existing VLM pipeline simultaneously (a) stabilizes per-entity identity across time and (b) persists verified physical rules so the system improves with experience. PhysNote argues this is now tractable because canonicalization gives stable anchors that make accumulated notes indexable and reusable — turning one-off reasoning into a growing repository. Scope caveat: gains are reported on a single benchmark (PhysBench), so &ldquo;evolvable reasoning&rdquo; is so far demonstrated only in that distribution.</p>
+<h2 id="key-ideas">Key Ideas</h2>
+<ul>
+<li>Diagnose two root causes of VLM failure on dynamic physics: spatio-temporal identity drift and volatility of correct-but-forgotten insights.</li>
+<li>Externalize reasoning as self-generated <strong>Knowledge Notes</strong>, organized hierarchically and reused across queries.</li>
+<li><strong>Spatio-temporal canonicalization</strong> assigns immutable IDs to visual entities so notes can be indexed and retrieved deterministically.</li>
+<li>An <strong>InfoAgent</strong> runs an iterative Hypothesis–Evidence loop, grounding claims in visual anchors before consolidating verified knowledge.</li>
+<li>Three interconnected spaces (visual anchors, canonicalized query, hierarchical notes) form a closed generate–consult–refine cycle.</li>
+</ul>
+<h2 id="method">Method</h2>
+<p>PhysNote is a pipeline with three stages. First, a <strong>Spatio-Temporal Grounding Engine</strong> ingests question Q and visual input V (image or video) and assigns each entity an immutable ID, producing canonicalized (Q̂, V̂). Second, these keys retrieve task-relevant entries from a <strong>Hierarchical Knowledge Notes</strong> store 𝒩. Third, an <strong>InfoAgent</strong> runs an iterative Hypothesis–Evidence loop: it proposes physical hypotheses, verifies them against visual anchors, and on success writes back consolidated notes, so the repository evolves with use.</p>
+<p><img alt="Figure 1" src="/images/papers/2604.24443/fig1.png"></p>
+<p>Figure 1 lays out the three interconnected spaces that realize the &ldquo;generate, consult, refine&rdquo; loop named in Key Ideas. On the left, the Spatio-Temporal Grounding Engine turns raw frames into entities with immutable IDs — the concrete mechanism answering identity drift. The middle and right blocks show canonicalized inputs keying into the hierarchical note store, which then conditions the InfoAgent. Reading the diagram alone conveys that notes are not a cache of answers but a queryable memory indexed by stable entity IDs.</p>
+<p><img alt="Figure 2" src="/images/papers/2604.24443/fig2.png"></p>
+<p>Figure 2 zooms into the runtime half — it concretizes the Hypothesis–Evidence loop that turns &ldquo;volatility of insights&rdquo; into accumulation. Given (Q̂, V̂), the system retrieves notes from 𝒩, hands them to the InfoAgent, and only verified hypotheses are written back as new notes. This is the diagram&rsquo;s take-away: each successful inference permanently enlarges 𝒩, which is what the paper means by &ldquo;evolvable.&rdquo;</p>
+<h2 id="experiments">Experiments</h2>
+<p>Benchmark: <strong>PhysBench</strong>, covering four physical-reasoning domains. Baselines include prior multi-agent VLM systems (unspecified names in abstract). Metric: overall accuracy plus per-domain accuracy.</p>
+<h2 id="results">Results</h2>
+<p>PhysNote hits <strong>56.68% overall accuracy on PhysBench</strong>, beating the best multi-agent baseline by <strong>4.96%</strong>, with consistent gains across all four domains. Two qualitative cases back the mechanism.</p>
+<p><img alt="Figure 3" src="/images/papers/2604.24443/fig3.jpg"></p>
+<p>Figure 3 supports the &ldquo;evidence-based visual anchoring&rdquo; claim from Method. The task asks which camera adjustment produced a video; the baseline (left) misses a vertical shift, latches onto perceived stability, and picks C (lateral), while PhysNote (right) iteratively verifies frame-to-frame displacement and picks D. The contrast shows canonicalized anchors translating into a correct causal read where the baseline hallucinates a simpler motion.</p>
+<p><img alt="Figure 4" src="/images/papers/2604.24443/fig4.jpg"></p>
+<p>Figure 4 backs the &ldquo;knowledge-guided attribute discrimination&rdquo; story for Knowledge Notes. Two balls roll and collide; the baseline sees no obvious deformation and calls plasticity equal (C), while PhysNote, conditioned on retrieved notes about material cues (shadow sharpness, post-interaction shape), correctly differentiates plasticity and answers A. This is the intended payoff of persisted notes: domain rules the base VLM cannot re-derive per query are reused.</p>
+<h2 id="conclusion">Conclusion</h2>
+<p>The practical takeaway: giving a VLM (a) stable per-entity IDs across frames and (b) a hierarchical, writable note store moves PhysBench accuracy from the multi-agent baseline ceiling to 56.68%, a <strong>+4.96%</strong> absolute gain that holds in all four domains. That is the single number worth remembering. The honest limit is scope — results live on one benchmark, the abstract does not compare against non-agentic tool-augmented VLMs or quantify how much of the gain comes from canonicalization vs. note reuse, and &ldquo;evolvable&rdquo; is asserted by construction rather than shown via a learning curve.</p>
+<h2 id="novelty-check">Novelty Check</h2>
+<ul>
+<li><strong>Multi-agent VLM reasoners</strong> (e.g., debate/role-play agent stacks on PhysBench): similar agentic framing, but PhysNote adds a persistent, indexable note store instead of discarding inter-agent dialogue.</li>
+<li><strong>Video object tracking + VLM hybrids</strong>: share the identity-stabilization goal; PhysNote&rsquo;s novelty is tying canonical IDs directly to a knowledge index used for reasoning, not just perception.</li>
+<li><strong>Retrieval-augmented reasoning / memory-augmented agents</strong> (Reflexion-style self-notes): the self-generated note idea is not new; the new piece is keying notes on canonicalized spatio-temporal entities so retrieval is physics-aware.</li>
+</ul>
+<p>Net: genuinely new combination (canonicalization + self-notes for physical reasoning), but each ingredient has precedent; uncertain how much of the 4.96% gain is from canonicalization alone.</p>
+<h2 id="open-questions">Open Questions</h2>
+<ul>
+<li>Ablation: how much of the 4.96% comes from canonicalization vs. the note store vs. the iterative loop?</li>
+<li>Does the note store actually <em>grow in value</em> over time (learning curve), or is it effectively a prompt-engineering artifact?</li>
+<li>Generalization beyond PhysBench — robotics video, embodied QA, unseen physical domains?</li>
+<li>Cost: how many InfoAgent iterations per query, and what is the latency trade-off versus single-pass VLMs?</li>
+</ul>
+<hr>
+<h2 id="original-abstract">Original abstract</h2>
+<p>Vision-Language Models (VLMs) have demonstrated strong performance on textbook-style physics problems, yet they frequently fail when confronted with dynamic real-world scenarios that require temporal consistency and causal reasoning across frames. We identify two fundamental challenges underlying these failures: (1) spatio-temporal identity drift, where objects lose their physical identity across successive frames and break causal chains, and (2) volatility of inference-time insights, where a model may occasionally produce correct physical reasoning but never consolidates it for future reuse. To address these challenges, we propose PhysNote, an agentic framework that enables VLMs to externalize and refine physical knowledge through self-generated &ldquo;Knowledge Notes.&rdquo; PhysNote stabilizes dynamic perception through spatio-temporal canonicalization, organizes self-generated insights into a hierarchical knowledge repository, and drives an iterative reasoning loop that grounds hypotheses in visual evidence before consolidating verified knowledge. Experiments on PhysBench demonstrate that PhysNote achieves 56.68% overall accuracy, a 4.96% improvement over the best multi-agent baseline, with consistent gains across all four physical reasoning domains.</p>
+
+      </div>
+
+
+      <footer>
+        
+
+
+        
+        
+        
+        
+        
+        
+        
+      </footer>
+    </article>
+
+    
+  </section>
+
+    </div>
+
+    <footer class="footer">
+  <section class="container">
+    ©
+    
+      2019 -
+    
+    2026
+     Jie Xin 
+    ·
+    
+    Powered by <a href="https://gohugo.io/" target="_blank" rel="noopener">Hugo</a> & <a href="https://github.com/luizdepra/hugo-coder/" target="_blank" rel="noopener">Coder</a>.
+    
+  </section>
+</footer>
+
+  </main>
+
+  
+
+  
+  
+  <script src="/js/coder.min.6ae284be93d2d19dad1f02b0039508d9aab3180a12a06dcc71b0b0ef7825a317.js" integrity="sha256-auKEvpPS0Z2tHwKwA5UI2aqzGAoSoG3McbCw73gloxc="></script>
+  
+
+  
+
+  
+
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+</body>
+</html>

@@ -1,0 +1,369 @@
+<!DOCTYPE html>
+<html lang="zh">
+
+<head>
+  <title>
+  Unlocking the Edge deployment and ondevice acceleration of multi-LoRA enabled one-for-all foundational LLM · JXIN&#39;s Home
+</title>
+  <meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="color-scheme" content="light dark">
+
+
+
+
+<meta name="author" content="Jie Xin">
+<meta name="description" content="arXiv: 2604.18655 · PDF
+作者: Sravanth Kodavanti, Sowmya Vajrala, Srinivas Miriyala, Utsav Tiwari, Uttam Kumar, Utkarsh Kumar Mahawar, Achal Pratap Singh, Arya D, Narendra Mutyala, Vikram Nelvoy Rajendiran, Sharan Kumar Allur, Euntaik Lee, Dohyoung Kim, HyeonSu Lee, Gyusung Cho, JungBae Kim
+主分类: cs.DC · 全部: cs.AI, cs.CL, cs.DC
+命中关键词: large language model, llm, inference, quantization, speculative decoding, latency
+
+TL;DR
+面向三星 Galaxy S24/S25 的端侧 LLM 部署框架：用多 LoRA 共享单一冻结推理图、多流解码与 DS2D 自推测解码，实现 4–6× 内存与时延改进。
+核心观点
+
+以单个冻结的 LLaMA 多语基座图承载多个应用场景，通过 runtime 注入 LoRA 实现无需重编译的动态任务切换。
+提出多流解码，在一次前向中并发生成多种风格回复，降低最多 6× 时延。
+提出 Dynamic Self-Speculative Decoding (DS2D)：无需 draft model 的树状自推测解码，decode 加速最高 2.3×。
+与 INT4 量化、架构级优化组合，在 9 语言 / 8 任务上达成 4–6× 整体内存和时延优化且保持精度。
+
+方法
+在 Qualcomm SM8650/SM8750 上做硬件感知部署：冻结一张 LLaMA 推理图，将任务 LoRA 权重作为运行时输入喂入，实现 one-for-all。解码阶段引入多流机制，让同一 forward pass 并行产生 formal/polite/jovial 等风格输出；同时使用基于树的自推测解码 DS2D，由模型自身预测未来 token，省去独立 draft 模型。模型以 INT4 量化落地，并配合架构层优化。">
+<meta name="keywords" content="blog,developer,personal">
+
+
+
+  <meta name="twitter:card" content="summary">
+  <meta name="twitter:title" content="Unlocking the Edge deployment and ondevice acceleration of multi-LoRA enabled one-for-all foundational LLM">
+  <meta name="twitter:description" content="arXiv: 2604.18655 · PDF
+作者: Sravanth Kodavanti, Sowmya Vajrala, Srinivas Miriyala, Utsav Tiwari, Uttam Kumar, Utkarsh Kumar Mahawar, Achal Pratap Singh, Arya D, Narendra Mutyala, Vikram Nelvoy Rajendiran, Sharan Kumar Allur, Euntaik Lee, Dohyoung Kim, HyeonSu Lee, Gyusung Cho, JungBae Kim
+主分类: cs.DC · 全部: cs.AI, cs.CL, cs.DC
+命中关键词: large language model, llm, inference, quantization, speculative decoding, latency
+TL;DR 面向三星 Galaxy S24/S25 的端侧 LLM 部署框架：用多 LoRA 共享单一冻结推理图、多流解码与 DS2D 自推测解码，实现 4–6× 内存与时延改进。
+核心观点 以单个冻结的 LLaMA 多语基座图承载多个应用场景，通过 runtime 注入 LoRA 实现无需重编译的动态任务切换。 提出多流解码，在一次前向中并发生成多种风格回复，降低最多 6× 时延。 提出 Dynamic Self-Speculative Decoding (DS2D)：无需 draft model 的树状自推测解码，decode 加速最高 2.3×。 与 INT4 量化、架构级优化组合，在 9 语言 / 8 任务上达成 4–6× 整体内存和时延优化且保持精度。 方法 在 Qualcomm SM8650/SM8750 上做硬件感知部署：冻结一张 LLaMA 推理图，将任务 LoRA 权重作为运行时输入喂入，实现 one-for-all。解码阶段引入多流机制，让同一 forward pass 并行产生 formal/polite/jovial 等风格输出；同时使用基于树的自推测解码 DS2D，由模型自身预测未来 token，省去独立 draft 模型。模型以 INT4 量化落地，并配合架构层优化。">
+
+<meta property="og:url" content="https://ftxj.github.io/zh/posts/2026-04-20/07-unlocking-the-edge-deployment-and-ondevice-acceleration-of-m/">
+  <meta property="og:site_name" content="JXIN&#39;s Home">
+  <meta property="og:title" content="Unlocking the Edge deployment and ondevice acceleration of multi-LoRA enabled one-for-all foundational LLM">
+  <meta property="og:description" content="arXiv: 2604.18655 · PDF
+作者: Sravanth Kodavanti, Sowmya Vajrala, Srinivas Miriyala, Utsav Tiwari, Uttam Kumar, Utkarsh Kumar Mahawar, Achal Pratap Singh, Arya D, Narendra Mutyala, Vikram Nelvoy Rajendiran, Sharan Kumar Allur, Euntaik Lee, Dohyoung Kim, HyeonSu Lee, Gyusung Cho, JungBae Kim
+主分类: cs.DC · 全部: cs.AI, cs.CL, cs.DC
+命中关键词: large language model, llm, inference, quantization, speculative decoding, latency
+TL;DR 面向三星 Galaxy S24/S25 的端侧 LLM 部署框架：用多 LoRA 共享单一冻结推理图、多流解码与 DS2D 自推测解码，实现 4–6× 内存与时延改进。
+核心观点 以单个冻结的 LLaMA 多语基座图承载多个应用场景，通过 runtime 注入 LoRA 实现无需重编译的动态任务切换。 提出多流解码，在一次前向中并发生成多种风格回复，降低最多 6× 时延。 提出 Dynamic Self-Speculative Decoding (DS2D)：无需 draft model 的树状自推测解码，decode 加速最高 2.3×。 与 INT4 量化、架构级优化组合，在 9 语言 / 8 任务上达成 4–6× 整体内存和时延优化且保持精度。 方法 在 Qualcomm SM8650/SM8750 上做硬件感知部署：冻结一张 LLaMA 推理图，将任务 LoRA 权重作为运行时输入喂入，实现 one-for-all。解码阶段引入多流机制，让同一 forward pass 并行产生 formal/polite/jovial 等风格输出；同时使用基于树的自推测解码 DS2D，由模型自身预测未来 token，省去独立 draft 模型。模型以 INT4 量化落地，并配合架构层优化。">
+  <meta property="og:locale" content="zh">
+  <meta property="og:type" content="article">
+    <meta property="article:section" content="posts">
+    <meta property="article:published_time" content="2026-04-27T05:27:11+00:00">
+    <meta property="article:modified_time" content="2026-04-27T05:27:11+00:00">
+
+
+
+
+<link rel="canonical" href="https://ftxj.github.io/zh/posts/2026-04-20/07-unlocking-the-edge-deployment-and-ondevice-acceleration-of-m/">
+
+
+<link rel="preload" href="/fonts/fa-brands-400.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="/fonts/fa-regular-400.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="/fonts/fa-solid-900.woff2" as="font" type="font/woff2" crossorigin>
+
+
+  
+  
+  <link rel="stylesheet" href="/css/coder.min.5e94c1acf7aa2066035cf2764ae3e4fe39db101d68b870f919966100d51fb861.css" integrity="sha256-XpTBrPeqIGYDXPJ2SuPk/jnbEB1ouHD5GZZhANUfuGE=" crossorigin="anonymous" media="screen" />
+
+
+
+
+
+
+  
+    
+    
+    <link rel="stylesheet" href="/css/coder-dark.min.a00e6364bacbc8266ad1cc81230774a1397198f8cfb7bcba29b7d6fcb54ce57f.css" integrity="sha256-oA5jZLrLyCZq0cyBIwd0oTlxmPjPt7y6KbfW/LVM5X8=" crossorigin="anonymous" media="screen" />
+  
+
+
+
+ 
+
+
+
+
+<link rel="icon" type="image/svg+xml" href="/images/favicon.svg" sizes="any">
+<link rel="icon" type="image/png" href="/images/favicon-32x32.png" sizes="32x32">
+<link rel="icon" type="image/png" href="/images/favicon-16x16.png" sizes="16x16">
+
+<link rel="apple-touch-icon" href="/images/apple-touch-icon.png">
+<link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon.png">
+
+<link rel="manifest" href="/site.webmanifest">
+<link rel="mask-icon" href="/images/safari-pinned-tab.svg" color="#5bbad5">
+
+
+
+
+
+
+<style>
+.content article ul {
+  list-style: disc !important;
+  padding-left: 2.5rem !important;
+}
+
+.content article ul li {
+  display: list-item !important;
+}
+</style>
+
+
+
+
+  
+</head>
+
+
+
+
+
+
+<body class="preload-transitions colorscheme-auto">
+  
+<div class="float-container">
+    <a id="dark-mode-toggle" class="colorscheme-toggle">
+        <i class="fa-solid fa-adjust fa-fw" aria-hidden="true"></i>
+    </a>
+</div>
+
+
+  <main class="wrapper">
+    <nav class="navigation">
+  <section class="container">
+    
+    <a class="navigation-title" href="https://ftxj.github.io/zh/">
+      JXIN&#39;s Home
+    </a>
+    
+    
+      <input type="checkbox" id="menu-toggle" />
+      <label class="menu-button float-right" for="menu-toggle">
+        <i class="fa-solid fa-bars fa-fw" aria-hidden="true"></i>
+      </label>
+      <ul class="navigation-list">
+        
+          
+            <li class="navigation-item">
+              <a class="navigation-link " href="/zh/about/">关于</a>
+            </li>
+          
+            <li class="navigation-item">
+              <a class="navigation-link " href="/zh/travel/">旅行</a>
+            </li>
+          
+            <li class="navigation-item">
+              <a class="navigation-link " href="/zh/posts/">博客</a>
+            </li>
+          
+            <li class="navigation-item">
+              <a class="navigation-link " href="https://ftxj.github.io/cv/cv_zh.pdf">简历</a>
+            </li>
+          
+        
+        
+          
+          
+          
+            
+              
+                <li class="navigation-item menu-separator">
+                  <span>|</span>
+                </li>
+                
+              
+              <li class="navigation-item">
+                <a href="/posts/2026-04-20/07-unlocking-the-edge-deployment-and-ondevice-acceleration-of-m/">EN</a>
+              </li>
+            
+          
+        
+      </ul>
+    
+  </section>
+</nav>
+
+
+    <div class="content">
+      
+  <section class="container post">
+    <article>
+      <header>
+        <div class="post-title">
+          <h1 class="title">
+            <a class="title-link" href="https://ftxj.github.io/zh/posts/2026-04-20/07-unlocking-the-edge-deployment-and-ondevice-acceleration-of-m/">
+              Unlocking the Edge deployment and ondevice acceleration of multi-LoRA enabled one-for-all foundational LLM
+            </a>
+          </h1>
+        </div>
+        <div class="post-meta">
+          <div class="date">
+            <span class="posted-on">
+              <i class="fa-solid fa-calendar" aria-hidden="true"></i>
+              <time datetime="2026-04-27T05:27:11Z">
+                四月 27, 2026
+              </time>
+            </span>
+            <span class="reading-time">
+              <i class="fa-solid fa-clock" aria-hidden="true"></i>
+              2-minute read
+            </span>
+          </div>
+          
+          <div class="categories">
+  <i class="fa-solid fa-folder" aria-hidden="true"></i>
+    <a href="/zh/categories/paper-digest/">Paper-Digest</a>
+      <span class="separator">•</span>
+    <a href="/zh/categories/2026-04-20/">2026-04-20</a></div>
+
+          
+        </div>
+      </header>
+
+      
+
+
+      <div class="post-content">
+        
+        <p><strong>arXiv:</strong> <a href="https://arxiv.org/abs/2604.18655v2">2604.18655</a> · <a href="https://arxiv.org/pdf/2604.18655v2">PDF</a></p>
+<p><strong>作者:</strong> Sravanth Kodavanti, Sowmya Vajrala, Srinivas Miriyala, Utsav Tiwari, Uttam Kumar, Utkarsh Kumar Mahawar, Achal Pratap Singh, Arya D, Narendra Mutyala, Vikram Nelvoy Rajendiran, Sharan Kumar Allur, Euntaik Lee, Dohyoung Kim, HyeonSu Lee, Gyusung Cho, JungBae Kim</p>
+<p><strong>主分类:</strong> <code>cs.DC</code> · 全部: cs.AI, cs.CL, cs.DC</p>
+<p><strong>命中关键词:</strong> large language model, llm, inference, quantization, speculative decoding, latency</p>
+<hr>
+<h2 id="tldr">TL;DR</h2>
+<p>面向三星 Galaxy S24/S25 的端侧 LLM 部署框架：用多 LoRA 共享单一冻结推理图、多流解码与 DS2D 自推测解码，实现 4–6× 内存与时延改进。</p>
+<h2 id="核心观点">核心观点</h2>
+<ul>
+<li>以单个冻结的 LLaMA 多语基座图承载多个应用场景，通过 runtime 注入 LoRA 实现无需重编译的动态任务切换。</li>
+<li>提出多流解码，在一次前向中并发生成多种风格回复，降低最多 6× 时延。</li>
+<li>提出 Dynamic Self-Speculative Decoding (DS2D)：无需 draft model 的树状自推测解码，decode 加速最高 2.3×。</li>
+<li>与 INT4 量化、架构级优化组合，在 9 语言 / 8 任务上达成 4–6× 整体内存和时延优化且保持精度。</li>
+</ul>
+<h2 id="方法">方法</h2>
+<p>在 Qualcomm SM8650/SM8750 上做硬件感知部署：冻结一张 LLaMA 推理图，将任务 LoRA 权重作为运行时输入喂入，实现 one-for-all。解码阶段引入多流机制，让同一 forward pass 并行产生 formal/polite/jovial 等风格输出；同时使用基于树的自推测解码 DS2D，由模型自身预测未来 token，省去独立 draft 模型。模型以 INT4 量化落地，并配合架构层优化。</p>
+<h2 id="实验">实验</h2>
+<p>硬件：Samsung Galaxy S24 (SM8650) 与 S25 (SM8750)。模型：LLaMA 系多语基座 + 多个应用 LoRA。覆盖 9 种语言、8 个任务；对比指标为内存占用、端到端时延、decode 时延与精度。摘要未披露具体基线名称或数据集细节。</p>
+<h2 id="结果">结果</h2>
+<ul>
+<li>多流解码：时延最多降低 6×。</li>
+<li>DS2D：decode 时延最多加速 2.3×。</li>
+<li>综合 INT4 + 架构优化：内存与时延整体改进 4–6×，9 语言 / 8 任务精度保持。摘要未给出绝对数值与具体精度指标，难以独立核验。</li>
+</ul>
+<h2 id="为什么重要">为什么重要</h2>
+<p>对端侧 LLM 从业者提供了一个可商用路径：单图 + 多 LoRA 解决多场景切换与内存膨胀，多流解码降低风格化生成成本，DS2D 免去部署 draft model 的工程负担，直接落地主流 Qualcomm 旗舰芯片。</p>
+<h2 id="与已有工作的关系">与已有工作的关系</h2>
+<p>LoRA / multi-LoRA serving（S-LoRA、Punica 思路的端侧版）、speculative decoding（Medusa、Self-Speculative、EAGLE 等树状推测）、INT4 量化（GPTQ、AWQ）、端侧 LLaMA 部署（MLC-LLM、llama.cpp）。本文特色在于三者在手机 NPU 上协同。</p>
+<h2 id="尚未回答的问题">尚未回答的问题</h2>
+<ul>
+<li>精度保持的具体幅度与任务级下降未披露。</li>
+<li>LoRA 切换与多流对 NPU 内存带宽的真实开销。</li>
+<li>DS2D 相对成熟 speculative 方法的精度/接受率对比。</li>
+<li>跨更多芯片（MediaTek、Apple）与更大模型规模的可移植性。</li>
+<li>能耗与热 throttling 下的稳态表现。</li>
+</ul>
+<hr>
+<h2 id="论文图表">论文图表</h2>
+<p><strong>图 1:</strong> Figure 1 (extracted from PDF)</p>
+<p><img alt="图 1" src="/images/papers/2604.18655/fig1.jpg"></p>
+<p><strong>图 2:</strong> Figure 2 (extracted from PDF)</p>
+<p><img alt="图 2" src="/images/papers/2604.18655/fig2.jpg"></p>
+<p><strong>图 3:</strong> Figure 3 (extracted from PDF)</p>
+<p><img alt="图 3" src="/images/papers/2604.18655/fig3.jpg"></p>
+<hr>
+<h2 id="原始摘要">原始摘要</h2>
+<p>Deploying large language models (LLMs) on smartphones poses significant engineering challenges due to stringent constraints on memory, latency, and runtime flexibility. In this work, we present a hardware-aware framework for efficient on-device inference of a LLaMA-based multilingual foundation model supporting multiple use cases on Samsung Galaxy S24 and S25 devices with SM8650 and SM8750 Qualcomm chipsets respectively. Our approach integrates application-specific LoRAs as runtime inputs to a single frozen inference graph, enabling dynamic task switching without recompilation or memory overhead. We further introduce a multi-stream decoding mechanism that concurrently generates stylistic variations - such as formal, polite, or jovial responses - within a single forward pass, reducing latency by up to 6x. To accelerate token generation, we apply Dynamic Self-Speculative Decoding (DS2D), a tree-based strategy that predicts future tokens without requiring a draft model, yielding up to 2.3x speedup in decode time. Combined with quantization to INT4 and architecture-level optimizations, our system achieves 4-6x overall improvements in memory and latency while maintaining accuracy across 9 languages and 8 tasks. These results demonstrate practical feasibility of deploying multi-use-case LLMs on edge devices, advancing the commercial viability of Generative AI in mobile platforms.</p>
+
+      </div>
+
+
+      <footer>
+        
+
+
+        
+        
+        
+        
+        
+        
+        
+      </footer>
+    </article>
+
+    
+  </section>
+
+    </div>
+
+    <footer class="footer">
+  <section class="container">
+    ©
+    
+      2019 -
+    
+    2026
+     Jie Xin 
+    ·
+    
+    Powered by <a href="https://gohugo.io/" target="_blank" rel="noopener">Hugo</a> & <a href="https://github.com/luizdepra/hugo-coder/" target="_blank" rel="noopener">Coder</a>.
+    
+  </section>
+</footer>
+
+  </main>
+
+  
+
+  
+  
+  <script src="/js/coder.min.6ae284be93d2d19dad1f02b0039508d9aab3180a12a06dcc71b0b0ef7825a317.js" integrity="sha256-auKEvpPS0Z2tHwKwA5UI2aqzGAoSoG3McbCw73gloxc="></script>
+  
+
+  
+
+  
+
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+</body>
+</html>

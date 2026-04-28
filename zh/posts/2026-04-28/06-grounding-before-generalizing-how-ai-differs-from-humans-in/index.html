@@ -1,0 +1,370 @@
+<!DOCTYPE html>
+<html lang="zh">
+
+<head>
+  <title>
+  Grounding Before Generalizing: How AI Differs from Humans in Causal Transfer · JXIN&#39;s Home
+</title>
+  <meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="color-scheme" content="light dark">
+
+
+
+
+<meta name="author" content="Jie Xin">
+<meta name="description" content="arXiv: 2604.24062 · PDF
+作者: Liangru Xiang, Yuxi Ma, Zhihao Cao, Yixin Zhu, Song-Chun Zhu
+单位: Tsinghua University, Peking University, State Key Laboratory of General Artificial Intelligence
+主分类: cs.AI · 全部: cs.AI
+命中关键词: large language model, llm, agent, rag, reasoning
+
+TL;DR
+在 OpenLock 因果结构迁移任务上，LLM/VLM 必须先做环境特定的 grounding 才能获得迁移收益，而人类从第一次尝试就能用上先验结构；视觉信息反而拖累表现。
+Motivation
+抽取抽象因果结构并迁移到新场景是人类智能的标志，但当前 LLM/VLM 是否具备这一能力没有被系统刻画过。经典 RL agent 在这类任务上灾难性失败，人类却能在极少暴露后完成迁移，这中间到底隔了什么？对 agent runtime 团队和做 long-horizon 规划 / 工具使用的开发者来说，这是一个现实的痛点：今天的 LLM agent 在一个环境里调通之后，换一个物理布局、换一批 lever 标签，往往又要从零摸索，复用先前&quot;学到的因果结构&quot;的能力被悄悄高估。作者选择用 OpenLock 这一经典人机对比范式，正是因为它要求顺序发现 Common Cause (CC) 与 Common Effect (CE) 两种因果结构，且已有成熟的人类基线。作者认为，现在才值得做这件事，是因为前沿 LLM/VLM 在常规 reasoning benchmark 上已经追平甚至超过人类，于是&quot;它们能不能像人一样迁移因果骨架&quot;这个问题第一次变得可证伪，而不是被表面分数掩盖。论文实际影响范围有限——它不是提出新模型，而是给出&quot;grounding 依赖&quot;这一可量化的失败模式，提醒不要把 LLM 在纯文本 reasoning 上的表现外推为具备与人类对等的因果抽象。">
+<meta name="keywords" content="blog,developer,personal">
+
+
+
+  <meta name="twitter:card" content="summary">
+  <meta name="twitter:title" content="Grounding Before Generalizing: How AI Differs from Humans in Causal Transfer">
+  <meta name="twitter:description" content="arXiv: 2604.24062 · PDF
+作者: Liangru Xiang, Yuxi Ma, Zhihao Cao, Yixin Zhu, Song-Chun Zhu
+单位: Tsinghua University, Peking University, State Key Laboratory of General Artificial Intelligence
+主分类: cs.AI · 全部: cs.AI
+命中关键词: large language model, llm, agent, rag, reasoning
+TL;DR 在 OpenLock 因果结构迁移任务上，LLM/VLM 必须先做环境特定的 grounding 才能获得迁移收益，而人类从第一次尝试就能用上先验结构；视觉信息反而拖累表现。
+Motivation 抽取抽象因果结构并迁移到新场景是人类智能的标志，但当前 LLM/VLM 是否具备这一能力没有被系统刻画过。经典 RL agent 在这类任务上灾难性失败，人类却能在极少暴露后完成迁移，这中间到底隔了什么？对 agent runtime 团队和做 long-horizon 规划 / 工具使用的开发者来说，这是一个现实的痛点：今天的 LLM agent 在一个环境里调通之后，换一个物理布局、换一批 lever 标签，往往又要从零摸索，复用先前&#34;学到的因果结构&#34;的能力被悄悄高估。作者选择用 OpenLock 这一经典人机对比范式，正是因为它要求顺序发现 Common Cause (CC) 与 Common Effect (CE) 两种因果结构，且已有成熟的人类基线。作者认为，现在才值得做这件事，是因为前沿 LLM/VLM 在常规 reasoning benchmark 上已经追平甚至超过人类，于是&#34;它们能不能像人一样迁移因果骨架&#34;这个问题第一次变得可证伪，而不是被表面分数掩盖。论文实际影响范围有限——它不是提出新模型，而是给出&#34;grounding 依赖&#34;这一可量化的失败模式，提醒不要把 LLM 在纯文本 reasoning 上的表现外推为具备与人类对等的因果抽象。">
+
+<meta property="og:url" content="https://ftxj.github.io/zh/posts/2026-04-28/06-grounding-before-generalizing-how-ai-differs-from-humans-in/">
+  <meta property="og:site_name" content="JXIN&#39;s Home">
+  <meta property="og:title" content="Grounding Before Generalizing: How AI Differs from Humans in Causal Transfer">
+  <meta property="og:description" content="arXiv: 2604.24062 · PDF
+作者: Liangru Xiang, Yuxi Ma, Zhihao Cao, Yixin Zhu, Song-Chun Zhu
+单位: Tsinghua University, Peking University, State Key Laboratory of General Artificial Intelligence
+主分类: cs.AI · 全部: cs.AI
+命中关键词: large language model, llm, agent, rag, reasoning
+TL;DR 在 OpenLock 因果结构迁移任务上，LLM/VLM 必须先做环境特定的 grounding 才能获得迁移收益，而人类从第一次尝试就能用上先验结构；视觉信息反而拖累表现。
+Motivation 抽取抽象因果结构并迁移到新场景是人类智能的标志，但当前 LLM/VLM 是否具备这一能力没有被系统刻画过。经典 RL agent 在这类任务上灾难性失败，人类却能在极少暴露后完成迁移，这中间到底隔了什么？对 agent runtime 团队和做 long-horizon 规划 / 工具使用的开发者来说，这是一个现实的痛点：今天的 LLM agent 在一个环境里调通之后，换一个物理布局、换一批 lever 标签，往往又要从零摸索，复用先前&#34;学到的因果结构&#34;的能力被悄悄高估。作者选择用 OpenLock 这一经典人机对比范式，正是因为它要求顺序发现 Common Cause (CC) 与 Common Effect (CE) 两种因果结构，且已有成熟的人类基线。作者认为，现在才值得做这件事，是因为前沿 LLM/VLM 在常规 reasoning benchmark 上已经追平甚至超过人类，于是&#34;它们能不能像人一样迁移因果骨架&#34;这个问题第一次变得可证伪，而不是被表面分数掩盖。论文实际影响范围有限——它不是提出新模型，而是给出&#34;grounding 依赖&#34;这一可量化的失败模式，提醒不要把 LLM 在纯文本 reasoning 上的表现外推为具备与人类对等的因果抽象。">
+  <meta property="og:locale" content="zh">
+  <meta property="og:type" content="article">
+    <meta property="article:section" content="posts">
+    <meta property="article:published_time" content="2026-04-28T08:53:48+00:00">
+    <meta property="article:modified_time" content="2026-04-28T08:53:48+00:00">
+
+
+
+
+<link rel="canonical" href="https://ftxj.github.io/zh/posts/2026-04-28/06-grounding-before-generalizing-how-ai-differs-from-humans-in/">
+
+
+<link rel="preload" href="/fonts/fa-brands-400.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="/fonts/fa-regular-400.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="/fonts/fa-solid-900.woff2" as="font" type="font/woff2" crossorigin>
+
+
+  
+  
+  <link rel="stylesheet" href="/css/coder.min.5e94c1acf7aa2066035cf2764ae3e4fe39db101d68b870f919966100d51fb861.css" integrity="sha256-XpTBrPeqIGYDXPJ2SuPk/jnbEB1ouHD5GZZhANUfuGE=" crossorigin="anonymous" media="screen" />
+
+
+
+
+
+
+  
+    
+    
+    <link rel="stylesheet" href="/css/coder-dark.min.a00e6364bacbc8266ad1cc81230774a1397198f8cfb7bcba29b7d6fcb54ce57f.css" integrity="sha256-oA5jZLrLyCZq0cyBIwd0oTlxmPjPt7y6KbfW/LVM5X8=" crossorigin="anonymous" media="screen" />
+  
+
+
+
+ 
+
+
+
+
+<link rel="icon" type="image/svg+xml" href="/images/favicon.svg" sizes="any">
+<link rel="icon" type="image/png" href="/images/favicon-32x32.png" sizes="32x32">
+<link rel="icon" type="image/png" href="/images/favicon-16x16.png" sizes="16x16">
+
+<link rel="apple-touch-icon" href="/images/apple-touch-icon.png">
+<link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon.png">
+
+<link rel="manifest" href="/site.webmanifest">
+<link rel="mask-icon" href="/images/safari-pinned-tab.svg" color="#5bbad5">
+
+
+
+
+
+
+<style>
+.content article ul {
+  list-style: disc !important;
+  padding-left: 2.5rem !important;
+}
+
+.content article ul li {
+  display: list-item !important;
+}
+</style>
+
+
+
+
+  
+</head>
+
+
+
+
+
+
+<body class="preload-transitions colorscheme-auto">
+  
+<div class="float-container">
+    <a id="dark-mode-toggle" class="colorscheme-toggle">
+        <i class="fa-solid fa-adjust fa-fw" aria-hidden="true"></i>
+    </a>
+</div>
+
+
+  <main class="wrapper">
+    <nav class="navigation">
+  <section class="container">
+    
+    <a class="navigation-title" href="https://ftxj.github.io/zh/">
+      JXIN&#39;s Home
+    </a>
+    
+    
+      <input type="checkbox" id="menu-toggle" />
+      <label class="menu-button float-right" for="menu-toggle">
+        <i class="fa-solid fa-bars fa-fw" aria-hidden="true"></i>
+      </label>
+      <ul class="navigation-list">
+        
+          
+            <li class="navigation-item">
+              <a class="navigation-link " href="/zh/about/">关于</a>
+            </li>
+          
+            <li class="navigation-item">
+              <a class="navigation-link " href="/zh/travel/">旅行</a>
+            </li>
+          
+            <li class="navigation-item">
+              <a class="navigation-link " href="/zh/posts/">博客</a>
+            </li>
+          
+            <li class="navigation-item">
+              <a class="navigation-link " href="https://ftxj.github.io/cv/cv_zh.pdf">简历</a>
+            </li>
+          
+        
+        
+          
+          
+          
+            
+              
+                <li class="navigation-item menu-separator">
+                  <span>|</span>
+                </li>
+                
+              
+              <li class="navigation-item">
+                <a href="/posts/2026-04-28/06-grounding-before-generalizing-how-ai-differs-from-humans-in/">EN</a>
+              </li>
+            
+          
+        
+      </ul>
+    
+  </section>
+</nav>
+
+
+    <div class="content">
+      
+  <section class="container post">
+    <article>
+      <header>
+        <div class="post-title">
+          <h1 class="title">
+            <a class="title-link" href="https://ftxj.github.io/zh/posts/2026-04-28/06-grounding-before-generalizing-how-ai-differs-from-humans-in/">
+              Grounding Before Generalizing: How AI Differs from Humans in Causal Transfer
+            </a>
+          </h1>
+        </div>
+        <div class="post-meta">
+          <div class="date">
+            <span class="posted-on">
+              <i class="fa-solid fa-calendar" aria-hidden="true"></i>
+              <time datetime="2026-04-28T08:53:48Z">
+                四月 28, 2026
+              </time>
+            </span>
+            <span class="reading-time">
+              <i class="fa-solid fa-clock" aria-hidden="true"></i>
+              2-minute read
+            </span>
+          </div>
+          
+          <div class="categories">
+  <i class="fa-solid fa-folder" aria-hidden="true"></i>
+    <a href="/zh/categories/paper-digest/">Paper-Digest</a>
+      <span class="separator">•</span>
+    <a href="/zh/categories/2026-04-28/">2026-04-28</a></div>
+
+          
+        </div>
+      </header>
+
+      
+
+
+      <div class="post-content">
+        
+        <p><strong>arXiv:</strong> <a href="https://arxiv.org/abs/2604.24062v1">2604.24062</a> · <a href="https://arxiv.org/pdf/2604.24062v1">PDF</a></p>
+<p><strong>作者:</strong> Liangru Xiang, Yuxi Ma, Zhihao Cao, Yixin Zhu, Song-Chun Zhu</p>
+<p><strong>单位:</strong> Tsinghua University, Peking University, State Key Laboratory of General Artificial Intelligence</p>
+<p><strong>主分类:</strong> <code>cs.AI</code> · 全部: cs.AI</p>
+<p><strong>命中关键词:</strong> large language model, llm, agent, rag, reasoning</p>
+<hr>
+<h2 id="tldr">TL;DR</h2>
+<p>在 OpenLock 因果结构迁移任务上，LLM/VLM 必须先做环境特定的 grounding 才能获得迁移收益，而人类从第一次尝试就能用上先验结构；视觉信息反而拖累表现。</p>
+<h2 id="motivation">Motivation</h2>
+<p>抽取抽象因果结构并迁移到新场景是人类智能的标志，但当前 LLM/VLM 是否具备这一能力没有被系统刻画过。经典 RL agent 在这类任务上灾难性失败，人类却能在极少暴露后完成迁移，这中间到底隔了什么？对 agent runtime 团队和做 long-horizon 规划 / 工具使用的开发者来说，这是一个现实的痛点：今天的 LLM agent 在一个环境里调通之后，换一个物理布局、换一批 lever 标签，往往又要从零摸索，复用先前&quot;学到的因果结构&quot;的能力被悄悄高估。作者选择用 OpenLock 这一经典人机对比范式，正是因为它要求顺序发现 Common Cause (CC) 与 Common Effect (CE) 两种因果结构，且已有成熟的人类基线。作者认为，现在才值得做这件事，是因为前沿 LLM/VLM 在常规 reasoning benchmark 上已经追平甚至超过人类，于是&quot;它们能不能像人一样迁移因果骨架&quot;这个问题第一次变得可证伪，而不是被表面分数掩盖。论文实际影响范围有限——它不是提出新模型，而是给出&quot;grounding 依赖&quot;这一可量化的失败模式，提醒不要把 LLM 在纯文本 reasoning 上的表现外推为具备与人类对等的因果抽象。</p>
+<h2 id="核心观点">核心观点</h2>
+<ul>
+<li>当前 SOTA LLM/VLM 在 OpenLock 上表现出<strong>延迟或缺失的因果迁移</strong>：必须先做 environmental grounding，效率收益才出现。</li>
+<li>人类从<strong>第一次尝试</strong>就能用上先前的 CC/CE 结构知识，跨环境迁移几乎无额外代价。</li>
+<li><strong>纯文本条件</strong>下模型发现效率能匹敌甚至超过人类；<strong>加入视觉</strong>（image-only 或 text+image）整体反而变差。</li>
+<li>模型在 CC vs CE 之间存在<strong>系统性不对称</strong>，而人类没有，暗示是启发式偏好而非方向中立的因果抽象。</li>
+<li>大规模统计学习不会自动产出人类那种<strong>脱离具体环境的因果 schema</strong>；grounding 依赖是 LLM/VLM 的根本性局限。</li>
+</ul>
+<h2 id="方法">方法</h2>
+<p>沿用 OpenLock 范式：七根 lever + 一扇门的虚拟环境，agent 必须通过顺序交互发现隐藏的因果依赖，环境间 lever 位置/颜色/标签变，但底层结构（CC 或 CE）不变。实验分两阶段：Experiment 1（Baseline）在单一环境内测发现效率；Experiment 2（Transfer）把 agent 迁移到保留同一因果结构但外观改变的新环境，测&quot;结构迁移带来的加速&quot;。被试者涵盖 LLM/VLM（含 Claude-4.5）与人类参与者；模型按输入模态拆成 text-only (T)、image-only、text+image 三个条件。主要度量是 <strong>marginal discovery cost</strong>——找到第 k 个解所需的尝试数，以及 Experiment 1→2 的 <strong>efficiency gain ratio</strong>。</p>
+<h2 id="实验">实验</h2>
+<p>环境：OpenLock，包含 CC 与 CE 两种因果结构。基线：人类参与者作为金标准，辅以不同输入模态下的模型条件对照。指标：marginal discovery cost（每个顺序解的尝试数）和 (Attempts_base − Attempts_trans) / Attempts_base 的 efficiency gain ratio。Figure 1 给出环境布局与两种因果结构的示意。</p>
+<p><img alt="图 1" src="/images/papers/2604.24062/fig1.png"></p>
+<p>上图展示的是实验台本身：左边是带 7 根 lever + 1 扇门的 OpenLock 虚拟环境，右边是 CC 与 CE 两种底层因果结构的示意。它支撑的是&quot;顺序发现因果依赖 + 跨环境结构不变、外观变化&quot;这一实验设置——没有它，后文所有 marginal discovery cost 和 transfer gain 的对比都无从定义。</p>
+<h2 id="结果">结果</h2>
+<p>在 text-only 条件下模型的发现效率追平甚至超过人类；image-only 和 text+image 条件整体拖累表现，说明模型主要靠符号处理而非真正的多模态整合。CC/CE 之间人类表现大致对称，模型则系统性偏向某一方向。</p>
+<p><img alt="图 2" src="/images/papers/2604.24062/fig2.png"></p>
+<p>这张图支撑&quot;纯文本条件下模型能追平人类发现效率&quot;这一主张：分别画出 CC（左）和 CE（右）下，每个后续解所需的尝试数曲线，人类与 Claude-4.5 等模型（T 条件）放在一起比较，可见文本条件下模型曲线贴近甚至压过人类曲线，但 CC/CE 两侧形状不对称。</p>
+<p><img alt="图 3" src="/images/papers/2604.24062/fig3.png"></p>
+<p>这张柱状图是论文核心结论的定量证据：Experiment 1→2 的 efficiency gain ratio，即从 baseline 迁到新环境后尝试数下降的比例。人类柱子明显高，说明迁移立刻兑现；多数模型柱子低甚至接近 0，证明它们没有从结构迁移中获得收益。</p>
+<p><img alt="图 4" src="/images/papers/2604.24062/fig4.png"></p>
+<p>这张图把 baseline（灰）与 transfer（红）的 marginal discovery cost 叠在一起，逐模型和人类对比。人类的红色曲线从第一次尝试就显著低于灰色，体现&quot;first-attempt 就用上先验结构&quot;；模型的红灰曲线几乎重合，只有在后续尝试才慢慢分开，正好对应作者所说的 environmental grounding 必须先行。</p>
+<h2 id="结论">结论</h2>
+<p>实践者该带走的一点是：<strong>当前 LLM/VLM 的&quot;因果迁移&quot;其实是 grounding 后的局部加速，而不是人类式的结构复用</strong>——在同一物理布局里它可以追平甚至超过人类（text-only 条件），但换个外观就要重新摸索，transfer gain ratio 明显低于人类。边界也要讲清楚：结论建立在 OpenLock 这一单一人机对比范式、CC/CE 两种结构和包括 Claude-4.5 在内的若干前沿模型上，没覆盖更复杂的因果图、真实物理交互或经过显式 causal-tuning 的 agent；视觉条件的退化也可能部分来自 VLM 对这类抽象示意图的感知瓶颈，而非纯粹的因果抽象缺陷。</p>
+<h2 id="是否新瓶装旧酒">是否新瓶装旧酒</h2>
+<p>这是<strong>偏诊断性的新工作</strong>，不是换皮。相关前置研究：</p>
+<ul>
+<li><strong>原始 OpenLock + 经典 RL agent</strong> 的人机对比研究，已指出 RL 在此任务上灾难性失败——本文把被测对象换成前沿 LLM/VLM，并明确提出 &ldquo;environmental grounding&rdquo; 这一中间阶段作为新机制描述，不只是换 benchmark 刷榜。</li>
+<li><strong>LLM causal reasoning 评测</strong>（如各类 causal QA / counterfactual benchmark）大多是静态文本问答，本文强调<strong>交互式顺序发现 + 结构迁移</strong>，设定不同。</li>
+<li><strong>VLM 多模态推理评测</strong>常报告&quot;加视觉就更好&quot;；本文反过来给出视觉条件整体拖累表现的反例，是一个有价值的负面发现。
+增量部分：CC/CE 不对称这一观察偏启发式，尚未给出机制解释。总体判断是真工作，但价值在&quot;划出失败模式&quot;而非提出新方法。</li>
+</ul>
+<h2 id="尚未回答的问题">尚未回答的问题</h2>
+<ul>
+<li>grounding 阶段具体在模型内部发生了什么？是 in-context 记忆，还是某种 latent schema 形成？</li>
+<li>经过显式 causal fine-tuning 或工具使用（如调用符号求解器）的 agent 是否仍表现出同样的 grounding 依赖？</li>
+<li>视觉条件下的退化有多少来自感知瓶颈、多少来自推理瓶颈？用更清晰的结构化视觉输入能否翻转？</li>
+<li>CC/CE 不对称的方向与强度是否随模型规模 / 家族系统变化？</li>
+<li>在更复杂、非二元的因果图或真实机器人交互中，这种 grounding-dependent transfer 还成立吗？</li>
+</ul>
+<h2 id="原始摘要中文翻译">原始摘要（中文翻译）</h2>
+<p>从具体情境中抽取抽象的因果结构并将其应用到新情境，是人类智能的标志之一。尽管大语言模型（LLMs）和视觉语言模型（VLMs）在广泛的推理任务上表现出色，它们进行<strong>交互式因果学习</strong>——通过顺序探索归纳潜在结构并跨情境迁移——的能力仍未被刻画。人类学习者在极少暴露后就能完成此类迁移，而经典强化学习（RL）agent 则灾难性失败。当前最先进的 AI 模型是否具备类人的抽象因果结构迁移机制，仍是一个开放问题。我们使用 OpenLock 范式（要求顺序发现 Common Cause (CC) 与 Common Effect (CE) 两类结构）来研究这一问题，结果表明：模型表现出<strong>根本上延迟或缺失的迁移能力</strong>——即便是成功的模型，也必须先进行环境特定的映射（我们称之为 environmental grounding），效率收益才会出现；而人类从第一次求解尝试起就能利用先验结构知识。在 text-only 条件下，模型的发现效率匹敌甚至超过人类；与之相反，无论是 image-only 还是 text-and-image 条件下的视觉信息，整体上都<strong>降低</strong>而非提升了表现，暴露出模型广泛依赖符号处理，而非真正整合多模态推理。模型还表现出人类所没有的系统性 CC/CE 不对称，暗示其使用的是启发式偏好而非方向中立的因果抽象。这些发现揭示：大规模统计学习不会产出支撑人类类比推理的<strong>去情境化因果 schema</strong>，并将 grounding 依赖的迁移确立为当前 LLM 与 VLM 的一项根本性局限。</p>
+
+      </div>
+
+
+      <footer>
+        
+
+
+        
+        
+        
+        
+        
+        
+        
+      </footer>
+    </article>
+
+    
+  </section>
+
+    </div>
+
+    <footer class="footer">
+  <section class="container">
+    ©
+    
+      2019 -
+    
+    2026
+     Jie Xin 
+    ·
+    
+    Powered by <a href="https://gohugo.io/" target="_blank" rel="noopener">Hugo</a> & <a href="https://github.com/luizdepra/hugo-coder/" target="_blank" rel="noopener">Coder</a>.
+    
+  </section>
+</footer>
+
+  </main>
+
+  
+
+  
+  
+  <script src="/js/coder.min.6ae284be93d2d19dad1f02b0039508d9aab3180a12a06dcc71b0b0ef7825a317.js" integrity="sha256-auKEvpPS0Z2tHwKwA5UI2aqzGAoSoG3McbCw73gloxc="></script>
+  
+
+  
+
+  
+
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+</body>
+</html>

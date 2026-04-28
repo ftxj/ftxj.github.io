@@ -1,0 +1,370 @@
+<!DOCTYPE html>
+<html lang="zh">
+
+<head>
+  <title>
+  DepthKV: Layer-Dependent KV Cache Pruning for Long-Context LLM Inference · JXIN&#39;s Home
+</title>
+  <meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="color-scheme" content="light dark">
+
+
+
+
+<meta name="author" content="Jie Xin">
+<meta name="description" content="arXiv: 2604.24647 · PDF
+作者: Zahra Dehghanighobadi, Asja Fischer
+单位: Ruhr University Bochum, UAR Research Center for Trustworthy Data Science and Security
+主分类: cs.CL · 全部: cs.AI, cs.CL
+命中关键词: large language model, llm, reasoning, inference, kv cache, attention
+
+TL;DR
+DepthKV 提出按层敏感度分配 KV cache 预算的剪枝框架，在相同全局剪枝率下持续优于均匀分配，更有效利用 KV 缓存。
+Motivation
+长上下文推理是 LLM 的关键能力，支撑长文档理解、摘要、代码生成等应用。然而自回归推理依赖 KV cache，其显存占用随序列长度线性增长，成为主要瓶颈。目前 vLLM / SGLang 等长上下文 serving 系统普遍采用 KV cache pruning 来缓解这一开销——即根据 attention score 丢弃低贡献 token。但现有主流方法（如 H2O、SnapKV、StreamingLLM 等）几乎都对所有 transformer 层施加相同的剪枝比例，隐含假设每一层对模型性能的贡献是等价的。作者直接攻击这个假设：实测表明，不同层对 pruning 的敏感度差异显著，某些特定层一旦被剪就会导致 ROUGE-1 断崖式下降，而其他层几乎无感。既然如此，给不敏感的层继续保留同等预算就是浪费；生产系统今天之所以还在这么凑合，是因为缺少一个便宜、可部署的按层预算分配方案。DepthKV 的前提条件——可度量的层敏感度代理（InfoNCE）——让这件事现在值得做。">
+<meta name="keywords" content="blog,developer,personal">
+
+
+
+  <meta name="twitter:card" content="summary">
+  <meta name="twitter:title" content="DepthKV: Layer-Dependent KV Cache Pruning for Long-Context LLM Inference">
+  <meta name="twitter:description" content="arXiv: 2604.24647 · PDF
+作者: Zahra Dehghanighobadi, Asja Fischer
+单位: Ruhr University Bochum, UAR Research Center for Trustworthy Data Science and Security
+主分类: cs.CL · 全部: cs.AI, cs.CL
+命中关键词: large language model, llm, reasoning, inference, kv cache, attention
+TL;DR DepthKV 提出按层敏感度分配 KV cache 预算的剪枝框架，在相同全局剪枝率下持续优于均匀分配，更有效利用 KV 缓存。
+Motivation 长上下文推理是 LLM 的关键能力，支撑长文档理解、摘要、代码生成等应用。然而自回归推理依赖 KV cache，其显存占用随序列长度线性增长，成为主要瓶颈。目前 vLLM / SGLang 等长上下文 serving 系统普遍采用 KV cache pruning 来缓解这一开销——即根据 attention score 丢弃低贡献 token。但现有主流方法（如 H2O、SnapKV、StreamingLLM 等）几乎都对所有 transformer 层施加相同的剪枝比例，隐含假设每一层对模型性能的贡献是等价的。作者直接攻击这个假设：实测表明，不同层对 pruning 的敏感度差异显著，某些特定层一旦被剪就会导致 ROUGE-1 断崖式下降，而其他层几乎无感。既然如此，给不敏感的层继续保留同等预算就是浪费；生产系统今天之所以还在这么凑合，是因为缺少一个便宜、可部署的按层预算分配方案。DepthKV 的前提条件——可度量的层敏感度代理（InfoNCE）——让这件事现在值得做。">
+
+<meta property="og:url" content="https://ftxj.github.io/zh/posts/2026-04-28/08-depthkv-layer-dependent-kv-cache-pruning-for-long-context-ll/">
+  <meta property="og:site_name" content="JXIN&#39;s Home">
+  <meta property="og:title" content="DepthKV: Layer-Dependent KV Cache Pruning for Long-Context LLM Inference">
+  <meta property="og:description" content="arXiv: 2604.24647 · PDF
+作者: Zahra Dehghanighobadi, Asja Fischer
+单位: Ruhr University Bochum, UAR Research Center for Trustworthy Data Science and Security
+主分类: cs.CL · 全部: cs.AI, cs.CL
+命中关键词: large language model, llm, reasoning, inference, kv cache, attention
+TL;DR DepthKV 提出按层敏感度分配 KV cache 预算的剪枝框架，在相同全局剪枝率下持续优于均匀分配，更有效利用 KV 缓存。
+Motivation 长上下文推理是 LLM 的关键能力，支撑长文档理解、摘要、代码生成等应用。然而自回归推理依赖 KV cache，其显存占用随序列长度线性增长，成为主要瓶颈。目前 vLLM / SGLang 等长上下文 serving 系统普遍采用 KV cache pruning 来缓解这一开销——即根据 attention score 丢弃低贡献 token。但现有主流方法（如 H2O、SnapKV、StreamingLLM 等）几乎都对所有 transformer 层施加相同的剪枝比例，隐含假设每一层对模型性能的贡献是等价的。作者直接攻击这个假设：实测表明，不同层对 pruning 的敏感度差异显著，某些特定层一旦被剪就会导致 ROUGE-1 断崖式下降，而其他层几乎无感。既然如此，给不敏感的层继续保留同等预算就是浪费；生产系统今天之所以还在这么凑合，是因为缺少一个便宜、可部署的按层预算分配方案。DepthKV 的前提条件——可度量的层敏感度代理（InfoNCE）——让这件事现在值得做。">
+  <meta property="og:locale" content="zh">
+  <meta property="og:type" content="article">
+    <meta property="article:section" content="posts">
+    <meta property="article:published_time" content="2026-04-28T09:07:11+00:00">
+    <meta property="article:modified_time" content="2026-04-28T09:07:11+00:00">
+
+
+
+
+<link rel="canonical" href="https://ftxj.github.io/zh/posts/2026-04-28/08-depthkv-layer-dependent-kv-cache-pruning-for-long-context-ll/">
+
+
+<link rel="preload" href="/fonts/fa-brands-400.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="/fonts/fa-regular-400.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="/fonts/fa-solid-900.woff2" as="font" type="font/woff2" crossorigin>
+
+
+  
+  
+  <link rel="stylesheet" href="/css/coder.min.5e94c1acf7aa2066035cf2764ae3e4fe39db101d68b870f919966100d51fb861.css" integrity="sha256-XpTBrPeqIGYDXPJ2SuPk/jnbEB1ouHD5GZZhANUfuGE=" crossorigin="anonymous" media="screen" />
+
+
+
+
+
+
+  
+    
+    
+    <link rel="stylesheet" href="/css/coder-dark.min.a00e6364bacbc8266ad1cc81230774a1397198f8cfb7bcba29b7d6fcb54ce57f.css" integrity="sha256-oA5jZLrLyCZq0cyBIwd0oTlxmPjPt7y6KbfW/LVM5X8=" crossorigin="anonymous" media="screen" />
+  
+
+
+
+ 
+
+
+
+
+<link rel="icon" type="image/svg+xml" href="/images/favicon.svg" sizes="any">
+<link rel="icon" type="image/png" href="/images/favicon-32x32.png" sizes="32x32">
+<link rel="icon" type="image/png" href="/images/favicon-16x16.png" sizes="16x16">
+
+<link rel="apple-touch-icon" href="/images/apple-touch-icon.png">
+<link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon.png">
+
+<link rel="manifest" href="/site.webmanifest">
+<link rel="mask-icon" href="/images/safari-pinned-tab.svg" color="#5bbad5">
+
+
+
+
+
+
+<style>
+.content article ul {
+  list-style: disc !important;
+  padding-left: 2.5rem !important;
+}
+
+.content article ul li {
+  display: list-item !important;
+}
+</style>
+
+
+
+
+  
+</head>
+
+
+
+
+
+
+<body class="preload-transitions colorscheme-auto">
+  
+<div class="float-container">
+    <a id="dark-mode-toggle" class="colorscheme-toggle">
+        <i class="fa-solid fa-adjust fa-fw" aria-hidden="true"></i>
+    </a>
+</div>
+
+
+  <main class="wrapper">
+    <nav class="navigation">
+  <section class="container">
+    
+    <a class="navigation-title" href="https://ftxj.github.io/zh/">
+      JXIN&#39;s Home
+    </a>
+    
+    
+      <input type="checkbox" id="menu-toggle" />
+      <label class="menu-button float-right" for="menu-toggle">
+        <i class="fa-solid fa-bars fa-fw" aria-hidden="true"></i>
+      </label>
+      <ul class="navigation-list">
+        
+          
+            <li class="navigation-item">
+              <a class="navigation-link " href="/zh/about/">关于</a>
+            </li>
+          
+            <li class="navigation-item">
+              <a class="navigation-link " href="/zh/travel/">旅行</a>
+            </li>
+          
+            <li class="navigation-item">
+              <a class="navigation-link " href="/zh/posts/">博客</a>
+            </li>
+          
+            <li class="navigation-item">
+              <a class="navigation-link " href="https://ftxj.github.io/cv/cv_zh.pdf">简历</a>
+            </li>
+          
+        
+        
+          
+          
+          
+            
+              
+                <li class="navigation-item menu-separator">
+                  <span>|</span>
+                </li>
+                
+              
+              <li class="navigation-item">
+                <a href="/posts/2026-04-28/08-depthkv-layer-dependent-kv-cache-pruning-for-long-context-ll/">EN</a>
+              </li>
+            
+          
+        
+      </ul>
+    
+  </section>
+</nav>
+
+
+    <div class="content">
+      
+  <section class="container post">
+    <article>
+      <header>
+        <div class="post-title">
+          <h1 class="title">
+            <a class="title-link" href="https://ftxj.github.io/zh/posts/2026-04-28/08-depthkv-layer-dependent-kv-cache-pruning-for-long-context-ll/">
+              DepthKV: Layer-Dependent KV Cache Pruning for Long-Context LLM Inference
+            </a>
+          </h1>
+        </div>
+        <div class="post-meta">
+          <div class="date">
+            <span class="posted-on">
+              <i class="fa-solid fa-calendar" aria-hidden="true"></i>
+              <time datetime="2026-04-28T09:07:11Z">
+                四月 28, 2026
+              </time>
+            </span>
+            <span class="reading-time">
+              <i class="fa-solid fa-clock" aria-hidden="true"></i>
+              2-minute read
+            </span>
+          </div>
+          
+          <div class="categories">
+  <i class="fa-solid fa-folder" aria-hidden="true"></i>
+    <a href="/zh/categories/paper-digest/">Paper-Digest</a>
+      <span class="separator">•</span>
+    <a href="/zh/categories/2026-04-28/">2026-04-28</a></div>
+
+          
+        </div>
+      </header>
+
+      
+
+
+      <div class="post-content">
+        
+        <p><strong>arXiv:</strong> <a href="https://arxiv.org/abs/2604.24647v1">2604.24647</a> · <a href="https://arxiv.org/pdf/2604.24647v1">PDF</a></p>
+<p><strong>作者:</strong> Zahra Dehghanighobadi, Asja Fischer</p>
+<p><strong>单位:</strong> Ruhr University Bochum, UAR Research Center for Trustworthy Data Science and Security</p>
+<p><strong>主分类:</strong> <code>cs.CL</code> · 全部: cs.AI, cs.CL</p>
+<p><strong>命中关键词:</strong> large language model, llm, reasoning, inference, kv cache, attention</p>
+<hr>
+<h2 id="tldr">TL;DR</h2>
+<p>DepthKV 提出按层敏感度分配 KV cache 预算的剪枝框架，在相同全局剪枝率下持续优于均匀分配，更有效利用 KV 缓存。</p>
+<h2 id="motivation">Motivation</h2>
+<p>长上下文推理是 LLM 的关键能力，支撑长文档理解、摘要、代码生成等应用。然而自回归推理依赖 KV cache，其显存占用随序列长度线性增长，成为主要瓶颈。目前 vLLM / SGLang 等长上下文 serving 系统普遍采用 KV cache pruning 来缓解这一开销——即根据 attention score 丢弃低贡献 token。但现有主流方法（如 H2O、SnapKV、StreamingLLM 等）几乎都对所有 transformer 层施加<strong>相同的剪枝比例</strong>，隐含假设每一层对模型性能的贡献是等价的。作者直接攻击这个假设：实测表明，不同层对 pruning 的敏感度差异显著，某些特定层一旦被剪就会导致 ROUGE-1 断崖式下降，而其他层几乎无感。既然如此，给不敏感的层继续保留同等预算就是浪费；生产系统今天之所以还在这么凑合，是因为缺少一个便宜、可部署的按层预算分配方案。DepthKV 的前提条件——可度量的层敏感度代理（InfoNCE）——让这件事现在值得做。</p>
+<h2 id="核心观点">核心观点</h2>
+<ul>
+<li>各 transformer 层对 KV pruning 的敏感度差异巨大，均匀分配次优。</li>
+<li>基于 ROUGE-1 和 YapScore 的 per-layer probing 可识别关键层。</li>
+<li>post-attention InfoNCE 与性能下降呈一致负相关，可作为层重要性代理。</li>
+<li>在固定全局 KV 预算下，按敏感度重新分配预算能显著优于均匀方案。</li>
+</ul>
+<p><img alt="图 2" src="/images/papers/2604.24647/fig2.png"></p>
+<p>图 2 支撑&quot;层敏感度不均&quot;这一核心主张：在每个模型–数据集对内对 ROUGE-1 做 z-score 标准化，逐层单独 prune 时曲线呈剧烈波动，标记点显示性能跌幅集中在特定层而非均匀分布。这直接证伪了均匀剪枝的等价性假设。</p>
+<p><img alt="图 3" src="/images/papers/2604.24647/fig3.png"></p>
+<p>图 3 用 YapScore 复核同一现象：在多数据集上对单层 pruning 做 z-score 归一化，各曲线仍在相近的深层区域出现一致跌幅，说明&quot;关键层&quot;不是 ROUGE 指标的伪影，而是层本身属性。</p>
+<p><img alt="图 4" src="/images/papers/2604.24647/fig4.png"></p>
+<p>图 4 为 DepthKV 的分配准则提供依据：在 arXiv 上，标准化的 post-attention InfoNCE 与 ROUGE-1 跌幅呈稳定负相关——InfoNCE 越低的层，被 prune 后性能掉得越多。作者因此用 InfoNCE 作为无需反复 probing 的层重要性信号。</p>
+<h2 id="方法">方法</h2>
+<p>DepthKV 保持全局 KV 预算不变，但按层敏感度重分配：关键层保留更多 token，其余层更激进地剪枝。敏感度通过 post-attention InfoNCE 估计，避免对每层都跑一遍下游指标评测。框架与现有基于 attention score 的 per-layer 剪枝算法正交，只改&quot;层间预算切分&quot;这一环。</p>
+<p><img alt="图 1" src="/images/papers/2604.24647/fig1.png"></p>
+<p>图 1 对比均匀分配与 DepthKV：左侧各层分到同样的 KV budget，右侧则把预算向高敏感层倾斜、削减低敏感层。这直观展示了 DepthKV 唯一要改的机制点——层间预算再分配，而非替换底层 token 选择算法。</p>
+<h2 id="实验">实验</h2>
+<p>跨多个模型和任务评估，基线为相同全局剪枝率下的 uniform 分配；涉及长上下文数据集（arXiv 等摘要任务）以及数学推理基准 GSM-∞；指标包括 ROUGE-1、YapScore、GSM-∞ 准确率。</p>
+<h2 id="结果">结果</h2>
+<p>在相同全局剪枝率下，DepthKV 持续优于 uniform pruning。数学推理任务上所有 DepthKV 变体在 GSM-∞ 上均超过均匀剪枝，证明层相关分配确实更高效利用了 KV 预算。</p>
+<p><img alt="图 5" src="/images/papers/2604.24647/fig5.png"></p>
+<p>图 5 给出 GSM-∞ 上的准确率对比：不同 KV cache pruning 设置下，DepthKV 的多个变体整体高于 uniform baseline，印证&quot;按层分配&quot;在推理任务上同样有增益，而不仅是摘要类任务的局部现象。</p>
+<h2 id="结论">结论</h2>
+<p>实践者的 single takeaway：在既有 KV cache pruning pipeline 里把&quot;均匀预算&quot;换成基于 InfoNCE 的层相关预算，几乎零成本就能在同一 memory budget 下换来稳定性能提升——GSM-∞ 上所有变体均超 uniform 即是最直接佐证。边界同样明确：摘要未给出具体百分点提升、未披露绝对 latency/显存收益，也未在更大模型或更多剪枝算法上系统消融；InfoNCE 代理的鲁棒性仍需在更多分布外任务上验证。</p>
+<h2 id="是否新瓶装旧酒">是否新瓶装旧酒</h2>
+<p>算增量而非纯换名：</p>
+<ul>
+<li><strong>H2O / SnapKV / StreamingLLM</strong>：同属 attention-score 驱动的 token 级 KV pruning，但都用 uniform 层分配；DepthKV 的新点是在它们之上加一层&quot;层间预算再分配&quot;。</li>
+<li><strong>PyramidKV / PyramidInfer</strong>：已提出非均匀层分配（金字塔状递减），思路方向相同；DepthKV 的差别在于用 InfoNCE 做<strong>数据驱动</strong>的敏感度估计，而非预设金字塔形状。</li>
+<li><strong>layer-wise pruning in vision/general DNN</strong>：按层敏感度剪参数是老思路；这里迁移到 KV cache 场景并给出具体代理指标。
+总体：核心 idea &ldquo;层不等价&quot;并非首创，贡献主要在 InfoNCE 作为层重要性信号 + 在 LLM KV cache 场景的系统化验证。</li>
+</ul>
+<h2 id="尚未回答的问题">尚未回答的问题</h2>
+<ul>
+<li>与 PyramidKV 等已有非均匀分配方法的直接对比如何？</li>
+<li>InfoNCE 代理在多大模型规模下仍稳定？Mixture-of-Experts 场景是否适用？</li>
+<li>具体显存节省与端到端 latency 收益有多少，而非仅看准确率？</li>
+<li>该分配是否需针对不同任务重新校准，还是一次离线 profile 即可通用？</li>
+</ul>
+<h2 id="原始摘要中文翻译">原始摘要（中文翻译）</h2>
+<p>长上下文推理是大语言模型（LLMs）的一项关键能力，支持诸如长文档理解、摘要和代码生成等应用。然而，高效的自回归推理依赖于 key-value（KV）cache，其内存占用随序列长度线性增长，导致严重的内存瓶颈。为缓解这一开销，KV cache pruning 方法会在推理过程中丢弃 attention score 较低的缓存 token。现有大多数方法对各层采用统一的剪枝比例，隐含地假设所有层对整体模型性能的贡献是相同的。我们证明该假设并非最优，因为各层对剪枝的敏感度存在显著差异。我们提出 DepthKV，一种层相关的剪枝框架，根据各层的敏感度在它们之间分配固定的全局 KV 预算，而不是采用均匀分配。在多个模型和任务上，DepthKV 在相同全局剪枝率下持续优于均匀剪枝，表明通过层相关的分配能够更有效地利用 KV cache 预算。</p>
+
+      </div>
+
+
+      <footer>
+        
+
+
+        
+        
+        
+        
+        
+        
+        
+      </footer>
+    </article>
+
+    
+  </section>
+
+    </div>
+
+    <footer class="footer">
+  <section class="container">
+    ©
+    
+      2019 -
+    
+    2026
+     Jie Xin 
+    ·
+    
+    Powered by <a href="https://gohugo.io/" target="_blank" rel="noopener">Hugo</a> & <a href="https://github.com/luizdepra/hugo-coder/" target="_blank" rel="noopener">Coder</a>.
+    
+  </section>
+</footer>
+
+  </main>
+
+  
+
+  
+  
+  <script src="/js/coder.min.6ae284be93d2d19dad1f02b0039508d9aab3180a12a06dcc71b0b0ef7825a317.js" integrity="sha256-auKEvpPS0Z2tHwKwA5UI2aqzGAoSoG3McbCw73gloxc="></script>
+  
+
+  
+
+  
+
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+</body>
+</html>

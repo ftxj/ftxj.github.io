@@ -1,0 +1,380 @@
+<!DOCTYPE html>
+<html lang="zh">
+
+<head>
+  <title>
+  FlashOverlap: Minimizing Tail Latency in Communication Overlap for Distributed LLM Training · JXIN&#39;s Home
+</title>
+  <meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="color-scheme" content="light dark">
+
+
+
+
+<meta name="author" content="Jie Xin">
+<meta name="description" content="arXiv: 2604.24013 · PDF
+作者: Rezaul Karim, Austin Wen, Wang Zongzuo, Weiwei Zhang, Yang Liu, Walid Ahmed
+单位: Toronto Ascend Team, Huawei
+主分类: cs.LG · 全部: cs.CV, cs.DC, cs.LG
+命中关键词: large language model, llm, inference, distributed training, parallelism, gpu, throughput, latency
+
+TL;DR
+FlashOverlap 用分解的 P2P 通信替代 reduce-scatter / all-gather collective，精确消除分布式 LLM 训练中通信-计算 overlap 的 tail latency，适配 TP、DP、TPSP、UP 等多种并行策略。
+Motivation
+LLM 规模膨胀迫使训练和推理不得不跨 GPU/TPU/NPU 切分，但 tensor 并行和 data 并行的 collective 通信开销已经成为算力利用率的主要瓶颈。当前业界的主流 workaround 是通信-计算 overlap，具体做法是把输入按 data slicing 切成若干 chunk、错峰调度——vLLM/Megatron/TransformerEngine 里都能看到这类实现。但作者指出一个具体的痛点：这些 data-slicing 方法会引入 tail latency——最后一个 chunk 没有可 overlap 的计算来掩盖，通信时间直接暴露在关键路径上，导致 overlap 的收益被末尾那一段吃掉。对于今天跑大规模分布式训练 / 长序列 TP 推理的团队来说，这意味着即便上了 overlap，MFU 仍然卡在一个次优点，而单纯堆带宽或者换 NIC 并不能解决这个尾部形状问题。作者认为现在值得做的原因是：ring 型 collective 的内部步骤本来就是一串 P2P，只要敢把 collective 拆开并重新调度 partitioned compute，就能把尾部那一刀填掉。本文的作用范围明确——收紧到通信 overlap 的 tail，不追求改网络拓扑，也不碰 collective 语义。">
+<meta name="keywords" content="blog,developer,personal">
+
+
+
+  <meta name="twitter:card" content="summary">
+  <meta name="twitter:title" content="FlashOverlap: Minimizing Tail Latency in Communication Overlap for Distributed LLM Training">
+  <meta name="twitter:description" content="arXiv: 2604.24013 · PDF
+作者: Rezaul Karim, Austin Wen, Wang Zongzuo, Weiwei Zhang, Yang Liu, Walid Ahmed
+单位: Toronto Ascend Team, Huawei
+主分类: cs.LG · 全部: cs.CV, cs.DC, cs.LG
+命中关键词: large language model, llm, inference, distributed training, parallelism, gpu, throughput, latency
+TL;DR FlashOverlap 用分解的 P2P 通信替代 reduce-scatter / all-gather collective，精确消除分布式 LLM 训练中通信-计算 overlap 的 tail latency，适配 TP、DP、TPSP、UP 等多种并行策略。
+Motivation LLM 规模膨胀迫使训练和推理不得不跨 GPU/TPU/NPU 切分，但 tensor 并行和 data 并行的 collective 通信开销已经成为算力利用率的主要瓶颈。当前业界的主流 workaround 是通信-计算 overlap，具体做法是把输入按 data slicing 切成若干 chunk、错峰调度——vLLM/Megatron/TransformerEngine 里都能看到这类实现。但作者指出一个具体的痛点：这些 data-slicing 方法会引入 tail latency——最后一个 chunk 没有可 overlap 的计算来掩盖，通信时间直接暴露在关键路径上，导致 overlap 的收益被末尾那一段吃掉。对于今天跑大规模分布式训练 / 长序列 TP 推理的团队来说，这意味着即便上了 overlap，MFU 仍然卡在一个次优点，而单纯堆带宽或者换 NIC 并不能解决这个尾部形状问题。作者认为现在值得做的原因是：ring 型 collective 的内部步骤本来就是一串 P2P，只要敢把 collective 拆开并重新调度 partitioned compute，就能把尾部那一刀填掉。本文的作用范围明确——收紧到通信 overlap 的 tail，不追求改网络拓扑，也不碰 collective 语义。">
+
+<meta property="og:url" content="https://ftxj.github.io/zh/posts/2026-04-28/01-flashoverlap-minimizing-tail-latency-in-communication-overla/">
+  <meta property="og:site_name" content="JXIN&#39;s Home">
+  <meta property="og:title" content="FlashOverlap: Minimizing Tail Latency in Communication Overlap for Distributed LLM Training">
+  <meta property="og:description" content="arXiv: 2604.24013 · PDF
+作者: Rezaul Karim, Austin Wen, Wang Zongzuo, Weiwei Zhang, Yang Liu, Walid Ahmed
+单位: Toronto Ascend Team, Huawei
+主分类: cs.LG · 全部: cs.CV, cs.DC, cs.LG
+命中关键词: large language model, llm, inference, distributed training, parallelism, gpu, throughput, latency
+TL;DR FlashOverlap 用分解的 P2P 通信替代 reduce-scatter / all-gather collective，精确消除分布式 LLM 训练中通信-计算 overlap 的 tail latency，适配 TP、DP、TPSP、UP 等多种并行策略。
+Motivation LLM 规模膨胀迫使训练和推理不得不跨 GPU/TPU/NPU 切分，但 tensor 并行和 data 并行的 collective 通信开销已经成为算力利用率的主要瓶颈。当前业界的主流 workaround 是通信-计算 overlap，具体做法是把输入按 data slicing 切成若干 chunk、错峰调度——vLLM/Megatron/TransformerEngine 里都能看到这类实现。但作者指出一个具体的痛点：这些 data-slicing 方法会引入 tail latency——最后一个 chunk 没有可 overlap 的计算来掩盖，通信时间直接暴露在关键路径上，导致 overlap 的收益被末尾那一段吃掉。对于今天跑大规模分布式训练 / 长序列 TP 推理的团队来说，这意味着即便上了 overlap，MFU 仍然卡在一个次优点，而单纯堆带宽或者换 NIC 并不能解决这个尾部形状问题。作者认为现在值得做的原因是：ring 型 collective 的内部步骤本来就是一串 P2P，只要敢把 collective 拆开并重新调度 partitioned compute，就能把尾部那一刀填掉。本文的作用范围明确——收紧到通信 overlap 的 tail，不追求改网络拓扑，也不碰 collective 语义。">
+  <meta property="og:locale" content="zh">
+  <meta property="og:type" content="article">
+    <meta property="article:section" content="posts">
+    <meta property="article:published_time" content="2026-04-28T08:25:04+00:00">
+    <meta property="article:modified_time" content="2026-04-28T08:25:04+00:00">
+
+
+
+
+<link rel="canonical" href="https://ftxj.github.io/zh/posts/2026-04-28/01-flashoverlap-minimizing-tail-latency-in-communication-overla/">
+
+
+<link rel="preload" href="/fonts/fa-brands-400.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="/fonts/fa-regular-400.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="/fonts/fa-solid-900.woff2" as="font" type="font/woff2" crossorigin>
+
+
+  
+  
+  <link rel="stylesheet" href="/css/coder.min.5e94c1acf7aa2066035cf2764ae3e4fe39db101d68b870f919966100d51fb861.css" integrity="sha256-XpTBrPeqIGYDXPJ2SuPk/jnbEB1ouHD5GZZhANUfuGE=" crossorigin="anonymous" media="screen" />
+
+
+
+
+
+
+  
+    
+    
+    <link rel="stylesheet" href="/css/coder-dark.min.a00e6364bacbc8266ad1cc81230774a1397198f8cfb7bcba29b7d6fcb54ce57f.css" integrity="sha256-oA5jZLrLyCZq0cyBIwd0oTlxmPjPt7y6KbfW/LVM5X8=" crossorigin="anonymous" media="screen" />
+  
+
+
+
+ 
+
+
+
+
+<link rel="icon" type="image/svg+xml" href="/images/favicon.svg" sizes="any">
+<link rel="icon" type="image/png" href="/images/favicon-32x32.png" sizes="32x32">
+<link rel="icon" type="image/png" href="/images/favicon-16x16.png" sizes="16x16">
+
+<link rel="apple-touch-icon" href="/images/apple-touch-icon.png">
+<link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon.png">
+
+<link rel="manifest" href="/site.webmanifest">
+<link rel="mask-icon" href="/images/safari-pinned-tab.svg" color="#5bbad5">
+
+
+
+
+
+
+<style>
+.content article ul {
+  list-style: disc !important;
+  padding-left: 2.5rem !important;
+}
+
+.content article ul li {
+  display: list-item !important;
+}
+</style>
+
+
+
+
+  
+</head>
+
+
+
+
+
+
+<body class="preload-transitions colorscheme-auto">
+  
+<div class="float-container">
+    <a id="dark-mode-toggle" class="colorscheme-toggle">
+        <i class="fa-solid fa-adjust fa-fw" aria-hidden="true"></i>
+    </a>
+</div>
+
+
+  <main class="wrapper">
+    <nav class="navigation">
+  <section class="container">
+    
+    <a class="navigation-title" href="https://ftxj.github.io/zh/">
+      JXIN&#39;s Home
+    </a>
+    
+    
+      <input type="checkbox" id="menu-toggle" />
+      <label class="menu-button float-right" for="menu-toggle">
+        <i class="fa-solid fa-bars fa-fw" aria-hidden="true"></i>
+      </label>
+      <ul class="navigation-list">
+        
+          
+            <li class="navigation-item">
+              <a class="navigation-link " href="/zh/about/">关于</a>
+            </li>
+          
+            <li class="navigation-item">
+              <a class="navigation-link " href="/zh/travel/">旅行</a>
+            </li>
+          
+            <li class="navigation-item">
+              <a class="navigation-link " href="/zh/posts/">博客</a>
+            </li>
+          
+            <li class="navigation-item">
+              <a class="navigation-link " href="https://ftxj.github.io/cv/cv_zh.pdf">简历</a>
+            </li>
+          
+        
+        
+          
+          
+          
+            
+              
+                <li class="navigation-item menu-separator">
+                  <span>|</span>
+                </li>
+                
+              
+              <li class="navigation-item">
+                <a href="/posts/2026-04-28/01-flashoverlap-minimizing-tail-latency-in-communication-overla/">EN</a>
+              </li>
+            
+          
+        
+      </ul>
+    
+  </section>
+</nav>
+
+
+    <div class="content">
+      
+  <section class="container post">
+    <article>
+      <header>
+        <div class="post-title">
+          <h1 class="title">
+            <a class="title-link" href="https://ftxj.github.io/zh/posts/2026-04-28/01-flashoverlap-minimizing-tail-latency-in-communication-overla/">
+              FlashOverlap: Minimizing Tail Latency in Communication Overlap for Distributed LLM Training
+            </a>
+          </h1>
+        </div>
+        <div class="post-meta">
+          <div class="date">
+            <span class="posted-on">
+              <i class="fa-solid fa-calendar" aria-hidden="true"></i>
+              <time datetime="2026-04-28T08:25:04Z">
+                四月 28, 2026
+              </time>
+            </span>
+            <span class="reading-time">
+              <i class="fa-solid fa-clock" aria-hidden="true"></i>
+              3-minute read
+            </span>
+          </div>
+          
+          <div class="categories">
+  <i class="fa-solid fa-folder" aria-hidden="true"></i>
+    <a href="/zh/categories/paper-digest/">Paper-Digest</a>
+      <span class="separator">•</span>
+    <a href="/zh/categories/2026-04-28/">2026-04-28</a></div>
+
+          
+        </div>
+      </header>
+
+      
+
+
+      <div class="post-content">
+        
+        <p><strong>arXiv:</strong> <a href="https://arxiv.org/abs/2604.24013v1">2604.24013</a> · <a href="https://arxiv.org/pdf/2604.24013v1">PDF</a></p>
+<p><strong>作者:</strong> Rezaul Karim, Austin Wen, Wang Zongzuo, Weiwei Zhang, Yang Liu, Walid Ahmed</p>
+<p><strong>单位:</strong> Toronto Ascend Team, Huawei</p>
+<p><strong>主分类:</strong> <code>cs.LG</code> · 全部: cs.CV, cs.DC, cs.LG</p>
+<p><strong>命中关键词:</strong> large language model, llm, inference, distributed training, parallelism, gpu, throughput, latency</p>
+<hr>
+<h2 id="tldr">TL;DR</h2>
+<p>FlashOverlap 用分解的 P2P 通信替代 reduce-scatter / all-gather collective，精确消除分布式 LLM 训练中通信-计算 overlap 的 tail latency，适配 TP、DP、TPSP、UP 等多种并行策略。</p>
+<h2 id="motivation">Motivation</h2>
+<p>LLM 规模膨胀迫使训练和推理不得不跨 GPU/TPU/NPU 切分，但 tensor 并行和 data 并行的 collective 通信开销已经成为算力利用率的主要瓶颈。当前业界的主流 workaround 是通信-计算 overlap，具体做法是把输入按 data slicing 切成若干 chunk、错峰调度——vLLM/Megatron/TransformerEngine 里都能看到这类实现。但作者指出一个具体的痛点：<strong>这些 data-slicing 方法会引入 tail latency</strong>——最后一个 chunk 没有可 overlap 的计算来掩盖，通信时间直接暴露在关键路径上，导致 overlap 的收益被末尾那一段吃掉。对于今天跑大规模分布式训练 / 长序列 TP 推理的团队来说，这意味着即便上了 overlap，MFU 仍然卡在一个次优点，而单纯堆带宽或者换 NIC 并不能解决这个尾部形状问题。作者认为现在值得做的原因是：ring 型 collective 的内部步骤本来就是一串 P2P，只要敢把 collective 拆开并重新调度 partitioned compute，就能把尾部那一刀填掉。本文的作用范围明确——收紧到通信 overlap 的 tail，不追求改网络拓扑，也不碰 collective 语义。</p>
+<h2 id="核心观点">核心观点</h2>
+<ul>
+<li>指出现有 data-slicing overlap 方法共同的 tail latency 问题，是 overlap 增益天花板的主因。</li>
+<li>提出 Flash-Overlap：用分解后的 P2P 通信取代 reduce-scatter / all-gather 这两个 collective。</li>
+<li>给出一个<strong>精确（exact）算法</strong>调度 partitioned 计算，使通信与计算细粒度重叠，尾延迟被消除而非掩盖。</li>
+<li>方案通用：兼容 data-parallel、TP、TPSP、UP 等主流并行策略，不是某一种并行的一次性补丁。</li>
+<li>实验声称同时拿到更低 latency、更高 MFU 和更高 throughput。</li>
+</ul>
+<p><img alt="图 7" src="/images/papers/2604.24013/fig7.png"></p>
+<p>上图展示的就是作者要消除的问题：TP 下 attention 用未 overlap 的 reduce-scatter，通信时间直接堆在计算后面形成明显的 overhead——这正是 data-slicing 方案在最后一个 chunk 也解决不掉的 tail。</p>
+<h2 id="方法">方法</h2>
+<p>核心思路是把 ring 型 collective 拆回它底层的 P2P step 序列，并把与之对应的 partitioned 计算重排，让每一个 P2P step 都有一段&quot;自己这一份&quot;的 partial compute 来掩盖。具体包括两个对称的构件：</p>
+<ul>
+<li><strong>Flash All-Gather</strong>：按 ring 顺序把 AG 拆成 N-1 个 P2P send/recv，每一步完成后立刻对已到达的分片启动对应的 partial 计算，下一轮 P2P 与当前 partial compute 异步重叠。</li>
+<li><strong>Flash Reduce-Scatter</strong>：对称地把 RS 分解为 P2P 步 + partial 归约，partitioned compute 与 P2P 交错发射。</li>
+</ul>
+<p><img alt="图 1" src="/images/papers/2604.24013/fig1.png">
+<img alt="图 2" src="/images/papers/2604.24013/fig2.png"></p>
+<p>上面两张图给出 AG 与 RS 的语义起止状态，是理解为什么可以被拆的前提：两者本质上都是分片在 rank 间的一个重新排布 / 规约模式，作者正是要把这个排布过程打开。</p>
+<p><img alt="图 3" src="/images/papers/2604.24013/fig3.png">
+<img alt="图 4" src="/images/papers/2604.24013/fig4.png"></p>
+<p>这两张图进一步展示 AG / RS 的标准 ring 实现——四 rank 逐步传递，每一步只和邻居 P2P。这说明 collective 内部本来就是 P2P 序列，Flash-Overlap 的拆解并不打破语义，只是把隐式的 step 显式暴露出来供调度。</p>
+<p><img alt="图 5" src="/images/papers/2604.24013/fig5.png">
+<img alt="图 6" src="/images/papers/2604.24013/fig6.png"></p>
+<p>这是方法的关键落地图：四 rank 下的 Flash All-Gather / Flash Reduce-Scatter，把 ring 顺序的 P2P step 与 partial-output 计算交错，使每个通信 step 都被一段算力覆盖，末尾不再出现只通信不计算的空洞。作者强调这是一个 exact 算法——不是启发式切 chunk。</p>
+<p><img alt="图 8" src="/images/papers/2604.24013/fig8.png"></p>
+<p>把上述 Flash-RS 套进 TP attention，就得到 Query-Split Flash-RS Attention：Q 维切分后用异步分解 P2P 和 attention 计算重叠，对应消除图 7 中那段暴露的 RS overhead。</p>
+<h2 id="实验">实验</h2>
+<p>摘要层面给出的对比维度包括：latency、Model FLOPS Utilization (MFU)、throughput；覆盖 data-parallel 训练以及 TPSP、UP 在内的多种 tensor 级并行。摘要未披露具体模型、序列长度、集群规模、基线系统名称与数值。</p>
+<h2 id="结果">结果</h2>
+<p>作者报告 Flash-Overlap 在上述设置下&quot;一致地（consistently）&ldquo;拿到更低延迟、更高 MFU 和更高吞吐。由于摘要没给数字，相对 data-slicing overlap 的量化增益、在什么规模下增益最大、通信/计算比例分别是多少这些关键点都待正文确认。</p>
+<h2 id="结论">结论</h2>
+<p>实践者带走的 single takeaway：如果你的 distributed LLM 训练/推理已经上了 data-slicing 的 comm-compute overlap 但 MFU 仍卡住，瓶颈很可能是尾部那一段暴露的 collective，而 Flash-Overlap 通过把 RS/AG 拆成 P2P + partitioned compute 精确调度，从机制上而非启发式地消除它。最能支撑这一点的是作者给出的 &ldquo;exact algorithm that eliminates tail latency&rdquo; 这一定性主张以及 MFU/throughput 同向改善的报告。边界要说清楚：摘要未提供具体数字、未公开集群规模与基线，也没描述 ablation，因此&quot;能把 tail 压到多小&quot;&ldquo;在非 ring 拓扑或异构带宽下是否仍然 exact&quot;仍需正文与复现验证。</p>
+<h2 id="是否新瓶装旧酒">是否新瓶装旧酒</h2>
+<p>倾向真·增量工作，但改进维度相对聚焦：</p>
+<ul>
+<li><strong>CoCoNet / T3 / Megatron 的 SP-overlap</strong>：同样把 collective 与 compute 重叠，但多数是 chunk-level data slicing，正是本文指出会产生 tail latency 的一类；FlashOverlap 的差别在于 collective 被分解成 P2P 后<strong>一次性</strong>消掉尾部，而不是增加 chunk 数量渐近逼近。</li>
+<li><strong>Flux / TransformerEngine 的 TP overlap kernel</strong>：同样面向 TP 的 AG/RS 融合，但大多以 kernel fusion / stream 级别编排为主；本文更强调调度算法层的 exact 重排，与 kernel 层实现正交。</li>
+<li><strong>SplitAttention 类工作</strong>：把 attention 在 Q 维切分以便重叠，这在本文 Query-Split Flash-RS 里也有影子——相似之处是 Q-split 思路，新点在于把 Q-split 直接挂到分解 P2P 的 RS 调度上。</li>
+</ul>
+<p>总体上不确定性在于摘要未公布具体 baseline 名称，真正的新颖度需要看正文对 CoCoNet/T3/Flux 的直接对比。</p>
+<h2 id="尚未回答的问题">尚未回答的问题</h2>
+<ul>
+<li>消除 tail latency 的精确增益数字：MFU 提升多少、throughput 提升多少？</li>
+<li>在非 ring 拓扑（如 rail-optimized、NVSwitch all-to-all）下 exact 性是否仍成立？</li>
+<li>长序列 + 低带宽（跨节点 InfiniBand）下收益与近节点 NVLink 的差异？</li>
+<li>与 kernel-level overlap（Flux 类）叠加是否还有边际收益？</li>
+<li>推理侧（prefill vs decode）的适用性与对 TTFT / ITL 的影响未说明。</li>
+<li>分解 P2P 对调度器复杂度、对 NCCL/HCCL 栈的侵入程度、对容错的影响。</li>
+</ul>
+<h2 id="原始摘要中文翻译">原始摘要（中文翻译）</h2>
+<p>大语言模型规模的快速增长要求把计算负载切分到 GPU、TPU、NPU 等加速器上执行。然而，这些并行策略会带来大量的数据通信开销，严重拖累计算效率。虽然通信-计算 overlap 是一个有前景的方向，但现有基于 data slicing 的方案存在 tail latency 问题。为克服这一限制，本研究提出一种新颖的通信-计算 overlap 技术，用于消除当前最先进 overlap 方法在分布式 LLM 训练中的 tail latency。该技术的目标是有效缓解分布式训练与推理中 tensor parallelism 和 data parallelism 的通信瓶颈。具体而言，我们提出一种名为 Flash-Overlap 的新方法：用分解式的点对点（P2P）通信替代传统的 reduce-scatter 和 all-gather collective 操作，并调度分片计算以实现细粒度 overlap。我们的方法提供了一个用于降低通信开销并消除 tail latency 的 exact 算法。此外，它提供了一个通用解决方案，兼容 data-parallel 训练以及包括 TPSP 和 UP 在内的多种 tensor-level parallelism 策略。实验评估表明，我们的技术在延迟、Model FLOPS Utilization (MFU) 和吞吐等方面都一致取得更优结果。</p>
+
+      </div>
+
+
+      <footer>
+        
+
+
+        
+        
+        
+        
+        
+        
+        
+      </footer>
+    </article>
+
+    
+  </section>
+
+    </div>
+
+    <footer class="footer">
+  <section class="container">
+    ©
+    
+      2019 -
+    
+    2026
+     Jie Xin 
+    ·
+    
+    Powered by <a href="https://gohugo.io/" target="_blank" rel="noopener">Hugo</a> & <a href="https://github.com/luizdepra/hugo-coder/" target="_blank" rel="noopener">Coder</a>.
+    
+  </section>
+</footer>
+
+  </main>
+
+  
+
+  
+  
+  <script src="/js/coder.min.6ae284be93d2d19dad1f02b0039508d9aab3180a12a06dcc71b0b0ef7825a317.js" integrity="sha256-auKEvpPS0Z2tHwKwA5UI2aqzGAoSoG3McbCw73gloxc="></script>
+  
+
+  
+
+  
+
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+</body>
+</html>

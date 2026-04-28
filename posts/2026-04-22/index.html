@@ -1,0 +1,344 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <title>
+  2026-04-22 Paper Digest · JXIN&#39;s Home
+</title>
+  <meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="color-scheme" content="light dark">
+
+
+
+
+<meta name="author" content="Jie Xin">
+<meta name="description" content="Automated digest of 10 arXiv papers on agent / LLM / AI infra submitted in the last 24h, analysed with Claude Code.
+1. SAKE: Self-aware Knowledge Exploitation-Exploration for Grounded Multimodal Named Entity Recognition
+arXiv: 2604.20146 · cs.IR · relevance score 32
+SAKE is an end-to-end agentic framework for Grounded Multimodal Named Entity Recognition (GMNER) that blends internal MLLM knowledge with external retrieval via self-aware reasoning, deciding when to invoke search tools to handle long-tailed and unseen entities on social media.">
+<meta name="keywords" content="blog,developer,personal">
+
+
+
+  <meta name="twitter:card" content="summary">
+  <meta name="twitter:title" content="2026-04-22 Paper Digest">
+  <meta name="twitter:description" content="Automated digest of 10 arXiv papers on agent / LLM / AI infra submitted in the last 24h, analysed with Claude Code.
+1. SAKE: Self-aware Knowledge Exploitation-Exploration for Grounded Multimodal Named Entity Recognition arXiv: 2604.20146 · cs.IR · relevance score 32
+SAKE is an end-to-end agentic framework for Grounded Multimodal Named Entity Recognition (GMNER) that blends internal MLLM knowledge with external retrieval via self-aware reasoning, deciding when to invoke search tools to handle long-tailed and unseen entities on social media.">
+
+<meta property="og:url" content="https://ftxj.github.io/posts/2026-04-22/">
+  <meta property="og:site_name" content="JXIN&#39;s Home">
+  <meta property="og:title" content="2026-04-22 Paper Digest">
+  <meta property="og:description" content="Automated digest of 10 arXiv papers on agent / LLM / AI infra submitted in the last 24h, analysed with Claude Code.
+1. SAKE: Self-aware Knowledge Exploitation-Exploration for Grounded Multimodal Named Entity Recognition arXiv: 2604.20146 · cs.IR · relevance score 32
+SAKE is an end-to-end agentic framework for Grounded Multimodal Named Entity Recognition (GMNER) that blends internal MLLM knowledge with external retrieval via self-aware reasoning, deciding when to invoke search tools to handle long-tailed and unseen entities on social media.">
+  <meta property="og:locale" content="en">
+  <meta property="og:type" content="website">
+
+
+
+
+<link rel="canonical" href="https://ftxj.github.io/posts/2026-04-22/">
+
+
+<link rel="preload" href="/fonts/fa-brands-400.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="/fonts/fa-regular-400.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="/fonts/fa-solid-900.woff2" as="font" type="font/woff2" crossorigin>
+
+
+  
+  
+  <link rel="stylesheet" href="/css/coder.min.5e94c1acf7aa2066035cf2764ae3e4fe39db101d68b870f919966100d51fb861.css" integrity="sha256-XpTBrPeqIGYDXPJ2SuPk/jnbEB1ouHD5GZZhANUfuGE=" crossorigin="anonymous" media="screen" />
+
+
+
+
+
+
+  
+    
+    
+    <link rel="stylesheet" href="/css/coder-dark.min.a00e6364bacbc8266ad1cc81230774a1397198f8cfb7bcba29b7d6fcb54ce57f.css" integrity="sha256-oA5jZLrLyCZq0cyBIwd0oTlxmPjPt7y6KbfW/LVM5X8=" crossorigin="anonymous" media="screen" />
+  
+
+
+
+ 
+
+
+
+
+<link rel="icon" type="image/svg+xml" href="/images/favicon.svg" sizes="any">
+<link rel="icon" type="image/png" href="/images/favicon-32x32.png" sizes="32x32">
+<link rel="icon" type="image/png" href="/images/favicon-16x16.png" sizes="16x16">
+
+<link rel="apple-touch-icon" href="/images/apple-touch-icon.png">
+<link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon.png">
+
+<link rel="manifest" href="/site.webmanifest">
+<link rel="mask-icon" href="/images/safari-pinned-tab.svg" color="#5bbad5">
+
+
+<link rel="alternate" type="application/rss+xml" href="/posts/2026-04-22/index.xml" title="JXIN's Home" />
+
+
+
+
+<style>
+.content article ul {
+  list-style: disc !important;
+  padding-left: 2.5rem !important;
+}
+
+.content article ul li {
+  display: list-item !important;
+}
+</style>
+
+
+
+
+  
+</head>
+
+
+
+
+
+
+<body class="preload-transitions colorscheme-auto">
+  
+<div class="float-container">
+    <a id="dark-mode-toggle" class="colorscheme-toggle">
+        <i class="fa-solid fa-adjust fa-fw" aria-hidden="true"></i>
+    </a>
+</div>
+
+
+  <main class="wrapper">
+    <nav class="navigation">
+  <section class="container">
+    
+    <a class="navigation-title" href="https://ftxj.github.io/">
+      JXIN&#39;s Home
+    </a>
+    
+    
+      <input type="checkbox" id="menu-toggle" />
+      <label class="menu-button float-right" for="menu-toggle">
+        <i class="fa-solid fa-bars fa-fw" aria-hidden="true"></i>
+      </label>
+      <ul class="navigation-list">
+        
+          
+            <li class="navigation-item">
+              <a class="navigation-link " href="/about/">About</a>
+            </li>
+          
+            <li class="navigation-item">
+              <a class="navigation-link " href="/travel/">Travel</a>
+            </li>
+          
+            <li class="navigation-item">
+              <a class="navigation-link " href="/posts/">Blog</a>
+            </li>
+          
+            <li class="navigation-item">
+              <a class="navigation-link " href="https://ftxj.github.io/cv/cv.pdf">CV</a>
+            </li>
+          
+        
+        
+          
+          
+          
+            
+              
+                <li class="navigation-item menu-separator">
+                  <span>|</span>
+                </li>
+                
+              
+              <li class="navigation-item">
+                <a href="/zh/posts/2026-04-22/">中文</a>
+              </li>
+            
+          
+        
+      </ul>
+    
+  </section>
+</nav>
+
+
+    <div class="content">
+      
+  <section class="container list">
+    <header>
+      <h1 class="title">
+        <a class="title-link" href="https://ftxj.github.io/posts/2026-04-22/">
+          2026-04-22 Paper Digest
+        </a>
+      </h1>
+    </header>
+    <p>Automated digest of <strong>10</strong> arXiv papers on agent / LLM / AI infra submitted in the last 24h, analysed with Claude Code.</p>
+<h3 id="1-sake-self-aware-knowledge-exploitation-exploration-for-grounded-multimodal-named-entity-recognition">1. SAKE: Self-aware Knowledge Exploitation-Exploration for Grounded Multimodal Named Entity Recognition</h3>
+<p><em>arXiv: <a href="https://arxiv.org/abs/2604.20146v1">2604.20146</a> · <code>cs.IR</code> · relevance score <strong>32</strong></em></p>
+<p>SAKE is an end-to-end agentic framework for Grounded Multimodal Named Entity Recognition (GMNER) that blends internal MLLM knowledge with external retrieval via self-aware reasoning, deciding when to invoke search tools to handle long-tailed and unseen entities on social media.</p>
+<p><a href="/posts/2026-04-22/01-sake-self-aware-knowledge-exploitation-exploration-for-groun/">Read detailed analysis →</a></p>
+<hr>
+<h3 id="2-has-accelerating-rag-through-homology-aware-speculative-retrieval">2. HaS: Accelerating RAG through Homology-Aware Speculative Retrieval</h3>
+<p><em>arXiv: <a href="https://arxiv.org/abs/2604.20452v1">2604.20452</a> · <code>cs.IR</code> · relevance score <strong>26</strong></em></p>
+<p>HaS accelerates Retrieval-Augmented Generation by speculatively retrieving from a restricted scope, then validating candidates via &ldquo;homologous query re-identification&rdquo; — checking whether the incoming query matches a previously-seen one. This bypasses full-database search for repeat-like queries, cutting latency 24–37% with 1–2% accuracy loss.</p>
+<p><a href="/posts/2026-04-22/02-has-accelerating-rag-through-homology-aware-speculative-retr/">Read detailed analysis →</a></p>
+<hr>
+<h3 id="3-automatic-ontology-construction-using-llms-as-an-external-layer-of-memory-verification-and-planning-for-hybrid-intelligent-systems">3. Automatic Ontology Construction Using LLMs as an External Layer of Memory, Verification, and Planning for Hybrid Intelligent Systems</h3>
+<p><em>arXiv: <a href="https://arxiv.org/abs/2604.20795v1">2604.20795</a> · <code>cs.AI</code> · relevance score <strong>22</strong></em></p>
+<p>The paper proposes a hybrid architecture augmenting LLMs with an external RDF/OWL ontological memory layer, automatically constructed from heterogeneous sources, to enable persistent, verifiable, and semantically grounded reasoning beyond vector-based RAG.</p>
+<p><a href="/posts/2026-04-22/03-automatic-ontology-construction-using-llms-as-an-external-la/">Read detailed analysis →</a></p>
+<hr>
+<h3 id="4-breaking-mcp-with-function-hijacking-attacks-novel-threats-for-function-calling-and-agentic-models">4. Breaking MCP with Function Hijacking Attacks: Novel Threats for Function Calling and Agentic Models</h3>
+<p><em>arXiv: <a href="https://arxiv.org/abs/2604.20994v1">2604.20994</a> · <code>cs.CR</code> · relevance score <strong>21</strong></em></p>
+<p>This paper introduces Function Hijacking Attacks (FHA), a novel adversarial technique that manipulates agentic LLMs&rsquo; tool selection to force invocation of attacker-chosen functions, achieving 70-100% attack success rates across five models on the BFCL benchmark, largely independent of query semantics.</p>
+<p><a href="/posts/2026-04-22/04-breaking-mcp-with-function-hijacking-attacks-novel-threats-f/">Read detailed analysis →</a></p>
+<hr>
+<h3 id="5-cooperative-profiles-predict-multi-agent-llm-team-performance-in-ai-for-science-workflows">5. Cooperative Profiles Predict Multi-Agent LLM Team Performance in AI for Science Workflows</h3>
+<p><em>arXiv: <a href="https://arxiv.org/abs/2604.20658v1">2604.20658</a> · <code>cs.CL</code> · relevance score <strong>21</strong></em></p>
+<p>Authors benchmark 35 open-weight LLMs on six behavioral-economics games and show that the resulting &ldquo;cooperative profiles&rdquo; predict downstream team performance in AI-for-Science workflows under shared budget constraints, offering a cheap diagnostic for multi-agent deployment.</p>
+<p><a href="/posts/2026-04-22/05-cooperative-profiles-predict-multi-agent-llm-team-performanc/">Read detailed analysis →</a></p>
+<hr>
+<h3 id="6-faser-fine-grained-phase-management-for-speculative-decoding-in-dynamic-llm-serving">6. FASER: Fine-Grained Phase Management for Speculative Decoding in Dynamic LLM Serving</h3>
+<p><em>arXiv: <a href="https://arxiv.org/abs/2604.20503v1">2604.20503</a> · <code>cs.DC</code> · relevance score <strong>21</strong></em></p>
+<p>FASER is a fine-grained speculative-decoding scheduler for dynamic LLM serving that tunes speculative length per request, prunes rejected tokens early, and spatially overlaps draft and verification phases, yielding up to 53% higher throughput and 1.92× lower latency over SOTA in vLLM.</p>
+<p><a href="/posts/2026-04-22/06-faser-fine-grained-phase-management-for-speculative-decoding/">Read detailed analysis →</a></p>
+<hr>
+<h3 id="7-dual-cluster-memory-agent-resolving-multi-paradigm-ambiguity-in-optimization-problem-solving">7. Dual-Cluster Memory Agent: Resolving Multi-Paradigm Ambiguity in Optimization Problem Solving</h3>
+<p><em>arXiv: <a href="https://arxiv.org/abs/2604.20183v1">2604.20183</a> · <code>cs.CL</code> · relevance score <strong>20</strong></em></p>
+<p>DCM-Agent is a training-free framework that resolves structural ambiguity in LLM-based optimization problem solving by maintaining dual clusters of historical solutions (modeling + coding), distilled into Approach/Checklist/Pitfall knowledge, and using them for memory-augmented inference.</p>
+<p><a href="/posts/2026-04-22/07-dual-cluster-memory-agent-resolving-multi-paradigm-ambiguity/">Read detailed analysis →</a></p>
+<hr>
+<h3 id="8-evoagent-an-evolvable-agent-framework-with-skill-learning-and-multi-agent-delegation">8. EvoAgent: An Evolvable Agent Framework with Skill Learning and Multi-Agent Delegation</h3>
+<p><em>arXiv: <a href="https://arxiv.org/abs/2604.20133v2">2604.20133</a> · <code>cs.AI</code> · relevance score <strong>19</strong></em></p>
+<p>EvoAgent is an evolvable LLM agent framework combining structured skill learning, hierarchical sub-agent delegation, and a three-layer memory. On real-world foreign-trade tasks with GPT5.2, it lifts a five-dimensional LLM-as-Judge score by ~28%.</p>
+<p><a href="/posts/2026-04-22/08-evoagent-an-evolvable-agent-framework-with-skill-learning-an/">Read detailed analysis →</a></p>
+<hr>
+<h3 id="9-agentic-ai-for-personalized-physiotherapy-a-multi-agent-framework-for-generative-video-training-and-real-time-pose-correction">9. Agentic AI for Personalized Physiotherapy: A Multi-Agent Framework for Generative Video Training and Real-Time Pose Correction</h3>
+<p><em>arXiv: <a href="https://arxiv.org/abs/2604.21154v1">2604.21154</a> · <code>cs.AI</code> · relevance score <strong>19</strong></em></p>
+<p>Proposes a four-agent system that parses clinical notes, generates patient-specific exercise videos, tracks poses in real time, and delivers corrective feedback for at-home physiotherapy. The paper is largely architectural, presenting a prototype and evaluation plan rather than clinical results.</p>
+<p><a href="/posts/2026-04-22/09-agentic-ai-for-personalized-physiotherapy-a-multi-agent-fram/">Read detailed analysis →</a></p>
+<hr>
+<h3 id="10-co-evolving-llm-decision-and-skill-bank-agents-for-long-horizon-tasks">10. Co-Evolving LLM Decision and Skill Bank Agents for Long-Horizon Tasks</h3>
+<p><em>arXiv: <a href="https://arxiv.org/abs/2604.20987v1">2604.20987</a> · <code>cs.AI</code> · relevance score <strong>19</strong></em></p>
+<p>COSPLAY is a co-evolution framework pairing an LLM decision agent with a learnable skill bank: the decision agent retrieves skills to act, while a skill-pipeline agent mines reusable skills from unlabeled rollouts. An 8B model beats four frontier LLM baselines by &gt;25% average reward on six game environments.</p>
+<p><a href="/posts/2026-04-22/10-co-evolving-llm-decision-and-skill-bank-agents-for-long-hori/">Read detailed analysis →</a></p>
+<hr>
+
+    <ul>
+      <li>
+          <span class="date">April 27, 2026</span>
+          <a class="title" href="/posts/2026-04-22/10-co-evolving-llm-decision-and-skill-bank-agents-for-long-hori/">Co-Evolving LLM Decision and Skill Bank Agents for Long-Horizon Tasks</a>
+        </li><li>
+          <span class="date">April 27, 2026</span>
+          <a class="title" href="/posts/2026-04-22/09-agentic-ai-for-personalized-physiotherapy-a-multi-agent-fram/">Agentic AI for Personalized Physiotherapy: A Multi-Agent Framework for Generative Video Training and Real-Time Pose Correction</a>
+        </li><li>
+          <span class="date">April 27, 2026</span>
+          <a class="title" href="/posts/2026-04-22/08-evoagent-an-evolvable-agent-framework-with-skill-learning-an/">EvoAgent: An Evolvable Agent Framework with Skill Learning and Multi-Agent Delegation</a>
+        </li><li>
+          <span class="date">April 27, 2026</span>
+          <a class="title" href="/posts/2026-04-22/07-dual-cluster-memory-agent-resolving-multi-paradigm-ambiguity/">Dual-Cluster Memory Agent: Resolving Multi-Paradigm Ambiguity in Optimization Problem Solving</a>
+        </li><li>
+          <span class="date">April 27, 2026</span>
+          <a class="title" href="/posts/2026-04-22/06-faser-fine-grained-phase-management-for-speculative-decoding/">FASER: Fine-Grained Phase Management for Speculative Decoding in Dynamic LLM Serving</a>
+        </li><li>
+          <span class="date">April 27, 2026</span>
+          <a class="title" href="/posts/2026-04-22/05-cooperative-profiles-predict-multi-agent-llm-team-performanc/">Cooperative Profiles Predict Multi-Agent LLM Team Performance in AI for Science Workflows</a>
+        </li><li>
+          <span class="date">April 27, 2026</span>
+          <a class="title" href="/posts/2026-04-22/04-breaking-mcp-with-function-hijacking-attacks-novel-threats-f/">Breaking MCP with Function Hijacking Attacks: Novel Threats for Function Calling and Agentic Models</a>
+        </li><li>
+          <span class="date">April 27, 2026</span>
+          <a class="title" href="/posts/2026-04-22/03-automatic-ontology-construction-using-llms-as-an-external-la/">Automatic Ontology Construction Using LLMs as an External Layer of Memory, Verification, and Planning for Hybrid Intelligent Systems</a>
+        </li><li>
+          <span class="date">April 27, 2026</span>
+          <a class="title" href="/posts/2026-04-22/02-has-accelerating-rag-through-homology-aware-speculative-retr/">HaS: Accelerating RAG through Homology-Aware Speculative Retrieval</a>
+        </li><li>
+          <span class="date">April 27, 2026</span>
+          <a class="title" href="/posts/2026-04-22/01-sake-self-aware-knowledge-exploitation-exploration-for-groun/">SAKE: Self-aware Knowledge Exploitation-Exploration for Grounded Multimodal Named Entity Recognition</a>
+        </li></ul>
+
+    
+
+
+
+
+
+
+  </section>
+
+    </div>
+
+    <footer class="footer">
+  <section class="container">
+    ©
+    
+      2019 -
+    
+    2026
+     Jie Xin 
+    ·
+    
+    Powered by <a href="https://gohugo.io/" target="_blank" rel="noopener">Hugo</a> & <a href="https://github.com/luizdepra/hugo-coder/" target="_blank" rel="noopener">Coder</a>.
+    
+  </section>
+</footer>
+
+  </main>
+
+  
+
+  
+  
+  <script src="/js/coder.min.6ae284be93d2d19dad1f02b0039508d9aab3180a12a06dcc71b0b0ef7825a317.js" integrity="sha256-auKEvpPS0Z2tHwKwA5UI2aqzGAoSoG3McbCw73gloxc="></script>
+  
+
+  
+
+  
+
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+</body>
+</html>
