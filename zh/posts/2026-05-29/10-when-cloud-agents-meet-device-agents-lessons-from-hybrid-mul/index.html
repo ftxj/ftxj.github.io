@@ -1,0 +1,396 @@
+<!DOCTYPE html>
+<html lang="zh">
+
+<head>
+  <title>
+  When Cloud Agents Meet Device Agents: Lessons from Hybrid Multi-Agent Systems · JXIN&#39;s Home
+</title>
+  <meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="color-scheme" content="light dark">
+
+
+
+
+<meta name="author" content="Jie Xin">
+<meta name="description" content="arXiv: 2605.30102 · PDF
+作者: Corrado Rainone, Davide Belli, Bence Major, Arash Behboodi
+单位: Qualcomm AI Research
+主分类: cs.MA · 全部: cs.AI, cs.MA
+命中关键词: large language model, llm, agent, agentic, multi-agent, inference
+
+TL;DR
+本文系统研究了云端大模型与设备端小模型组成的混合多智能体系统（MAS）设计空间，发现最优架构高度依赖任务类型，增加云端算力并不总能提升性能。
+Motivation
+随着 LLM 越来越多地以&quot;agent&quot;形式部署，用户面临两难困境：云端前沿大模型（如 GPT-4o）能力强但按 token 计费，长 horizon 任务的 API 成本可能急剧膨胀；而设备端小模型（SLM）成本低、私密性好，但能力有显著差距，尤其在上下文长度上受设备 DRAM 硬性约束，KV-cache 容量远不及云端。
+现有混合方案通常是&quot;路由&quot;模式——根据请求类型将其分派给大或小模型——但这种方案没有充分发挥多智能体协作的潜力：不同模型可以承担不同角色（规划者 vs 执行者，督导者 vs 操作者），而不仅仅是互为替补。当前工程实践中，将云端与边缘模型结合进 MAS 的做法仍是针对特定领域的 ad hoc 决策，缺乏通用设计原则。作者认为现在是系统研究这一设计空间的时机：SLM 质量近年显著提升，已可在受限域内接近前沿模型，且上下文管理（context reset / summarization）技术可缓解设备端内存瓶颈，使得云端&#43;边缘协作比以前更可行。
+核心观点
+
+将两种代表性 MAS 架构（PEVA 和 EVA）改造为支持混合云-边推理，提供统一框架评估准确率、货币成本与边缘能耗之间的 Pareto 权衡。
+证明不存在&quot;免费午餐&quot;架构：PEVA（规划为主）在 UI 任务（AppWorld）上表现最优，EVA（建议为主）在 Deep Search（FanOutQA）上更具竞争力。
+云端算力使用越多并不总能带来更好性能——在某些任务上增加云端 Supervisor 干预反而有害。
+确定了影响混合协作效果的关键机制：督导频率、重启策略、以及摘要机制。
+展示混合 MAS 通过 context reset 与 summarization 有效控制边缘 KV-cache 增长，提升对内存受限设备的适配性（Table 3）。
+
+方法
+论文适配并研究了两种混合 MAS 架构：">
+<meta name="keywords" content="blog,developer,personal">
+
+
+
+  <meta name="twitter:card" content="summary">
+  <meta name="twitter:title" content="When Cloud Agents Meet Device Agents: Lessons from Hybrid Multi-Agent Systems">
+  <meta name="twitter:description" content="arXiv: 2605.30102 · PDF
+作者: Corrado Rainone, Davide Belli, Bence Major, Arash Behboodi
+单位: Qualcomm AI Research
+主分类: cs.MA · 全部: cs.AI, cs.MA
+命中关键词: large language model, llm, agent, agentic, multi-agent, inference
+TL;DR 本文系统研究了云端大模型与设备端小模型组成的混合多智能体系统（MAS）设计空间，发现最优架构高度依赖任务类型，增加云端算力并不总能提升性能。
+Motivation 随着 LLM 越来越多地以&#34;agent&#34;形式部署，用户面临两难困境：云端前沿大模型（如 GPT-4o）能力强但按 token 计费，长 horizon 任务的 API 成本可能急剧膨胀；而设备端小模型（SLM）成本低、私密性好，但能力有显著差距，尤其在上下文长度上受设备 DRAM 硬性约束，KV-cache 容量远不及云端。
+现有混合方案通常是&#34;路由&#34;模式——根据请求类型将其分派给大或小模型——但这种方案没有充分发挥多智能体协作的潜力：不同模型可以承担不同角色（规划者 vs 执行者，督导者 vs 操作者），而不仅仅是互为替补。当前工程实践中，将云端与边缘模型结合进 MAS 的做法仍是针对特定领域的 ad hoc 决策，缺乏通用设计原则。作者认为现在是系统研究这一设计空间的时机：SLM 质量近年显著提升，已可在受限域内接近前沿模型，且上下文管理（context reset / summarization）技术可缓解设备端内存瓶颈，使得云端&#43;边缘协作比以前更可行。
+核心观点 将两种代表性 MAS 架构（PEVA 和 EVA）改造为支持混合云-边推理，提供统一框架评估准确率、货币成本与边缘能耗之间的 Pareto 权衡。 证明不存在&#34;免费午餐&#34;架构：PEVA（规划为主）在 UI 任务（AppWorld）上表现最优，EVA（建议为主）在 Deep Search（FanOutQA）上更具竞争力。 云端算力使用越多并不总能带来更好性能——在某些任务上增加云端 Supervisor 干预反而有害。 确定了影响混合协作效果的关键机制：督导频率、重启策略、以及摘要机制。 展示混合 MAS 通过 context reset 与 summarization 有效控制边缘 KV-cache 增长，提升对内存受限设备的适配性（Table 3）。 方法 论文适配并研究了两种混合 MAS 架构：">
+
+<meta property="og:url" content="https://ftxj.github.io/zh/posts/2026-05-29/10-when-cloud-agents-meet-device-agents-lessons-from-hybrid-mul/">
+  <meta property="og:site_name" content="JXIN&#39;s Home">
+  <meta property="og:title" content="When Cloud Agents Meet Device Agents: Lessons from Hybrid Multi-Agent Systems">
+  <meta property="og:description" content="arXiv: 2605.30102 · PDF
+作者: Corrado Rainone, Davide Belli, Bence Major, Arash Behboodi
+单位: Qualcomm AI Research
+主分类: cs.MA · 全部: cs.AI, cs.MA
+命中关键词: large language model, llm, agent, agentic, multi-agent, inference
+TL;DR 本文系统研究了云端大模型与设备端小模型组成的混合多智能体系统（MAS）设计空间，发现最优架构高度依赖任务类型，增加云端算力并不总能提升性能。
+Motivation 随着 LLM 越来越多地以&#34;agent&#34;形式部署，用户面临两难困境：云端前沿大模型（如 GPT-4o）能力强但按 token 计费，长 horizon 任务的 API 成本可能急剧膨胀；而设备端小模型（SLM）成本低、私密性好，但能力有显著差距，尤其在上下文长度上受设备 DRAM 硬性约束，KV-cache 容量远不及云端。
+现有混合方案通常是&#34;路由&#34;模式——根据请求类型将其分派给大或小模型——但这种方案没有充分发挥多智能体协作的潜力：不同模型可以承担不同角色（规划者 vs 执行者，督导者 vs 操作者），而不仅仅是互为替补。当前工程实践中，将云端与边缘模型结合进 MAS 的做法仍是针对特定领域的 ad hoc 决策，缺乏通用设计原则。作者认为现在是系统研究这一设计空间的时机：SLM 质量近年显著提升，已可在受限域内接近前沿模型，且上下文管理（context reset / summarization）技术可缓解设备端内存瓶颈，使得云端&#43;边缘协作比以前更可行。
+核心观点 将两种代表性 MAS 架构（PEVA 和 EVA）改造为支持混合云-边推理，提供统一框架评估准确率、货币成本与边缘能耗之间的 Pareto 权衡。 证明不存在&#34;免费午餐&#34;架构：PEVA（规划为主）在 UI 任务（AppWorld）上表现最优，EVA（建议为主）在 Deep Search（FanOutQA）上更具竞争力。 云端算力使用越多并不总能带来更好性能——在某些任务上增加云端 Supervisor 干预反而有害。 确定了影响混合协作效果的关键机制：督导频率、重启策略、以及摘要机制。 展示混合 MAS 通过 context reset 与 summarization 有效控制边缘 KV-cache 增长，提升对内存受限设备的适配性（Table 3）。 方法 论文适配并研究了两种混合 MAS 架构：">
+  <meta property="og:locale" content="zh">
+  <meta property="og:type" content="article">
+    <meta property="article:section" content="posts">
+    <meta property="article:published_time" content="2026-05-29T12:36:41+00:00">
+    <meta property="article:modified_time" content="2026-05-29T12:36:41+00:00">
+
+
+
+
+<link rel="canonical" href="https://ftxj.github.io/zh/posts/2026-05-29/10-when-cloud-agents-meet-device-agents-lessons-from-hybrid-mul/">
+
+
+<link rel="preload" href="/fonts/fa-brands-400.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="/fonts/fa-regular-400.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="/fonts/fa-solid-900.woff2" as="font" type="font/woff2" crossorigin>
+
+
+  
+  
+  <link rel="stylesheet" href="/css/coder.min.5e94c1acf7aa2066035cf2764ae3e4fe39db101d68b870f919966100d51fb861.css" integrity="sha256-XpTBrPeqIGYDXPJ2SuPk/jnbEB1ouHD5GZZhANUfuGE=" crossorigin="anonymous" media="screen" />
+
+
+
+
+
+
+  
+    
+    
+    <link rel="stylesheet" href="/css/coder-dark.min.a00e6364bacbc8266ad1cc81230774a1397198f8cfb7bcba29b7d6fcb54ce57f.css" integrity="sha256-oA5jZLrLyCZq0cyBIwd0oTlxmPjPt7y6KbfW/LVM5X8=" crossorigin="anonymous" media="screen" />
+  
+
+
+
+ 
+
+
+
+
+<link rel="icon" type="image/svg+xml" href="/images/favicon.svg" sizes="any">
+<link rel="icon" type="image/png" href="/images/favicon-32x32.png" sizes="32x32">
+<link rel="icon" type="image/png" href="/images/favicon-16x16.png" sizes="16x16">
+
+<link rel="apple-touch-icon" href="/images/apple-touch-icon.png">
+<link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon.png">
+
+<link rel="manifest" href="/site.webmanifest">
+<link rel="mask-icon" href="/images/safari-pinned-tab.svg" color="#5bbad5">
+
+
+
+
+
+
+<style>
+.content article ul {
+  list-style: disc !important;
+  padding-left: 2.5rem !important;
+}
+
+.content article ul li {
+  display: list-item !important;
+}
+</style>
+
+
+
+
+  
+</head>
+
+
+
+
+
+
+<body class="preload-transitions colorscheme-auto">
+  
+<div class="float-container">
+    <a id="dark-mode-toggle" class="colorscheme-toggle">
+        <i class="fa-solid fa-adjust fa-fw" aria-hidden="true"></i>
+    </a>
+</div>
+
+
+  <main class="wrapper">
+    <nav class="navigation">
+  <section class="container">
+    
+    <a class="navigation-title" href="https://ftxj.github.io/zh/">
+      JXIN&#39;s Home
+    </a>
+    
+    
+      <input type="checkbox" id="menu-toggle" />
+      <label class="menu-button float-right" for="menu-toggle">
+        <i class="fa-solid fa-bars fa-fw" aria-hidden="true"></i>
+      </label>
+      <ul class="navigation-list">
+        
+          
+            <li class="navigation-item">
+              <a class="navigation-link " href="/zh/about/">关于</a>
+            </li>
+          
+            <li class="navigation-item">
+              <a class="navigation-link " href="/zh/travel/">旅行</a>
+            </li>
+          
+            <li class="navigation-item">
+              <a class="navigation-link " href="/zh/hiking/">徒步</a>
+            </li>
+          
+            <li class="navigation-item">
+              <a class="navigation-link " href="/zh/posts/">博客</a>
+            </li>
+          
+            <li class="navigation-item">
+              <a class="navigation-link " href="https://ftxj.github.io/cv/cv_zh.pdf">简历</a>
+            </li>
+          
+        
+        
+          
+          
+          
+            
+              
+                <li class="navigation-item menu-separator">
+                  <span>|</span>
+                </li>
+                
+              
+              <li class="navigation-item">
+                <a href="/posts/2026-05-29/10-when-cloud-agents-meet-device-agents-lessons-from-hybrid-mul/">EN</a>
+              </li>
+            
+          
+        
+      </ul>
+    
+  </section>
+</nav>
+
+
+    <div class="content">
+      
+  <section class="container post">
+    <article>
+      <header>
+        <div class="post-title">
+          <h1 class="title">
+            <a class="title-link" href="https://ftxj.github.io/zh/posts/2026-05-29/10-when-cloud-agents-meet-device-agents-lessons-from-hybrid-mul/">
+              When Cloud Agents Meet Device Agents: Lessons from Hybrid Multi-Agent Systems
+            </a>
+          </h1>
+        </div>
+        <div class="post-meta">
+          <div class="date">
+            <span class="posted-on">
+              <i class="fa-solid fa-calendar" aria-hidden="true"></i>
+              <time datetime="2026-05-29T12:36:41Z">
+                五月 29, 2026
+              </time>
+            </span>
+            <span class="reading-time">
+              <i class="fa-solid fa-clock" aria-hidden="true"></i>
+              2-minute read
+            </span>
+          </div>
+          
+          <div class="categories">
+  <i class="fa-solid fa-folder" aria-hidden="true"></i>
+    <a href="/zh/categories/paper-digest/">Paper-Digest</a>
+      <span class="separator">•</span>
+    <a href="/zh/categories/2026-05-29/">2026-05-29</a></div>
+
+          
+        </div>
+      </header>
+
+      
+
+
+      <div class="post-content">
+        
+        <p><strong>arXiv:</strong> <a href="https://arxiv.org/abs/2605.30102">2605.30102</a> · <a href="https://arxiv.org/pdf/2605.30102">PDF</a></p>
+<p><strong>作者:</strong> Corrado Rainone, Davide Belli, Bence Major, Arash Behboodi</p>
+<p><strong>单位:</strong> Qualcomm AI Research</p>
+<p><strong>主分类:</strong> <code>cs.MA</code> · 全部: cs.AI, cs.MA</p>
+<p><strong>命中关键词:</strong> large language model, llm, agent, agentic, multi-agent, inference</p>
+<hr>
+<h2 id="tldr">TL;DR</h2>
+<p>本文系统研究了云端大模型与设备端小模型组成的混合多智能体系统（MAS）设计空间，发现最优架构高度依赖任务类型，增加云端算力并不总能提升性能。</p>
+<h2 id="motivation">Motivation</h2>
+<p>随着 LLM 越来越多地以&quot;agent&quot;形式部署，用户面临两难困境：云端前沿大模型（如 GPT-4o）能力强但按 token 计费，长 horizon 任务的 API 成本可能急剧膨胀；而设备端小模型（SLM）成本低、私密性好，但能力有显著差距，尤其在上下文长度上受设备 DRAM 硬性约束，KV-cache 容量远不及云端。</p>
+<p>现有混合方案通常是&quot;路由&quot;模式——根据请求类型将其分派给大或小模型——但这种方案没有充分发挥多智能体协作的潜力：不同模型可以承担不同角色（规划者 vs 执行者，督导者 vs 操作者），而不仅仅是互为替补。当前工程实践中，将云端与边缘模型结合进 MAS 的做法仍是针对特定领域的 ad hoc 决策，缺乏通用设计原则。作者认为现在是系统研究这一设计空间的时机：SLM 质量近年显著提升，已可在受限域内接近前沿模型，且上下文管理（context reset / summarization）技术可缓解设备端内存瓶颈，使得云端+边缘协作比以前更可行。</p>
+<h2 id="核心观点">核心观点</h2>
+<ul>
+<li>将两种代表性 MAS 架构（PEVA 和 EVA）改造为支持混合云-边推理，提供统一框架评估准确率、货币成本与边缘能耗之间的 Pareto 权衡。</li>
+<li>证明不存在&quot;免费午餐&quot;架构：PEVA（规划为主）在 UI 任务（AppWorld）上表现最优，EVA（建议为主）在 Deep Search（FanOutQA）上更具竞争力。</li>
+<li>云端算力使用越多并不总能带来更好性能——在某些任务上增加云端 Supervisor 干预反而有害。</li>
+<li>确定了影响混合协作效果的关键机制：督导频率、重启策略、以及摘要机制。</li>
+<li>展示混合 MAS 通过 context reset 与 summarization 有效控制边缘 KV-cache 增长，提升对内存受限设备的适配性（Table 3）。</li>
+</ul>
+<h2 id="方法">方法</h2>
+<p>论文适配并研究了两种混合 MAS 架构：</p>
+<p><strong>PEVA（Plan-Execute-Verify-Replan）</strong>：Supervisor（云端 LLM）先为查询生成初始计划 $p_0$，然后 Executor（边缘 SLM）在 ReAct 循环中执行；每隔 $T_v$ 步，Supervisor 重新验证并按需 replan。云端模型负责宏观规划与周期性纠偏，边缘模型负责与环境（工具调用、界面操作等）的具体交互。</p>
+<p><strong>EVA（Execute-Verify-Advice）</strong>：无初始规划阶段，Supervisor 周期性地向 Executor 提供 advice（而非完整 replan），Executor 持续执行 ReAct 步骤。云端只在关键节点提供战略建议，执行控制权更多留在边缘。</p>
+<p>两种架构均支持以下设计维度的实验：(a) 云端 vs 边缘模型在 Supervisor / Executor 角色上的分配；(b) 督导频率 $T_v$（即多久云端介入一次）；(c) 是否引入 context summarization 来管理 KV-cache。</p>
+<p>云端模型使用 GPT-4o；边缘模型使用 Qwen2 系列（4B、8B、14B、32B），对 32B 变体使用 KV-cache 和权重量化以适配设备 DRAM。</p>
+<p>图 2 描绘了两种架构在不同基准下的整体系统结构，左侧 PEVA 包含显式初始规划步骤，右侧 EVA 以建议驱动代替 replan：</p>
+<p><img alt="图 2" src="/images/papers/2605.30102/page2.png"></p>
+<h2 id="实验">实验</h2>
+<p><strong>数据集</strong>：Deep Search 场景采用 HotpotQA（多跳问答，较易）和 FanOutQA（更宽泛的 fan-out 结构，较难）；UI 自动化场景采用 AppWorld（交互式基准，要求 agent 操作模拟 App）。最大步数（max_turns）在 AppWorld 实验中为 12。</p>
+<p><strong>Baseline</strong>：cloud-only（GPT-4o 独立运行）与 edge-only（Qwen2 各档单独运行）均作为对照组。混合配置以不同督导频率区间 $T_v \in [1, 12]$（AppWorld）或 $[1, 8]$（FanOutQA）扫描。</p>
+<p><strong>指标</strong>：任务成功率（Task Success）、云端 API 货币成本（Cloud Cost）、边缘 GPU 能耗（mAh/mWh）。三者共同构成 Pareto 前沿。</p>
+<p><strong>硬件</strong>：边缘端在消费级 GPU 上推理 Qwen2 系列，32B 模型启用量化后可置入受限 DRAM。</p>
+<h2 id="结果">结果</h2>
+<p>下图展示了各混合配置在 HotpotQA 与 FanOutQA 上的 Pareto 前沿，每个点对应一种特定的云/边分配与督导频率组合。可以看出，PEVA 在 AppWorld（UI 任务）方向占优，而 EVA 在 FanOutQA（Deep Search）上形成更有竞争力的曲线；没有一种配置能在所有基准上同时最优（Figure 2）：</p>
+<p><img alt="图 4" src="/images/papers/2605.30102/page4.png"></p>
+<p>下图进一步以督导频率为横轴，对比了 PEVA 和 EVA 的准确率变化以及干预类型分布（True Positive / False Positive / False Negative）。PEVA 在 AppWorld 上随督导频率提升持续受益，但在 FanOutQA 上曲线趋于平坦甚至下降；EVA 在 FanOutQA 上的 True Positive 率更高，但 PEVA 能抑制更多 False Positive（Figure 3）：</p>
+<p><img alt="图 5" src="/images/papers/2605.30102/page5.png"></p>
+<p>Table 1 的 ablation 研究（Figure 3 同页）揭示了督导质量对性能的非单调影响：以 oracle 质量（True 信号）干预时性能显著提升，而 False Positive（误认任务失败）会将性能拉低至低于无督导基线（Table 1）：</p>
+<p><img alt="图 6" src="/images/papers/2605.30102/page6.png"></p>
+<p>Table 2 对比了将 Executor 置于云端、Supervisor 置于边缘的&quot;反向&quot;配置与标准混合配置，结果表明这种反向分配在任务成功率和成本上均处于劣势——将执行层卸载到云端并不经济（Table 2）：</p>
+<p><img alt="图 7" src="/images/papers/2605.30102/page7.png"></p>
+<p>Table 3 展示了随 max_turns 增加，纯边缘架构的 KV-cache 急剧膨胀，而 PEVA 的 context reset 与 summarization 机制将 KV-cache 增长控制在较低水平，支持更长 horizon 任务在内存受限设备上的可行性（Table 3）：</p>
+<p><img alt="图 8" src="/images/papers/2605.30102/page8.png"></p>
+<h2 id="结论">结论</h2>
+<p>最值得带走的 takeaway 是：混合 MAS 的最优架构由任务结构决定，而非由云端模型的能力档位决定——规划导向架构（PEVA）在有明确步骤结构的 UI 任务中最优，而建议导向架构（EVA）在需要灵活信息检索的 Deep Search 中更具优势，且盲目增加云端督导频率在某些任务上会引入 False Positive 干扰，损害整体性能（Table 1）。</p>
+<p><strong>边界</strong>：所有结论均在英文 benchmarks（HotpotQA、FanOutQA、AppWorld）、Qwen2 系列 SLM、以及 GPT-4o 作为云端模型的特定组合下成立；不同 SLM 系列或其他云端模型是否有相同规律尚未验证。论文没有测试三个以上的 agent 节点，也没有系统研究 SLM 经 fine-tune 后对架构选择的影响。能耗数字来自特定硬件，实际部署在异构边缘设备上的结果可能不同。</p>
+<h2 id="是否新瓶装旧酒">是否新瓶装旧酒</h2>
+<p><strong>论文自述</strong>：Related Work 列出了最相近的工作，包括 MAI-UI（Zhou et al., 2025，引入了原生云-边混合 GUI agent）、路由类框架（Ding et al., 2024; Stripelis et al., 2024 等）以及针对单一任务 co-design 的系统（Bogavelli et al., 2025; Zeng et al., 2025 等）。作者将自己的 delta 定位为：首次在统一框架下跨多任务、多维度（成本/准确率/能耗）系统评估 cloud-edge MAS 架构选择，而非针对单一任务做特定系统设计。</p>
+<p><strong>独立判断</strong>：将云端与边缘模型结合用于 agent 的思路并不新颖，路由/级联方案（如 LLM cascade、FrugalGPT）已有先例。但将 MAS 的 Supervisor/Executor 角色分配与云-边混合对应起来，并系统测量 Pareto 权衡，的确是这类 benchmark-level 比较研究中相对少见的视角。整体来看，这更像一篇工程性的实证分析论文，而非提出新算法——贡献在于&quot;系统研究了设计空间&quot;而非&quot;提出新机制&quot;，因此不算旧瓶装新酒，但创新厚度有限。</p>
+<h2 id="尚未回答的问题">尚未回答的问题</h2>
+<ul>
+<li>所有 ablation 均在 GPT-4o + Qwen2 组合下完成，换用其他 SLM 系列（如 Llama、Mistral）或其他云端模型（如 Claude、Gemini）时，任务依赖性结论是否仍然成立？</li>
+<li>论文缺少对 SLM 经任务特定 fine-tune 后的对比：微调 SLM 后，混合架构是否仍比 SLM 独立运行有优势？</li>
+<li>督导频率 $T_v$ 目前是人工设定的超参数，缺少自适应选择 $T_v$ 的方法；能否训练一个轻量路由器在运行时决策何时调用云端 Supervisor？</li>
+<li>能耗测量仅限于特定 GPU 硬件，在真实移动端（NPU、手机 SoC）上的结果和结论是否一致？</li>
+<li>超过两个 agent 节点（多云端 + 多边缘）的配置完全未被研究。</li>
+</ul>
+<h2 id="原始摘要中文翻译">原始摘要（中文翻译）</h2>
+<p>智能体 AI 推理的设计空间横跨两个极端：一端是前沿大语言模型（LLM），通常托管于云端，能在广泛任务上提供强劲性能，但成本显著高昂；另一端是更具成本效益的小语言模型（SLM），适合在设备端推理。将设备端模型与云端模型结合的混合多智能体系统（MAS）提供了一种有前景的折中方案，但同时也引入了一个复杂且尚未被充分理解的设计空间——任务准确率、货币成本与边缘能耗在其中紧密耦合；由于缺乏通用设计原则，混合组件虽然并非最主流的选择，但通常是通过针对特定领域量身定制的 ad hoc 决策引入的。在本工作中，我们对这一设计空间进行了更系统的研究。我们将两种具有代表性的 MAS 架构改造为支持混合推理，并研究各个设计选择如何在功耗、成本与性能的 Pareto 前沿上移动系统的工作点。我们的发现呈现出混合 MAS 设计的细腻图景：尽管 SLM 确实能从 LLM 的协助中获益，但最优架构高度依赖具体任务，更多前沿级别的算力并不总能转化为更好的性能。</p>
+
+      </div>
+
+
+      <footer>
+        
+
+
+        
+        
+        
+        
+        
+        
+        
+      </footer>
+    </article>
+
+    
+  </section>
+
+    </div>
+
+    <footer class="footer">
+  <section class="container">
+    ©
+    
+      2019 -
+    
+    2026
+     Jie Xin 
+    ·
+    
+    Powered by <a href="https://gohugo.io/" target="_blank" rel="noopener">Hugo</a> & <a href="https://github.com/luizdepra/hugo-coder/" target="_blank" rel="noopener">Coder</a>.
+    
+  </section>
+</footer>
+
+  </main>
+
+  
+
+  
+  
+  <script src="/js/coder.min.6ae284be93d2d19dad1f02b0039508d9aab3180a12a06dcc71b0b0ef7825a317.js" integrity="sha256-auKEvpPS0Z2tHwKwA5UI2aqzGAoSoG3McbCw73gloxc="></script>
+  
+
+  
+
+  
+
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+</body>
+</html>

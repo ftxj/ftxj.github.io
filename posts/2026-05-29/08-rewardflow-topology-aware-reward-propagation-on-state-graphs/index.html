@@ -1,0 +1,385 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <title>
+  RewardFlow: Topology-Aware Reward Propagation on State Graphs for Agentic RL with Large Language Models · JXIN&#39;s Home
+</title>
+  <meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="color-scheme" content="light dark">
+
+
+
+
+<meta name="author" content="Jie Xin">
+<meta name="description" content="arXiv: 2603.18859 · PDF
+Authors: Xiao Feng, Bo Han, Zhanke Zhou, Jiaqi Fan, Jiangchao Yao, Ka Ho Li, Dahai Yu, Michael Kwok-Po Ng
+Affiliations: TMLR Group, Hong Kong Baptist University, TCL Corporate Research (HK) Co Ltd, Cooperative Medianet Innovation Center, Shanghai Jiao Tong University, Department of Mathematics, Hong Kong Baptist University
+Primary category: cs.AI · all: cs.AI, cs.CL, cs.LG
+Matched keywords: large language model, llm, agent, agentic, rag, reasoning
+
+TL;DR
+RewardFlow builds a state graph from sampled agentic trajectories and propagates BFS-based rewards from success nodes to intermediate states, providing annotation-free dense process rewards that improve RL training across four agentic benchmarks without any reward model.">
+<meta name="keywords" content="blog,developer,personal">
+
+
+
+  <meta name="twitter:card" content="summary">
+  <meta name="twitter:title" content="RewardFlow: Topology-Aware Reward Propagation on State Graphs for Agentic RL with Large Language Models">
+  <meta name="twitter:description" content="arXiv: 2603.18859 · PDF
+Authors: Xiao Feng, Bo Han, Zhanke Zhou, Jiaqi Fan, Jiangchao Yao, Ka Ho Li, Dahai Yu, Michael Kwok-Po Ng
+Affiliations: TMLR Group, Hong Kong Baptist University, TCL Corporate Research (HK) Co Ltd, Cooperative Medianet Innovation Center, Shanghai Jiao Tong University, Department of Mathematics, Hong Kong Baptist University
+Primary category: cs.AI · all: cs.AI, cs.CL, cs.LG
+Matched keywords: large language model, llm, agent, agentic, rag, reasoning
+TL;DR RewardFlow builds a state graph from sampled agentic trajectories and propagates BFS-based rewards from success nodes to intermediate states, providing annotation-free dense process rewards that improve RL training across four agentic benchmarks without any reward model.">
+
+<meta property="og:url" content="https://ftxj.github.io/posts/2026-05-29/08-rewardflow-topology-aware-reward-propagation-on-state-graphs/">
+  <meta property="og:site_name" content="JXIN&#39;s Home">
+  <meta property="og:title" content="RewardFlow: Topology-Aware Reward Propagation on State Graphs for Agentic RL with Large Language Models">
+  <meta property="og:description" content="arXiv: 2603.18859 · PDF
+Authors: Xiao Feng, Bo Han, Zhanke Zhou, Jiaqi Fan, Jiangchao Yao, Ka Ho Li, Dahai Yu, Michael Kwok-Po Ng
+Affiliations: TMLR Group, Hong Kong Baptist University, TCL Corporate Research (HK) Co Ltd, Cooperative Medianet Innovation Center, Shanghai Jiao Tong University, Department of Mathematics, Hong Kong Baptist University
+Primary category: cs.AI · all: cs.AI, cs.CL, cs.LG
+Matched keywords: large language model, llm, agent, agentic, rag, reasoning
+TL;DR RewardFlow builds a state graph from sampled agentic trajectories and propagates BFS-based rewards from success nodes to intermediate states, providing annotation-free dense process rewards that improve RL training across four agentic benchmarks without any reward model.">
+  <meta property="og:locale" content="en">
+  <meta property="og:type" content="article">
+    <meta property="article:section" content="posts">
+    <meta property="article:published_time" content="2026-05-29T12:26:47+00:00">
+    <meta property="article:modified_time" content="2026-05-29T12:26:47+00:00">
+
+
+
+
+<link rel="canonical" href="https://ftxj.github.io/posts/2026-05-29/08-rewardflow-topology-aware-reward-propagation-on-state-graphs/">
+
+
+<link rel="preload" href="/fonts/fa-brands-400.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="/fonts/fa-regular-400.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="/fonts/fa-solid-900.woff2" as="font" type="font/woff2" crossorigin>
+
+
+  
+  
+  <link rel="stylesheet" href="/css/coder.min.5e94c1acf7aa2066035cf2764ae3e4fe39db101d68b870f919966100d51fb861.css" integrity="sha256-XpTBrPeqIGYDXPJ2SuPk/jnbEB1ouHD5GZZhANUfuGE=" crossorigin="anonymous" media="screen" />
+
+
+
+
+
+
+  
+    
+    
+    <link rel="stylesheet" href="/css/coder-dark.min.a00e6364bacbc8266ad1cc81230774a1397198f8cfb7bcba29b7d6fcb54ce57f.css" integrity="sha256-oA5jZLrLyCZq0cyBIwd0oTlxmPjPt7y6KbfW/LVM5X8=" crossorigin="anonymous" media="screen" />
+  
+
+
+
+ 
+
+
+
+
+<link rel="icon" type="image/svg+xml" href="/images/favicon.svg" sizes="any">
+<link rel="icon" type="image/png" href="/images/favicon-32x32.png" sizes="32x32">
+<link rel="icon" type="image/png" href="/images/favicon-16x16.png" sizes="16x16">
+
+<link rel="apple-touch-icon" href="/images/apple-touch-icon.png">
+<link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon.png">
+
+<link rel="manifest" href="/site.webmanifest">
+<link rel="mask-icon" href="/images/safari-pinned-tab.svg" color="#5bbad5">
+
+
+
+
+
+
+<style>
+.content article ul {
+  list-style: disc !important;
+  padding-left: 2.5rem !important;
+}
+
+.content article ul li {
+  display: list-item !important;
+}
+</style>
+
+
+
+
+  
+</head>
+
+
+
+
+
+
+<body class="preload-transitions colorscheme-auto">
+  
+<div class="float-container">
+    <a id="dark-mode-toggle" class="colorscheme-toggle">
+        <i class="fa-solid fa-adjust fa-fw" aria-hidden="true"></i>
+    </a>
+</div>
+
+
+  <main class="wrapper">
+    <nav class="navigation">
+  <section class="container">
+    
+    <a class="navigation-title" href="https://ftxj.github.io/">
+      JXIN&#39;s Home
+    </a>
+    
+    
+      <input type="checkbox" id="menu-toggle" />
+      <label class="menu-button float-right" for="menu-toggle">
+        <i class="fa-solid fa-bars fa-fw" aria-hidden="true"></i>
+      </label>
+      <ul class="navigation-list">
+        
+          
+            <li class="navigation-item">
+              <a class="navigation-link " href="/about/">About</a>
+            </li>
+          
+            <li class="navigation-item">
+              <a class="navigation-link " href="/travel/">Travel</a>
+            </li>
+          
+            <li class="navigation-item">
+              <a class="navigation-link " href="/hiking/">Hiking</a>
+            </li>
+          
+            <li class="navigation-item">
+              <a class="navigation-link " href="/posts/">Blog</a>
+            </li>
+          
+            <li class="navigation-item">
+              <a class="navigation-link " href="https://ftxj.github.io/cv/cv.pdf">CV</a>
+            </li>
+          
+        
+        
+          
+          
+          
+            
+              
+                <li class="navigation-item menu-separator">
+                  <span>|</span>
+                </li>
+                
+              
+              <li class="navigation-item">
+                <a href="/zh/posts/2026-05-29/08-rewardflow-topology-aware-reward-propagation-on-state-graphs/">中文</a>
+              </li>
+            
+          
+        
+      </ul>
+    
+  </section>
+</nav>
+
+
+    <div class="content">
+      
+  <section class="container post">
+    <article>
+      <header>
+        <div class="post-title">
+          <h1 class="title">
+            <a class="title-link" href="https://ftxj.github.io/posts/2026-05-29/08-rewardflow-topology-aware-reward-propagation-on-state-graphs/">
+              RewardFlow: Topology-Aware Reward Propagation on State Graphs for Agentic RL with Large Language Models
+            </a>
+          </h1>
+        </div>
+        <div class="post-meta">
+          <div class="date">
+            <span class="posted-on">
+              <i class="fa-solid fa-calendar" aria-hidden="true"></i>
+              <time datetime="2026-05-29T12:26:47Z">
+                May 29, 2026
+              </time>
+            </span>
+            <span class="reading-time">
+              <i class="fa-solid fa-clock" aria-hidden="true"></i>
+              7-minute read
+            </span>
+          </div>
+          
+          <div class="categories">
+  <i class="fa-solid fa-folder" aria-hidden="true"></i>
+    <a href="/categories/paper-digest/">Paper-Digest</a>
+      <span class="separator">•</span>
+    <a href="/categories/2026-05-29/">2026-05-29</a></div>
+
+          
+        </div>
+      </header>
+
+      
+
+
+      <div class="post-content">
+        
+        <p><strong>arXiv:</strong> <a href="https://arxiv.org/abs/2603.18859">2603.18859</a> · <a href="https://arxiv.org/pdf/2603.18859">PDF</a></p>
+<p><strong>Authors:</strong> Xiao Feng, Bo Han, Zhanke Zhou, Jiaqi Fan, Jiangchao Yao, Ka Ho Li, Dahai Yu, Michael Kwok-Po Ng</p>
+<p><strong>Affiliations:</strong> TMLR Group, Hong Kong Baptist University, TCL Corporate Research (HK) Co Ltd, Cooperative Medianet Innovation Center, Shanghai Jiao Tong University, Department of Mathematics, Hong Kong Baptist University</p>
+<p><strong>Primary category:</strong> <code>cs.AI</code> · all: cs.AI, cs.CL, cs.LG</p>
+<p><strong>Matched keywords:</strong> large language model, llm, agent, agentic, rag, reasoning</p>
+<hr>
+<h2 id="tldr">TL;DR</h2>
+<p>RewardFlow builds a state graph from sampled agentic trajectories and propagates BFS-based rewards from success nodes to intermediate states, providing annotation-free dense process rewards that improve RL training across four agentic benchmarks without any reward model.</p>
+<h2 id="motivation">Motivation</h2>
+<p>Agentic RL training for LLMs suffers from sparse terminal rewards: the agent completes an entire multi-step trajectory and receives only a single binary outcome signal. This coarse signal makes credit assignment difficult—early missteps receive the same zero reward as genuinely neutral actions, compounding errors over long horizons. The standard fix, process reward modeling (PRM), requires separately trained reward models with human-annotated step labels, introducing data bottlenecks, substantial compute overhead, and reward hacking: once the policy updates, the static scorer drifts out-of-distribution and assigns inflated rewards to novel outputs. Existing group-sampling RL methods like GRPO and RLOO assign the same terminal reward uniformly to every token in a trajectory, and even the closest prior work, GiGPO, propagates rewards along individual trajectories without exploiting shared topological structure across rollouts. The missing insight is that LLMs sample overlapping state sequences: across a group of rollouts, the number of unique states is substantially smaller than total state visits (confirmed empirically on ALFWorld, WebShop, Sokoban, and DeepResearch). This redundancy enables a consolidated state graph that reveals reachability and proximity to success—information no single trajectory exposes—making principled, annotation-free dense reward estimation tractable.</p>
+<h2 id="key-ideas">Key Ideas</h2>
+<p>The state graph motivating RewardFlow—trajectories merged into unique nodes with directed action edges, colored by distance to success—illustrates how topology encodes reward signal that single-trajectory methods miss.</p>
+<p><img alt="Figure 1" src="/images/papers/2603.18859/fig1.png">
+States closer to a success node (darker color) should receive higher rewards; grey nodes have no path to success and should be penalized. This topological signal is invisible in per-trajectory reward propagation.</p>
+<ul>
+<li><strong>State graph construction</strong>: equivalent states across G sampled rollouts are merged into unique nodes; environment-invalid (hallucinated) actions are pruned to eliminate spurious edges.</li>
+</ul>
+<p>The bar charts below confirm the compression that makes graph construction worthwhile: across all four benchmarks, unique states are substantially fewer than total state visits, so aggregating trajectories into a graph recovers far richer structure than any single rollout.</p>
+<p><img alt="Figure 3" src="/images/papers/2603.18859/fig3.png">
+On ALFWorld, WebShop, Sokoban, and DeepResearch with Qwen2.5-(VL)-3B-Instruct, unique state and action counts compress significantly versus cumulative visit counts, validating that a shared graph captures the task structure no individual trajectory can.</p>
+<ul>
+<li><strong>Topology-aware propagation</strong>: BFS backward from success nodes assigns each state a reward proportional to its shortest-path distance to success; unreachable states receive no positive reward.</li>
+<li><strong>Action-level reward shaping</strong>: per-action reward is the gain (difference) between post-action and pre-action state rewards, giving dense step-level supervision.</li>
+<li><strong>Synergistic advantage</strong>: policy is updated with a combined objective integrating action-level rewards and trajectory-level group normalization.</li>
+</ul>
+<p>Invalid actions must be filtered before graph construction; without pruning, LLM hallucinations create spurious edges that distort reachability and centrality estimates.</p>
+<p><img alt="Figure 4" src="/images/papers/2603.18859/fig4.png">
+The figure shows how a hallucinated action creates a phantom edge connecting states that are not actually reachable from each other—omitting this step would corrupt both reward propagation and the resulting policy gradient.</p>
+<h2 id="method">Method</h2>
+<p>RewardFlow operates in three stages, illustrated end-to-end below.</p>
+<p><img alt="Figure 2" src="/images/papers/2603.18859/fig2.png">
+The pipeline covers (1) graph construction from G sampled trajectories, (2) backward BFS propagation from success terminal states assigning reward levels to intermediate nodes, and (3) mapping propagated state rewards back to raw trajectories as action-wise reward gains.</p>
+<p><strong>Graph construction</strong>: states are canonicalized via a normalization function f (exact string matching for structured environments; embedding-based cosine-similarity clustering with threshold τ for open-ended environments like DeepResearch). Invalid actions are filtered by checking whether the environment transition actually occurred. The graph G_state = (S, A, T) is the union of all valid transitions across all G rollouts.</p>
+<p><strong>Reachability and centrality</strong> (Fig. 5) are the two structural properties extracted: reachability flags whether any observed path leads to a success terminal; centrality (in/out degree) identifies bottleneck states.</p>
+<p><img alt="Figure 5" src="/images/papers/2603.18859/fig5.png">
+The &ldquo;Go to desk&rdquo; state has high out-degree—it provides access to both a desklamp and a book needed for task success—making it a high-centrality node that should receive elevated reward regardless of which downstream trajectory succeeded.</p>
+<p><strong>Reward propagation</strong>: BFS assigns reward r(s) = 1/(1+d(s, S_succ)) for reachable states, where d is shortest-path distance. <strong>Action reward</strong>: r_action(a_t) = r(s_{t+1}) − r(s_t). <strong>Policy update</strong>: clipped surrogate objective (PPO-style) using advantages that blend action-level and trajectory-level signals via mixing weights α_action and α_traj.</p>
+<h2 id="experiments">Experiments</h2>
+<p><strong>Benchmarks</strong>: ALFWorld (text-based household tasks), WebShop (web shopping), Sokoban (visual puzzle), DeepResearch (multi-hop web research).
+<strong>Baselines</strong>: GRPO, RLOO, GiGPO (strongest RL baseline); PRM-based methods; Search-R1 (on DeepResearch).
+<strong>Models</strong>: Qwen2.5-1.5B, Qwen2.5-3B, Qwen2.5-VL-3B-Instruct (three scales as stated in abstract).
+<strong>Hardware/scale</strong>: not quantified in the paper text.</p>
+<h2 id="results">Results</h2>
+<p>RewardFlow gains <strong>+6.2% average success rate</strong> on text-based tasks (ALFWorld, WebShop, Sokoban) and <strong>+29.7%</strong> on visual reasoning (Sokoban with VL model) over GiGPO, the strongest RL baseline, across three model scales (abstract). On DeepResearch it surpasses Search-R1 by <strong>over 10%</strong> across model sizes (introduction).</p>
+<p><strong>Rollout-budget robustness (Fig. 9)</strong>: at only 4 rollouts on ALFWorld (Qwen2.5-1.5B), RewardFlow beats GiGPO by <strong>+13.3%</strong>, and maintains a substantial advantage as the budget grows to 8.</p>
+<p><img alt="Figure 7" src="/images/papers/2603.18859/fig7.png">
+The line chart shows RewardFlow consistently above GiGPO at every rollout budget from 4 to 8; the largest gap (+13.3%) occurs at the smallest budget, indicating RewardFlow extracts more signal per rollout—important for compute-constrained training.</p>
+<p><strong>Out-of-distribution generalization (Table 3)</strong>: RewardFlow outperforms all baselines including PRM-based methods on ALFWorld with novel room layouts; exact numbers from Table 3 are not available in the truncated full text.</p>
+<p><img alt="Figure 6" src="/images/papers/2603.18859/fig6.png">
+Table 3 reports average success rate (%) on held-out ALFWorld environments with unfamiliar rooms and furniture arrangements; RewardFlow without any reward model training surpasses PRM-based baselines, supporting the claim of better generalization.</p>
+<p><strong>Hyperparameter sensitivity (Fig. 10)</strong>: varying the cosine-similarity threshold τ across [0.80, 1.00] on DeepResearch (Qwen2.5-3B) changes average accuracy by only <strong>1.2 percentage points</strong>, confirming robustness to this design choice.</p>
+<p><img alt="Figure 8" src="/images/papers/2603.18859/fig8.png">
+The flat accuracy curve across the full τ range means practitioners do not need to tune this threshold carefully—any value in [0.80, 1.00] yields near-identical results on DeepResearch.</p>
+<h2 id="conclusion">Conclusion</h2>
+<p>RewardFlow demonstrates that aggregating sampled trajectories into a state graph and running BFS from success nodes yields dense, annotation-free process rewards that substantially improve agentic RL—+6.2% on text tasks, +29.7% on visual reasoning, +10% on DeepResearch over strong baselines. The result is established at small model scales (1.5B–3B parameters) on four benchmarks; whether gains hold at 7B+ or in production-scale agentic systems is untested. The title&rsquo;s claim of &ldquo;topology-aware&rdquo; propagation is accurate but simple BFS suffices—no GNN or learned propagation is used. Ablations on the BFS vs. PPR propagation strategy and mixing weights α are mentioned but their numbers are not available in the truncated text.</p>
+<h2 id="novelty-check">Novelty Check</h2>
+<p>The paper&rsquo;s own Related Work identifies GiGPO (Feng et al., 2025b) as the closest prior work. The authors&rsquo; stated delta: GiGPO propagates rewards backward along individual trajectories without exploiting cross-trajectory topological structure; RewardFlow merges equivalent states across rollouts into a shared graph before propagating. This is a genuine structural distinction—multi-trajectory state aggregation before reward estimation is not present in GiGPO. The connection to potential-based reward shaping (acknowledged in Appendix C.1) is honest. The core graph construction idea has conceptual overlap with model-based RL and Monte Carlo Tree Search planning, but applying it specifically to LLM-sampled trajectory aggregation for annotation-free PRM replacement is a legitimate contribution at this scope.</p>
+<h2 id="open-questions">Open Questions</h2>
+<ul>
+<li>Do gains scale to models larger than 3B, where unique-state compression may be lower relative to trajectory length?</li>
+<li>BFS assigns reward by hop count; does a learned propagation (GNN, PPR) provide better credit assignment on tasks with non-uniform action costs?</li>
+<li>The method requires environment feedback to detect invalid actions—how does it degrade in environments where validity signals are noisy or absent?</li>
+<li>The +29.7% visual reasoning gain is large; ablations isolating whether it comes from the graph structure or simply from more diverse sampling across rollouts are not reported.</li>
+</ul>
+<hr>
+<h2 id="original-abstract">Original abstract</h2>
+<p>arXiv:2603.18859v2 Announce Type: replace Abstract: Reinforcement learning (RL) shows promise for enhancing LLM agentic reasoning, yet sparse terminal rewards hinder fine-grained optimization. Process reward modeling offers an alternative but incurs high computational costs, reward hacking risks, and annotation bottlenecks. We introduce RewardFlow, a lightweight method for estimating state-level rewards in agentic reasoning. By constructing state graphs that capture the intrinsic topological structure of trajectories, RewardFlow performs topology-aware propagation to estimate each state&rsquo;s contribution to success, yielding principled, annotation-free dense rewards. Used for RL optimization, RewardFlow substantially outperforms prior baselines across four agentic benchmarks: +6.2% average success rate on text-based tasks, +29.7% on visual reasoning over the strongest baseline across three model scales, and +10% accuracy on DeepResearch, with superior robustness and training efficiency. The implementation of RewardFlow is publicly available at <a href="https://github.com/tmlr-group/RewardFlow">https://github.com/tmlr-group/RewardFlow</a>.</p>
+
+      </div>
+
+
+      <footer>
+        
+
+
+        
+        
+        
+        
+        
+        
+        
+      </footer>
+    </article>
+
+    
+  </section>
+
+    </div>
+
+    <footer class="footer">
+  <section class="container">
+    ©
+    
+      2019 -
+    
+    2026
+     Jie Xin 
+    ·
+    
+    Powered by <a href="https://gohugo.io/" target="_blank" rel="noopener">Hugo</a> & <a href="https://github.com/luizdepra/hugo-coder/" target="_blank" rel="noopener">Coder</a>.
+    
+  </section>
+</footer>
+
+  </main>
+
+  
+
+  
+  
+  <script src="/js/coder.min.6ae284be93d2d19dad1f02b0039508d9aab3180a12a06dcc71b0b0ef7825a317.js" integrity="sha256-auKEvpPS0Z2tHwKwA5UI2aqzGAoSoG3McbCw73gloxc="></script>
+  
+
+  
+
+  
+
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+</body>
+</html>

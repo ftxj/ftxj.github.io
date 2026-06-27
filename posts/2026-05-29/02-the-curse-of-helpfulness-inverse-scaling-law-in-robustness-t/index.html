@@ -1,0 +1,381 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <title>
+  The Curse of Helpfulness: Inverse Scaling Law in Robustness to Distractor Instructions via DistractionIF · JXIN&#39;s Home
+</title>
+  <meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="color-scheme" content="light dark">
+
+
+
+
+<meta name="author" content="Jie Xin">
+<meta name="description" content="arXiv: 2605.29491 · PDF
+Authors: Zeli Su, Zhankai Xu, Tianlei Chen, Longfei Zheng, Xiaolu Zhang, Jun Zhou, Wentao Zhang
+Affiliations: Ant Financial Services Group
+Primary category: cs.AI · all: cs.AI
+Matched keywords: large language model, llm, agent, agentic, retrieval, rag
+
+TL;DR
+Larger LLMs are systematically less robust to instruction-like noise embedded in reference text — a &ldquo;Curse of Helpfulness&rdquo; — which the new DistractionIF benchmark quantifies; GRPO-based RL partially recovers up to 15.5% robustness without hurting general instruction following.">
+<meta name="keywords" content="blog,developer,personal">
+
+
+
+  <meta name="twitter:card" content="summary">
+  <meta name="twitter:title" content="The Curse of Helpfulness: Inverse Scaling Law in Robustness to Distractor Instructions via DistractionIF">
+  <meta name="twitter:description" content="arXiv: 2605.29491 · PDF
+Authors: Zeli Su, Zhankai Xu, Tianlei Chen, Longfei Zheng, Xiaolu Zhang, Jun Zhou, Wentao Zhang
+Affiliations: Ant Financial Services Group
+Primary category: cs.AI · all: cs.AI
+Matched keywords: large language model, llm, agent, agentic, retrieval, rag
+TL;DR Larger LLMs are systematically less robust to instruction-like noise embedded in reference text — a “Curse of Helpfulness” — which the new DistractionIF benchmark quantifies; GRPO-based RL partially recovers up to 15.5% robustness without hurting general instruction following.">
+
+<meta property="og:url" content="https://ftxj.github.io/posts/2026-05-29/02-the-curse-of-helpfulness-inverse-scaling-law-in-robustness-t/">
+  <meta property="og:site_name" content="JXIN&#39;s Home">
+  <meta property="og:title" content="The Curse of Helpfulness: Inverse Scaling Law in Robustness to Distractor Instructions via DistractionIF">
+  <meta property="og:description" content="arXiv: 2605.29491 · PDF
+Authors: Zeli Su, Zhankai Xu, Tianlei Chen, Longfei Zheng, Xiaolu Zhang, Jun Zhou, Wentao Zhang
+Affiliations: Ant Financial Services Group
+Primary category: cs.AI · all: cs.AI
+Matched keywords: large language model, llm, agent, agentic, retrieval, rag
+TL;DR Larger LLMs are systematically less robust to instruction-like noise embedded in reference text — a “Curse of Helpfulness” — which the new DistractionIF benchmark quantifies; GRPO-based RL partially recovers up to 15.5% robustness without hurting general instruction following.">
+  <meta property="og:locale" content="en">
+  <meta property="og:type" content="article">
+    <meta property="article:section" content="posts">
+    <meta property="article:published_time" content="2026-05-29T12:01:18+00:00">
+    <meta property="article:modified_time" content="2026-05-29T12:01:18+00:00">
+
+
+
+
+<link rel="canonical" href="https://ftxj.github.io/posts/2026-05-29/02-the-curse-of-helpfulness-inverse-scaling-law-in-robustness-t/">
+
+
+<link rel="preload" href="/fonts/fa-brands-400.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="/fonts/fa-regular-400.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="/fonts/fa-solid-900.woff2" as="font" type="font/woff2" crossorigin>
+
+
+  
+  
+  <link rel="stylesheet" href="/css/coder.min.5e94c1acf7aa2066035cf2764ae3e4fe39db101d68b870f919966100d51fb861.css" integrity="sha256-XpTBrPeqIGYDXPJ2SuPk/jnbEB1ouHD5GZZhANUfuGE=" crossorigin="anonymous" media="screen" />
+
+
+
+
+
+
+  
+    
+    
+    <link rel="stylesheet" href="/css/coder-dark.min.a00e6364bacbc8266ad1cc81230774a1397198f8cfb7bcba29b7d6fcb54ce57f.css" integrity="sha256-oA5jZLrLyCZq0cyBIwd0oTlxmPjPt7y6KbfW/LVM5X8=" crossorigin="anonymous" media="screen" />
+  
+
+
+
+ 
+
+
+
+
+<link rel="icon" type="image/svg+xml" href="/images/favicon.svg" sizes="any">
+<link rel="icon" type="image/png" href="/images/favicon-32x32.png" sizes="32x32">
+<link rel="icon" type="image/png" href="/images/favicon-16x16.png" sizes="16x16">
+
+<link rel="apple-touch-icon" href="/images/apple-touch-icon.png">
+<link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon.png">
+
+<link rel="manifest" href="/site.webmanifest">
+<link rel="mask-icon" href="/images/safari-pinned-tab.svg" color="#5bbad5">
+
+
+
+
+
+
+<style>
+.content article ul {
+  list-style: disc !important;
+  padding-left: 2.5rem !important;
+}
+
+.content article ul li {
+  display: list-item !important;
+}
+</style>
+
+
+
+
+  
+</head>
+
+
+
+
+
+
+<body class="preload-transitions colorscheme-auto">
+  
+<div class="float-container">
+    <a id="dark-mode-toggle" class="colorscheme-toggle">
+        <i class="fa-solid fa-adjust fa-fw" aria-hidden="true"></i>
+    </a>
+</div>
+
+
+  <main class="wrapper">
+    <nav class="navigation">
+  <section class="container">
+    
+    <a class="navigation-title" href="https://ftxj.github.io/">
+      JXIN&#39;s Home
+    </a>
+    
+    
+      <input type="checkbox" id="menu-toggle" />
+      <label class="menu-button float-right" for="menu-toggle">
+        <i class="fa-solid fa-bars fa-fw" aria-hidden="true"></i>
+      </label>
+      <ul class="navigation-list">
+        
+          
+            <li class="navigation-item">
+              <a class="navigation-link " href="/about/">About</a>
+            </li>
+          
+            <li class="navigation-item">
+              <a class="navigation-link " href="/travel/">Travel</a>
+            </li>
+          
+            <li class="navigation-item">
+              <a class="navigation-link " href="/hiking/">Hiking</a>
+            </li>
+          
+            <li class="navigation-item">
+              <a class="navigation-link " href="/posts/">Blog</a>
+            </li>
+          
+            <li class="navigation-item">
+              <a class="navigation-link " href="https://ftxj.github.io/cv/cv.pdf">CV</a>
+            </li>
+          
+        
+        
+          
+          
+          
+            
+              
+                <li class="navigation-item menu-separator">
+                  <span>|</span>
+                </li>
+                
+              
+              <li class="navigation-item">
+                <a href="/zh/posts/2026-05-29/02-the-curse-of-helpfulness-inverse-scaling-law-in-robustness-t/">中文</a>
+              </li>
+            
+          
+        
+      </ul>
+    
+  </section>
+</nav>
+
+
+    <div class="content">
+      
+  <section class="container post">
+    <article>
+      <header>
+        <div class="post-title">
+          <h1 class="title">
+            <a class="title-link" href="https://ftxj.github.io/posts/2026-05-29/02-the-curse-of-helpfulness-inverse-scaling-law-in-robustness-t/">
+              The Curse of Helpfulness: Inverse Scaling Law in Robustness to Distractor Instructions via DistractionIF
+            </a>
+          </h1>
+        </div>
+        <div class="post-meta">
+          <div class="date">
+            <span class="posted-on">
+              <i class="fa-solid fa-calendar" aria-hidden="true"></i>
+              <time datetime="2026-05-29T12:01:18Z">
+                May 29, 2026
+              </time>
+            </span>
+            <span class="reading-time">
+              <i class="fa-solid fa-clock" aria-hidden="true"></i>
+              7-minute read
+            </span>
+          </div>
+          
+          <div class="categories">
+  <i class="fa-solid fa-folder" aria-hidden="true"></i>
+    <a href="/categories/paper-digest/">Paper-Digest</a>
+      <span class="separator">•</span>
+    <a href="/categories/2026-05-29/">2026-05-29</a></div>
+
+          
+        </div>
+      </header>
+
+      
+
+
+      <div class="post-content">
+        
+        <p><strong>arXiv:</strong> <a href="https://arxiv.org/abs/2605.29491">2605.29491</a> · <a href="https://arxiv.org/pdf/2605.29491">PDF</a></p>
+<p><strong>Authors:</strong> Zeli Su, Zhankai Xu, Tianlei Chen, Longfei Zheng, Xiaolu Zhang, Jun Zhou, Wentao Zhang</p>
+<p><strong>Affiliations:</strong> Ant Financial Services Group</p>
+<p><strong>Primary category:</strong> <code>cs.AI</code> · all: cs.AI</p>
+<p><strong>Matched keywords:</strong> large language model, llm, agent, agentic, retrieval, rag</p>
+<hr>
+<h2 id="tldr">TL;DR</h2>
+<p>Larger LLMs are systematically <em>less</em> robust to instruction-like noise embedded in reference text — a &ldquo;Curse of Helpfulness&rdquo; — which the new DistractionIF benchmark quantifies; GRPO-based RL partially recovers up to 15.5% robustness without hurting general instruction following.</p>
+<h2 id="motivation">Motivation</h2>
+<p>RAG and agentic pipelines routinely ask LLMs to process externally provided reference text: retrieved documents, enterprise files, upstream tool outputs. Real-world reference text is messy — it contains editorial annotations, UI residues, copied conversations, and system traces that <em>look</em> like instructions but are not intended to be followed. Current benchmarks like IFEval assume clean separation between instructions and data; no prior benchmark measures whether a model can resist incidental, benign noise at scale. The problem turns out to be worse precisely where practitioners would expect the opposite: larger, more capable models are more likely to &ldquo;helpfully&rdquo; act on embedded noise rather than ignore it. Practitioners deploying frontier models in production RAG pipelines had no reliable way to measure or anticipate this failure mode. The gap existed because prior prompt-injection work focused on conspicuous adversarial payloads, not low-salience benign residues like TODO comments or formatting hints naturally occurring in documents.</p>
+<h2 id="key-ideas">Key Ideas</h2>
+<p>The central finding is an &ldquo;over-interpretation bias&rdquo; in larger models — rather than treating reference text as flat passive data, they infer latent structure and misidentify incidental instruction-like fragments as actionable directives.</p>
+<p><img alt="Figure 1" src="/images/papers/2605.29491/fig1.png"></p>
+<p>Figure 1 contrasts how smaller models correctly preserve all formats and notes in reference text against how larger models identify a &ldquo;true body&rdquo; and elevate semantic noise (e.g., &ldquo;output as latex&rdquo;) into executable constraints. This over-interpretation is the proposed mechanistic explanation for the ~28-point inverse scaling drop quantified on Qwen3 0.6B → 235B.</p>
+<ul>
+<li><strong>DistractionIF benchmark</strong>: tasks over reference text contaminated with 3 low-salience distractors from a pool of 40+ atomic patterns; three deployment paradigms (single-turn, multi-turn, system-prompt); strict 5-criterion conjunctive rubric.</li>
+<li><strong>Inverse scaling law</strong>: within Qwen3 (non-thinking), score drops 65.97 → 37.6 as scale goes 0.6B → 235B.</li>
+<li><strong>Perplexity-based mechanism</strong>: scaling compresses the Robustness Margin Ratio (RMR) between robust and distracted output paths; Qwen3-0.6B has RMR = 2.24, which collapses at larger scales.</li>
+<li><strong>GRPO mitigation</strong>: RL with rubric-based reward widens the eroded margin, recovering up to +15.5% robustness without degrading general instruction following.</li>
+</ul>
+<h2 id="method">Method</h2>
+<p><strong>Benchmark construction</strong>: each instance has one main instruction (sampled from four task categories: Meta-Processing, Traditional NLP, Structure &amp; Format, Analysis &amp; Safety) and exactly three distraction intents from a pool of 40+ atomic patterns (editorial annotations, UI residues, style hints). Distractors are embedded as natural low-salience artifacts — side remarks, TODO notes, forwarded-message fragments — with no special markers. All three interaction paradigms are rendered from the same instance using gemini3-pro in one atomic invocation that also produces the gold output and evaluation rubric (&ldquo;who poses also answers&rdquo;), minimising alignment errors. ~2% of instances had rubric mismatches and were manually corrected.</p>
+<p><img alt="Figure 2" src="/images/papers/2605.29491/fig2.png"></p>
+<p>Figure 2 shows the full pipeline: starting from main instruction and trap pool, the 3 distractors are embedded into the reference text, then a single gemini3-pro call renders the instance into all three interaction formats with a consistent gold output and rubric, controlling for content variation across paradigms.</p>
+<p><strong>Scoring</strong>: 5 binary rubric criteria — (1) task execution, (2–4) resistance to each of the three distractors, (5) format integrity — graded conjunctively: all five must pass simultaneously.</p>
+<p><strong>GRPO mitigation</strong>: Qwen3-8B is fine-tuned with Group Relative Policy Optimization using the rubric-based reward directly.</p>
+<h2 id="experiments">Experiments</h2>
+<ul>
+<li><strong>Models</strong>: Qwen3 family (0.6B → 235B) in thinking and non-thinking modes; DeepSeek v3.2-1201 and thinking variants; Kimi-k2 (thinking and non-thinking); GPT-5.1-chat and GPT-5.1-HighThinking; Gemini-3-Pro (low- and high-reasoning).</li>
+<li><strong>Benchmark</strong>: DistractionIF (authors&rsquo; own), three paradigms.</li>
+<li><strong>Metric</strong>: Pass rate (%) under strict conjunctive rubric.</li>
+<li><strong>Hardware</strong>: Not specified in available text.</li>
+</ul>
+<h2 id="results">Results</h2>
+<p>Within Qwen3 under non-thinking decoding, average DistractionIF score drops from <strong>65.97 (0.6B) to 37.6 (235B)</strong> — a ~28-point degradation (Figure 3).</p>
+<p><img alt="Figure 3" src="/images/papers/2605.29491/fig3.png"></p>
+<p>Figure 3 (left) shows Qwen3 as a clear monotonic inverse-scaling curve. It also reveals a nuanced thinking interaction: small dense models suffer a <em>Thinking Penalty</em> (reasoning mode worsens robustness), while large MoE architectures show a <em>Thinking Benefit</em> (phase transition to positive scaling). The right panel places proprietary models (GPT-5.1, Gemini-3-Pro, DeepSeek, Kimi-k2) in context.</p>
+<p>The Robustness Margin Ratio mechanically explains why. Qwen3-0.6B achieves RMR = <strong>2.24</strong>, meaning its probability mass for the correct response is 2.24× that of the distracted response; this margin collapses with scale (Figure 4).</p>
+<p><img alt="Figure 4" src="/images/papers/2605.29491/fig4.png"></p>
+<p>Figure 4 plots PPL of gold (blue bars), model prediction (green), and bad-case distracted (red) responses on the left axis, and the RMR with single-turn score on the right axis across model scales. Smaller models maintain a wide PPL gap; larger models assign increasingly similar likelihoods to both paths, directly explaining robustness erosion.</p>
+<p><img alt="Figure 5" src="/images/papers/2605.29491/fig5.png"></p>
+<p>Figure 5 shows per-scale perplexity distribution grids: the gap between gold (blue) and bad-case (red) distributions narrows continuously with model size, confirming the erosion is distributional rather than isolated to outlier instances.</p>
+<p><img alt="Figure 6" src="/images/papers/2605.29491/fig6.png"></p>
+<p>Figure 6 plots per-instance gold PPL vs. bad-case PPL as scatter plots across model scales. Points below the identity line indicate instances where the model finds distracted behavior <em>more probable</em> than correct behavior; the mass shifts increasingly below the diagonal at larger scales, quantifying how individual instances flip from robust to distracted as scale grows.</p>
+<p>GRPO fine-tuning of Qwen3-8B recovers robustness by <strong>up to +15.5%</strong> across paradigms without degrading general instruction-following (abstract-only; detailed per-paradigm breakdown is in truncated text). Training dynamics are stable (Figure 7).</p>
+<p><img alt="Figure 7" src="/images/papers/2605.29491/fig7.png"></p>
+<p>Figure 7 shows training loss, average reward, and reward standard deviation for Qwen3-8B under GRPO. The reward rises steadily while reward variance decreases, indicating the policy is learning to consistently prefer robust responses — consistent with the RMR-widening claim.</p>
+<h2 id="conclusion">Conclusion</h2>
+<p>DistractionIF establishes that LLM robustness to benign instruction-like noise decreases with scale — Qwen3 drops ~28 points from 0.6B to 235B. The probabilistic mechanism (RMR collapsing from 2.24 at 0.6B) provides a concrete diagnostic. GRPO with rubric reward partially restores this (+15.5% peak). Key limits: the benchmark is self-constructed using gemini3-pro for both generation and evaluation, raising potential circularity and diversity concerns; GRPO results cover only Qwen3-8B, so cross-family generalization is unverified; the MoE thinking-benefit phase transition is observed but not mechanistically explained; the full per-paradigm results table is in the truncated paper section.</p>
+<h2 id="novelty-check">Novelty Check</h2>
+<p><strong>From Related Work</strong>: Authors cite McKenzie et al. (2023)&rsquo;s Inverse Scaling Prize as closest precedent, framing their delta as inverse scaling specifically in <em>data–instruction separation</em> under benign noise. They distinguish from Greshake et al. (2023) and Liu et al. (2023)&rsquo;s adversarial injection work by targeting incidental residues rather than crafted attacks. IFEval (Zhou et al., 2023) is the nearest instruction-following benchmark, but assumes clean separation.</p>
+<p><strong>Independent assessment</strong>: The framing is reasonably novel — targeting benign ambient noise rather than adversarial payloads is a genuine gap. However, the LLM-generated-and-LLM-judged benchmark methodology is a standard limitation in this line of work that the paper does not deeply address. The GRPO application is methodologically straightforward, not algorithmically novel.</p>
+<h2 id="open-questions">Open Questions</h2>
+<ul>
+<li>Does inverse scaling hold uniformly across non-Qwen3 families? Figure 3 shows them but the results text is truncated.</li>
+<li>Does GRPO recovery generalize beyond Qwen3-8B to other model families or scales?</li>
+<li>The benchmark uses gemini3-pro for generation — is there contamination risk for Gemini-family model evaluation?</li>
+<li>What determines the MoE phase transition threshold for thinking benefit vs. penalty?</li>
+<li>The conjunctive rubric (all-or-nothing) may be overly strict; how does partial-resistance performance distribute across the three distractor slots?</li>
+</ul>
+<hr>
+<h2 id="original-abstract">Original abstract</h2>
+<p>arXiv:2605.29491v1 Announce Type: new Abstract: Large Language Models (LLMs) are increasingly deployed in agentic and retrieval-augmented generation (RAG) systems, where they must execute user-specified tasks over externally provided reference text. In practice, such context is often unstructured and contaminated with benign but instruction-like semantic noise, such as editorial comments and system traces, which should be treated strictly as data. We introduce DistractionIF, a benchmark designed to evaluate robustness against such distractor instructions in reference text. Across a broad range of models, we observe a consistent inverse scaling phenomenon: larger models are often less robust, with performance dropping by up to 30 points as scale increases. Mechanistically, our perplexity analysis reveals that scaling erodes the probabilistic boundary between robust and distracted behaviors, making models increasingly prone to over-interpreting noise as instructions. To address this, we demonstrate that reinforcement learning, specifically Group Relative Policy Optimization (GRPO), can restore this boundary, improving robustness by up to 15.5% without compromising general instruction-following capability. Our findings highlight a critical instruction-following robustness gap in reference-grounded tasks and establish reinforcement learning as a promising path for enforcing strict data-instruction separation at scale.</p>
+
+      </div>
+
+
+      <footer>
+        
+
+
+        
+        
+        
+        
+        
+        
+        
+      </footer>
+    </article>
+
+    
+  </section>
+
+    </div>
+
+    <footer class="footer">
+  <section class="container">
+    ©
+    
+      2019 -
+    
+    2026
+     Jie Xin 
+    ·
+    
+    Powered by <a href="https://gohugo.io/" target="_blank" rel="noopener">Hugo</a> & <a href="https://github.com/luizdepra/hugo-coder/" target="_blank" rel="noopener">Coder</a>.
+    
+  </section>
+</footer>
+
+  </main>
+
+  
+
+  
+  
+  <script src="/js/coder.min.6ae284be93d2d19dad1f02b0039508d9aab3180a12a06dcc71b0b0ef7825a317.js" integrity="sha256-auKEvpPS0Z2tHwKwA5UI2aqzGAoSoG3McbCw73gloxc="></script>
+  
+
+  
+
+  
+
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+</body>
+</html>

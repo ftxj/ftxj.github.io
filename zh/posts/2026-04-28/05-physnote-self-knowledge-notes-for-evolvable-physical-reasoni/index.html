@@ -1,0 +1,378 @@
+<!DOCTYPE html>
+<html lang="zh">
+
+<head>
+  <title>
+  PhysNote: Self-Knowledge Notes for Evolvable Physical Reasoning in Vision-Language Model · JXIN&#39;s Home
+</title>
+  <meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="color-scheme" content="light dark">
+
+
+
+
+<meta name="author" content="Jie Xin">
+<meta name="description" content="arXiv: 2604.24443 · PDF
+作者: Sinin Zhang, Yunfei Xie, Yuxuan Cheng, Haoyu Zhang, Tong Zhang
+单位: The Chinese University of Hong Kong, Shenzhen, Rice University, City University of Hong Kong, Fudan University
+主分类: cs.AI · 全部: cs.AI
+命中关键词: agent, agentic, multi-agent, reasoning, inference
+
+TL;DR
+PhysNote 让 VLM 通过自生成的 &ldquo;Knowledge Notes&rdquo; 外化并演化物理推理知识，结合时空规范化与 InfoAgent 迭代验证，在 PhysBench 测试集上达到 56.68% 准确率。
+Motivation
+VLM 在教科书式物理题上表现不错，但一旦面对多帧动态场景就常常失手：PhysBench 上 75 个 VLM 的大规模评测显示，多数模型在物理推理任务上只有约 40% 准确率，远低于人类，且这个缺口不会随模型尺寸、训练数据或输入帧数增加而缩小。作者把失败归到两条根因：(1) 时空身份漂移——物体在连续帧之间会&quot;换身份&quot;，因果链被幻觉式转场切断，典型如碰撞后的轨迹无法被连贯表征；(2) 推理洞见的易失性——模型偶尔能蹦出正确的物理推理，但推理一结束就随上下文窗口蒸发，下次遇到同类问题还得从零开始，像&quot;金鱼记忆的物理学家&quot;。
+今天受这个问题困扰的是 embodied agent / 机器人操作 / 自动导航这些需要精确物理推断的场景，当前的绕路做法是 PhysAgent 这类&quot;reason-act-observe&quot;框架外挂 SAM/Depth Anything 等工具，或 PCBs 通过微调小 VLM 产出辅助描述——要么推理链条用完即弃，要么靠昂贵的参数微调，都缺少自主演化知识的能力。作者认为可以把人类物理学家&quot;记笔记、攒启发式、反思改错&quot;的工作流外化成一个持续更新的结构化知识库，既不碰底模权重，也不依赖专用视觉工具。">
+<meta name="keywords" content="blog,developer,personal">
+
+
+
+  <meta name="twitter:card" content="summary">
+  <meta name="twitter:title" content="PhysNote: Self-Knowledge Notes for Evolvable Physical Reasoning in Vision-Language Model">
+  <meta name="twitter:description" content="arXiv: 2604.24443 · PDF
+作者: Sinin Zhang, Yunfei Xie, Yuxuan Cheng, Haoyu Zhang, Tong Zhang
+单位: The Chinese University of Hong Kong, Shenzhen, Rice University, City University of Hong Kong, Fudan University
+主分类: cs.AI · 全部: cs.AI
+命中关键词: agent, agentic, multi-agent, reasoning, inference
+TL;DR PhysNote 让 VLM 通过自生成的 “Knowledge Notes” 外化并演化物理推理知识，结合时空规范化与 InfoAgent 迭代验证，在 PhysBench 测试集上达到 56.68% 准确率。
+Motivation VLM 在教科书式物理题上表现不错，但一旦面对多帧动态场景就常常失手：PhysBench 上 75 个 VLM 的大规模评测显示，多数模型在物理推理任务上只有约 40% 准确率，远低于人类，且这个缺口不会随模型尺寸、训练数据或输入帧数增加而缩小。作者把失败归到两条根因：(1) 时空身份漂移——物体在连续帧之间会&#34;换身份&#34;，因果链被幻觉式转场切断，典型如碰撞后的轨迹无法被连贯表征；(2) 推理洞见的易失性——模型偶尔能蹦出正确的物理推理，但推理一结束就随上下文窗口蒸发，下次遇到同类问题还得从零开始，像&#34;金鱼记忆的物理学家&#34;。
+今天受这个问题困扰的是 embodied agent / 机器人操作 / 自动导航这些需要精确物理推断的场景，当前的绕路做法是 PhysAgent 这类&#34;reason-act-observe&#34;框架外挂 SAM/Depth Anything 等工具，或 PCBs 通过微调小 VLM 产出辅助描述——要么推理链条用完即弃，要么靠昂贵的参数微调，都缺少自主演化知识的能力。作者认为可以把人类物理学家&#34;记笔记、攒启发式、反思改错&#34;的工作流外化成一个持续更新的结构化知识库，既不碰底模权重，也不依赖专用视觉工具。">
+
+<meta property="og:url" content="https://ftxj.github.io/zh/posts/2026-04-28/05-physnote-self-knowledge-notes-for-evolvable-physical-reasoni/">
+  <meta property="og:site_name" content="JXIN&#39;s Home">
+  <meta property="og:title" content="PhysNote: Self-Knowledge Notes for Evolvable Physical Reasoning in Vision-Language Model">
+  <meta property="og:description" content="arXiv: 2604.24443 · PDF
+作者: Sinin Zhang, Yunfei Xie, Yuxuan Cheng, Haoyu Zhang, Tong Zhang
+单位: The Chinese University of Hong Kong, Shenzhen, Rice University, City University of Hong Kong, Fudan University
+主分类: cs.AI · 全部: cs.AI
+命中关键词: agent, agentic, multi-agent, reasoning, inference
+TL;DR PhysNote 让 VLM 通过自生成的 “Knowledge Notes” 外化并演化物理推理知识，结合时空规范化与 InfoAgent 迭代验证，在 PhysBench 测试集上达到 56.68% 准确率。
+Motivation VLM 在教科书式物理题上表现不错，但一旦面对多帧动态场景就常常失手：PhysBench 上 75 个 VLM 的大规模评测显示，多数模型在物理推理任务上只有约 40% 准确率，远低于人类，且这个缺口不会随模型尺寸、训练数据或输入帧数增加而缩小。作者把失败归到两条根因：(1) 时空身份漂移——物体在连续帧之间会&#34;换身份&#34;，因果链被幻觉式转场切断，典型如碰撞后的轨迹无法被连贯表征；(2) 推理洞见的易失性——模型偶尔能蹦出正确的物理推理，但推理一结束就随上下文窗口蒸发，下次遇到同类问题还得从零开始，像&#34;金鱼记忆的物理学家&#34;。
+今天受这个问题困扰的是 embodied agent / 机器人操作 / 自动导航这些需要精确物理推断的场景，当前的绕路做法是 PhysAgent 这类&#34;reason-act-observe&#34;框架外挂 SAM/Depth Anything 等工具，或 PCBs 通过微调小 VLM 产出辅助描述——要么推理链条用完即弃，要么靠昂贵的参数微调，都缺少自主演化知识的能力。作者认为可以把人类物理学家&#34;记笔记、攒启发式、反思改错&#34;的工作流外化成一个持续更新的结构化知识库，既不碰底模权重，也不依赖专用视觉工具。">
+  <meta property="og:locale" content="zh">
+  <meta property="og:type" content="article">
+    <meta property="article:section" content="posts">
+    <meta property="article:published_time" content="2026-04-28T13:56:28+00:00">
+    <meta property="article:modified_time" content="2026-04-28T13:56:28+00:00">
+
+
+
+
+<link rel="canonical" href="https://ftxj.github.io/zh/posts/2026-04-28/05-physnote-self-knowledge-notes-for-evolvable-physical-reasoni/">
+
+
+<link rel="preload" href="/fonts/fa-brands-400.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="/fonts/fa-regular-400.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="/fonts/fa-solid-900.woff2" as="font" type="font/woff2" crossorigin>
+
+
+  
+  
+  <link rel="stylesheet" href="/css/coder.min.5e94c1acf7aa2066035cf2764ae3e4fe39db101d68b870f919966100d51fb861.css" integrity="sha256-XpTBrPeqIGYDXPJ2SuPk/jnbEB1ouHD5GZZhANUfuGE=" crossorigin="anonymous" media="screen" />
+
+
+
+
+
+
+  
+    
+    
+    <link rel="stylesheet" href="/css/coder-dark.min.a00e6364bacbc8266ad1cc81230774a1397198f8cfb7bcba29b7d6fcb54ce57f.css" integrity="sha256-oA5jZLrLyCZq0cyBIwd0oTlxmPjPt7y6KbfW/LVM5X8=" crossorigin="anonymous" media="screen" />
+  
+
+
+
+ 
+
+
+
+
+<link rel="icon" type="image/svg+xml" href="/images/favicon.svg" sizes="any">
+<link rel="icon" type="image/png" href="/images/favicon-32x32.png" sizes="32x32">
+<link rel="icon" type="image/png" href="/images/favicon-16x16.png" sizes="16x16">
+
+<link rel="apple-touch-icon" href="/images/apple-touch-icon.png">
+<link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon.png">
+
+<link rel="manifest" href="/site.webmanifest">
+<link rel="mask-icon" href="/images/safari-pinned-tab.svg" color="#5bbad5">
+
+
+
+
+
+
+<style>
+.content article ul {
+  list-style: disc !important;
+  padding-left: 2.5rem !important;
+}
+
+.content article ul li {
+  display: list-item !important;
+}
+</style>
+
+
+
+
+  
+</head>
+
+
+
+
+
+
+<body class="preload-transitions colorscheme-auto">
+  
+<div class="float-container">
+    <a id="dark-mode-toggle" class="colorscheme-toggle">
+        <i class="fa-solid fa-adjust fa-fw" aria-hidden="true"></i>
+    </a>
+</div>
+
+
+  <main class="wrapper">
+    <nav class="navigation">
+  <section class="container">
+    
+    <a class="navigation-title" href="https://ftxj.github.io/zh/">
+      JXIN&#39;s Home
+    </a>
+    
+    
+      <input type="checkbox" id="menu-toggle" />
+      <label class="menu-button float-right" for="menu-toggle">
+        <i class="fa-solid fa-bars fa-fw" aria-hidden="true"></i>
+      </label>
+      <ul class="navigation-list">
+        
+          
+            <li class="navigation-item">
+              <a class="navigation-link " href="/zh/about/">关于</a>
+            </li>
+          
+            <li class="navigation-item">
+              <a class="navigation-link " href="/zh/travel/">旅行</a>
+            </li>
+          
+            <li class="navigation-item">
+              <a class="navigation-link " href="/zh/hiking/">徒步</a>
+            </li>
+          
+            <li class="navigation-item">
+              <a class="navigation-link " href="/zh/posts/">博客</a>
+            </li>
+          
+            <li class="navigation-item">
+              <a class="navigation-link " href="https://ftxj.github.io/cv/cv_zh.pdf">简历</a>
+            </li>
+          
+        
+        
+          
+          
+          
+            
+              
+                <li class="navigation-item menu-separator">
+                  <span>|</span>
+                </li>
+                
+              
+              <li class="navigation-item">
+                <a href="/posts/2026-04-28/05-physnote-self-knowledge-notes-for-evolvable-physical-reasoni/">EN</a>
+              </li>
+            
+          
+        
+      </ul>
+    
+  </section>
+</nav>
+
+
+    <div class="content">
+      
+  <section class="container post">
+    <article>
+      <header>
+        <div class="post-title">
+          <h1 class="title">
+            <a class="title-link" href="https://ftxj.github.io/zh/posts/2026-04-28/05-physnote-self-knowledge-notes-for-evolvable-physical-reasoni/">
+              PhysNote: Self-Knowledge Notes for Evolvable Physical Reasoning in Vision-Language Model
+            </a>
+          </h1>
+        </div>
+        <div class="post-meta">
+          <div class="date">
+            <span class="posted-on">
+              <i class="fa-solid fa-calendar" aria-hidden="true"></i>
+              <time datetime="2026-04-28T13:56:28Z">
+                四月 28, 2026
+              </time>
+            </span>
+            <span class="reading-time">
+              <i class="fa-solid fa-clock" aria-hidden="true"></i>
+              3-minute read
+            </span>
+          </div>
+          
+          <div class="categories">
+  <i class="fa-solid fa-folder" aria-hidden="true"></i>
+    <a href="/zh/categories/paper-digest/">Paper-Digest</a>
+      <span class="separator">•</span>
+    <a href="/zh/categories/2026-04-28/">2026-04-28</a></div>
+
+          
+        </div>
+      </header>
+
+      
+
+
+      <div class="post-content">
+        
+        <p><strong>arXiv:</strong> <a href="https://arxiv.org/abs/2604.24443v1">2604.24443</a> · <a href="https://arxiv.org/pdf/2604.24443v1">PDF</a></p>
+<p><strong>作者:</strong> Sinin Zhang, Yunfei Xie, Yuxuan Cheng, Haoyu Zhang, Tong Zhang</p>
+<p><strong>单位:</strong> The Chinese University of Hong Kong, Shenzhen, Rice University, City University of Hong Kong, Fudan University</p>
+<p><strong>主分类:</strong> <code>cs.AI</code> · 全部: cs.AI</p>
+<p><strong>命中关键词:</strong> agent, agentic, multi-agent, reasoning, inference</p>
+<hr>
+<h2 id="tldr">TL;DR</h2>
+<p>PhysNote 让 VLM 通过自生成的 &ldquo;Knowledge Notes&rdquo; 外化并演化物理推理知识，结合时空规范化与 InfoAgent 迭代验证，在 PhysBench 测试集上达到 56.68% 准确率。</p>
+<h2 id="motivation">Motivation</h2>
+<p>VLM 在教科书式物理题上表现不错，但一旦面对多帧动态场景就常常失手：PhysBench 上 75 个 VLM 的大规模评测显示，多数模型在物理推理任务上只有约 40% 准确率，远低于人类，且这个缺口不会随模型尺寸、训练数据或输入帧数增加而缩小。作者把失败归到两条根因：(1) <strong>时空身份漂移</strong>——物体在连续帧之间会&quot;换身份&quot;，因果链被幻觉式转场切断，典型如碰撞后的轨迹无法被连贯表征；(2) <strong>推理洞见的易失性</strong>——模型偶尔能蹦出正确的物理推理，但推理一结束就随上下文窗口蒸发，下次遇到同类问题还得从零开始，像&quot;金鱼记忆的物理学家&quot;。</p>
+<p>今天受这个问题困扰的是 embodied agent / 机器人操作 / 自动导航这些需要精确物理推断的场景，当前的绕路做法是 PhysAgent 这类&quot;reason-act-observe&quot;框架外挂 SAM/Depth Anything 等工具，或 PCBs 通过微调小 VLM 产出辅助描述——要么推理链条用完即弃，要么靠昂贵的参数微调，都缺少自主演化知识的能力。作者认为可以把人类物理学家&quot;记笔记、攒启发式、反思改错&quot;的工作流外化成一个持续更新的结构化知识库，既不碰底模权重，也不依赖专用视觉工具。</p>
+<h2 id="核心观点">核心观点</h2>
+<ul>
+<li>指出动态物理推理失败的两大根因：<strong>时空身份漂移</strong>与<strong>推理洞见的易失性</strong>。</li>
+<li>提出 <strong>PhysNote</strong>：agentic 框架，让 VLM 自生成、检索、反思 &ldquo;Knowledge Notes&rdquo;。</li>
+<li><strong>Spatio-Temporal Canonicalization</strong>：给视觉 entity 分配不可变 ID，加上 Triadic Observation Template <code>⟨ID, Anchor, State⟩</code>，稳定跨帧对象身份。</li>
+<li><strong>三层 Knowledge Hierarchy</strong>：General Tips / Task Descriptions / Task Details，带自动剪枝机制防污染。</li>
+<li><strong>InfoAgent</strong>：最多 3 轮 Hypothesis-Evidence-Validation 循环，evidence gap 未闭合时进入 Degenerative Inference Mode。</li>
+<li><strong>严格的 Update Eligibility 门 Φ(P)</strong>：四条件合取，只有完全 grounded 的正确 trace 才能回写知识库。</li>
+</ul>
+<h2 id="方法">方法</h2>
+<p>三阶段流水线。<strong>时空规范化</strong>先把 <code>(Q, V)</code> 变成 <code>(Q̂, V̂)</code>：对图像/视频分别打上 <code>[#0image]</code>、<code>[#1videoframe3]</code> 之类不可变 ID，每条 observation 被强制写成 <code>O = (v, e, d)</code>（Visual ID、Visual Anchor、Description），保证任何观察都可追溯到具体帧和实体。</p>
+<p><img alt="图 1" src="/images/papers/2604.24443/fig1.png"></p>
+<p>图 1 给出框架的三空间布局：左侧 Visual Anchors 负责 canonicalize 输入流；中间 InfoAgent 从分层 Knowledge Notes <code>𝒩</code> 里按任务检索相关 Tips/Description/Details，执行 Hypothesis-Evidence-Validation 循环抽出 Triadic Observations；右侧（仅训练期）对推理 trace <code>P</code> 做 Update Eligibility Check <code>Φ(P)</code>，合格的 trace 用于同步更新 Notes，错误率过高的任务节点被 Autonomous Denoising and Pruning 清除。这张图直接对应本文三大组件的信息流，支撑&quot;知识可演化&quot;这一核心主张。</p>
+<p><strong>知识层级</strong>分 General Tips / Task Descriptions / Task Details 三层，由 Context Selection Agent 在全局视野下匹配任务节点 <code>T</code>，缺匹配则触发 Note Discovery。节点错误率 <code>E(T) = n₋/(n₊+n₋) &gt; τ</code>（正文 τ=0.7，最小激活 8 次）则整节点剪除。</p>
+<p><strong>InfoAgent 循环</strong>最多 3 轮：每轮生成假设 <code>H_i</code> + 候选答 <code>A_cand</code> + <code>&lt;info&gt;/&lt;attention&gt;</code> 查询，返回 micro-facts <code>Facts_i</code>，validator 判定是否足以支撑 <code>A_cand</code>；3 轮仍未闭合 gap 就进入 Degenerative Inference Mode 用启发式补齐。</p>
+<p><img alt="图 2" src="/images/papers/2604.24443/fig2.png"></p>
+<p>图 2 专门展开 Knowledge Note 的&quot;使用 + 演化&quot;两条路径：推理时根据 canonicalized 输入 <code>(Q̂, V̂)</code> 检索任务相关笔记喂给 InfoAgent 的 Hypothesis-Evidence-Validation 循环；训练时对 reasoning trace <code>P</code> 过 Eligibility Check，合格则合成新笔记、持续高错节点则剪枝。这张图直接支撑 &ldquo;Notes 能跨批次自演化&rdquo; 的主张。更新门 <code>Φ(P) = c(P) ∧ ¬f(P) ∧ ¬a(P) ∧ d(P)</code>——答案对、未退化、无启发式假设、micro-facts 含显式物理算子（trajectory/collision/contact）——四条件全真才允许写回。</p>
+<h2 id="实验">实验</h2>
+<p><strong>底模</strong>：Qwen2.5-VL-72B-Instruct。视频均匀采样 4 帧、分辨率 512 px。知识库用分层 JSON + all-MiniLM-L6-v2 embedding 检索。剪枝阈值 τ=0.7，最小激活 8 次；InfoAgent 上限 3 轮；Φ(P) 用 15 个物理原语关键词过滤。<strong>数据集</strong>：PhysBench，训练 500 条用于知识演化，测试集 10,000 条，验证集 200 条，覆盖四大域 S1 动力学 / S2 物体关系 / S3 场景理解 / S4 物体属性。<strong>Baseline</strong>：开源 VLM（LLaVA 系列、InternVL1.5、Mantis、PLLaVA、LLaVA-interleave-dpo）、闭源 VLM（GPT-4o、Gemini-1.5 pro/flash、Claude-3.5-sonnet）、Multi-agent 的 PhysAgent，全部 zero-shot。</p>
+<h2 id="结果">结果</h2>
+<p><strong>主表（Table 1）</strong>：PhysNote 测试集总平均 <strong>56.68%</strong>，比最强 multi-agent baseline PhysAgent 的 51.72% 绝对提升 <strong>+4.96</strong>；四域全胜（S1 62.45 vs 58.20、S2 72.10 vs 65.40、S3 42.33 vs 38.10、S4 49.85 vs 45.20）。闭源里最强的 GPT-4o 平均只有 49.49%，Gemini-1.5-pro 49.11%。人类上界 95.87%，缺口仍显著。</p>
+<p><strong>消融（Table 2，验证集）</strong>：Full Model 总分 72.86%，比 Qwen2.5-VL-72B 裸底模 69.85% 提升 +3.01；有意思的是 Baseline+InfoAgent 单独上反而降到 64.32%（作者解释为无结构引导时 agent &ldquo;stochastic parrot&rdquo;），Baseline+Note 单独为 66.83%，两者协同才达到 72.86%，验证 InfoAgent 与 Notes 必须一起用。</p>
+<p><img alt="图 3" src="/images/papers/2604.24443/fig3.jpg"></p>
+<p>图 3 是相机运动推理的定性对比，支撑&quot;canonicalization 防身份漂移&quot;。问题要求判断相机是否做了垂直位移（GT=D）。Baseline 觉得相对位置稳定就错选 C（横向平行移动）；PhysNote 通过 Triadic Observation 跟踪 peg 尖与酒杯口的持续对齐、物体相对尺寸不变，逐项排除 B（距离变远）和 C，再通过灰色钟形物体到画面边缘距离的减小识别出垂直位移，正确选 D。</p>
+<p><img alt="图 4" src="/images/papers/2604.24443/fig4.jpg"></p>
+<p>图 4 展示 Knowledge Notes 如何引导细粒度属性辨别：任务是比较绿球与青球的可塑性（GT=A，绿球 much less）。Baseline 只看宏观运动觉得两球都没明显形变，判 C（差不多）；PhysNote 从 Notes 里调出&quot;影子清晰度+球形保持度&quot;这条材料先验，量化出绿球形变比青球少约 15%，正确选 A。支撑&quot;externalized tips 让模型看到平时忽略的信号&quot;这一结论。</p>
+<h2 id="结论">结论</h2>
+<p>实践者该带走的结论：把 VLM 物理推理的失败拆成&quot;感知漂移&quot;+&ldquo;洞见易失&quot;两件事，再用&quot;笔记化 + agentic 循环&quot;同时治，能在不动底模参数的前提下拿到 <strong>PhysBench 测试集 +4.96% 绝对提升</strong>（56.68% vs PhysAgent 51.72%），四域均衡受益。边界也很清楚：(1) 所有主表和消融都只在 Qwen2.5-VL-72B-Instruct + PhysBench 上跑，没有换底模验证可迁移性；(2) 知识演化只用了 500 条训练样本，长期演化下知识库是否仍保稳定、会不会污染，论文未给曲线；(3) 视频只用 4 帧均匀采样 + 3 轮 InfoAgent 上限，很多真实动态场景需要更高时序分辨率，未给帧数/迭代数的敏感性分析；(4) 标题说&quot;evolvable&quot;但论文没展示跨 batch 的知识库质量随时间变化曲线。</p>
+<h2 id="是否新瓶装旧酒">是否新瓶装旧酒</h2>
+<p>作者自陈的最近邻工作：<strong>PhysAgent</strong>（Chow et al., PhysBench）——reason-act-observe 循环 + SAM/Depth Anything 外部工具；<strong>Physics Context Builders, PCBs</strong>（Balazadeh et al., 2025）——微调小 VLM 产出场景描述。作者框出的 delta：前者推理 trace 用完即弃，后者需要参数微调，PhysNote 两样都不做，强调&quot;持久化外化知识 + 自主剪枝演化 + 零工具零微调&rdquo;。</p>
+<p>独立看：用外部记忆 / 自生成笔记增强 LLM/agent 并非首创（Generative Agents 的记忆流、Reflexion 的 verbal RL、Voyager 的技能库都沿这条线），但把&quot;时空规范化（不可变 ID + Triadic Template）+ 严格 Φ(P) 四条件更新门 + 错误率剪枝&quot;这套组合装配在 VLM 物理推理上确实是一个较具体的新组合。<strong>不算换名，但&quot;Knowledge Notes&quot; 的核心思想可视为 LLM agent 长期记忆范式在视觉物理场景的迁移</strong>，真正的原创在时空锚定机制与更新门设计。</p>
+<h2 id="尚未回答的问题">尚未回答的问题</h2>
+<ul>
+<li>500 训练样本下的知识库增长/剪枝曲线如何？多 batch 下 error rate 是否单调收敛？</li>
+<li>更换底模（GPT-4o、Gemini-1.5-pro、InternVL 等）后框架是否仍有 +5% 量级收益？</li>
+<li>采样帧数（4→16→32）和 InfoAgent 迭代上限（3→5→10）的敏感性？</li>
+<li>非 PhysBench 的 embodied 任务（真机操作、CARLA、RoboTHOR）上是否 transfer？</li>
+<li>Φ(P) 四个条件各自对知识质量的贡献未做消融。</li>
+<li>剪枝阈值 τ=0.7、最小激活 8 次是怎么选出来的，是否敏感？</li>
+</ul>
+<h2 id="原始摘要中文翻译">原始摘要（中文翻译）</h2>
+<p>视觉语言模型（VLMs）在教科书式的物理题上已展现出不错的表现，但在面对需要跨帧时序一致性与因果推理的动态真实场景时，它们往往失败。我们识别出两个根本挑战：(1) <strong>时空身份漂移</strong>——物体在连续帧间丢失其物理身份，从而打断因果链；(2) <strong>推理时洞见的易失性</strong>——模型偶尔能给出正确的物理推理，但从未将其固化以便未来复用。为应对这两个挑战，我们提出 PhysNote，一个让 VLM 能通过自生成的 &ldquo;Knowledge Notes&rdquo; 外化并精炼物理知识的 agentic 框架。PhysNote 通过时空规范化稳定动态感知，将自生成洞见组织进一个分层知识库，并驱动一个迭代推理循环——先把假设锚定到视觉证据上，再把验证过的知识固化。PhysBench 上的实验表明 PhysNote 取得 56.68% 的整体准确率，比最强的 multi-agent baseline 高出 4.96%，并在全部四个物理推理子域上都有一致提升。</p>
+
+      </div>
+
+
+      <footer>
+        
+
+
+        
+        
+        
+        
+        
+        
+        
+      </footer>
+    </article>
+
+    
+  </section>
+
+    </div>
+
+    <footer class="footer">
+  <section class="container">
+    ©
+    
+      2019 -
+    
+    2026
+     Jie Xin 
+    ·
+    
+    Powered by <a href="https://gohugo.io/" target="_blank" rel="noopener">Hugo</a> & <a href="https://github.com/luizdepra/hugo-coder/" target="_blank" rel="noopener">Coder</a>.
+    
+  </section>
+</footer>
+
+  </main>
+
+  
+
+  
+  
+  <script src="/js/coder.min.6ae284be93d2d19dad1f02b0039508d9aab3180a12a06dcc71b0b0ef7825a317.js" integrity="sha256-auKEvpPS0Z2tHwKwA5UI2aqzGAoSoG3McbCw73gloxc="></script>
+  
+
+  
+
+  
+
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+</body>
+</html>

@@ -1,0 +1,405 @@
+:root {
+  --bg: #f5efe2;
+  --paper: #fffaf0;
+  --ink: #231f1a;
+  --muted: #796d5c;
+  --line: #e1d2b8;
+  --red: #dc2626;
+  --orange: #f97316;
+  --blue: #2563eb;
+  --purple: #7c3aed;
+  --green: #15803d;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif;
+}
+
+* { box-sizing: border-box; }
+
+html { height: 100%; }
+
+body.route-page {
+  margin: 0;
+  color: var(--ink);
+  background:
+    radial-gradient(circle at 5% -10%, rgba(220, 38, 38, .12), transparent 28rem),
+    radial-gradient(circle at 100% 0%, rgba(21, 128, 61, .12), transparent 26rem),
+    linear-gradient(180deg, #f9edd4, var(--bg));
+}
+
+.route-shell {
+  max-width: 1220px;
+  margin: 0 auto;
+  padding: 22px 16px 44px;
+}
+
+.route-hero {
+  background: rgba(255,250,240,.92);
+  border: 1px solid var(--line);
+  border-radius: 24px;
+  padding: clamp(18px, 3vw, 28px);
+  box-shadow: 0 12px 30px rgba(60, 44, 22, .10);
+  position: relative;
+  overflow: hidden;
+}
+
+.route-hero::after {
+  content: "";
+  position: absolute;
+  right: -70px;
+  top: -80px;
+  width: 220px;
+  height: 220px;
+  border-radius: 50%;
+  border: 28px solid rgba(217,103,43,.08);
+  pointer-events: none;
+}
+
+.route-eyebrow {
+  color: #9f3f1c;
+  font-size: 12px;
+  letter-spacing: .18em;
+  text-transform: uppercase;
+  font-weight: 700;
+}
+
+.route-hero h1 {
+  margin: 8px 0 8px;
+  font-size: clamp(28px, 5vw, 48px);
+  line-height: 1.05;
+}
+
+.route-subtitle {
+  color: var(--muted);
+  margin: 0;
+  max-width: 70ch;
+}
+
+.route-actions {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+  margin-top: 14px;
+}
+
+.route-actions a,
+.route-actions button {
+  display: inline-flex;
+  align-items: center;
+  border: 1px solid var(--line);
+  background: #fff;
+  border-radius: 999px;
+  padding: 9px 12px;
+  color: var(--ink);
+  text-decoration: none;
+  font-size: 14px;
+  font-weight: 700;
+  min-height: 40px;
+  cursor: pointer;
+}
+
+.route-actions .primary {
+  background: #231f1a;
+  color: #fff;
+  border-color: #231f1a;
+}
+
+.route-stats {
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  gap: 10px;
+  margin-top: 18px;
+}
+
+.route-stat {
+  background: #fff;
+  border: 1px solid var(--line);
+  border-radius: 16px;
+  padding: 12px;
+  min-height: 76px;
+  position: relative;
+  z-index: 1;
+}
+
+.route-stat b {
+  display: block;
+  font-size: 22px;
+  line-height: 1;
+}
+
+.route-stat span {
+  color: var(--muted);
+  font-size: 12px;
+  display: block;
+  margin-top: 8px;
+}
+
+.route-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1.4fr) minmax(320px, .6fr);
+  gap: 16px;
+  margin-top: 16px;
+}
+
+.route-card {
+  background: rgba(255,250,240,.94);
+  border: 1px solid var(--line);
+  border-radius: 22px;
+  padding: 14px;
+  box-shadow: 0 10px 28px rgba(60, 44, 22, .09);
+}
+
+.route-map {
+  height: min(68vh, 720px);
+  min-height: 520px;
+  border-radius: 18px;
+  overflow: hidden;
+  border: 1px solid var(--line);
+}
+
+.route-profile {
+  width: 100%;
+  height: 190px;
+  display: block;
+  background: #fff;
+  border: 1px solid var(--line);
+  border-radius: 16px;
+  margin-top: 12px;
+}
+
+.route-legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 10px;
+  color: var(--muted);
+  font-size: 13px;
+}
+
+.route-legend i {
+  display: inline-block;
+  width: 28px;
+  height: 4px;
+  border-radius: 99px;
+  vertical-align: middle;
+  margin-right: 6px;
+}
+
+.route-card h2 {
+  margin: 2px 0 12px;
+  font-size: 20px;
+}
+
+.route-notes {
+  color: var(--muted);
+  font-size: 14px;
+  margin: 10px 0 0;
+  padding-left: 18px;
+}
+
+.route-poi-list {
+  display: grid;
+  gap: 8px;
+  max-height: 650px;
+  overflow: auto;
+  padding-right: 4px;
+}
+
+.route-poi {
+  border: 1px solid var(--line);
+  background: #fff;
+  border-radius: 14px;
+  padding: 10px 12px;
+  cursor: pointer;
+}
+
+.route-poi:hover { border-color: #c9aa7a; }
+.route-poi b { display: block; font-size: 14px; }
+.route-poi span { color: var(--muted); font-size: 12px; }
+
+.route-filters {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin-bottom: 12px;
+}
+
+.route-filters button {
+  border: 1px solid var(--line);
+  background: #fff;
+  border-radius: 999px;
+  padding: 7px 10px;
+  color: var(--ink);
+  cursor: pointer;
+}
+
+.route-filters button.active {
+  background: #231f1a;
+  color: #fff;
+  border-color: #231f1a;
+}
+
+.marker {
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  border: 3px solid #fff;
+  box-shadow: 0 1px 6px rgba(0,0,0,.35);
+}
+
+.peak { background: #111827; clip-path: polygon(50% 0, 100% 100%, 0 100%); border-radius: 0; }
+.camp { background: var(--green); }
+.pass { background: var(--red); }
+.water { background: #0284c7; }
+.glacier { background: #67e8f9; }
+.risk { background: var(--purple); }
+.terminal { background: #111827; }
+
+body.route-3d-page,
+body.route-3d-page #viewDiv {
+  width: 100%;
+  height: 100%;
+  margin: 0;
+  padding: 0;
+}
+
+body.route-3d-page {
+  overflow: hidden;
+}
+
+body.route-3d-page #viewDiv {
+  min-height: 100vh;
+}
+
+.route-3d-panel {
+  position: absolute;
+  left: 18px;
+  top: 18px;
+  z-index: 10;
+  width: min(380px, calc(100vw - 36px));
+  background: rgba(255, 250, 240, .92);
+  border: 1px solid rgba(201,183,147,.8);
+  border-radius: 18px;
+  box-shadow: 0 16px 42px rgba(20, 18, 12, .22);
+  padding: 14px 16px;
+  backdrop-filter: blur(14px);
+}
+
+.route-3d-panel.collapsed .panel-body { display: none; }
+
+.panel-head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.route-toggle {
+  border: 1px solid #d7c4a6;
+  background: #fff;
+  border-radius: 999px;
+  padding: 6px 9px;
+  color: #231f1a;
+  cursor: pointer;
+  font-size: 12px;
+  flex: 0 0 auto;
+}
+
+.route-3d-panel h1 {
+  font-size: 23px;
+  line-height: 1.1;
+  margin: 6px 0 8px;
+}
+
+.route-3d-panel p {
+  margin: 8px 0 0;
+  color: #796d5c;
+  font-size: 13px;
+  line-height: 1.45;
+}
+
+.route-3d-legend {
+  position: absolute;
+  right: 16px;
+  bottom: 28px;
+  z-index: 10;
+  background: rgba(255, 250, 240, .92);
+  border: 1px solid rgba(201,183,147,.8);
+  border-radius: 14px;
+  padding: 10px 12px;
+  box-shadow: 0 10px 32px rgba(20,18,12,.18);
+  font-size: 12px;
+}
+
+.route-3d-legend div { margin: 5px 0; white-space: nowrap; }
+.route-3d-legend i {
+  display: inline-block;
+  width: 28px;
+  height: 4px;
+  border-radius: 4px;
+  margin-right: 8px;
+  vertical-align: middle;
+}
+
+.route-loading {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  background: #f5efe2;
+  z-index: 20;
+  color: #796d5c;
+}
+
+@media (max-width: 860px) {
+  .route-grid { grid-template-columns: 1fr; }
+  .route-stats { grid-template-columns: repeat(2, 1fr); }
+  .route-map { height: 58vh; min-height: 420px; border-radius: 16px; }
+  .route-shell { padding: 12px 10px 32px; }
+  .route-hero { border-radius: 20px; }
+  .route-card { border-radius: 18px; padding: 10px; }
+  .route-poi-list { max-height: none; }
+  .route-filters {
+    position: sticky;
+    top: 0;
+    z-index: 2;
+    background: rgba(255,250,240,.96);
+    padding-bottom: 8px;
+  }
+  .route-filters button { min-height: 38px; }
+  .route-legend { font-size: 12px; }
+  .route-actions a,
+  .route-actions button { flex: 1 1 auto; justify-content: center; }
+}
+
+@media (max-width: 720px) {
+  .route-3d-panel {
+    position: fixed;
+    top: auto;
+    left: 10px;
+    right: 10px;
+    bottom: calc(10px + env(safe-area-inset-bottom));
+    width: auto;
+    max-height: 48vh;
+    overflow: auto;
+    padding: 12px;
+  }
+  .route-3d-panel.collapsed { max-height: none; }
+  .route-3d-panel h1 { font-size: 18px; margin-bottom: 4px; }
+  .route-3d-panel p { font-size: 12px; }
+  .route-actions a,
+  .route-actions button {
+    padding: 10px 12px;
+    font-size: 13px;
+    min-height: 40px;
+  }
+  .route-3d-legend { display: none; }
+  .esri-ui-top-left { top: 8px !important; }
+}
+
+@media (max-width: 520px) {
+  .route-stats { grid-template-columns: 1fr 1fr; gap: 8px; }
+  .route-stat { min-height: auto; padding: 10px; }
+  .route-stat b { font-size: 18px; }
+  .route-hero h1 { font-size: 28px; }
+  .route-subtitle { font-size: 13px; }
+  .route-profile { height: 150px; }
+}

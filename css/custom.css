@@ -1,0 +1,54 @@
+/* Custom styles to show list bullets */
+.content ul {
+    list-style: disc !important;
+    padding-left: 2rem !important;
+}
+
+.content ul li {
+    display: list-item !important;
+}
+
+/* Fix social icons on mobile */
+.social-icons {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 0.5rem;
+}
+
+.social-icons a {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 2.5rem;
+    min-height: 2.5rem;
+    padding: 0.5rem;
+}
+
+.social-icons a svg,
+.social-icons a i {
+    font-size: 1.25rem;
+    width: 1.25rem;
+    height: 1.25rem;
+}
+
+/* Ensure icons are visible on small screens */
+@media (max-width: 768px) {
+    .social-icons {
+        gap: 1rem;
+        padding: 0.5rem 0;
+    }
+
+    .social-icons a {
+        min-width: 3rem;
+        min-height: 3rem;
+    }
+
+    .social-icons a svg,
+    .social-icons a i {
+        font-size: 1.5rem;
+        width: 1.5rem;
+        height: 1.5rem;
+    }
+}
+

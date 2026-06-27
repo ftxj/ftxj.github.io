@@ -1,0 +1,416 @@
+<!DOCTYPE html>
+<html lang="zh">
+
+<head>
+  <title>
+  The Curse of Helpfulness: Inverse Scaling Law in Robustness to Distractor Instructions via DistractionIF · JXIN&#39;s Home
+</title>
+  <meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="color-scheme" content="light dark">
+
+
+
+
+<meta name="author" content="Jie Xin">
+<meta name="description" content="arXiv: 2605.29491 · PDF
+作者: Zeli Su, Zhankai Xu, Tianlei Chen, Longfei Zheng, Xiaolu Zhang, Jun Zhou, Wentao Zhang
+单位: Ant Financial Services Group
+主分类: cs.AI · 全部: cs.AI
+命中关键词: large language model, llm, agent, agentic, retrieval, rag
+
+TL;DR
+大模型在 RAG/Agent 场景中存在**&ldquo;帮助诅咒&rdquo;**：模型越大，越容易把参考文本里的指令式噪声当作真实指令执行，反而更不鲁棒。GRPO 强化学习可将此鲁棒性提升最多 15.5%。
+
+Motivation
+在 RAG 和 Agent 系统中，LLM 经常被要求对外部参考文本执行特定任务（翻译、抽取、格式转换等）。现实中的参考文本并不干净——它混杂着来自真实工作流的残留物：编辑注解（&quot;(revise this paragraph)&quot;）、UI 提示（&ldquo;Output as JSON&rdquo;）、邮件旁注等。这些片段语义上像指令，但本质上是数据，不应被执行。
+问题的关键在于：这类干扰不是对抗性攻击，而是良性的、偶然的语义噪声。现有 prompt injection 研究聚焦于显式恶意载荷，而生产环境中更普遍的失效来自这类&quot;无意为之&quot;的干扰。IFEval 等主流 instruction-following 评测默认指令与数据干净分离，无法覆盖&quot;脏上下文&quot;场景。
+更反直觉的是，作者发现模型越大，反而越容易被干扰：Qwen3 系列从 0.6B 扩展到 235B，无思考模式下平均得分从 65.97 骤降至 37.6，跌幅接近 30 分。这意味着靠扩参数解决不了问题，甚至会让问题恶化——今天正在做长文档处理的 RAG 团队和 Agent 运维都在受这个问题的苦，而现有 workaround（prompt engineering、明确划定分隔符）远不够可靠。">
+<meta name="keywords" content="blog,developer,personal">
+
+
+
+  <meta name="twitter:card" content="summary">
+  <meta name="twitter:title" content="The Curse of Helpfulness: Inverse Scaling Law in Robustness to Distractor Instructions via DistractionIF">
+  <meta name="twitter:description" content="arXiv: 2605.29491 · PDF
+作者: Zeli Su, Zhankai Xu, Tianlei Chen, Longfei Zheng, Xiaolu Zhang, Jun Zhou, Wentao Zhang
+单位: Ant Financial Services Group
+主分类: cs.AI · 全部: cs.AI
+命中关键词: large language model, llm, agent, agentic, retrieval, rag
+TL;DR 大模型在 RAG/Agent 场景中存在**“帮助诅咒”**：模型越大，越容易把参考文本里的指令式噪声当作真实指令执行，反而更不鲁棒。GRPO 强化学习可将此鲁棒性提升最多 15.5%。
+Motivation 在 RAG 和 Agent 系统中，LLM 经常被要求对外部参考文本执行特定任务（翻译、抽取、格式转换等）。现实中的参考文本并不干净——它混杂着来自真实工作流的残留物：编辑注解（&#34;(revise this paragraph)&#34;）、UI 提示（“Output as JSON”）、邮件旁注等。这些片段语义上像指令，但本质上是数据，不应被执行。
+问题的关键在于：这类干扰不是对抗性攻击，而是良性的、偶然的语义噪声。现有 prompt injection 研究聚焦于显式恶意载荷，而生产环境中更普遍的失效来自这类&#34;无意为之&#34;的干扰。IFEval 等主流 instruction-following 评测默认指令与数据干净分离，无法覆盖&#34;脏上下文&#34;场景。
+更反直觉的是，作者发现模型越大，反而越容易被干扰：Qwen3 系列从 0.6B 扩展到 235B，无思考模式下平均得分从 65.97 骤降至 37.6，跌幅接近 30 分。这意味着靠扩参数解决不了问题，甚至会让问题恶化——今天正在做长文档处理的 RAG 团队和 Agent 运维都在受这个问题的苦，而现有 workaround（prompt engineering、明确划定分隔符）远不够可靠。">
+
+<meta property="og:url" content="https://ftxj.github.io/zh/posts/2026-05-29/02-the-curse-of-helpfulness-inverse-scaling-law-in-robustness-t/">
+  <meta property="og:site_name" content="JXIN&#39;s Home">
+  <meta property="og:title" content="The Curse of Helpfulness: Inverse Scaling Law in Robustness to Distractor Instructions via DistractionIF">
+  <meta property="og:description" content="arXiv: 2605.29491 · PDF
+作者: Zeli Su, Zhankai Xu, Tianlei Chen, Longfei Zheng, Xiaolu Zhang, Jun Zhou, Wentao Zhang
+单位: Ant Financial Services Group
+主分类: cs.AI · 全部: cs.AI
+命中关键词: large language model, llm, agent, agentic, retrieval, rag
+TL;DR 大模型在 RAG/Agent 场景中存在**“帮助诅咒”**：模型越大，越容易把参考文本里的指令式噪声当作真实指令执行，反而更不鲁棒。GRPO 强化学习可将此鲁棒性提升最多 15.5%。
+Motivation 在 RAG 和 Agent 系统中，LLM 经常被要求对外部参考文本执行特定任务（翻译、抽取、格式转换等）。现实中的参考文本并不干净——它混杂着来自真实工作流的残留物：编辑注解（&#34;(revise this paragraph)&#34;）、UI 提示（“Output as JSON”）、邮件旁注等。这些片段语义上像指令，但本质上是数据，不应被执行。
+问题的关键在于：这类干扰不是对抗性攻击，而是良性的、偶然的语义噪声。现有 prompt injection 研究聚焦于显式恶意载荷，而生产环境中更普遍的失效来自这类&#34;无意为之&#34;的干扰。IFEval 等主流 instruction-following 评测默认指令与数据干净分离，无法覆盖&#34;脏上下文&#34;场景。
+更反直觉的是，作者发现模型越大，反而越容易被干扰：Qwen3 系列从 0.6B 扩展到 235B，无思考模式下平均得分从 65.97 骤降至 37.6，跌幅接近 30 分。这意味着靠扩参数解决不了问题，甚至会让问题恶化——今天正在做长文档处理的 RAG 团队和 Agent 运维都在受这个问题的苦，而现有 workaround（prompt engineering、明确划定分隔符）远不够可靠。">
+  <meta property="og:locale" content="zh">
+  <meta property="og:type" content="article">
+    <meta property="article:section" content="posts">
+    <meta property="article:published_time" content="2026-05-29T12:02:49+00:00">
+    <meta property="article:modified_time" content="2026-05-29T12:02:49+00:00">
+
+
+
+
+<link rel="canonical" href="https://ftxj.github.io/zh/posts/2026-05-29/02-the-curse-of-helpfulness-inverse-scaling-law-in-robustness-t/">
+
+
+<link rel="preload" href="/fonts/fa-brands-400.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="/fonts/fa-regular-400.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="/fonts/fa-solid-900.woff2" as="font" type="font/woff2" crossorigin>
+
+
+  
+  
+  <link rel="stylesheet" href="/css/coder.min.5e94c1acf7aa2066035cf2764ae3e4fe39db101d68b870f919966100d51fb861.css" integrity="sha256-XpTBrPeqIGYDXPJ2SuPk/jnbEB1ouHD5GZZhANUfuGE=" crossorigin="anonymous" media="screen" />
+
+
+
+
+
+
+  
+    
+    
+    <link rel="stylesheet" href="/css/coder-dark.min.a00e6364bacbc8266ad1cc81230774a1397198f8cfb7bcba29b7d6fcb54ce57f.css" integrity="sha256-oA5jZLrLyCZq0cyBIwd0oTlxmPjPt7y6KbfW/LVM5X8=" crossorigin="anonymous" media="screen" />
+  
+
+
+
+ 
+
+
+
+
+<link rel="icon" type="image/svg+xml" href="/images/favicon.svg" sizes="any">
+<link rel="icon" type="image/png" href="/images/favicon-32x32.png" sizes="32x32">
+<link rel="icon" type="image/png" href="/images/favicon-16x16.png" sizes="16x16">
+
+<link rel="apple-touch-icon" href="/images/apple-touch-icon.png">
+<link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon.png">
+
+<link rel="manifest" href="/site.webmanifest">
+<link rel="mask-icon" href="/images/safari-pinned-tab.svg" color="#5bbad5">
+
+
+
+
+
+
+<style>
+.content article ul {
+  list-style: disc !important;
+  padding-left: 2.5rem !important;
+}
+
+.content article ul li {
+  display: list-item !important;
+}
+</style>
+
+
+
+
+  
+</head>
+
+
+
+
+
+
+<body class="preload-transitions colorscheme-auto">
+  
+<div class="float-container">
+    <a id="dark-mode-toggle" class="colorscheme-toggle">
+        <i class="fa-solid fa-adjust fa-fw" aria-hidden="true"></i>
+    </a>
+</div>
+
+
+  <main class="wrapper">
+    <nav class="navigation">
+  <section class="container">
+    
+    <a class="navigation-title" href="https://ftxj.github.io/zh/">
+      JXIN&#39;s Home
+    </a>
+    
+    
+      <input type="checkbox" id="menu-toggle" />
+      <label class="menu-button float-right" for="menu-toggle">
+        <i class="fa-solid fa-bars fa-fw" aria-hidden="true"></i>
+      </label>
+      <ul class="navigation-list">
+        
+          
+            <li class="navigation-item">
+              <a class="navigation-link " href="/zh/about/">关于</a>
+            </li>
+          
+            <li class="navigation-item">
+              <a class="navigation-link " href="/zh/travel/">旅行</a>
+            </li>
+          
+            <li class="navigation-item">
+              <a class="navigation-link " href="/zh/hiking/">徒步</a>
+            </li>
+          
+            <li class="navigation-item">
+              <a class="navigation-link " href="/zh/posts/">博客</a>
+            </li>
+          
+            <li class="navigation-item">
+              <a class="navigation-link " href="https://ftxj.github.io/cv/cv_zh.pdf">简历</a>
+            </li>
+          
+        
+        
+          
+          
+          
+            
+              
+                <li class="navigation-item menu-separator">
+                  <span>|</span>
+                </li>
+                
+              
+              <li class="navigation-item">
+                <a href="/posts/2026-05-29/02-the-curse-of-helpfulness-inverse-scaling-law-in-robustness-t/">EN</a>
+              </li>
+            
+          
+        
+      </ul>
+    
+  </section>
+</nav>
+
+
+    <div class="content">
+      
+  <section class="container post">
+    <article>
+      <header>
+        <div class="post-title">
+          <h1 class="title">
+            <a class="title-link" href="https://ftxj.github.io/zh/posts/2026-05-29/02-the-curse-of-helpfulness-inverse-scaling-law-in-robustness-t/">
+              The Curse of Helpfulness: Inverse Scaling Law in Robustness to Distractor Instructions via DistractionIF
+            </a>
+          </h1>
+        </div>
+        <div class="post-meta">
+          <div class="date">
+            <span class="posted-on">
+              <i class="fa-solid fa-calendar" aria-hidden="true"></i>
+              <time datetime="2026-05-29T12:02:49Z">
+                五月 29, 2026
+              </time>
+            </span>
+            <span class="reading-time">
+              <i class="fa-solid fa-clock" aria-hidden="true"></i>
+              2-minute read
+            </span>
+          </div>
+          
+          <div class="categories">
+  <i class="fa-solid fa-folder" aria-hidden="true"></i>
+    <a href="/zh/categories/paper-digest/">Paper-Digest</a>
+      <span class="separator">•</span>
+    <a href="/zh/categories/2026-05-29/">2026-05-29</a></div>
+
+          
+        </div>
+      </header>
+
+      
+
+
+      <div class="post-content">
+        
+        <p><strong>arXiv:</strong> <a href="https://arxiv.org/abs/2605.29491">2605.29491</a> · <a href="https://arxiv.org/pdf/2605.29491">PDF</a></p>
+<p><strong>作者:</strong> Zeli Su, Zhankai Xu, Tianlei Chen, Longfei Zheng, Xiaolu Zhang, Jun Zhou, Wentao Zhang</p>
+<p><strong>单位:</strong> Ant Financial Services Group</p>
+<p><strong>主分类:</strong> <code>cs.AI</code> · 全部: cs.AI</p>
+<p><strong>命中关键词:</strong> large language model, llm, agent, agentic, retrieval, rag</p>
+<hr>
+<h2 id="tldr">TL;DR</h2>
+<p>大模型在 RAG/Agent 场景中存在**&ldquo;帮助诅咒&rdquo;**：模型越大，越容易把参考文本里的指令式噪声当作真实指令执行，反而更不鲁棒。GRPO 强化学习可将此鲁棒性提升最多 15.5%。</p>
+<hr>
+<h2 id="motivation">Motivation</h2>
+<p>在 RAG 和 Agent 系统中，LLM 经常被要求对外部参考文本执行特定任务（翻译、抽取、格式转换等）。现实中的参考文本并不干净——它混杂着来自真实工作流的残留物：编辑注解（&quot;(revise this paragraph)&quot;）、UI 提示（&ldquo;Output as JSON&rdquo;）、邮件旁注等。这些片段语义上像指令，但本质上是数据，不应被执行。</p>
+<p>问题的关键在于：这类干扰<strong>不是对抗性攻击</strong>，而是良性的、偶然的语义噪声。现有 prompt injection 研究聚焦于显式恶意载荷，而生产环境中更普遍的失效来自这类&quot;无意为之&quot;的干扰。IFEval 等主流 instruction-following 评测默认指令与数据干净分离，无法覆盖&quot;脏上下文&quot;场景。</p>
+<p>更反直觉的是，作者发现<strong>模型越大，反而越容易被干扰</strong>：Qwen3 系列从 0.6B 扩展到 235B，无思考模式下平均得分从 65.97 骤降至 37.6，跌幅接近 30 分。这意味着靠扩参数解决不了问题，甚至会让问题恶化——今天正在做长文档处理的 RAG 团队和 Agent 运维都在受这个问题的苦，而现有 workaround（prompt engineering、明确划定分隔符）远不够可靠。</p>
+<hr>
+<h2 id="核心观点">核心观点</h2>
+<ul>
+<li><strong>DistractionIF benchmark</strong>：首个专门评测参考文本鲁棒性的 benchmark，覆盖 single-turn、multi-turn、system-prompt 三种部署范式，严格联合评分（任务完成 + 全部三条干扰过滤同时满足才算通过）。</li>
+<li><strong>逆规模律（Inverse Scaling Law）</strong>：在广泛模型家族上系统性地验证了&quot;更大 → 更不鲁棒&quot;这一反直觉结论，Qwen3 0.6B→235B 得分从 65.97 降至 37.6。</li>
+<li><strong>&ldquo;帮助诅咒&quot;机制</strong>：较大模型倾向于推断参考文本的潜在结构、将干扰片段提升为可执行约束，根源是过度 helpfulness 导致的过度解读偏差（over-interpretation bias）。</li>
+</ul>
+<p>下图展示了小模型与大模型在处理参考文本时的行为差异——小模型将其视为扁平被动数据，大模型则主动推断&quot;真实意图&quot;并执行嵌入的干扰指令：</p>
+<p><img alt="图 1" src="/images/papers/2605.29491/fig1.png"></p>
+<p>这张图直接支撑了&quot;帮助诅咒&quot;的核心命题：左侧小模型正确保留了所有格式和注解，右侧大模型则把&quot;output as latex&quot;这类旁注误认为需执行的约束，导致行为偏离用户真实意图。</p>
+<ul>
+<li><strong>概率边界侵蚀</strong>：基于 perplexity 的机制分析表明，规模增大会压缩&quot;鲁棒行为&quot;与&quot;干扰行为&quot;之间的概率间隔（Robustness Margin Ratio，RMR）。</li>
+<li><strong>GRPO 缓解</strong>：强化学习（GRPO + rubric-based reward）可在不损失通用 instruction-following 能力的前提下，将鲁棒性提升最多 15.5%。</li>
+</ul>
+<hr>
+<h2 id="方法">方法</h2>
+<p><strong>Benchmark 构建（DistractionIF）</strong></p>
+<p>每个实例由三部分组成：（1）主指令（从 Meta-Processing / Traditional NLP / Structure &amp; Format / Analysis &amp; Safety 四类任务池均匀采样）；（2）干扰陷阱（从 40+ 原子干扰意图库随机采样 3 条，模拟真实噪声如格式提示、语言偏好、元指令覆盖）；（3）嵌有陷阱的参考文本（干扰以低显著性自然语言形式嵌入，不使用特殊标记区分）。</p>
+<p><img alt="图 2" src="/images/papers/2605.29491/fig2.png"></p>
+<p>如图所示，构建流程统一使用 gemini-pro 生成实例，并在同一次调用中同时生成对话上下文、gold_output 和评测 rubric，以保证内部一致性。三种交互范式（single-turn / multi-turn / system-prompt）共享相同的任务语义和陷阱文本，仅改变指令位置，从而严格控制变量。</p>
+<p><strong>评分协议</strong>：5 条二元标准严格联合（AND）评分：任务执行 + 三条陷阱各自的抵抗情况 + 格式完整性，任一失败则整体失败。</p>
+<p><strong>机制分析（Perplexity/RMR）</strong></p>
+<p>对鲁棒行为（gold output）和干扰行为（bad-case output）分别计算 perplexity，定义 Robustness Margin Ratio（RMR）= PPL(bad-case) / PPL(gold)，RMR 越高说明模型更偏好鲁棒行为。</p>
+<p><strong>GRPO 缓解</strong></p>
+<p>以 rubric-based reward 为信号，对 Qwen3-8B 执行 GRPO 微调，显式拓宽鲁棒行为与干扰行为之间的概率间隔。</p>
+<hr>
+<h2 id="实验">实验</h2>
+<ul>
+<li><strong>模型</strong>：Qwen3 全系列（0.6B → 235B，非思考/思考双模式）、DeepSeek v3.2（含 v3.2-1201 和 thinking 变体）、Kimi-k2（非思考/思考）、GPT-5.1-chat、GPT-5.1-HighThinking、Gemini-3-Pro（低/高推理模式）。</li>
+<li><strong>Baseline</strong>：以上各模型零样本直接评测，无任务特定微调。</li>
+<li><strong>数据集</strong>：DistractionIF（本文构建），覆盖 single-turn、multi-turn、system-prompt 三种范式。</li>
+<li><strong>指标</strong>：pass rate（%），严格联合评分。</li>
+<li><strong>GRPO 实验</strong>：在 Qwen3-8B 上微调，以评测 rubric 作为奖励函数。</li>
+</ul>
+<hr>
+<h2 id="结果">结果</h2>
+<p><strong>逆规模律</strong>：如 Figure 3 所示，Qwen3 系列在非思考模式下，规模从 0.6B 扩大到 235B，平均得分从 65.97 降至 37.6，降幅达 28 分以上。</p>
+<p><img alt="图 3" src="/images/papers/2605.29491/fig3.png"></p>
+<p>Figure 3 同时展示了其他领先模型（右侧灰色）与 Qwen3 系列的对比，以及 thinking 模式的影响：小型稠密模型中 thinking 反而带来性能下降（Thinking Penalty），而在 MoE 架构和更大规模模型中出现正向相变（Thinking Benefit）。</p>
+<p><strong>机制：RMR 侵蚀</strong>：Figure 4 揭示了规模如何侵蚀概率边界——Qwen3-0.6B 的 RMR 为 2.24，随规模增大 RMR 持续下降；与此同时，gold 输出和 bad-case 输出的 perplexity 分布逐渐重叠。</p>
+<p><img alt="图 4" src="/images/papers/2605.29491/fig4.png"></p>
+<p>Figure 4 左轴（柱）展示了 gold、预测输出和 bad-case 三种响应的 PPL；右轴（线）展示 RMR 和 single-turn 得分随规模变化的趋势。小模型 RMR=2.24 说明模型对&quot;鲁棒行为&quot;的偏好显著高于&quot;干扰行为&rdquo;，而大模型两者 PPL 趋近，模型实际上在随机选择。</p>
+<p><strong>GRPO 缓解效果</strong>：GRPO 将鲁棒性提升最多 15.5%，且不损失通用 instruction-following 能力（论文正文中 abstract 明确给出此数字；具体 Table/Figure 编号正文截断，未给出对应表格）。</p>
+<hr>
+<h2 id="结论">结论</h2>
+<p>核心 takeaway：<strong>更强的通用能力并不带来更强的指令边界维护能力</strong>——在 Qwen3 系列中，规模扩大 400 倍（0.6B→235B）导致干扰鲁棒性下降约 28 分，而 GRPO 强化学习可在不牺牲通用性的前提下挽回最多 15.5%。这意味着 RAG/Agent 系统不应依赖&quot;更大模型自然更可靠&quot;的假设。</p>
+<p><strong>边界与局限</strong>：</p>
+<ul>
+<li>实验主要基于 Qwen3 系列验证逆规模律，其他家族仅有零散数据点，泛化性待确认。</li>
+<li>GRPO 微调仅在 Qwen3-8B 上验证，能否在更大规模模型上同样有效、cost 如何，论文未回答。</li>
+<li>DistractionIF 聚焦于良性语义噪声，不覆盖显式对抗注入场景；两者是否共用同一失效机制未被验证。</li>
+<li>缺少对&quot;为何 thinking 在 MoE 上反转&quot;的 ablation——是推理 token 数量、MoE routing 还是训练数据差异导致的相变尚不清楚。</li>
+</ul>
+<hr>
+<h2 id="是否新瓶装旧酒">是否新瓶装旧酒</h2>
+<p><strong>作者自述的最近相关工作</strong>：</p>
+<ol>
+<li><strong>Inverse Scaling Prize / McKenzie et al. (2023)</strong>：记录了多任务上性能随规模退化的现象，本文在&quot;指令-数据分离鲁棒性&quot;这一具体维度上复现并深化了该现象。</li>
+<li><strong>间接 prompt injection（Greshake et al., 2023; Liu et al., 2023/2024）</strong>：关注显式恶意载荷；本文明确区分，聚焦于良性偶发噪声，是不同的失效模式。</li>
+<li><strong>IFEval / M-IFEval（Zhou et al., 2023; Song et al., 2025）</strong>：评测显式约束下的指令遵循，假设指令与数据干净分离，无法覆盖&quot;脏上下文&quot;场景。</li>
+</ol>
+<p><strong>独立判断</strong>：本文的核心新意在于将逆规模律与 RAG/Agent 场景的&quot;良性语义噪声&quot;明确结合，并提供了概率层面（RMR）的机制解释，这在已知文献中确实是较新的切入角度。GRPO 用于此类鲁棒性恢复不算首创（RL alignment 已被广泛用于各类安全/对齐问题），但在此场景下的应用和机制验证（widening the margin）有其实际价值。总体评价：<strong>不是换名微调，有具体实验贡献，但方法论上没有突破</strong>。</p>
+<hr>
+<h2 id="尚未回答的问题">尚未回答的问题</h2>
+<ol>
+<li><strong>GRPO 在更大规模模型（&gt;8B）上的有效性</strong>：论文仅在 Qwen3-8B 上验证，70B/235B 模型上 RMR 更低，GRPO 是否仍能收回损失的 margin 未知。</li>
+<li><strong>Thinking 模式相变的机制</strong>：为何在 MoE 架构上 thinking 从 Penalty 转为 Benefit，缺少控制实验（是 MoE routing 的作用还是参数量本身）。</li>
+<li><strong>跨语言/跨模型家族泛化</strong>：逆规模律是否在非 Qwen3、非英文场景下同样成立？目前 Qwen3 以外的数据点较少。</li>
+<li><strong>良性噪声 vs. 对抗注入的共用修复路径</strong>：GRPO 修复干扰鲁棒性后，是否同时提升了对显式 prompt injection 的防御，论文未测试。</li>
+<li><strong>DistractionIF 规模与多样性</strong>：benchmark 的实例数量、语言覆盖范围、任务类别分布论文正文截断未完整给出，难以判断评测集是否足够大。</li>
+</ol>
+<hr>
+<h2 id="原始摘要中文翻译">原始摘要（中文翻译）</h2>
+<p>大型语言模型（LLM）正越来越多地被部署于 Agent 和检索增强生成（RAG）系统中，在这些场景下，模型必须基于外部提供的参考文本执行用户指定的任务。实际使用中，此类上下文往往是非结构化的，并混杂着良性但具有指令语义的噪声，例如编辑注释和系统追踪信息，这些内容本应被严格视为数据处理。我们提出 DistractionIF，一个专门评测模型对参考文本中此类干扰指令的鲁棒性的 benchmark。在广泛的模型评测中，我们观察到一个一致的<strong>逆规模现象</strong>：更大的模型往往鲁棒性更差，随规模增大性能最多下降 30 分。从机制层面分析，我们的 perplexity 分析表明，规模扩大会侵蚀鲁棒行为与干扰行为之间的概率边界，使模型越来越容易将噪声过度解读为指令。为此，我们证明强化学习（具体为 Group Relative Policy Optimization，GRPO）可以恢复这一边界，在不损害通用指令遵循能力的前提下将鲁棒性提升最多 15.5%。我们的发现揭示了参考文本驱动任务中关键的指令遵循鲁棒性缺口，并确立了强化学习作为在大规模场景下强制执行严格数据–指令分离的有前途路径。</p>
+
+      </div>
+
+
+      <footer>
+        
+
+
+        
+        
+        
+        
+        
+        
+        
+      </footer>
+    </article>
+
+    
+  </section>
+
+    </div>
+
+    <footer class="footer">
+  <section class="container">
+    ©
+    
+      2019 -
+    
+    2026
+     Jie Xin 
+    ·
+    
+    Powered by <a href="https://gohugo.io/" target="_blank" rel="noopener">Hugo</a> & <a href="https://github.com/luizdepra/hugo-coder/" target="_blank" rel="noopener">Coder</a>.
+    
+  </section>
+</footer>
+
+  </main>
+
+  
+
+  
+  
+  <script src="/js/coder.min.6ae284be93d2d19dad1f02b0039508d9aab3180a12a06dcc71b0b0ef7825a317.js" integrity="sha256-auKEvpPS0Z2tHwKwA5UI2aqzGAoSoG3McbCw73gloxc="></script>
+  
+
+  
+
+  
+
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+</body>
+</html>

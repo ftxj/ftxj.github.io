@@ -1,0 +1,366 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <title>
+  Stabilizing Efficient Reasoning with Step-Level Advantage Selection · JXIN&#39;s Home
+</title>
+  <meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="color-scheme" content="light dark">
+
+
+
+
+<meta name="author" content="Jie Xin">
+<meta name="description" content="arXiv: 2604.24003 · PDF
+Authors: Han Wang, Xiaodong Yu, Jialian Wu, Jiang Liu, Ximeng Sun, Mohit Bansal, Zicheng Liu
+Affiliations: UNC Chapel Hill, Advanced Micro Devices, Inc
+Primary category: cs.CL · all: cs.CL, cs.LG
+Matched keywords: large language model, llm, rag, reasoning, inference, post-train
+
+TL;DR
+Step-level Advantage Selection (SAS) zeros advantages for low-confidence steps in correct GRPO rollouts and high-confidence steps in verifier-failed rollouts, stabilizing short-context post-training. On five math benchmarks it lifts Pass@1 by 0.86 points over the strongest length-aware baseline while cutting reasoning length by 16.3%.">
+<meta name="keywords" content="blog,developer,personal">
+
+
+
+  <meta name="twitter:card" content="summary">
+  <meta name="twitter:title" content="Stabilizing Efficient Reasoning with Step-Level Advantage Selection">
+  <meta name="twitter:description" content="arXiv: 2604.24003 · PDF
+Authors: Han Wang, Xiaodong Yu, Jialian Wu, Jiang Liu, Ximeng Sun, Mohit Bansal, Zicheng Liu
+Affiliations: UNC Chapel Hill, Advanced Micro Devices, Inc
+Primary category: cs.CL · all: cs.CL, cs.LG
+Matched keywords: large language model, llm, rag, reasoning, inference, post-train
+TL;DR Step-level Advantage Selection (SAS) zeros advantages for low-confidence steps in correct GRPO rollouts and high-confidence steps in verifier-failed rollouts, stabilizing short-context post-training. On five math benchmarks it lifts Pass@1 by 0.86 points over the strongest length-aware baseline while cutting reasoning length by 16.3%.">
+
+<meta property="og:url" content="https://ftxj.github.io/posts/2026-04-28/04-stabilizing-efficient-reasoning-with-step-level-advantage-se/">
+  <meta property="og:site_name" content="JXIN&#39;s Home">
+  <meta property="og:title" content="Stabilizing Efficient Reasoning with Step-Level Advantage Selection">
+  <meta property="og:description" content="arXiv: 2604.24003 · PDF
+Authors: Han Wang, Xiaodong Yu, Jialian Wu, Jiang Liu, Ximeng Sun, Mohit Bansal, Zicheng Liu
+Affiliations: UNC Chapel Hill, Advanced Micro Devices, Inc
+Primary category: cs.CL · all: cs.CL, cs.LG
+Matched keywords: large language model, llm, rag, reasoning, inference, post-train
+TL;DR Step-level Advantage Selection (SAS) zeros advantages for low-confidence steps in correct GRPO rollouts and high-confidence steps in verifier-failed rollouts, stabilizing short-context post-training. On five math benchmarks it lifts Pass@1 by 0.86 points over the strongest length-aware baseline while cutting reasoning length by 16.3%.">
+  <meta property="og:locale" content="en">
+  <meta property="og:type" content="article">
+    <meta property="article:section" content="posts">
+    <meta property="article:published_time" content="2026-04-28T13:44:12+00:00">
+    <meta property="article:modified_time" content="2026-04-28T13:44:12+00:00">
+
+
+
+
+<link rel="canonical" href="https://ftxj.github.io/posts/2026-04-28/04-stabilizing-efficient-reasoning-with-step-level-advantage-se/">
+
+
+<link rel="preload" href="/fonts/fa-brands-400.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="/fonts/fa-regular-400.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="/fonts/fa-solid-900.woff2" as="font" type="font/woff2" crossorigin>
+
+
+  
+  
+  <link rel="stylesheet" href="/css/coder.min.5e94c1acf7aa2066035cf2764ae3e4fe39db101d68b870f919966100d51fb861.css" integrity="sha256-XpTBrPeqIGYDXPJ2SuPk/jnbEB1ouHD5GZZhANUfuGE=" crossorigin="anonymous" media="screen" />
+
+
+
+
+
+
+  
+    
+    
+    <link rel="stylesheet" href="/css/coder-dark.min.a00e6364bacbc8266ad1cc81230774a1397198f8cfb7bcba29b7d6fcb54ce57f.css" integrity="sha256-oA5jZLrLyCZq0cyBIwd0oTlxmPjPt7y6KbfW/LVM5X8=" crossorigin="anonymous" media="screen" />
+  
+
+
+
+ 
+
+
+
+
+<link rel="icon" type="image/svg+xml" href="/images/favicon.svg" sizes="any">
+<link rel="icon" type="image/png" href="/images/favicon-32x32.png" sizes="32x32">
+<link rel="icon" type="image/png" href="/images/favicon-16x16.png" sizes="16x16">
+
+<link rel="apple-touch-icon" href="/images/apple-touch-icon.png">
+<link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon.png">
+
+<link rel="manifest" href="/site.webmanifest">
+<link rel="mask-icon" href="/images/safari-pinned-tab.svg" color="#5bbad5">
+
+
+
+
+
+
+<style>
+.content article ul {
+  list-style: disc !important;
+  padding-left: 2.5rem !important;
+}
+
+.content article ul li {
+  display: list-item !important;
+}
+</style>
+
+
+
+
+  
+</head>
+
+
+
+
+
+
+<body class="preload-transitions colorscheme-auto">
+  
+<div class="float-container">
+    <a id="dark-mode-toggle" class="colorscheme-toggle">
+        <i class="fa-solid fa-adjust fa-fw" aria-hidden="true"></i>
+    </a>
+</div>
+
+
+  <main class="wrapper">
+    <nav class="navigation">
+  <section class="container">
+    
+    <a class="navigation-title" href="https://ftxj.github.io/">
+      JXIN&#39;s Home
+    </a>
+    
+    
+      <input type="checkbox" id="menu-toggle" />
+      <label class="menu-button float-right" for="menu-toggle">
+        <i class="fa-solid fa-bars fa-fw" aria-hidden="true"></i>
+      </label>
+      <ul class="navigation-list">
+        
+          
+            <li class="navigation-item">
+              <a class="navigation-link " href="/about/">About</a>
+            </li>
+          
+            <li class="navigation-item">
+              <a class="navigation-link " href="/travel/">Travel</a>
+            </li>
+          
+            <li class="navigation-item">
+              <a class="navigation-link " href="/hiking/">Hiking</a>
+            </li>
+          
+            <li class="navigation-item">
+              <a class="navigation-link " href="/posts/">Blog</a>
+            </li>
+          
+            <li class="navigation-item">
+              <a class="navigation-link " href="https://ftxj.github.io/cv/cv.pdf">CV</a>
+            </li>
+          
+        
+        
+          
+          
+          
+            
+              
+                <li class="navigation-item menu-separator">
+                  <span>|</span>
+                </li>
+                
+              
+              <li class="navigation-item">
+                <a href="/zh/posts/2026-04-28/04-stabilizing-efficient-reasoning-with-step-level-advantage-se/">中文</a>
+              </li>
+            
+          
+        
+      </ul>
+    
+  </section>
+</nav>
+
+
+    <div class="content">
+      
+  <section class="container post">
+    <article>
+      <header>
+        <div class="post-title">
+          <h1 class="title">
+            <a class="title-link" href="https://ftxj.github.io/posts/2026-04-28/04-stabilizing-efficient-reasoning-with-step-level-advantage-se/">
+              Stabilizing Efficient Reasoning with Step-Level Advantage Selection
+            </a>
+          </h1>
+        </div>
+        <div class="post-meta">
+          <div class="date">
+            <span class="posted-on">
+              <i class="fa-solid fa-calendar" aria-hidden="true"></i>
+              <time datetime="2026-04-28T13:44:12Z">
+                April 28, 2026
+              </time>
+            </span>
+            <span class="reading-time">
+              <i class="fa-solid fa-clock" aria-hidden="true"></i>
+              7-minute read
+            </span>
+          </div>
+          
+          <div class="categories">
+  <i class="fa-solid fa-folder" aria-hidden="true"></i>
+    <a href="/categories/paper-digest/">Paper-Digest</a>
+      <span class="separator">•</span>
+    <a href="/categories/2026-04-28/">2026-04-28</a></div>
+
+          
+        </div>
+      </header>
+
+      
+
+
+      <div class="post-content">
+        
+        <p><strong>arXiv:</strong> <a href="https://arxiv.org/abs/2604.24003v1">2604.24003</a> · <a href="https://arxiv.org/pdf/2604.24003v1">PDF</a></p>
+<p><strong>Authors:</strong> Han Wang, Xiaodong Yu, Jialian Wu, Jiang Liu, Ximeng Sun, Mohit Bansal, Zicheng Liu</p>
+<p><strong>Affiliations:</strong> UNC Chapel Hill, Advanced Micro Devices, Inc</p>
+<p><strong>Primary category:</strong> <code>cs.CL</code> · all: cs.CL, cs.LG</p>
+<p><strong>Matched keywords:</strong> large language model, llm, rag, reasoning, inference, post-train</p>
+<hr>
+<h2 id="tldr">TL;DR</h2>
+<p>Step-level Advantage Selection (SAS) zeros advantages for low-confidence steps in correct GRPO rollouts and high-confidence steps in verifier-failed rollouts, stabilizing short-context post-training. On five math benchmarks it lifts Pass@1 by 0.86 points over the strongest length-aware baseline while cutting reasoning length by 16.3%.</p>
+<h2 id="motivation">Motivation</h2>
+<p>Efficient-reasoning methods (L1, LAPO, ThinkPrune) typically post-train reasoning LLMs under a 4K context window while the base model was trained at 16–24K — a confound the literature never isolates. The authors first run plain GRPO at 4K with no length reward and find that short-context post-training <em>by itself</em> already compresses outputs to levels matching those specialized methods. But accuracy becomes volatile and degrades late in training. The root cause: roughly 29% of originally-correct 8K traces become verifier-failed when truncated to 4K, losing only the final boxed answer; GRPO then assigns negative advantages to their (correct) intermediate reasoning, poisoning credit assignment. Practitioners fine-tuning DeepScaleR-style 1.5B reasoners under tight serving budgets thus face a tension: short contexts compress for free, but rollout-level credit assignment injects noise that existing length-aware rewards do not fix because they operate at the wrong granularity.</p>
+<h2 id="key-ideas">Key Ideas</h2>
+<ul>
+<li>Short-context post-training alone is a strong, previously-conflated compression signal; explicit length rewards are not required for compression.</li>
+<li>Truncation under short context creates systematically mislabeled rollouts: ~29% of correct 8K traces become verifier-failed at 4K.</li>
+<li>Reframe efficient reasoning as a <strong>credit-assignment</strong> problem: move from rollout-level to step-level advantages.</li>
+<li>A single zero-advantage operation, applied asymmetrically: suppress low-confidence steps in correct rollouts; shield high-confidence steps in verifier-failed rollouts.</li>
+<li>Step confidence = mean token log-prob; validated against an external PRM (nDCG correlation 0.9022).</li>
+</ul>
+<p><img alt="Figure 1" src="/images/papers/2604.24003/fig1.png"></p>
+<p>Figure 1 visualizes the core claim above. It contrasts standard GRPO — where every token in a correct rollout gets the same positive advantage and every token in a failed rollout the same negative advantage — with SAS, which carves the rollout into <code>\n\n</code>-delimited steps and zeros advantages on the unreliable subset. Because zero sits below positive peers and above negative peers after group-relative normalization, the same operation suppresses shaky steps in winners and protects strong steps in truncated losers.</p>
+<h2 id="method">Method</h2>
+<p>Starting from DeepScaleR-1.5B-Preview, the authors run GRPO at a 4K context with a purely task-correctness reward. Each rollout is split on <code>\n\n</code> into steps; for each step <code>s_j</code> they compute <code>c_j</code>, the mean token log-probability under the current policy. Steps are then ranked and a ratio <code>r=0.3</code> is zeroed: in <strong>correct</strong> rollouts, the lowest-confidence <code>r</code> fraction of steps (Eq. 4); in <strong>verifier-failed</strong> rollouts, the highest-confidence <code>r</code> fraction (Eq. 5). All other tokens keep their original GRPO group-relative advantage. Under group normalization, a zeroed step in a correct rollout is strictly below its still-positive peers (down-weighting redundant self-doubt), while a zeroed step in a failed rollout is strictly above its still-negative peers (shielding usable reasoning from truncation penalties) without ever exceeding legitimate positive advantages from actually-correct rollouts in the group. No extra model, no extra rollouts, no length reward.</p>
+<h2 id="experiments">Experiments</h2>
+<p>Base model: DeepScaleR-1.5B-Preview (1.5B, RL-distilled from DeepSeek-R1-Distill-Qwen-1.5B). Training: DeepScaleR-Preview-Dataset (~40K math problems), 4K context, lr 1e-6, batch 128, 8 rollouts/prompt, 500 steps, VeRL framework, 8× AMD MI250 64GB. Math eval: AIME24, AIME25, MATH, AMC, OlympiadBench. OOD general reasoning: GPQA-Diamond, LSAT, MMLU. Metrics: Pass@1 (k=16, T=0.6, top-p=0.95, max 8K gen), average #tokens, and Accuracy–Efficiency Score (AES). Baselines: DeepScaleR base, GRPO-4K, L1-Max, LAPO-I, ThinkPrune-4k.</p>
+<h2 id="results">Results</h2>
+<p>On the five math benchmarks (Table 1), SAS hits <strong>54.54 Pass@1 / 3407 tokens / AES 0.46</strong>, versus the base DeepScaleR at 52.37 / 5118 / 0.00, GRPO-4K at 53.61 / 3775 / 0.33, LAPO-I at 53.29 / 4127 / 0.25, and ThinkPrune-4k at 53.35 / 4004 / 0.27. So relative to the base: <strong>+2.17 Pass@1 with 33% fewer tokens</strong>; relative to the strongest length-aware baseline: roughly +1.2 Pass@1 with ~15–17% fewer tokens — matching the abstract&rsquo;s &ldquo;+0.86 / −16.3%&rdquo; claim in the right ballpark. On OOD reasoning (Table 2), SAS reaches 38.30 avg Pass@1 / 2729 tokens / AES 0.45, beating GRPO-4K (36.55 / 2496, which over-compressed and lost accuracy) and LAPO-I (37.77 / 3331).</p>
+<p><img alt="Figure 2a" src="/images/papers/2604.24003/fig2.png"></p>
+<p>Figure 2a backs the motivation claim that short-context GRPO alone compresses: average output length on the five math sets drops sharply in early training and keeps decaying, ending at or below LAPO/ThinkPrune&rsquo;s horizontal reference lines — no length-aware reward needed.</p>
+<p><img alt="Figure 2b" src="/images/papers/2604.24003/fig3.png"></p>
+<p>Figure 2b is where short-context GRPO breaks. Accuracy climbs initially but then oscillates and drifts downward over training steps, while SAS&rsquo;s compression stays comparable. This is the instability that motivates SAS and is exactly what the Table 1 numbers quantify at convergence.</p>
+<p><img alt="Figure 3" src="/images/papers/2604.24003/fig4.png"></p>
+<p>Figure 3 shows training policy entropy: GRPO-4K collapses rapidly (brittle, repetitive policy), whereas both SAS (Both) and the &ldquo;Only Correct&rdquo; ablation hold a visibly higher, flatter entropy curve throughout training. This directly supports the Section 4.1 claim that shielding verifier-failed rollouts is what keeps exploration alive; the paper does not report exact entropy numbers.</p>
+<p>Ablations (Table 3): dropping the failed-rollout shield (&ldquo;Only Correct&rdquo;) costs AES 0.46 → 0.43 (Pass@1 54.54 → 53.90); random step selection falls to 0.38; token-level granularity to 0.39 — confirming all three design choices matter. Selection ratio (Table 4) is robust: r=0.3 is best (AES 0.46) but even r=0.9 stays at 0.36. Overhead: ~17% more wall-clock per step (279→327s), no extra forward passes or memory.</p>
+<h2 id="conclusion">Conclusion</h2>
+<p>The practitioner takeaway: when post-training a long-context reasoner under a tight context window, compression comes &ldquo;for free&rdquo; from the window itself — but you must fix the credit-assignment side, because truncation silently mislabels roughly a third of correct traces. SAS&rsquo;s single-zero operation, keyed on intrinsic token log-prob confidence, delivered AES 0.46 vs. ≤0.33 for all baselines at a 17% time cost. Scope caveats: one base model (DeepScaleR-1.5B-Preview, 1.5B), one post-training context (4K), mostly math; the title&rsquo;s &ldquo;efficient reasoning&rdquo; framing generalizes narrower than it sounds — no larger scales, no non-DeepSeek families, no sweep of training context lengths, and no theoretical account of why selection ratio is so flat.</p>
+<h2 id="novelty-check">Novelty Check</h2>
+<p>The authors&rsquo; own Related Work frames SAS against three length-aware RL lines — L1 (Aggarwal &amp; Welleck, 2025), ThinkPrune (Hou et al., 2025), LAPO (Wu et al., 2025a) — and two confidence/entropy RL works: Prabhudesai et al. (2025), which replaces the reward with negative entropy, and Wang et al. (2025b), which updates only the highest-entropy tokens and gets <em>longer</em> outputs. The authors&rsquo; delta is real and specific: neither changes the reward nor regularizes entropy; confidence is used only as a <em>selector</em> for which steps receive a nonzero advantage, and filtering is asymmetric across correct/failed rollouts. Independent read: step-level / process-level credit assignment has been explored via PRMs (e.g., Zhang et al. 2025, which the paper uses only for validation), but SAS&rsquo;s PRM-free, reward-conditioned zeroing tied specifically to short-context truncation artifacts appears genuinely new. Not a relabel.</p>
+<h2 id="open-questions">Open Questions</h2>
+<ul>
+<li>Does SAS generalize beyond the DeepScaleR-1.5B family — to 7B/32B reasoners or non-Qwen bases where <code>\n\n</code> step structure may be weaker?</li>
+<li>How does SAS interact with longer post-training contexts (8K, 16K) where the 29% truncation-induced mislabel rate should shrink?</li>
+<li>Can the selector be combined with an explicit length reward, or do they interfere?</li>
+<li>Why is performance so flat across r ∈ [0.1, 0.9]? The &ldquo;few decision-critical steps&rdquo; hypothesis is asserted but not directly measured here.</li>
+<li>Does SAS hold up on code generation or agentic tool-use traces, where step boundaries are less linguistically clean?</li>
+</ul>
+<hr>
+<h2 id="original-abstract">Original abstract</h2>
+<p>Large language models (LLMs) achieve strong reasoning performance by allocating substantial computation at inference time, often generating long and verbose reasoning traces. While recent work on efficient reasoning reduces this overhead through length-based rewards or pruning, many approaches are post-trained under a much shorter context window than base-model training, a factor whose effect has not been systematically isolated. We first show that short-context post-training alone, using standard GRPO without any length-aware objective, already induces substantial reasoning compression-but at the cost of increasingly unstable training dynamics and accuracy degradation. To address this, we propose Step-level Advantage Selection (SAS), which operates at the reasoning-step level and assigns a zero advantage to low-confidence steps in correct rollouts and to high-confidence steps in verifier-failed rollouts, where failures often arise from truncation or verifier issues rather than incorrect reasoning. Across diverse mathematical and general reasoning benchmarks, SAS improves average Pass@1 accuracy by 0.86 points over the strongest length-aware baseline while reducing average reasoning length by 16.3%, yielding a better accuracy-efficiency trade-off.</p>
+
+      </div>
+
+
+      <footer>
+        
+
+
+        
+        
+        
+        
+        
+        
+        
+      </footer>
+    </article>
+
+    
+  </section>
+
+    </div>
+
+    <footer class="footer">
+  <section class="container">
+    ©
+    
+      2019 -
+    
+    2026
+     Jie Xin 
+    ·
+    
+    Powered by <a href="https://gohugo.io/" target="_blank" rel="noopener">Hugo</a> & <a href="https://github.com/luizdepra/hugo-coder/" target="_blank" rel="noopener">Coder</a>.
+    
+  </section>
+</footer>
+
+  </main>
+
+  
+
+  
+  
+  <script src="/js/coder.min.6ae284be93d2d19dad1f02b0039508d9aab3180a12a06dcc71b0b0ef7825a317.js" integrity="sha256-auKEvpPS0Z2tHwKwA5UI2aqzGAoSoG3McbCw73gloxc="></script>
+  
+
+  
+
+  
+
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+</body>
+</html>

@@ -1,0 +1,370 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <title>
+  When Cloud Agents Meet Device Agents: Lessons from Hybrid Multi-Agent Systems · JXIN&#39;s Home
+</title>
+  <meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="color-scheme" content="light dark">
+
+
+
+
+<meta name="author" content="Jie Xin">
+<meta name="description" content="arXiv: 2605.30102 · PDF
+Authors: Corrado Rainone, Davide Belli, Bence Major, Arash Behboodi
+Affiliations: Qualcomm AI Research
+Primary category: cs.MA · all: cs.AI, cs.MA
+Matched keywords: large language model, llm, agent, agentic, multi-agent, inference
+
+TL;DR
+This position/workshop paper systematically examines the design space of hybrid multi-agent systems (MAS) that mix cloud-hosted frontier LLMs with on-device SLMs, finding that no single hybrid architecture dominates across tasks and that more cloud compute does not reliably improve performance.">
+<meta name="keywords" content="blog,developer,personal">
+
+
+
+  <meta name="twitter:card" content="summary">
+  <meta name="twitter:title" content="When Cloud Agents Meet Device Agents: Lessons from Hybrid Multi-Agent Systems">
+  <meta name="twitter:description" content="arXiv: 2605.30102 · PDF
+Authors: Corrado Rainone, Davide Belli, Bence Major, Arash Behboodi
+Affiliations: Qualcomm AI Research
+Primary category: cs.MA · all: cs.AI, cs.MA
+Matched keywords: large language model, llm, agent, agentic, multi-agent, inference
+TL;DR This position/workshop paper systematically examines the design space of hybrid multi-agent systems (MAS) that mix cloud-hosted frontier LLMs with on-device SLMs, finding that no single hybrid architecture dominates across tasks and that more cloud compute does not reliably improve performance.">
+
+<meta property="og:url" content="https://ftxj.github.io/posts/2026-05-29/10-when-cloud-agents-meet-device-agents-lessons-from-hybrid-mul/">
+  <meta property="og:site_name" content="JXIN&#39;s Home">
+  <meta property="og:title" content="When Cloud Agents Meet Device Agents: Lessons from Hybrid Multi-Agent Systems">
+  <meta property="og:description" content="arXiv: 2605.30102 · PDF
+Authors: Corrado Rainone, Davide Belli, Bence Major, Arash Behboodi
+Affiliations: Qualcomm AI Research
+Primary category: cs.MA · all: cs.AI, cs.MA
+Matched keywords: large language model, llm, agent, agentic, multi-agent, inference
+TL;DR This position/workshop paper systematically examines the design space of hybrid multi-agent systems (MAS) that mix cloud-hosted frontier LLMs with on-device SLMs, finding that no single hybrid architecture dominates across tasks and that more cloud compute does not reliably improve performance.">
+  <meta property="og:locale" content="en">
+  <meta property="og:type" content="article">
+    <meta property="article:section" content="posts">
+    <meta property="article:published_time" content="2026-05-29T12:33:35+00:00">
+    <meta property="article:modified_time" content="2026-05-29T12:33:35+00:00">
+
+
+
+
+<link rel="canonical" href="https://ftxj.github.io/posts/2026-05-29/10-when-cloud-agents-meet-device-agents-lessons-from-hybrid-mul/">
+
+
+<link rel="preload" href="/fonts/fa-brands-400.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="/fonts/fa-regular-400.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="/fonts/fa-solid-900.woff2" as="font" type="font/woff2" crossorigin>
+
+
+  
+  
+  <link rel="stylesheet" href="/css/coder.min.5e94c1acf7aa2066035cf2764ae3e4fe39db101d68b870f919966100d51fb861.css" integrity="sha256-XpTBrPeqIGYDXPJ2SuPk/jnbEB1ouHD5GZZhANUfuGE=" crossorigin="anonymous" media="screen" />
+
+
+
+
+
+
+  
+    
+    
+    <link rel="stylesheet" href="/css/coder-dark.min.a00e6364bacbc8266ad1cc81230774a1397198f8cfb7bcba29b7d6fcb54ce57f.css" integrity="sha256-oA5jZLrLyCZq0cyBIwd0oTlxmPjPt7y6KbfW/LVM5X8=" crossorigin="anonymous" media="screen" />
+  
+
+
+
+ 
+
+
+
+
+<link rel="icon" type="image/svg+xml" href="/images/favicon.svg" sizes="any">
+<link rel="icon" type="image/png" href="/images/favicon-32x32.png" sizes="32x32">
+<link rel="icon" type="image/png" href="/images/favicon-16x16.png" sizes="16x16">
+
+<link rel="apple-touch-icon" href="/images/apple-touch-icon.png">
+<link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon.png">
+
+<link rel="manifest" href="/site.webmanifest">
+<link rel="mask-icon" href="/images/safari-pinned-tab.svg" color="#5bbad5">
+
+
+
+
+
+
+<style>
+.content article ul {
+  list-style: disc !important;
+  padding-left: 2.5rem !important;
+}
+
+.content article ul li {
+  display: list-item !important;
+}
+</style>
+
+
+
+
+  
+</head>
+
+
+
+
+
+
+<body class="preload-transitions colorscheme-auto">
+  
+<div class="float-container">
+    <a id="dark-mode-toggle" class="colorscheme-toggle">
+        <i class="fa-solid fa-adjust fa-fw" aria-hidden="true"></i>
+    </a>
+</div>
+
+
+  <main class="wrapper">
+    <nav class="navigation">
+  <section class="container">
+    
+    <a class="navigation-title" href="https://ftxj.github.io/">
+      JXIN&#39;s Home
+    </a>
+    
+    
+      <input type="checkbox" id="menu-toggle" />
+      <label class="menu-button float-right" for="menu-toggle">
+        <i class="fa-solid fa-bars fa-fw" aria-hidden="true"></i>
+      </label>
+      <ul class="navigation-list">
+        
+          
+            <li class="navigation-item">
+              <a class="navigation-link " href="/about/">About</a>
+            </li>
+          
+            <li class="navigation-item">
+              <a class="navigation-link " href="/travel/">Travel</a>
+            </li>
+          
+            <li class="navigation-item">
+              <a class="navigation-link " href="/hiking/">Hiking</a>
+            </li>
+          
+            <li class="navigation-item">
+              <a class="navigation-link " href="/posts/">Blog</a>
+            </li>
+          
+            <li class="navigation-item">
+              <a class="navigation-link " href="https://ftxj.github.io/cv/cv.pdf">CV</a>
+            </li>
+          
+        
+        
+          
+          
+          
+            
+              
+                <li class="navigation-item menu-separator">
+                  <span>|</span>
+                </li>
+                
+              
+              <li class="navigation-item">
+                <a href="/zh/posts/2026-05-29/10-when-cloud-agents-meet-device-agents-lessons-from-hybrid-mul/">中文</a>
+              </li>
+            
+          
+        
+      </ul>
+    
+  </section>
+</nav>
+
+
+    <div class="content">
+      
+  <section class="container post">
+    <article>
+      <header>
+        <div class="post-title">
+          <h1 class="title">
+            <a class="title-link" href="https://ftxj.github.io/posts/2026-05-29/10-when-cloud-agents-meet-device-agents-lessons-from-hybrid-mul/">
+              When Cloud Agents Meet Device Agents: Lessons from Hybrid Multi-Agent Systems
+            </a>
+          </h1>
+        </div>
+        <div class="post-meta">
+          <div class="date">
+            <span class="posted-on">
+              <i class="fa-solid fa-calendar" aria-hidden="true"></i>
+              <time datetime="2026-05-29T12:33:35Z">
+                May 29, 2026
+              </time>
+            </span>
+            <span class="reading-time">
+              <i class="fa-solid fa-clock" aria-hidden="true"></i>
+              7-minute read
+            </span>
+          </div>
+          
+          <div class="categories">
+  <i class="fa-solid fa-folder" aria-hidden="true"></i>
+    <a href="/categories/paper-digest/">Paper-Digest</a>
+      <span class="separator">•</span>
+    <a href="/categories/2026-05-29/">2026-05-29</a></div>
+
+          
+        </div>
+      </header>
+
+      
+
+
+      <div class="post-content">
+        
+        <p><strong>arXiv:</strong> <a href="https://arxiv.org/abs/2605.30102">2605.30102</a> · <a href="https://arxiv.org/pdf/2605.30102">PDF</a></p>
+<p><strong>Authors:</strong> Corrado Rainone, Davide Belli, Bence Major, Arash Behboodi</p>
+<p><strong>Affiliations:</strong> Qualcomm AI Research</p>
+<p><strong>Primary category:</strong> <code>cs.MA</code> · all: cs.AI, cs.MA</p>
+<p><strong>Matched keywords:</strong> large language model, llm, agent, agentic, multi-agent, inference</p>
+<hr>
+<h2 id="tldr">TL;DR</h2>
+<p>This position/workshop paper systematically examines the design space of hybrid multi-agent systems (MAS) that mix cloud-hosted frontier LLMs with on-device SLMs, finding that no single hybrid architecture dominates across tasks and that more cloud compute does not reliably improve performance.</p>
+<h2 id="motivation">Motivation</h2>
+<p>Production agentic systems today face a fundamental tension: frontier LLMs (deployed in the cloud, accessed via per-token APIs) deliver broad capability but incur high and unpredictable costs under long-horizon, iterative workloads. On-device SLMs avoid API costs and address privacy concerns but suffer from a persistent capability gap with frontier models, particularly on long-context tasks where consumer DRAM imposes a hard upper bound on KV-cache and context length. Hybrid approaches that route requests across models of different sizes exist (Ding et al., 2024; Stripelis et al., 2024; Ong et al., 2024), but these prior works treat hybridization primarily as a routing or escalation problem — choosing which single model handles a given call — rather than exploring how cloud and edge models can play structurally distinct <em>roles</em> within a shared multi-agent pipeline. The MAS literature offers rich architectural diversity (centralized planners, mesh topologies, ReAct loops), but existing systems are almost uniformly co-designed with a specific task or benchmark, leaving open how architectural choices transfer. The authors argue that without principled design guidance, practitioners introduce hybrid components through ad hoc, domain-specific decisions.</p>
+<h2 id="key-ideas">Key Ideas</h2>
+<ul>
+<li><strong>Systematic hybrid MAS study:</strong> Two representative MAS architectures are adapted to cloud–edge hybrid settings and evaluated on a unified Pareto frontier of task accuracy, monetary cost, and edge energy consumption.</li>
+<li><strong>No single dominant design:</strong> Plan-based and advisory paradigms excel in different task domains; the optimal hybrid configuration is task-dependent, not universal.</li>
+<li><strong>More cloud ≠ better performance:</strong> Greater frontier-level compute does not consistently improve task outcomes — a counterintuitive finding the authors investigate mechanistically.</li>
+<li><strong>Mechanistic drivers of hybridization:</strong> Supervision frequency, restart policies, and summarization are identified as key factors explaining when cloud assistance helps or hurts long-horizon reasoning.</li>
+<li><strong>Context efficiency via resets:</strong> Hybrid MAS manage long contexts more effectively through context resets and summarization, limiting KV-cache growth and improving suitability for memory-constrained edge deployment.</li>
+</ul>
+<h2 id="method">Method</h2>
+<p>The paper adapts two MAS architectures to the hybrid cloud–edge setting:</p>
+<p><strong>Plan-based (Supervisor–Executor with Replan):</strong> A cloud Supervisor generates an initial plan <code>p0</code> from query <code>q</code>. An edge Executor runs a ReAct loop for up to <code>T</code> turns, producing reasoning <code>r_t</code>, action <code>a_t</code>, and observation <code>o_t</code>. Every <code>Tv</code> turns the Supervisor verifies progress and, if needed, replans — producing a new plan <code>p_t^new</code> that the Executor resumes from.</p>
+<p><strong>Advisory paradigm:</strong> No initial plan is generated. Instead, the Supervisor provides advice/hints <code>h_t</code> to the Executor at verification intervals. The Executor runs the same ReAct loop but is guided by advisory context rather than a structured plan. Supervision frequency <code>Tv</code> is a shared control variable across both architectures.</p>
+<p><img alt="Figure 1" src="/images/papers/2605.30102/page1.png"></p>
+<p>The pseudocode for both architectures (shown above) formalizes the two interaction patterns: the plan-based system intervenes via replan when verification fails, while the advisory system injects high-level hints without overwriting the execution context. Tasks evaluated include Deep Search and UI assistance.</p>
+<h2 id="experiments">Experiments</h2>
+<p>The paper evaluates on two task domains: <strong>Deep Search</strong> (long-horizon query decomposition, retrieval, browsing, and synthesis) and <strong>UI assistance</strong> (GUI agent tasks combining perception, grounding, and multi-step action recovery). The evaluation framework measures trade-offs across three axes: task accuracy, monetary cost (API spend), and edge energy consumption.</p>
+<p><img alt="Figure 2" src="/images/papers/2605.30102/page2.png"></p>
+<p>Baselines include different allocations of cloud compute — varying how frequently the cloud Supervisor intervenes (<code>Tv</code>) and which roles are assigned to cloud vs. edge models. The full experimental results, specific dataset names, and quantitative tables are not recoverable from the provided (truncated) text.</p>
+<h2 id="results">Results</h2>
+<p>Full text truncated — specific numbers, table references, and per-task deltas are not available in the provided content. From the abstract and contributions list:</p>
+<ul>
+<li><strong>Plan-based vs. advisory:</strong> The two paradigms excel in different task domains; neither universally dominates (contribution 2, abstract).</li>
+<li><strong>Cloud compute saturation:</strong> Increasing the fraction of frontier-model compute does not consistently improve performance — the authors describe this as an &ldquo;unexpected observation&rdquo; they investigate in depth (contribution 2, introduction).</li>
+<li><strong>Context management:</strong> Hybrid systems with context resets and summarization handle long-horizon tasks more effectively than those without, with measurable KV-cache footprint reductions at the edge (contribution 4) — specific magnitudes not quantified in available text.</li>
+</ul>
+<p>Concrete baseline→method deltas with Table/Figure anchors cannot be reported as the results section of the full text was not recovered.</p>
+<h2 id="conclusion">Conclusion</h2>
+<p>The central practitioner takeaway is that hybrid MAS design cannot be solved by a simple rule like &ldquo;always use the cloud for hard steps&rdquo; — the optimal assignment of cloud vs. edge roles depends heavily on the task structure, and more frontier compute can actively hurt performance in some configurations. The results are established on Deep Search and UI assistance tasks from a single lab (Qualcomm AI Research), published as a workshop paper (AIWILD @ ICML 2026), so generalization to other agentic domains is unverified. The paper does not quantify energy savings or cost reductions at production scale, and the ablation over supervision frequency (<code>Tv</code>) covers design choices within the two studied architectures rather than the full space of possible hybrid topologies. The title implies broad lessons for hybrid MAS; the experiments cover two architectures and two task families.</p>
+<h2 id="novelty-check">Novelty Check</h2>
+<p><strong>From the paper&rsquo;s own Related Work:</strong> The closest prior work the authors acknowledge is MAI-UI (Zhou et al., 2025), a &ldquo;native hybrid-AI design in which a cloud model is [used alongside an edge model].&rdquo; General routing/escalation work (Ding et al., 2024; Stripelis et al., 2024; Ong et al., 2024) treats hybridization as model selection rather than role assignment within a MAS. The authors&rsquo; claimed delta is moving from per-call routing to architectural role assignment and systematic multi-objective evaluation.</p>
+<p><strong>Independent assessment:</strong> The contribution is primarily empirical and organizational rather than algorithmic — the two architectures (plan-based supervisor and advisory supervisor) are natural extensions of existing ReAct/orchestrator patterns to the cloud–edge split. The novelty lies in the systematic Pareto-frontier framing and the mechanistic analysis of <em>why</em> hybridization helps or hurts. This is a workshop paper; the scope and depth of results appear commensurate with that venue. Not obviously &ldquo;old wine in a new bottle,&rdquo; but also not a major algorithmic advance.</p>
+<h2 id="open-questions">Open Questions</h2>
+<ul>
+<li>Does the finding that &ldquo;more cloud compute ≠ better performance&rdquo; persist across model families and sizes beyond those tested at Qualcomm?</li>
+<li>How sensitive are the Plan-based vs. Advisory rankings to the specific <code>Tv</code> (verification interval) chosen — is there a principled way to set <code>Tv</code> per task?</li>
+<li>The paper identifies summarization as a key factor for context efficiency, but does not ablate summarization quality — how much does the cloud LLM&rsquo;s summarization fidelity matter?</li>
+<li>Results cover English-language Deep Search and UI tasks; do the design lessons transfer to multilingual or multimodal agentic settings?</li>
+<li>Energy measurements are framed as edge consumption, but cloud inference energy is omitted from the Pareto analysis — does including it change the optimal operating point?</li>
+</ul>
+<hr>
+<h2 id="original-abstract">Original abstract</h2>
+<p>arXiv:2605.30102v1 Announce Type: cross Abstract: The design space of agentic AI inference spans two extremes: frontier large language models (LLMs), typically hosted in the cloud and offering strong performance across a wide range of tasks at substantially high cost, and more cost-efficient small language models (SLMs), which are amenable to on-device inference. Hybrid multi-agent systems (MASs) combining on-device and cloud models offer a promising middle ground, but they also introduce a complex and poorly understood design space in which task accuracy, monetary cost, and edge energy consumption are tightly coupled; in the absence of general design principles, hybrid components, although not the most prevalent choice, are typically introduced through ad hoc decisions tailored to specific domains. In this work, we examine this design space more systematically. We adapt two representative MAS architectures to support hybrid inference and study how individual design choices shift the operating point along the Pareto frontier of power, cost, and performance. Our findings paint a nuanced picture of hybrid MAS design: while SLMs can effectively benefit from LLM assistance, the optimal architecture is highly task-dependent, and greater frontier-level compute does not consistently translate to better performance.</p>
+
+      </div>
+
+
+      <footer>
+        
+
+
+        
+        
+        
+        
+        
+        
+        
+      </footer>
+    </article>
+
+    
+  </section>
+
+    </div>
+
+    <footer class="footer">
+  <section class="container">
+    ©
+    
+      2019 -
+    
+    2026
+     Jie Xin 
+    ·
+    
+    Powered by <a href="https://gohugo.io/" target="_blank" rel="noopener">Hugo</a> & <a href="https://github.com/luizdepra/hugo-coder/" target="_blank" rel="noopener">Coder</a>.
+    
+  </section>
+</footer>
+
+  </main>
+
+  
+
+  
+  
+  <script src="/js/coder.min.6ae284be93d2d19dad1f02b0039508d9aab3180a12a06dcc71b0b0ef7825a317.js" integrity="sha256-auKEvpPS0Z2tHwKwA5UI2aqzGAoSoG3McbCw73gloxc="></script>
+  
+
+  
+
+  
+
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+</body>
+</html>

@@ -1,0 +1,371 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <title>
+  Tiny Brains, Giant Impact: Uncovering the Keystone Neurons of LLM with Just a Few Prompts · JXIN&#39;s Home
+</title>
+  <meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="color-scheme" content="light dark">
+
+
+
+
+<meta name="author" content="Jie Xin">
+<meta name="description" content="arXiv: 2605.24846 · PDF
+Authors: Xiangtian Ji, Yuxin Chen, Zhengzhou Cai, Xiang Wang, An Zhang, Tat-Seng Chua
+Affiliations: National University of Singapore, University of Science and Technology of China, University of Melbourne
+Primary category: cs.LG · all: cs.AI, cs.LG
+Matched keywords: large language model, llm, inference, serving, transformer, fine-tun
+
+TL;DR
+A tiny, cross-task subset of neurons (&lt; 0.2% of all neurons) called &ldquo;keystone neurons&rdquo; can be identified in open-weight LLMs with just four prompts; removing them collapses all model capabilities, while fine-tuning only them matches or exceeds full-parameter fine-tuning.">
+<meta name="keywords" content="blog,developer,personal">
+
+
+
+  <meta name="twitter:card" content="summary">
+  <meta name="twitter:title" content="Tiny Brains, Giant Impact: Uncovering the Keystone Neurons of LLM with Just a Few Prompts">
+  <meta name="twitter:description" content="arXiv: 2605.24846 · PDF
+Authors: Xiangtian Ji, Yuxin Chen, Zhengzhou Cai, Xiang Wang, An Zhang, Tat-Seng Chua
+Affiliations: National University of Singapore, University of Science and Technology of China, University of Melbourne
+Primary category: cs.LG · all: cs.AI, cs.LG
+Matched keywords: large language model, llm, inference, serving, transformer, fine-tun
+TL;DR A tiny, cross-task subset of neurons (&lt; 0.2% of all neurons) called “keystone neurons” can be identified in open-weight LLMs with just four prompts; removing them collapses all model capabilities, while fine-tuning only them matches or exceeds full-parameter fine-tuning.">
+
+<meta property="og:url" content="https://ftxj.github.io/posts/2026-05-29/03-tiny-brains-giant-impact-uncovering-the-keystone-neurons-of/">
+  <meta property="og:site_name" content="JXIN&#39;s Home">
+  <meta property="og:title" content="Tiny Brains, Giant Impact: Uncovering the Keystone Neurons of LLM with Just a Few Prompts">
+  <meta property="og:description" content="arXiv: 2605.24846 · PDF
+Authors: Xiangtian Ji, Yuxin Chen, Zhengzhou Cai, Xiang Wang, An Zhang, Tat-Seng Chua
+Affiliations: National University of Singapore, University of Science and Technology of China, University of Melbourne
+Primary category: cs.LG · all: cs.AI, cs.LG
+Matched keywords: large language model, llm, inference, serving, transformer, fine-tun
+TL;DR A tiny, cross-task subset of neurons (&lt; 0.2% of all neurons) called “keystone neurons” can be identified in open-weight LLMs with just four prompts; removing them collapses all model capabilities, while fine-tuning only them matches or exceeds full-parameter fine-tuning.">
+  <meta property="og:locale" content="en">
+  <meta property="og:type" content="article">
+    <meta property="article:section" content="posts">
+    <meta property="article:published_time" content="2026-05-29T12:04:43+00:00">
+    <meta property="article:modified_time" content="2026-05-29T12:04:43+00:00">
+
+
+
+
+<link rel="canonical" href="https://ftxj.github.io/posts/2026-05-29/03-tiny-brains-giant-impact-uncovering-the-keystone-neurons-of/">
+
+
+<link rel="preload" href="/fonts/fa-brands-400.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="/fonts/fa-regular-400.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="/fonts/fa-solid-900.woff2" as="font" type="font/woff2" crossorigin>
+
+
+  
+  
+  <link rel="stylesheet" href="/css/coder.min.5e94c1acf7aa2066035cf2764ae3e4fe39db101d68b870f919966100d51fb861.css" integrity="sha256-XpTBrPeqIGYDXPJ2SuPk/jnbEB1ouHD5GZZhANUfuGE=" crossorigin="anonymous" media="screen" />
+
+
+
+
+
+
+  
+    
+    
+    <link rel="stylesheet" href="/css/coder-dark.min.a00e6364bacbc8266ad1cc81230774a1397198f8cfb7bcba29b7d6fcb54ce57f.css" integrity="sha256-oA5jZLrLyCZq0cyBIwd0oTlxmPjPt7y6KbfW/LVM5X8=" crossorigin="anonymous" media="screen" />
+  
+
+
+
+ 
+
+
+
+
+<link rel="icon" type="image/svg+xml" href="/images/favicon.svg" sizes="any">
+<link rel="icon" type="image/png" href="/images/favicon-32x32.png" sizes="32x32">
+<link rel="icon" type="image/png" href="/images/favicon-16x16.png" sizes="16x16">
+
+<link rel="apple-touch-icon" href="/images/apple-touch-icon.png">
+<link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon.png">
+
+<link rel="manifest" href="/site.webmanifest">
+<link rel="mask-icon" href="/images/safari-pinned-tab.svg" color="#5bbad5">
+
+
+
+
+
+
+<style>
+.content article ul {
+  list-style: disc !important;
+  padding-left: 2.5rem !important;
+}
+
+.content article ul li {
+  display: list-item !important;
+}
+</style>
+
+
+
+
+  
+</head>
+
+
+
+
+
+
+<body class="preload-transitions colorscheme-auto">
+  
+<div class="float-container">
+    <a id="dark-mode-toggle" class="colorscheme-toggle">
+        <i class="fa-solid fa-adjust fa-fw" aria-hidden="true"></i>
+    </a>
+</div>
+
+
+  <main class="wrapper">
+    <nav class="navigation">
+  <section class="container">
+    
+    <a class="navigation-title" href="https://ftxj.github.io/">
+      JXIN&#39;s Home
+    </a>
+    
+    
+      <input type="checkbox" id="menu-toggle" />
+      <label class="menu-button float-right" for="menu-toggle">
+        <i class="fa-solid fa-bars fa-fw" aria-hidden="true"></i>
+      </label>
+      <ul class="navigation-list">
+        
+          
+            <li class="navigation-item">
+              <a class="navigation-link " href="/about/">About</a>
+            </li>
+          
+            <li class="navigation-item">
+              <a class="navigation-link " href="/travel/">Travel</a>
+            </li>
+          
+            <li class="navigation-item">
+              <a class="navigation-link " href="/hiking/">Hiking</a>
+            </li>
+          
+            <li class="navigation-item">
+              <a class="navigation-link " href="/posts/">Blog</a>
+            </li>
+          
+            <li class="navigation-item">
+              <a class="navigation-link " href="https://ftxj.github.io/cv/cv.pdf">CV</a>
+            </li>
+          
+        
+        
+          
+          
+          
+            
+              
+                <li class="navigation-item menu-separator">
+                  <span>|</span>
+                </li>
+                
+              
+              <li class="navigation-item">
+                <a href="/zh/posts/2026-05-29/03-tiny-brains-giant-impact-uncovering-the-keystone-neurons-of/">中文</a>
+              </li>
+            
+          
+        
+      </ul>
+    
+  </section>
+</nav>
+
+
+    <div class="content">
+      
+  <section class="container post">
+    <article>
+      <header>
+        <div class="post-title">
+          <h1 class="title">
+            <a class="title-link" href="https://ftxj.github.io/posts/2026-05-29/03-tiny-brains-giant-impact-uncovering-the-keystone-neurons-of/">
+              Tiny Brains, Giant Impact: Uncovering the Keystone Neurons of LLM with Just a Few Prompts
+            </a>
+          </h1>
+        </div>
+        <div class="post-meta">
+          <div class="date">
+            <span class="posted-on">
+              <i class="fa-solid fa-calendar" aria-hidden="true"></i>
+              <time datetime="2026-05-29T12:04:43Z">
+                May 29, 2026
+              </time>
+            </span>
+            <span class="reading-time">
+              <i class="fa-solid fa-clock" aria-hidden="true"></i>
+              7-minute read
+            </span>
+          </div>
+          
+          <div class="categories">
+  <i class="fa-solid fa-folder" aria-hidden="true"></i>
+    <a href="/categories/paper-digest/">Paper-Digest</a>
+      <span class="separator">•</span>
+    <a href="/categories/2026-05-29/">2026-05-29</a></div>
+
+          
+        </div>
+      </header>
+
+      
+
+
+      <div class="post-content">
+        
+        <p><strong>arXiv:</strong> <a href="https://arxiv.org/abs/2605.24846">2605.24846</a> · <a href="https://arxiv.org/pdf/2605.24846">PDF</a></p>
+<p><strong>Authors:</strong> Xiangtian Ji, Yuxin Chen, Zhengzhou Cai, Xiang Wang, An Zhang, Tat-Seng Chua</p>
+<p><strong>Affiliations:</strong> National University of Singapore, University of Science and Technology of China, University of Melbourne</p>
+<p><strong>Primary category:</strong> <code>cs.LG</code> · all: cs.AI, cs.LG</p>
+<p><strong>Matched keywords:</strong> large language model, llm, inference, serving, transformer, fine-tun</p>
+<hr>
+<h2 id="tldr">TL;DR</h2>
+<p>A tiny, cross-task subset of neurons (&lt; 0.2% of all neurons) called &ldquo;keystone neurons&rdquo; can be identified in open-weight LLMs with just four prompts; removing them collapses all model capabilities, while fine-tuning only them matches or exceeds full-parameter fine-tuning.</p>
+<h2 id="motivation">Motivation</h2>
+<p>Prior interpretability work has identified task-specific neurons linked to multilingual processing, code generation, and mathematical reasoning. But those neurons primarily affect their target task while leaving other capabilities largely intact. This leaves a deeper question unanswered: is there a cross-task structural backbone — an even tinier set of neurons that every capability depends on — that underlies the model&rsquo;s broad competence? If such a set exists, its removal should cause global, not local, collapse. No prior work had posed or answered this question. The practical stakes are real: if such a backbone exists and is stable, it could be leveraged for highly parameter-efficient fine-tuning, enabling task adaptation that does not degrade unrelated capabilities — a known failure mode of standard full-parameter supervised fine-tuning.</p>
+<h2 id="key-ideas">Key Ideas</h2>
+<p>The paper identifies &ldquo;keystone neurons&rdquo; in LLMs — a cross-task, consistently activated subset that functions as a structural backbone:</p>
+<ul>
+<li><strong>Extreme sparsity with global criticality</strong>: keystone neurons make up &lt; 0.2% of all neurons (e.g., 30 neurons out of 1,245,184 in Llama-3.1-8B), yet zeroing them drives all benchmark scores to 0.</li>
+<li><strong>Prompt-agnostic stability</strong>: five disjoint prompt groups covering the same capability dimensions yield pairwise IoU of 80–95%, confirming keystone neurons are an intrinsic model property, not a detection artifact.</li>
+<li><strong>Established during pretraining</strong>: base and instruction-tuned variants share substantial keystone overlap, and the sets are stable across fine-tuning variants (reasoning-distilled, MoE).</li>
+<li><strong>Tight calibration</strong>: keystone neuron outputs are highly sensitive to multiplicative scaling; equivalent interventions on random neurons of matched size produce far smaller degradation.</li>
+<li><strong>Targeted fine-tuning</strong>: updating only keystone neuron parameters achieves gains comparable to or better than full-parameter fine-tuning on math and safety benchmarks while better preserving unrelated capabilities.</li>
+</ul>
+<p><img alt="Figure 1" src="/images/papers/2605.24846/fig1.png"></p>
+<p>The conceptual illustration captures the defining property of keystone neurons: unlike task-specific neurons that light up for one domain, keystone neurons engage consistently across all capability dimensions (general, math, code, multilingual), forming a universal backbone. Their deactivation does not selectively impair one task — it causes global capability collapse across every benchmark.</p>
+<h2 id="method">Method</h2>
+<p><strong>Stage 1 — Multi-prompt activation analysis</strong>: A small probe set of K prompts (one per capability dimension: general, math, code, multilingual) is passed through the model. For each prompt, every neuron&rsquo;s mean absolute activation across all generated tokens is recorded. Within each layer–module block, the top-ρ fraction by activation is retained per prompt. The intersection across all K prompts forms the candidate pool — neurons persistently among the most activated regardless of task.</p>
+<p><strong>Stage 2 — α-controlled masking</strong>: Candidates are ranked by cross-task activation strength. A scalar α sweeps the top-α fraction: selected neurons are zeroed during the forward pass (outputs set to zero) while the rest of the network is frozen. Performance is measured on MMLU, MATH500, MGSM, and EvalPlus plus C4 and WikiText-2 perplexity, identifying the sparse frontier where masking triggers capability collapse.</p>
+<p><strong>Targeted fine-tuning</strong>: Only the weight rows/columns corresponding to keystone neurons are updated during supervised fine-tuning; all other parameters are frozen.</p>
+<h2 id="experiments">Experiments</h2>
+<p><strong>Models</strong>: Qwen3 (0.6B, 8B, 30B-A3B MoE), Qwen2.5 (0.5B, 7B, instruct variants), Gemma-3-1B, Llama-3.2-1B and Llama-3.1-8B (base and instruct), DeepSeek-R1-distill variants (Qwen-1.5B, Qwen-7B, Llama-8B), Mixtral-8×7B.</p>
+<p><strong>Benchmarks</strong>: MMLU (general), MATH500 (math), MGSM (multilingual), EvalPlus (code synthesis); C4 and WikiText-2 perplexity for language modeling quality.</p>
+<p><strong>Baselines</strong>: random-neuron ablation (matched count), high-norm neuron ablation, module-aware random ablation, same-layer same-module random replacement (all in Appendix C.3).</p>
+<h2 id="results">Results</h2>
+<p><strong>Complete collapse from keystone removal (Table 1)</strong>: Across every tested model, zeroing keystone neurons drives MMLU, MATH500, MGSM, and EvalPlus to 0. For Llama-3.1-8B-Instruct, deactivating just 90 neurons (0.0072% of 1,245,184 total) achieves this; the same model&rsquo;s perplexity on C4 jumps from 11.78 to 522. By contrast, removing an equal-sized random set preserves near-baseline accuracy (random-off MMLU = 0.706 vs. base 0.713) and causes only minor perplexity shifts (C4: 11.83 vs. 11.78). Qwen3-8B shows the same pattern: keystone-off collapses all benchmarks from a base of 0.821/0.942/0.842/0.669 on MMLU/MATH500/MGSM/EvalPlus to 0, while random-off is 0.824/0.638/0.856/0.651 — a partial but not catastrophic degradation.</p>
+<p><img alt="Figure 2" src="/images/papers/2605.24846/fig2.png"></p>
+<p>Figure 2 shows for Qwen2.5-7B-Instruct how the 4-dimension intersection of top-α neurons (bars, left axis) remains a tight cluster even as α grows, while the comprehensive accuracy (black curve, right axis) collapses sharply once the intersection is zeroed — confirming that cross-task overlap, not raw activation magnitude, is the key predictor of functional criticality.</p>
+<p><strong>Keystone sensitivity vs. random neurons under scaling (Figure 3)</strong>: For Qwen2.5-7B-Instruct and Qwen2.5-0.5B-Instruct, multiplicative rescaling (r ≠ 1) of keystone neuron outputs causes rapid, pronounced degradation in the aggregate score, whereas the same rescaling applied to a size-matched random set produces far smaller effects — establishing that keystone neurons are tightly calibrated, not merely high-activation.</p>
+<p><img alt="Figure 3" src="/images/papers/2605.24846/fig3.png"></p>
+<p>The figure plots aggregate capability score vs. scaling factor r for keystone vs. random neurons across both model sizes. Keystone curves drop steeply for both r &gt; 1 (amplification) and r &lt; 1 (attenuation), while random-neuron curves remain nearly flat across the same range — quantifying the sensitivity asymmetry that defines keystone neurons as precisely calibrated.</p>
+<p><strong>Fine-tuning results</strong> (Sections 4.2–4.3): The full text is truncated before the specific fine-tuning numbers; the abstract states keystone-only fine-tuning achieves &ldquo;comparable to or even better than full-parameter fine-tuning&rdquo; on math and safety benchmarks while &ldquo;better preserving performance in other capability dimensions&rdquo; — exact deltas not available in the provided text.</p>
+<h2 id="conclusion">Conclusion</h2>
+<p>The central finding is that LLMs harbor an extremely sparse cross-task backbone (&lt; 0.2% of neurons), whose removal causes uniform, global capability collapse while equal-sized random ablations do not. This is established empirically across 19 model checkpoints spanning 4 architecture families (Qwen, Llama, Gemma, Mixtral) at sizes from 0.5B to 30B. The targeted fine-tuning result is directionally compelling but its specific quantitative gains are not available in the provided text. The study is limited to decoder-only Transformers evaluated on English-centric benchmarks; the claim that keystone neurons are established during pretraining rests on base–instruct overlap patterns rather than a pretraining intervention. The practical benefit of keystone-only fine-tuning over established PEFT methods (LoRA, DoRA) is not directly compared.</p>
+<h2 id="novelty-check">Novelty Check</h2>
+<p><strong>From Related Work (Section 5)</strong>: The authors position against task-specific neuron work — multilingual (Tang et al., 2024; Chen et al., 2025), code (Miller et al., 2025), math (Yu and Ananiadou, 2024), and safety (Song et al., 2024; Wang et al., 2025a) — and against modularity/sparsity work (Fedus et al., 2022; Bricken et al., 2023). Their framing: prior work isolates neurons for single capabilities; they are the first to identify a cross-task, globally-critical subset.</p>
+<p><strong>Independent assessment</strong>: The cross-task framing is a genuine conceptual shift from task-specific neuron work. The identification of a universal capability backbone with global collapse-inducing properties is novel in its framing and empirical scope. The use of only 4 prompts for identification is a notable practical contribution. The connection to fine-tuning efficiency overlaps with LoRA-adjacent literature (which targets low-rank subspaces rather than specific neurons), but the keystone-based approach is mechanistically distinct. Overall, genuinely new contribution, not a relabel.</p>
+<h2 id="open-questions">Open Questions</h2>
+<ul>
+<li>How do keystone neurons compare to LoRA/DoRA in fine-tuning efficiency and capability retention on the same benchmarks, with identical training data?</li>
+<li>Do keystone neurons identified in English-prompt probing remain structurally identical for multilingual models evaluated on non-English tasks?</li>
+<li>What is the causal mechanism during pretraining that makes specific neurons become keystone? Is it tied to a particular training phase or data mix?</li>
+<li>For MoE models (Mixtral, Qwen3-30B-A3B), do keystone neurons cluster in specific experts, and does expert routing interact with keystoneness?</li>
+<li>Can keystone neurons be used to detect or prevent fine-tuning-based capability degradation in production settings?</li>
+</ul>
+<hr>
+<h2 id="original-abstract">Original abstract</h2>
+<p>arXiv:2605.24846v2 Announce Type: replace-cross Abstract: Large language models (LLMs) display strong comprehensive abilities, yet the internal mechanisms that support these behaviors remain insufficiently understood. In this work, we show that across a wide range of open-weight Transformers, a subset of neurons remains consistently highly activated during inference across tasks of multiple capability dimensions. By probing along the cross-task activation strength, an extremely sparse subset is isolated, whose removal causes a collapse in model behavior, which we term keystone neurons. Our analysis reveals that keystone neurons are a stable and intrinsic neuron subset of the model that is largely established during pretraining. The parameters associated with these neurons are tightly calibrated during the training process, and their precise values are critical for the capabilities of the model. Building on these insights, we propose a supervised fine-tuning approach that updates only keystone neurons, achieving task gains comparable to or even better than full-parameter fine-tuning while better preserving performance in other capability dimensions, despite modifying a much smaller number of parameters.</p>
+
+      </div>
+
+
+      <footer>
+        
+
+
+        
+        
+        
+        
+        
+        
+        
+      </footer>
+    </article>
+
+    
+  </section>
+
+    </div>
+
+    <footer class="footer">
+  <section class="container">
+    ©
+    
+      2019 -
+    
+    2026
+     Jie Xin 
+    ·
+    
+    Powered by <a href="https://gohugo.io/" target="_blank" rel="noopener">Hugo</a> & <a href="https://github.com/luizdepra/hugo-coder/" target="_blank" rel="noopener">Coder</a>.
+    
+  </section>
+</footer>
+
+  </main>
+
+  
+
+  
+  
+  <script src="/js/coder.min.6ae284be93d2d19dad1f02b0039508d9aab3180a12a06dcc71b0b0ef7825a317.js" integrity="sha256-auKEvpPS0Z2tHwKwA5UI2aqzGAoSoG3McbCw73gloxc="></script>
+  
+
+  
+
+  
+
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+</body>
+</html>

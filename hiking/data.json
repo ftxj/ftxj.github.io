@@ -1,0 +1,1299 @@
+{
+  "meta": {
+    "date": "2026-06-26",
+    "scope": "当前首页只展示已有轨迹数据 / 分析 / prompt / 交互页面的路线；无轨迹路线暂不展示。",
+    "data_note": "距离、爬升和海拔来自本地 GPX/KML 或已有公开资料，部分轨迹存在变体和口径差异。"
+  },
+  "safety": "高海拔徒步的核心风险不是“公里数”，而是睡眠海拔上升速度、撤退条件、天气窗口、补给和队伍经验。超过 3,000 m 后应安排适应日；出现高反症状不要继续上升。本文是规划摘要，不替代当季许可、天气、路况、公园公告、向导路书或专业医疗建议。",
+  "routes": [
+    {
+      "number": 1,
+      "name": "珠峰大本营徒步（Everest Base Camp Trek, EBC）",
+      "where": "尼泊尔，昆布 / 萨加玛塔国家公园；常见起止：Lukla 往返。",
+      "duration": "12–14 天（其中约 11–12 天徒步，另留飞行/天气缓冲）",
+      "distance": "约 120–135 km 往返（不同支线、是否登 Kala Patthar 会变）",
+      "ascent": "累计爬升约 4,500–5,500 m；净海拔从 Lukla 2,860 m 到 EBC 约 5,364 m。",
+      "high_point": "EBC 约 5,364 m；常见观景点 Kala Patthar 约 5,545–5,644 m（口径有差异）。",
+      "lodging": "全线茶馆/客栈为主；Namche、Dingboche、Lobuche、Gorak Shep 越往上条件越基础。旺季建议提前订 Namche 以上热门村落。",
+      "confidence": "高：路线成熟、住宿与日程资料充足；累计爬升按常见行程估算。",
+      "days": [
+        {
+          "day": "D1",
+          "route_text": "Lukla → Phakding，约 7–8 km",
+          "lodging": "茶馆",
+          "distance": "约 7–8 km",
+          "ascent": "待 GPX / 官方路书核实",
+          "places": [
+            "Lukla",
+            "Phakding"
+          ],
+          "direction_note": "Lukla -> Phakding；山体区域：尼泊尔，昆布 / 萨加玛塔国家公园；常见起止：Lukla 往返；罗盘方位待地图 / GPX 复核",
+          "ascent_md": "实际上升约 472 m，下降约 687 m；净下降约 235–250 m",
+          "sleep_alt_m": 2610,
+          "max_alt_m": 2860,
+          "alt_note": "起 Lukla 2,860 m，缓下至 Phakding 2,610 m，全天最高点即出发点。",
+          "alt_confidence": "high"
+        },
+        {
+          "day": "D2",
+          "route_text": "Phakding → Namche Bazaar，约 10–11 km",
+          "lodging": "茶馆",
+          "distance": "约 10–11 km",
+          "ascent": "待 GPX / 官方路书核实",
+          "places": [
+            "Phakding",
+            "Namche Bazaar"
+          ],
+          "direction_note": "Phakding -> Namche Bazaar；山体区域：尼泊尔，昆布 / 萨加玛塔国家公园；常见起止：Lukla 往返；罗盘方位待地图 / GPX 复核",
+          "ascent_md": "实际上升约 1,628 m，下降约 851 m；净上升约 830–836 m",
+          "sleep_alt_m": 3440,
+          "max_alt_m": 3440,
+          "alt_note": "Phakding 2,610 m 经 Monjo、Jorsale 过 Hillary Bridge 上至 Namche 3,440 m，Namche 即当日最高。",
+          "alt_confidence": "high"
+        },
+        {
+          "day": "D3",
+          "route_text": "Namche 适应日：Everest View Hotel / Khumjung / Kunde 往返，约 4–7 km",
+          "lodging": "茶馆",
+          "distance": "约 4–7 km",
+          "ascent": "待 GPX / 官方路书核实",
+          "places": [
+            "Namche 适应日：Everest View Hotel",
+            "Khumjung",
+            "Kunde 往返"
+          ],
+          "direction_note": "Namche 适应日：Everest View Hotel -> Kunde 往返；山体区域：尼泊尔，昆布 / 萨加玛塔国家公园；常见起止：Lukla 往返；罗盘方位待地图 / GPX 复核",
+          "ascent_md": "适应往返上升/下降约 550–740 m；睡眠海拔基本不变",
+          "sleep_alt_m": 3440,
+          "max_alt_m": 3880,
+          "alt_note": "适应日：上 Hotel Everest View 3,880 m，可顺访 Khumjung 3,790 m / Kunde 3,800 m，回 Namche 过夜。",
+          "alt_confidence": "high"
+        },
+        {
+          "day": "D4",
+          "route_text": "Namche → Tengboche / Deboche，约 9–11 km",
+          "lodging": "茶馆",
+          "distance": "约 9–11 km",
+          "ascent": "待 GPX / 官方路书核实",
+          "places": [
+            "Namche",
+            "Tengboche",
+            "Deboche"
+          ],
+          "direction_note": "Namche -> Deboche；山体区域：尼泊尔，昆布 / 萨加玛塔国家公园；常见起止：Lukla 往返；罗盘方位待地图 / GPX 复核",
+          "ascent_md": "实际上升约 1,197 m，下降约 753 m；净上升约 420–427 m",
+          "sleep_alt_m": 3860,
+          "max_alt_m": 3860,
+          "alt_note": "Namche → Phunki Tenga 3,250 m → 陡升 Tengboche 3,860 m。常住 Deboche 3,820 m，当日最高仍是 Tengboche 山脊。",
+          "alt_confidence": "high"
+        },
+        {
+          "day": "D5",
+          "route_text": "Tengboche / Deboche → Dingboche，约 10–12 km",
+          "lodging": "茶馆",
+          "distance": "约 10–12 km",
+          "ascent": "待 GPX / 官方路书核实",
+          "places": [
+            "Tengboche",
+            "Deboche",
+            "Dingboche"
+          ],
+          "direction_note": "Tengboche -> Dingboche；山体区域：尼泊尔，昆布 / 萨加玛塔国家公园；常见起止：Lukla 往返；罗盘方位待地图 / GPX 复核",
+          "ascent_md": "实际上升约 944–950 m，下降约 486–513 m；净上升约 543–550 m",
+          "sleep_alt_m": 4410,
+          "max_alt_m": 4410,
+          "alt_note": "经 Pangboche 3,930 m、Somare 平缓上至 Dingboche 4,410 m，沿途无超过住宿点的高点。",
+          "alt_confidence": "high"
+        },
+        {
+          "day": "D6",
+          "route_text": "Dingboche 适应日：Nangkartshang Peak 支线，约 4–6 km",
+          "lodging": "茶馆",
+          "distance": "约 4–6 km",
+          "ascent": "待 GPX / 官方路书核实",
+          "places": [
+            "Dingboche 适应日：Nangkartshang Peak 支线"
+          ],
+          "direction_note": "山体区域：尼泊尔，昆布 / 萨加玛塔国家公园；常见起止：Lukla 往返；罗盘方位待地图 / GPX 复核",
+          "ascent_md": "适应往返上升/下降约 673–766 m；睡眠海拔基本不变",
+          "sleep_alt_m": 4410,
+          "max_alt_m": 5083,
+          "alt_note": "适应日：登 Nangkartshang Peak 5,083 m（部分资料 5,050–5,100 m），返回 Dingboche 过夜。",
+          "alt_confidence": "high"
+        },
+        {
+          "day": "D7",
+          "route_text": "Dingboche → Lobuche，约 8–9 km",
+          "lodging": "茶馆",
+          "distance": "约 8–9 km",
+          "ascent": "待 GPX / 官方路书核实",
+          "places": [
+            "Dingboche",
+            "Lobuche"
+          ],
+          "direction_note": "Dingboche -> Lobuche；山体区域：尼泊尔，昆布 / 萨加玛塔国家公园；常见起止：Lukla 往返；罗盘方位待地图 / GPX 复核",
+          "ascent_md": "实际上升约 773 m，下降约 151 m；净上升约 500 m",
+          "sleep_alt_m": 4910,
+          "max_alt_m": 4940,
+          "alt_note": "Dingboche → Thukla 4,620 m → Thukla Pass 纪念碑垭口 4,830 m → Lobuche 4,910 m。",
+          "alt_confidence": "high"
+        },
+        {
+          "day": "D8",
+          "route_text": "Lobuche → Gorak Shep → EBC → Gorak Shep，约 11–12 km",
+          "lodging": "茶馆",
+          "distance": "约 11–12 km",
+          "ascent": "待 GPX / 官方路书核实",
+          "places": [
+            "Lobuche",
+            "Gorak Shep",
+            "EBC",
+            "Gorak Shep"
+          ],
+          "direction_note": "Lobuche -> Gorak Shep；山体区域：尼泊尔，昆布 / 萨加玛塔国家公园；常见起止：Lukla 往返；罗盘方位待地图 / GPX 复核",
+          "ascent_md": "Lobuche 至 EBC 最高点累计上升约 454 m；睡眠海拔净上升约 250 m",
+          "sleep_alt_m": 5164,
+          "max_alt_m": 5364,
+          "alt_note": "Lobuche → Gorak Shep 5,164 m，午后往返 EBC 5,364 m（当日最高），住 Gorak Shep（全程最高睡眠点）。",
+          "alt_confidence": "high"
+        },
+        {
+          "day": "D9",
+          "route_text": "Gorak Shep → Kala Patthar → Pheriche / Pangboche，约 12–16 km",
+          "lodging": "茶馆",
+          "distance": "约 12–16 km",
+          "ascent": "待 GPX / 官方路书核实",
+          "places": [
+            "Gorak Shep",
+            "Kala Patthar",
+            "Pheriche",
+            "Pangboche"
+          ],
+          "direction_note": "Gorak Shep -> Pangboche；山体区域：尼泊尔，昆布 / 萨加玛塔国家公园；常见起止：Lukla 往返；罗盘方位待地图 / GPX 复核",
+          "ascent_md": "Kala Patthar 上升约 381–495 m；至 Pheriche 下降约 1,305 m（Pangboche 口径会变化）",
+          "sleep_alt_m": 4280,
+          "max_alt_m": 5644,
+          "alt_note": "凌晨登 Kala Patthar 真峰 5,644 m（拍照平台 5,545 m，全程最高点），下撤至 Pheriche 4,240–4,280 m（或 Pangboche 3,930 m）。",
+          "alt_confidence": "high"
+        },
+        {
+          "day": "D10",
+          "route_text": "Pheriche / Pangboche → Namche，约 18–20 km",
+          "lodging": "茶馆",
+          "distance": "约 18–20 km",
+          "ascent": "待 GPX / 官方路书核实",
+          "places": [
+            "Pheriche",
+            "Pangboche",
+            "Namche"
+          ],
+          "direction_note": "Pheriche -> Namche；山体区域：尼泊尔，昆布 / 萨加玛塔国家公园；常见起止：Lukla 往返；罗盘方位待地图 / GPX 复核",
+          "ascent_md": "Pheriche → Namche 实际上升约 1,298 m、下降约 2,130 m；净下降约 800 m",
+          "sleep_alt_m": 3440,
+          "max_alt_m": 4280,
+          "alt_note": "出发点 Pheriche 4,280 m 即当日最高，下降经 Tengboche 山脊（短暂反爬至 3,860 m）后长下至 Namche 3,440 m。",
+          "alt_confidence": "medium"
+        },
+        {
+          "day": "D11",
+          "route_text": "Namche → Lukla，约 18–20 km",
+          "lodging": "茶馆",
+          "distance": "约 18–20 km",
+          "ascent": "待 GPX / 官方路书核实",
+          "places": [
+            "Namche",
+            "Lukla"
+          ],
+          "direction_note": "Namche -> Lukla；山体区域：尼泊尔，昆布 / 萨加玛塔国家公园；常见起止：Lukla 往返；罗盘方位待地图 / GPX 复核",
+          "ascent_md": "实际上升约 1,571 m、下降约 2,133 m；净下降约 580–600 m",
+          "sleep_alt_m": 2860,
+          "max_alt_m": 3440,
+          "alt_note": "Namche 3,440 m 下至 Phakding 2,610 m，再缓上约 250 m 至 Lukla 2,860 m。当日最高即起点。",
+          "alt_confidence": "high"
+        },
+        {
+          "day": "D12",
+          "route_text": "Lukla 飞回 Kathmandu 或作天气缓冲",
+          "lodging": "酒店/茶馆",
+          "distance": "交通 / 机动日，未列徒步公里",
+          "ascent": "待 GPX / 官方路书核实",
+          "places": [
+            "Lukla 飞回 Kathmandu 或作天气缓冲"
+          ],
+          "direction_note": "山体区域：尼泊尔，昆布 / 萨加玛塔国家公园；常见起止：Lukla 往返；罗盘方位待地图 / GPX 复核",
+          "ascent_md": "无徒步爬升；视航班与天气安排",
+          "sleep_alt_m": 1400,
+          "max_alt_m": 2860,
+          "alt_note": "Lukla 2,860 m 飞回 Kathmandu 1,400 m（或 Manthali 474 m，再陆路）。天气延误则继续住 Lukla。",
+          "alt_confidence": "high"
+        }
+      ],
+      "sources": [
+        {
+          "title": "Nepal Tourism Board - Everest Base Camp",
+          "url": "https://ntb.gov.np/everest-base-camp"
+        },
+        {
+          "title": "Nepal Hiking Team - EBC daily map and distance",
+          "url": "https://www.nepalhikingteam.com/everest-base-camp-trek-map"
+        },
+        {
+          "title": "Himalayan Dream Team - EBC distance guide",
+          "url": "https://www.himalayandream.team/blog/everest-base-camp-trek-distance"
+        },
+        {
+          "title": "Going the Whole Hogg - EBC elevation gain/loss table",
+          "url": "https://www.goingthewholehogg.com/everest-base-camp-trek-guide/"
+        },
+        {
+          "title": "Places Nepal - EBC day-by-day elevation gain",
+          "url": "https://www.placesnepal.com/blog/everest-trek-itinerary-day-by-day-breakdown-from-lukla-to-base-camp"
+        },
+        {
+          "title": "Discover Altitude - EBC day-to-day altitude profile",
+          "url": "https://www.discoveraltitude.com/blog/everest-base-camp-trek-elevation"
+        }
+      ],
+      "search_text": "珠峰大本营徒步（everest base camp trek, ebc） 尼泊尔，昆布 / 萨加玛塔国家公园；常见起止：lukla 往返。 12–14 天（其中约 11–12 天徒步，另留飞行/天气缓冲） 约 120–135 km 往返（不同支线、是否登 kala patthar 会变） 累计爬升约 4,500–5,500 m；净海拔从 lukla 2,860 m 到 ebc 约 5,364 m。 ebc 约 5,364 m；常见观景点 kala patthar 约 5,545–5,644 m（口径有差异）。 全线茶馆/客栈为主；namche、dingboche、lobuche、gorak shep 越往上条件越基础。旺季建议提前订 namche 以上热门村落。 高：路线成熟、住宿与日程资料充足；累计爬升按常见行程估算。",
+      "lodging_tag": "茶馆/客栈",
+      "route_check": "已解析 GPX，可用于经典 EBC 的主线地理走向和坡段判断；Kala Patthar 仍按公开海拔表与实走笔记补充。",
+      "data_status": "已有 GPX：经典 EBC 主线；轨迹未真正登顶 Kala Patthar。；已生成 2D/3D 交互页。",
+      "links": [
+        {
+          "title": "2D 交互路书",
+          "url": "everest-base-camp/"
+        },
+        {
+          "title": "3D 地形版",
+          "url": "everest-base-camp/3d/"
+        }
+      ],
+      "image": "route-images/everest-base-camp.jpg"
+    },
+    {
+      "number": 2,
+      "name": "珠峰三垭口（Everest Three Passes Trek）",
+      "where": "尼泊尔，昆布地区；连接 Kongma La、Cho La、Renjo La，通常从 Lukla 出发成环。",
+      "duration": "17–22 天；此处按 18 天左右的常见逆/顺时针组合整理。",
+      "distance": "约 160–170 km（是否加入 EBC、Gokyo Ri、Kala Patthar 会影响总长）。",
+      "ascent": "累计爬升约 7,000–8,800 m（来源对支线和起止点口径不同）。",
+      "high_point": "Kongma La 约 5,535 m；Cho La 约 5,420 m；Renjo La 约 5,360–5,464 m。",
+      "lodging": "茶馆为主，但三垭口日之间村落少、海拔高；Cho La、Kongma La 日需早出发。淡季部分茶馆可能关闭。",
+      "confidence": "高：路线与村落清晰；累计爬升因顺/逆时针和支线差异较大。",
+      "days": [
+        {
+          "day": "D1",
+          "route_text": "Lukla → Phakding，约 8 km",
+          "lodging": "茶馆",
+          "distance": "约 8 km",
+          "ascent": "待 GPX / 官方路书核实",
+          "places": [
+            "Lukla",
+            "Phakding"
+          ],
+          "direction_note": "Lukla -> Phakding；山体区域：尼泊尔，昆布地区；连接 Kongma La、Cho La、Renjo La，通常从 Lukla 出发成环；罗盘方位待地图 / GPX 复核",
+          "ascent_md": "实际上升约 472 m，下降约 687 m；净下降约 235–250 m",
+          "sleep_alt_m": 2610,
+          "max_alt_m": 2860,
+          "alt_note": "Lukla 2,860 m → Phakding 2,610 m，Lukla 即当日最高点。",
+          "alt_confidence": "high"
+        },
+        {
+          "day": "D2",
+          "route_text": "Phakding → Namche，约 10 km",
+          "lodging": "茶馆",
+          "distance": "约 10 km",
+          "ascent": "待 GPX / 官方路书核实",
+          "places": [
+            "Phakding",
+            "Namche"
+          ],
+          "direction_note": "Phakding -> Namche；山体区域：尼泊尔，昆布地区；连接 Kongma La、Cho La、Renjo La，通常从 Lukla 出发成环；罗盘方位待地图 / GPX 复核",
+          "ascent_md": "实际上升约 1,628 m，下降约 851 m；净上升约 830–836 m",
+          "sleep_alt_m": 3440,
+          "max_alt_m": 3440,
+          "alt_note": "Phakding → Monjo → Namche 3,440 m，持续上升，Namche 即最高。",
+          "alt_confidence": "high"
+        },
+        {
+          "day": "D3",
+          "route_text": "Namche 适应日，Everest View / Khumjung 往返",
+          "lodging": "茶馆",
+          "distance": "未在原文列出",
+          "ascent": "待 GPX / 官方路书核实",
+          "places": [
+            "Namche 适应日"
+          ],
+          "direction_note": "山体区域：尼泊尔，昆布地区；连接 Kongma La、Cho La、Renjo La，通常从 Lukla 出发成环；罗盘方位待地图 / GPX 复核",
+          "ascent_md": "适应往返上升/下降约 550–740 m；睡眠海拔基本不变",
+          "sleep_alt_m": 3440,
+          "max_alt_m": 3880,
+          "alt_note": "适应日：上 Everest View / Syangboche ridge 3,880 m，经 Khumjung 3,790 m / Khunde 3,840 m。",
+          "alt_confidence": "high"
+        },
+        {
+          "day": "D4",
+          "route_text": "Namche → Thame，约 9–11 km",
+          "lodging": "茶馆",
+          "distance": "约 9–11 km",
+          "ascent": "待 GPX / 官方路书核实",
+          "places": [
+            "Namche",
+            "Thame"
+          ],
+          "direction_note": "Namche -> Thame；山体区域：尼泊尔，昆布地区；连接 Kongma La、Cho La、Renjo La，通常从 Lukla 出发成环；罗盘方位待地图 / GPX 复核",
+          "ascent_md": "净上升约 350–400 m；实际累计上升/下降需 GPX 复核",
+          "sleep_alt_m": 3800,
+          "max_alt_m": 3800,
+          "alt_note": "Namche → Thamo → Thame 3,800 m，沿 Bhote Koshi 起伏，Thame 即当日最高。",
+          "alt_confidence": "high"
+        },
+        {
+          "day": "D5",
+          "route_text": "Thame → Lungden / Marulung，约 10–12 km",
+          "lodging": "茶馆",
+          "distance": "约 10–12 km",
+          "ascent": "待 GPX / 官方路书核实",
+          "places": [
+            "Thame",
+            "Lungden",
+            "Marulung"
+          ],
+          "direction_note": "Thame -> Marulung；山体区域：尼泊尔，昆布地区；连接 Kongma La、Cho La、Renjo La，通常从 Lukla 出发成环；罗盘方位待地图 / GPX 复核",
+          "ascent_md": "净上升约 600 m；实际累计上升/下降需 GPX 复核",
+          "sleep_alt_m": 4380,
+          "max_alt_m": 4380,
+          "alt_note": "Thame → Marulung 4,210 m → Lungden 4,380 m。资料口径 4,350–4,500 m，取中位数。",
+          "alt_confidence": "medium"
+        },
+        {
+          "day": "D6",
+          "route_text": "Lungden → Renjo La → Gokyo，约 12 km",
+          "lodging": "茶馆",
+          "distance": "约 12 km",
+          "ascent": "待 GPX / 官方路书核实",
+          "places": [
+            "Lungden",
+            "Renjo La",
+            "Gokyo"
+          ],
+          "direction_note": "Lungden -> Gokyo；山体区域：尼泊尔，昆布地区；连接 Kongma La、Cho La、Renjo La，通常从 Lukla 出发成环；罗盘方位待地图 / GPX 复核",
+          "ascent_md": "上升约 700–1,000 m，下降约 600–700 m；Renjo La 约 5,360–5,464 m",
+          "sleep_alt_m": 4790,
+          "max_alt_m": 5360,
+          "alt_note": "Lungden → Renjo La 5,360 m（部分资料 5,345–5,417 m）→ Gokyo 4,790 m（Dudh Pokhari 湖畔）。",
+          "alt_confidence": "high"
+        },
+        {
+          "day": "D7",
+          "route_text": "Gokyo 适应/休整：Gokyo Ri 或湖区支线",
+          "lodging": "茶馆",
+          "distance": "未在原文列出",
+          "ascent": "待 GPX / 官方路书核实",
+          "places": [
+            "Gokyo 适应",
+            "休整：Gokyo Ri 或湖区支线"
+          ],
+          "direction_note": "Gokyo 适应 -> 休整：Gokyo Ri 或湖区支线；山体区域：尼泊尔，昆布地区；连接 Kongma La、Cho La、Renjo La，通常从 Lukla 出发成环；罗盘方位待地图 / GPX 复核",
+          "ascent_md": "Gokyo Ri 往返上升/下降约 605 m；湖区短线视选择变化",
+          "sleep_alt_m": 4790,
+          "max_alt_m": 5357,
+          "alt_note": "适应日：登 Gokyo Ri 5,357 m（主流选择），或第 4/5 湖区往返至 Scoundrel's Viewpoint ~4,990 m。",
+          "alt_confidence": "high"
+        },
+        {
+          "day": "D8",
+          "route_text": "Gokyo → Dragnag / Thagnak，约 4–6 km",
+          "lodging": "茶馆",
+          "distance": "约 4–6 km",
+          "ascent": "待 GPX / 官方路书核实",
+          "places": [
+            "Gokyo",
+            "Dragnag",
+            "Thagnak"
+          ],
+          "direction_note": "Gokyo -> Thagnak；山体区域：尼泊尔，昆布地区；连接 Kongma La、Cho La、Renjo La，通常从 Lukla 出发成环；罗盘方位待地图 / GPX 复核",
+          "ascent_md": "跨 Ngozumpa Glacier，按反向资料折算约上升 112 m、下降 184 m",
+          "sleep_alt_m": 4700,
+          "max_alt_m": 4750,
+          "alt_note": "Gokyo 4,790 m 穿 Ngozumpa Glacier 冰碛（~4,750 m）至 Dragnag / Thagnak 4,700 m。短日为 Cho La 蓄力。",
+          "alt_confidence": "high"
+        },
+        {
+          "day": "D9",
+          "route_text": "Dragnag → Cho La → Dzongla，约 11–13 km",
+          "lodging": "茶馆",
+          "distance": "约 11–13 km",
+          "ascent": "待 GPX / 官方路书核实",
+          "places": [
+            "Dragnag",
+            "Cho La",
+            "Dzongla"
+          ],
+          "direction_note": "Dragnag -> Dzongla；山体区域：尼泊尔，昆布地区；连接 Kongma La、Cho La、Renjo La，通常从 Lukla 出发成环；罗盘方位待地图 / GPX 复核",
+          "ascent_md": "按本文方向折算约上升 803 m、下降 653 m；Cho La 约 5,420 m",
+          "sleep_alt_m": 4830,
+          "max_alt_m": 5420,
+          "alt_note": "Dragnag → Cho La 5,420 m（部分资料 5,368–5,420 m）→ Dzongla 4,830 m。冰川垭口，西侧有短促陡冰段。",
+          "alt_confidence": "high"
+        },
+        {
+          "day": "D10",
+          "route_text": "Dzongla → Lobuche，约 6–8 km",
+          "lodging": "茶馆",
+          "distance": "约 6–8 km",
+          "ascent": "待 GPX / 官方路书核实",
+          "places": [
+            "Dzongla",
+            "Lobuche"
+          ],
+          "direction_note": "Dzongla -> Lobuche；山体区域：尼泊尔，昆布地区；连接 Kongma La、Cho La、Renjo La，通常从 Lukla 出发成环；罗盘方位待地图 / GPX 复核",
+          "ascent_md": "按反向资料折算约上升 321 m、下降 230 m",
+          "sleep_alt_m": 4940,
+          "max_alt_m": 4940,
+          "alt_note": "Dzongla 绕 Cholatse 山脚至 Lobuche 4,940 m，单调上升，Lobuche 即最高。",
+          "alt_confidence": "high"
+        },
+        {
+          "day": "D11",
+          "route_text": "Lobuche → Gorak Shep → EBC → Gorak Shep，约 11–12 km",
+          "lodging": "茶馆",
+          "distance": "约 11–12 km",
+          "ascent": "待 GPX / 官方路书核实",
+          "places": [
+            "Lobuche",
+            "Gorak Shep",
+            "EBC",
+            "Gorak Shep"
+          ],
+          "direction_note": "Lobuche -> Gorak Shep；山体区域：尼泊尔，昆布地区；连接 Kongma La、Cho La、Renjo La，通常从 Lukla 出发成环；罗盘方位待地图 / GPX 复核",
+          "ascent_md": "Lobuche 至 EBC 最高点累计上升约 454 m；睡眠海拔净上升约 250 m",
+          "sleep_alt_m": 5164,
+          "max_alt_m": 5364,
+          "alt_note": "Lobuche → Gorak Shep 5,164 m → EBC 5,364 m，回 Gorak Shep 住。",
+          "alt_confidence": "high"
+        },
+        {
+          "day": "D12",
+          "route_text": "Gorak Shep → Kala Patthar → Lobuche / Dingboche，约 12–16 km",
+          "lodging": "茶馆",
+          "distance": "约 12–16 km",
+          "ascent": "待 GPX / 官方路书核实",
+          "places": [
+            "Gorak Shep",
+            "Kala Patthar",
+            "Lobuche",
+            "Dingboche"
+          ],
+          "direction_note": "Gorak Shep -> Dingboche；山体区域：尼泊尔，昆布地区；连接 Kongma La、Cho La、Renjo La，通常从 Lukla 出发成环；罗盘方位待地图 / GPX 复核",
+          "ascent_md": "Kala Patthar 上升约 381–495 m；下撤至 Lobuche / Dingboche 的下降随终点变化",
+          "sleep_alt_m": 4410,
+          "max_alt_m": 5644,
+          "alt_note": "凌晨登 Kala Patthar（5,545 m 石堆 / 5,644 m 真峰），下撤经 Lobuche 至 Dingboche 4,410 m（为接 Chhukung 做准备）。",
+          "alt_confidence": "high"
+        },
+        {
+          "day": "D13",
+          "route_text": "Dingboche / Chhukung 适应与短线调整",
+          "lodging": "茶馆",
+          "distance": "未在原文列出",
+          "ascent": "待 GPX / 官方路书核实",
+          "places": [
+            "Dingboche",
+            "Chhukung 适应与短线调整"
+          ],
+          "direction_note": "Dingboche -> Chhukung 适应与短线调整；山体区域：尼泊尔，昆布地区；连接 Kongma La、Cho La、Renjo La，通常从 Lukla 出发成环；罗盘方位待地图 / GPX 复核",
+          "ascent_md": "Dingboche → Chhukung 净上升约 320 m；Chhukung Ri 往返可上升/下降约 645–810 m",
+          "sleep_alt_m": 4730,
+          "max_alt_m": 5546,
+          "alt_note": "Dingboche → Chhukung 4,730 m，再登 Chhukung Ri 5,546 m（资料 5,550 m），夜宿 Chhukung 为 Kongma La 占位。",
+          "alt_confidence": "high"
+        },
+        {
+          "day": "D14",
+          "route_text": "Chhukung → Kongma La → Lobuche，约 12–14 km",
+          "lodging": "茶馆",
+          "distance": "约 12–14 km",
+          "ascent": "待 GPX / 官方路书核实",
+          "places": [
+            "Chhukung",
+            "Kongma La",
+            "Lobuche"
+          ],
+          "direction_note": "Chhukung -> Lobuche；山体区域：尼泊尔，昆布地区；连接 Kongma La、Cho La、Renjo La，通常从 Lukla 出发成环；罗盘方位待地图 / GPX 复核",
+          "ascent_md": "实际上升约 973 m，下降约 792 m；Kongma La 约 5,535 m",
+          "sleep_alt_m": 4940,
+          "max_alt_m": 5535,
+          "alt_note": "Chhukung → Kongma La 5,535 m（资料 5,528–5,545 m）→ 穿 Khumbu Glacier 冰碛 → Lobuche 4,940 m。三垭口最高、最难的一天。",
+          "alt_confidence": "high"
+        },
+        {
+          "day": "D15",
+          "route_text": "Lobuche / Dingboche → Tengboche / Deboche",
+          "lodging": "茶馆",
+          "distance": "未在原文列出",
+          "ascent": "待 GPX / 官方路书核实",
+          "places": [
+            "Lobuche",
+            "Dingboche",
+            "Tengboche",
+            "Deboche"
+          ],
+          "direction_note": "Lobuche -> Deboche；山体区域：尼泊尔，昆布地区；连接 Kongma La、Cho La、Renjo La，通常从 Lukla 出发成环；罗盘方位待地图 / GPX 复核",
+          "ascent_md": "下降为主；若 Dingboche → Tengboche，约上升 486–513 m、下降 944–950 m",
+          "sleep_alt_m": 3860,
+          "max_alt_m": 4940,
+          "alt_note": "Lobuche 长下经 Pheriche / Dingboche → Pangboche → Tengboche 3,860 m（或 Deboche 3,820 m）；Lobuche 起点即最高。",
+          "alt_confidence": "high"
+        },
+        {
+          "day": "D16",
+          "route_text": "Tengboche / Deboche → Namche",
+          "lodging": "茶馆",
+          "distance": "未在原文列出",
+          "ascent": "待 GPX / 官方路书核实",
+          "places": [
+            "Tengboche",
+            "Deboche",
+            "Namche"
+          ],
+          "direction_note": "Tengboche -> Namche；山体区域：尼泊尔，昆布地区；连接 Kongma La、Cho La、Renjo La，通常从 Lukla 出发成环；罗盘方位待地图 / GPX 复核",
+          "ascent_md": "按反向资料折算约上升 753 m、下降 1,197 m",
+          "sleep_alt_m": 3440,
+          "max_alt_m": 3860,
+          "alt_note": "Tengboche → Phunki Tenga 3,250 m → 回升至 Namche 3,440 m；Tengboche 起点即最高。",
+          "alt_confidence": "high"
+        },
+        {
+          "day": "D17",
+          "route_text": "Namche → Lukla",
+          "lodging": "茶馆",
+          "distance": "未在原文列出",
+          "ascent": "待 GPX / 官方路书核实",
+          "places": [
+            "Namche",
+            "Lukla"
+          ],
+          "direction_note": "Namche -> Lukla；山体区域：尼泊尔，昆布地区；连接 Kongma La、Cho La、Renjo La，通常从 Lukla 出发成环；罗盘方位待地图 / GPX 复核",
+          "ascent_md": "实际上升约 1,571 m、下降约 2,133 m；净下降约 580–600 m",
+          "sleep_alt_m": 2860,
+          "max_alt_m": 3440,
+          "alt_note": "Namche → Phakding → Lukla 2,860 m。Namche 起点即最高，沿途有数次 ~2,800–2,900 m 的小反爬。",
+          "alt_confidence": "high"
+        },
+        {
+          "day": "D18",
+          "route_text": "Lukla 飞出或天气缓冲",
+          "lodging": "酒店/茶馆",
+          "distance": "交通 / 机动日，未列徒步公里",
+          "ascent": "待 GPX / 官方路书核实",
+          "places": [
+            "Lukla 飞出或天气缓冲"
+          ],
+          "direction_note": "山体区域：尼泊尔，昆布地区；连接 Kongma La、Cho La、Renjo La，通常从 Lukla 出发成环；罗盘方位待地图 / GPX 复核",
+          "ascent_md": "无徒步爬升；视航班与天气安排",
+          "sleep_alt_m": 2860,
+          "max_alt_m": 2860,
+          "alt_note": "Lukla 缓冲日 / 飞 Kathmandu。无新爬升；天气延误住 Lukla 海拔不变。",
+          "alt_confidence": "high"
+        }
+      ],
+      "sources": [
+        {
+          "title": "Green Valley Nepal Treks - Three Passes map, daily km and altitude",
+          "url": "https://www.greenvalleynepaltreks.com/travel-guides/everest-three-passes-trek-map"
+        },
+        {
+          "title": "Going the Whole Hogg - Three Passes route and accommodation notes",
+          "url": "https://www.goingthewholehogg.com/everest-three-passes-trekking-route-guide/"
+        },
+        {
+          "title": "Excellent Trek - Three Passes distance guide",
+          "url": "https://excellenttrek.com/three-passes-trek-distance-km-miles-everest-base-camp-elevation/"
+        },
+        {
+          "title": "Going the Whole Hogg - Three Passes elevation gain/loss table",
+          "url": "https://www.goingthewholehogg.com/everest-three-passes-trek-guide/"
+        },
+        {
+          "title": "All Nepal Hiking - Three Passes itinerary and highlights",
+          "url": "https://allnepalhiking.com/blog/everest-three-passes-trek-guide"
+        },
+        {
+          "title": "Next Trip Nepal - Three Pass day-by-day viewpoints",
+          "url": "https://nexttripnepal.com/everest-three-pass-trek-day-by-day-guide/"
+        }
+      ],
+      "search_text": "珠峰三垭口（everest three passes trek） 尼泊尔，昆布地区；连接 kongma la、cho la、renjo la，通常从 lukla 出发成环。 17–22 天；此处按 18 天左右的常见逆/顺时针组合整理。 约 160–170 km（是否加入 ebc、gokyo ri、kala patthar 会影响总长）。 累计爬升约 7,000–8,800 m（来源对支线和起止点口径不同）。 kongma la 约 5,535 m；cho la 约 5,420 m；renjo la 约 5,360–5,464 m。 茶馆为主，但三垭口日之间村落少、海拔高；cho la、kongma la 日需早出发。淡季部分茶馆可能关闭。 高：路线与村落清晰；累计爬升因顺/逆时针和支线差异较大。",
+      "lodging_tag": "茶馆/客栈",
+      "route_check": "已有 EBC 三垭口与陆路 EBC 大环 KML，可用于三垭口方向、路线形状和高海拔区间；Renjo La 段建议后续再补完整 GPX 复核。",
+      "data_status": "已有 KML：三垭口 / 陆路大环变体。；已生成 2D/3D 交互页。",
+      "links": [
+        {
+          "title": "2D 交互路书",
+          "url": "everest-three-passes/"
+        },
+        {
+          "title": "3D 地形版",
+          "url": "everest-three-passes/3d/"
+        }
+      ],
+      "image": "route-images/everest-three-passes.jpg"
+    },
+    {
+      "number": 3,
+      "name": "EBC + Gokyo 小环 / Kongma La + Cho La 变体",
+      "where": "尼泊尔，昆布地区；Lukla / Surke 入山，经 Namche、Chhukung、Kongma La、EBC、Cho La、Gokyo 后回撤。",
+      "duration": "约 12–16 天，取决于是否走完整三垭口和是否陆路进出。",
+      "distance": "已有轨迹约 156–166 km。",
+      "ascent": "已有轨迹累计爬升约 6,700–7,400 m；口径随记录方式变化。",
+      "high_point": "Kongma La / Cho La / Gokyo Ri / Kala Patthar 均为 5,300–5,600 m 级。",
+      "lodging": "茶馆为主；垭口日无补给或补给稀疏。",
+      "confidence": "中高：已有 KML + GPX，但不代表完整 Renjo La 三垭口。",
+      "lodging_tag": "茶馆/客栈",
+      "data_status": "已有 KML + GPX：EBC、Gokyo、Kongma La、Cho La。；已生成 2D/3D 交互页。",
+      "route_check": "该组数据适合 EBC + Gokyo / Kongma La / Cho La 变体，不应单独代表完整三垭口。",
+      "search_text": "EBC Gokyo Kongma La Cho La 小环 尼泊尔 昆布 茶馆",
+      "links": [
+        {
+          "title": "2D 交互路书",
+          "url": "everest-gokyo-kongma-cho-la/"
+        },
+        {
+          "title": "3D 地形版",
+          "url": "everest-gokyo-kongma-cho-la/3d/"
+        }
+      ],
+      "sources": [],
+      "days": [
+        {
+          "day": "S1",
+          "route_text": "Lukla / Surke → Namche 一带，入山强爬升",
+          "distance": "按轨迹分段约 24–36 km",
+          "ascent": "强爬升段集中在 Phakding / Monjo → Namche",
+          "lodging": "茶馆"
+        },
+        {
+          "day": "S2",
+          "route_text": "Namche → Dingboche / Chhukung，持续爬升适应",
+          "distance": "按行程拆分",
+          "ascent": "缓爬至高海拔谷地",
+          "lodging": "茶馆"
+        },
+        {
+          "day": "S3",
+          "route_text": "Chhukung → Kongma La → Lobuche",
+          "distance": "垭口长日",
+          "ascent": "主爬升 + 技术下降",
+          "lodging": "茶馆"
+        },
+        {
+          "day": "S4",
+          "route_text": "Lobuche / Gorak Shep → EBC / Kala Patthar",
+          "distance": "冰碛与观景支线",
+          "ascent": "高海拔缓爬 + 观景台爬升",
+          "lodging": "茶馆"
+        },
+        {
+          "day": "S5",
+          "route_text": "Dzongla → Cho La → Thagnak / Dragnag → Gokyo",
+          "distance": "垭口 + 冰川横切",
+          "ascent": "强爬升 / 强下降 / 冰川横切",
+          "lodging": "茶馆"
+        },
+        {
+          "day": "S6",
+          "route_text": "Gokyo / Gokyo Ri → Dole / Phortse / Namche 回撤",
+          "distance": "长下降",
+          "ascent": "下降为主，局部起伏",
+          "lodging": "茶馆"
+        }
+      ],
+      "image": "route-images/everest-gokyo-kongma-cho-la.jpg"
+    },
+    {
+      "number": 4,
+      "name": "安纳普尔纳大环（Annapurna Circuit Trek）",
+      "where": "尼泊尔中部，绕安纳普尔纳山群；常见从 Besisahar / Jagat / Dharapani 一带开始，经 Manang、Thorong La、Muktinath 至 Jomsom / Nayapul / Pokhara。",
+      "duration": "10–21 天；完整步行版常见 15–18 天，压缩版会大量用车。",
+      "distance": "约 160–230 km，取决于起止点和公路替代长度。",
+      "ascent": "累计爬升约 7,000–9,000 m；资料口径差异大。",
+      "high_point": "Thorong La Pass 约 5,416 m。",
+      "lodging": "茶馆/山屋为主，Manang 之前和 Muktinath / Jomsom 一带条件较好；High Camp / Thorong Phedi 条件较基础。",
+      "confidence": "中高：日程成熟；距离/爬升随起止点与用车比例变化非常大。",
+      "days": [
+        {
+          "day": "D1",
+          "route_text": "Besisahar / Bhulbhule → Jagat，常可部分乘车，徒步约 8–15 km",
+          "lodging": "茶馆",
+          "distance": "约 8–15 km",
+          "ascent": "待 GPX / 官方路书核实",
+          "places": [
+            "Besisahar",
+            "Bhulbhule",
+            "Jagat"
+          ],
+          "direction_note": "Besisahar -> Jagat；山体区域：尼泊尔中部，绕安纳普尔纳山群；常见从 Besisahar / Jagat / Dharapani 一带开始，经 Manang、Thorong La、Muktinath 至 Jomsom / Nayapul / Pokhara；罗盘方位待地图 / GPX 复核"
+        },
+        {
+          "day": "D2",
+          "route_text": "Jagat → Dharapani，约 14–16 km",
+          "lodging": "茶馆",
+          "distance": "约 14–16 km",
+          "ascent": "待 GPX / 官方路书核实",
+          "places": [
+            "Jagat",
+            "Dharapani"
+          ],
+          "direction_note": "Jagat -> Dharapani；山体区域：尼泊尔中部，绕安纳普尔纳山群；常见从 Besisahar / Jagat / Dharapani 一带开始，经 Manang、Thorong La、Muktinath 至 Jomsom / Nayapul / Pokhara；罗盘方位待地图 / GPX 复核"
+        },
+        {
+          "day": "D3",
+          "route_text": "Dharapani → Chame，约 15–16 km",
+          "lodging": "茶馆",
+          "distance": "约 15–16 km",
+          "ascent": "待 GPX / 官方路书核实",
+          "places": [
+            "Dharapani",
+            "Chame"
+          ],
+          "direction_note": "Dharapani -> Chame；山体区域：尼泊尔中部，绕安纳普尔纳山群；常见从 Besisahar / Jagat / Dharapani 一带开始，经 Manang、Thorong La、Muktinath 至 Jomsom / Nayapul / Pokhara；罗盘方位待地图 / GPX 复核"
+        },
+        {
+          "day": "D4",
+          "route_text": "Chame → Upper Pisang，约 13–15 km",
+          "lodging": "茶馆",
+          "distance": "约 13–15 km",
+          "ascent": "待 GPX / 官方路书核实",
+          "places": [
+            "Chame",
+            "Upper Pisang"
+          ],
+          "direction_note": "Chame -> Upper Pisang；山体区域：尼泊尔中部，绕安纳普尔纳山群；常见从 Besisahar / Jagat / Dharapani 一带开始，经 Manang、Thorong La、Muktinath 至 Jomsom / Nayapul / Pokhara；罗盘方位待地图 / GPX 复核"
+        },
+        {
+          "day": "D5",
+          "route_text": "Upper Pisang → Manang，经 Ghyaru / Ngawal 高线更利于适应，约 17–20 km",
+          "lodging": "茶馆",
+          "distance": "约 17–20 km",
+          "ascent": "待 GPX / 官方路书核实",
+          "places": [
+            "Upper Pisang",
+            "Manang"
+          ],
+          "direction_note": "Upper Pisang -> Manang；山体区域：尼泊尔中部，绕安纳普尔纳山群；常见从 Besisahar / Jagat / Dharapani 一带开始，经 Manang、Thorong La、Muktinath 至 Jomsom / Nayapul / Pokhara；罗盘方位待地图 / GPX 复核"
+        },
+        {
+          "day": "D6",
+          "route_text": "Manang 适应日：Gangapurna Lake / Ice Lake / Praken Gompa 支线",
+          "lodging": "茶馆",
+          "distance": "未在原文列出",
+          "ascent": "待 GPX / 官方路书核实",
+          "places": [
+            "Manang 适应日：Gangapurna Lake",
+            "Ice Lake",
+            "Praken Gompa 支线"
+          ],
+          "direction_note": "Manang 适应日：Gangapurna Lake -> Praken Gompa 支线；山体区域：尼泊尔中部，绕安纳普尔纳山群；常见从 Besisahar / Jagat / Dharapani 一带开始，经 Manang、Thorong La、Muktinath 至 Jomsom / Nayapul / Pokhara；罗盘方位待地图 / GPX 复核"
+        },
+        {
+          "day": "D7",
+          "route_text": "Manang → Yak Kharka，约 9–11 km",
+          "lodging": "茶馆",
+          "distance": "约 9–11 km",
+          "ascent": "待 GPX / 官方路书核实",
+          "places": [
+            "Manang",
+            "Yak Kharka"
+          ],
+          "direction_note": "Manang -> Yak Kharka；山体区域：尼泊尔中部，绕安纳普尔纳山群；常见从 Besisahar / Jagat / Dharapani 一带开始，经 Manang、Thorong La、Muktinath 至 Jomsom / Nayapul / Pokhara；罗盘方位待地图 / GPX 复核"
+        },
+        {
+          "day": "D8",
+          "route_text": "Yak Kharka → Thorong Phedi / High Camp，约 6–8 km",
+          "lodging": "茶馆",
+          "distance": "约 6–8 km",
+          "ascent": "待 GPX / 官方路书核实",
+          "places": [
+            "Yak Kharka",
+            "Thorong Phedi",
+            "High Camp"
+          ],
+          "direction_note": "Yak Kharka -> High Camp；山体区域：尼泊尔中部，绕安纳普尔纳山群；常见从 Besisahar / Jagat / Dharapani 一带开始，经 Manang、Thorong La、Muktinath 至 Jomsom / Nayapul / Pokhara；罗盘方位待地图 / GPX 复核"
+        },
+        {
+          "day": "D9",
+          "route_text": "Thorong Phedi / High Camp → Thorong La → Muktinath，约 14–16 km",
+          "lodging": "茶馆",
+          "distance": "约 14–16 km",
+          "ascent": "待 GPX / 官方路书核实",
+          "places": [
+            "Thorong Phedi",
+            "High Camp",
+            "Thorong La",
+            "Muktinath"
+          ],
+          "direction_note": "Thorong Phedi -> Muktinath；山体区域：尼泊尔中部，绕安纳普尔纳山群；常见从 Besisahar / Jagat / Dharapani 一带开始，经 Manang、Thorong La、Muktinath 至 Jomsom / Nayapul / Pokhara；罗盘方位待地图 / GPX 复核"
+        },
+        {
+          "day": "D10",
+          "route_text": "Muktinath → Kagbeni / Jomsom，约 10–18 km",
+          "lodging": "茶馆",
+          "distance": "约 10–18 km",
+          "ascent": "待 GPX / 官方路书核实",
+          "places": [
+            "Muktinath",
+            "Kagbeni",
+            "Jomsom"
+          ],
+          "direction_note": "Muktinath -> Jomsom；山体区域：尼泊尔中部，绕安纳普尔纳山群；常见从 Besisahar / Jagat / Dharapani 一带开始，经 Manang、Thorong La、Muktinath 至 Jomsom / Nayapul / Pokhara；罗盘方位待地图 / GPX 复核"
+        },
+        {
+          "day": "D11",
+          "route_text": "Jomsom → Marpha / Tukuche，约 6–13 km；也常乘车避尘",
+          "lodging": "茶馆",
+          "distance": "约 6–13 km",
+          "ascent": "待 GPX / 官方路书核实",
+          "places": [
+            "Jomsom",
+            "Marpha",
+            "Tukuche"
+          ],
+          "direction_note": "Jomsom -> Tukuche；山体区域：尼泊尔中部，绕安纳普尔纳山群；常见从 Besisahar / Jagat / Dharapani 一带开始，经 Manang、Thorong La、Muktinath 至 Jomsom / Nayapul / Pokhara；罗盘方位待地图 / GPX 复核"
+        },
+        {
+          "day": "D12",
+          "route_text": "Marpha / Tukuche → Kalopani / Lete，约 18–22 km",
+          "lodging": "茶馆",
+          "distance": "约 18–22 km",
+          "ascent": "待 GPX / 官方路书核实",
+          "places": [
+            "Marpha",
+            "Tukuche",
+            "Kalopani",
+            "Lete"
+          ],
+          "direction_note": "Marpha -> Lete；山体区域：尼泊尔中部，绕安纳普尔纳山群；常见从 Besisahar / Jagat / Dharapani 一带开始，经 Manang、Thorong La、Muktinath 至 Jomsom / Nayapul / Pokhara；罗盘方位待地图 / GPX 复核"
+        },
+        {
+          "day": "D13",
+          "route_text": "Kalopani → Tatopani，约 20–24 km",
+          "lodging": "茶馆",
+          "distance": "约 20–24 km",
+          "ascent": "待 GPX / 官方路书核实",
+          "places": [
+            "Kalopani",
+            "Tatopani"
+          ],
+          "direction_note": "Kalopani -> Tatopani；山体区域：尼泊尔中部，绕安纳普尔纳山群；常见从 Besisahar / Jagat / Dharapani 一带开始，经 Manang、Thorong La、Muktinath 至 Jomsom / Nayapul / Pokhara；罗盘方位待地图 / GPX 复核"
+        },
+        {
+          "day": "D14",
+          "route_text": "Tatopani → Ghorepani，约 15–17 km，上升明显",
+          "lodging": "茶馆",
+          "distance": "约 15–17 km",
+          "ascent": "待 GPX / 官方路书核实",
+          "places": [
+            "Tatopani",
+            "Ghorepani"
+          ],
+          "direction_note": "Tatopani -> Ghorepani；山体区域：尼泊尔中部，绕安纳普尔纳山群；常见从 Besisahar / Jagat / Dharapani 一带开始，经 Manang、Thorong La、Muktinath 至 Jomsom / Nayapul / Pokhara；罗盘方位待地图 / GPX 复核"
+        },
+        {
+          "day": "D15",
+          "route_text": "Ghorepani → Poon Hill → Nayapul / Ulleri，转车 Pokhara",
+          "lodging": "茶馆/酒店",
+          "distance": "未在原文列出",
+          "ascent": "待 GPX / 官方路书核实",
+          "places": [
+            "Ghorepani",
+            "Poon Hill",
+            "Nayapul",
+            "Ulleri"
+          ],
+          "direction_note": "Ghorepani -> Ulleri；山体区域：尼泊尔中部，绕安纳普尔纳山群；常见从 Besisahar / Jagat / Dharapani 一带开始，经 Manang、Thorong La、Muktinath 至 Jomsom / Nayapul / Pokhara；罗盘方位待地图 / GPX 复核"
+        }
+      ],
+      "sources": [
+        {
+          "title": "Nepal Intrepid Treks - Annapurna Circuit distance and route options",
+          "url": "https://www.nepalintrepidtreks.com/how-long-is-the-annapurna-circuit/"
+        },
+        {
+          "title": "Hi Nepal Treks - Annapurna Circuit day-by-day distance",
+          "url": "https://hinepaltreks.com/annapurna-circuit-trek-distance"
+        },
+        {
+          "title": "Himalayan Dream Team - Annapurna Circuit distance guide",
+          "url": "https://www.himalayandream.team/blog/annapurna-circuit-trek-distance-guide"
+        }
+      ],
+      "search_text": "安纳普尔纳大环（annapurna circuit trek） 尼泊尔中部，绕安纳普尔纳山群；常见从 besisahar / jagat / dharapani 一带开始，经 manang、thorong la、muktinath 至 jomsom / nayapul / pokhara。 10–21 天；完整步行版常见 15–18 天，压缩版会大量用车。 约 160–230 km，取决于起止点和公路替代长度。 累计爬升约 7,000–9,000 m；资料口径差异大。 thorong la pass 约 5,416 m。 茶馆/山屋为主，manang 之前和 muktinath / jomsom 一带条件较好；high camp / thorong phedi 条件较基础。 中高：日程成熟；距离/爬升随起止点与用车比例变化非常大。",
+      "lodging_tag": "茶馆/客栈",
+      "data_status": "已有 KML：ACT 核心段，覆盖 Chame / Manang / Thorong La / Muktinath。；已生成 2D/3D 交互页。",
+      "links": [
+        {
+          "title": "2D 交互路书",
+          "url": "annapurna-circuit/"
+        },
+        {
+          "title": "3D 地形版",
+          "url": "annapurna-circuit/3d/"
+        }
+      ],
+      "route_check": "已有两条 ACT KML，主要用于校准 Thorong La 前后坡度和方位；不覆盖完整 Besisahar → Pokhara 全步行版。",
+      "image": "route-images/annapurna-circuit.jpg"
+    },
+    {
+      "number": 5,
+      "name": "Annapurna Base Camp + Poon Hill",
+      "where": "尼泊尔，安纳普尔纳保护区；常见从 Ghandruk / Nayapul 一带进入 Modi Khola 山谷，经 MBC / ABC 后接 Ghorepani / Poon Hill。",
+      "duration": "约 6–9 天，取决于起止点和是否接 Poon Hill。",
+      "distance": "已有 KML 约 65–75 km。",
+      "ascent": "已有 KML 累计爬升约 5,200 m；部分文件有异常 0 m 海拔点，爬升需谨慎。",
+      "high_point": "Annapurna Base Camp 约 4,130 m。",
+      "lodging": "全线茶馆 / 山屋为主。",
+      "confidence": "中高：已有 KML 可用于路线走向；异常海拔点需过滤。",
+      "lodging_tag": "茶馆/客栈",
+      "data_status": "已有 KML：ABC + Poon Hill。；已生成 2D/3D 交互页。",
+      "route_check": "适合制作 ABC 雪山剧场 + Poon Hill 日出观景路线图。",
+      "search_text": "Annapurna Base Camp ABC Poon Hill Nepal trekking teahouse",
+      "links": [
+        {
+          "title": "2D 交互路书",
+          "url": "annapurna-base-camp-poon-hill/"
+        },
+        {
+          "title": "3D 地形版",
+          "url": "annapurna-base-camp-poon-hill/3d/"
+        }
+      ],
+      "sources": [],
+      "days": [
+        {
+          "day": "S1",
+          "route_text": "Ghandruk / Nayapul → Chhomrong → Sinuwa / Bamboo",
+          "distance": "按轨迹约 1–2 日",
+          "ascent": "台阶和山谷爬升",
+          "lodging": "茶馆"
+        },
+        {
+          "day": "S2",
+          "route_text": "Bamboo / Deurali → MBC → ABC",
+          "distance": "核心上行段",
+          "ascent": "红 / 橙主爬升",
+          "lodging": "茶馆"
+        },
+        {
+          "day": "S3",
+          "route_text": "ABC → Bamboo / Chhomrong 回撤",
+          "distance": "长下降",
+          "ascent": "下降为主",
+          "lodging": "茶馆"
+        },
+        {
+          "day": "S4",
+          "route_text": "Tadapani / Ghorepani → Poon Hill 支线",
+          "distance": "观景台支线",
+          "ascent": "短爬升",
+          "lodging": "茶馆"
+        }
+      ],
+      "image": "route-images/annapurna-base-camp-poon-hill.jpg"
+    },
+    {
+      "number": 6,
+      "name": "K2 Base Camp + Gondogoro La Trek",
+      "where": "巴基斯坦 Gilgit-Baltistan / 喀喇昆仑；Askole 进，Baltoro Glacier、Concordia、K2 Base Camp，经 Gondogoro La 出 Hushe。",
+      "duration": "18–21 天总行程；核心徒步约 12–14 天。",
+      "distance": "约 160–180 km（路线与是否到 K2 BC / Broad Peak BC 有差异）。",
+      "ascent": "累计爬升约 4,500–6,000 m；冰川起伏和垭口技术路段使体感远高于数字。",
+      "high_point": "Gondogoro La 约 5,585–5,650 m；K2 BC 约 5,150 m 级。",
+      "lodging": "Skardu / Islamabad 住酒店；徒步全程团队露营，需持证向导、厨师、背夫/驮队；Gondogoro La 常涉及绳索与冰雪安全。",
+      "confidence": "中高：路线骨架可靠；实际营地、直升机/天气缓冲、Gondogoro La 开放与绳索状况需当季确认。",
+      "days": [
+        {
+          "day": "D1",
+          "route_text": "Islamabad → Skardu，飞行或备用车程",
+          "lodging": "酒店",
+          "distance": "未在原文列出",
+          "ascent": "待 GPX / 官方路书核实",
+          "places": [
+            "Islamabad",
+            "Skardu"
+          ],
+          "direction_note": "Islamabad -> Skardu；山体区域：巴基斯坦 Gilgit-Baltistan / 喀喇昆仑；Askole 进，Baltoro Glacier、Concordia、K2 Base Camp，经 Gondogoro La 出 Hushe；罗盘方位待地图 / GPX 复核"
+        },
+        {
+          "day": "D2",
+          "route_text": "Skardu 许可/补给/机动",
+          "lodging": "酒店",
+          "distance": "未在原文列出",
+          "ascent": "待 GPX / 官方路书核实",
+          "places": [
+            "Skardu 许可",
+            "补给",
+            "机动"
+          ],
+          "direction_note": "Skardu 许可 -> 机动；山体区域：巴基斯坦 Gilgit-Baltistan / 喀喇昆仑；Askole 进，Baltoro Glacier、Concordia、K2 Base Camp，经 Gondogoro La 出 Hushe；罗盘方位待地图 / GPX 复核"
+        },
+        {
+          "day": "D3",
+          "route_text": "Skardu → Askole / Jhula，车程，视路况而定",
+          "lodging": "营地",
+          "distance": "未在原文列出",
+          "ascent": "待 GPX / 官方路书核实",
+          "places": [
+            "Skardu",
+            "Askole",
+            "Jhula"
+          ],
+          "direction_note": "Skardu -> Jhula；山体区域：巴基斯坦 Gilgit-Baltistan / 喀喇昆仑；Askole 进，Baltoro Glacier、Concordia、K2 Base Camp，经 Gondogoro La 出 Hushe；罗盘方位待地图 / GPX 复核"
+        },
+        {
+          "day": "D4",
+          "route_text": "Askole / Jhula → Paiju，约 18–22 km",
+          "lodging": "营地",
+          "distance": "约 18–22 km",
+          "ascent": "待 GPX / 官方路书核实",
+          "places": [
+            "Askole",
+            "Jhula",
+            "Paiju"
+          ],
+          "direction_note": "Askole -> Paiju；山体区域：巴基斯坦 Gilgit-Baltistan / 喀喇昆仑；Askole 进，Baltoro Glacier、Concordia、K2 Base Camp，经 Gondogoro La 出 Hushe；罗盘方位待地图 / GPX 复核"
+        },
+        {
+          "day": "D5",
+          "route_text": "Paiju 休整/背夫补给/适应",
+          "lodging": "营地",
+          "distance": "未在原文列出",
+          "ascent": "待 GPX / 官方路书核实",
+          "places": [
+            "Paiju 休整",
+            "背夫补给",
+            "适应"
+          ],
+          "direction_note": "Paiju 休整 -> 适应；山体区域：巴基斯坦 Gilgit-Baltistan / 喀喇昆仑；Askole 进，Baltoro Glacier、Concordia、K2 Base Camp，经 Gondogoro La 出 Hushe；罗盘方位待地图 / GPX 复核"
+        },
+        {
+          "day": "D6",
+          "route_text": "Paiju → Khoburtse，约 14–16 km",
+          "lodging": "营地",
+          "distance": "约 14–16 km",
+          "ascent": "待 GPX / 官方路书核实",
+          "places": [
+            "Paiju",
+            "Khoburtse"
+          ],
+          "direction_note": "Paiju -> Khoburtse；山体区域：巴基斯坦 Gilgit-Baltistan / 喀喇昆仑；Askole 进，Baltoro Glacier、Concordia、K2 Base Camp，经 Gondogoro La 出 Hushe；罗盘方位待地图 / GPX 复核"
+        },
+        {
+          "day": "D7",
+          "route_text": "Khoburtse → Urdukas，约 6–8 km",
+          "lodging": "营地",
+          "distance": "约 6–8 km",
+          "ascent": "待 GPX / 官方路书核实",
+          "places": [
+            "Khoburtse",
+            "Urdukas"
+          ],
+          "direction_note": "Khoburtse -> Urdukas；山体区域：巴基斯坦 Gilgit-Baltistan / 喀喇昆仑；Askole 进，Baltoro Glacier、Concordia、K2 Base Camp，经 Gondogoro La 出 Hushe；罗盘方位待地图 / GPX 复核"
+        },
+        {
+          "day": "D8",
+          "route_text": "Urdukas → Goro II，约 11–13 km",
+          "lodging": "营地",
+          "distance": "约 11–13 km",
+          "ascent": "待 GPX / 官方路书核实",
+          "places": [
+            "Urdukas",
+            "Goro II"
+          ],
+          "direction_note": "Urdukas -> Goro II；山体区域：巴基斯坦 Gilgit-Baltistan / 喀喇昆仑；Askole 进，Baltoro Glacier、Concordia、K2 Base Camp，经 Gondogoro La 出 Hushe；罗盘方位待地图 / GPX 复核"
+        },
+        {
+          "day": "D9",
+          "route_text": "Goro II → Concordia，约 12–14 km",
+          "lodging": "营地",
+          "distance": "约 12–14 km",
+          "ascent": "待 GPX / 官方路书核实",
+          "places": [
+            "Goro II",
+            "Concordia"
+          ],
+          "direction_note": "Goro II -> Concordia；山体区域：巴基斯坦 Gilgit-Baltistan / 喀喇昆仑；Askole 进，Baltoro Glacier、Concordia、K2 Base Camp，经 Gondogoro La 出 Hushe；罗盘方位待地图 / GPX 复核"
+        },
+        {
+          "day": "D10",
+          "route_text": "Concordia → Broad Peak BC / K2 BC → Concordia 或 K2 BC 营地，长日",
+          "lodging": "营地",
+          "distance": "未在原文列出",
+          "ascent": "待 GPX / 官方路书核实",
+          "places": [
+            "Concordia",
+            "Broad Peak BC",
+            "K2 BC",
+            "Concordia 或 K2 BC 营地"
+          ],
+          "direction_note": "Concordia -> Concordia 或 K2 BC 营地；山体区域：巴基斯坦 Gilgit-Baltistan / 喀喇昆仑；Askole 进，Baltoro Glacier、Concordia、K2 Base Camp，经 Gondogoro La 出 Hushe；罗盘方位待地图 / GPX 复核"
+        },
+        {
+          "day": "D11",
+          "route_text": "Concordia → Ali Camp，约 10–12 km",
+          "lodging": "营地",
+          "distance": "约 10–12 km",
+          "ascent": "待 GPX / 官方路书核实",
+          "places": [
+            "Concordia",
+            "Ali Camp"
+          ],
+          "direction_note": "Concordia -> Ali Camp；山体区域：巴基斯坦 Gilgit-Baltistan / 喀喇昆仑；Askole 进，Baltoro Glacier、Concordia、K2 Base Camp，经 Gondogoro La 出 Hushe；罗盘方位待地图 / GPX 复核"
+        },
+        {
+          "day": "D12",
+          "route_text": "Ali Camp → Gondogoro La → Khuspang，凌晨出发，长日",
+          "lodging": "营地",
+          "distance": "未在原文列出",
+          "ascent": "待 GPX / 官方路书核实",
+          "places": [
+            "Ali Camp",
+            "Gondogoro La",
+            "Khuspang"
+          ],
+          "direction_note": "Ali Camp -> Khuspang；山体区域：巴基斯坦 Gilgit-Baltistan / 喀喇昆仑；Askole 进，Baltoro Glacier、Concordia、K2 Base Camp，经 Gondogoro La 出 Hushe；罗盘方位待地图 / GPX 复核"
+        },
+        {
+          "day": "D13",
+          "route_text": "Khuspang → Saicho / Dalsampa，约 12–16 km",
+          "lodging": "营地",
+          "distance": "约 12–16 km",
+          "ascent": "待 GPX / 官方路书核实",
+          "places": [
+            "Khuspang",
+            "Saicho",
+            "Dalsampa"
+          ],
+          "direction_note": "Khuspang -> Dalsampa；山体区域：巴基斯坦 Gilgit-Baltistan / 喀喇昆仑；Askole 进，Baltoro Glacier、Concordia、K2 Base Camp，经 Gondogoro La 出 Hushe；罗盘方位待地图 / GPX 复核"
+        },
+        {
+          "day": "D14",
+          "route_text": "Saicho → Hushe，约 8–12 km，转车 Skardu",
+          "lodging": "酒店/营地",
+          "distance": "约 8–12 km",
+          "ascent": "待 GPX / 官方路书核实",
+          "places": [
+            "Saicho",
+            "Hushe"
+          ],
+          "direction_note": "Saicho -> Hushe；山体区域：巴基斯坦 Gilgit-Baltistan / 喀喇昆仑；Askole 进，Baltoro Glacier、Concordia、K2 Base Camp，经 Gondogoro La 出 Hushe；罗盘方位待地图 / GPX 复核"
+        },
+        {
+          "day": "D15+",
+          "route_text": "Skardu → Islamabad 与天气机动",
+          "lodging": "酒店",
+          "distance": "未在原文列出",
+          "ascent": "待 GPX / 官方路书核实",
+          "places": [
+            "Skardu",
+            "Islamabad 与天气机动"
+          ],
+          "direction_note": "Skardu -> Islamabad 与天气机动；山体区域：巴基斯坦 Gilgit-Baltistan / 喀喇昆仑；Askole 进，Baltoro Glacier、Concordia、K2 Base Camp，经 Gondogoro La 出 Hushe；罗盘方位待地图 / GPX 复核"
+        }
+      ],
+      "sources": [
+        {
+          "title": "We Seek Travel - K2 Base Camp and Gondogoro La itinerary",
+          "url": "https://www.weseektravel.com/k2-base-camp-itinerary/"
+        },
+        {
+          "title": "K2BC - K2 Gondogoro loop",
+          "url": "https://k2bc.com/treks/k2-gondogoro-loop.html"
+        },
+        {
+          "title": "CKNP - K2 Base Camp trek guide",
+          "url": "https://www.cknp.org/k2-base-camp-trek-guide/"
+        }
+      ],
+      "search_text": "k2 base camp + gondogoro la trek 巴基斯坦 gilgit-baltistan / 喀喇昆仑；askole 进，baltoro glacier、concordia、k2 base camp，经 gondogoro la 出 hushe。 18–21 天总行程；核心徒步约 12–14 天。 约 160–180 km（路线与是否到 k2 bc / broad peak bc 有差异）。 累计爬升约 4,500–6,000 m；冰川起伏和垭口技术路段使体感远高于数字。 gondogoro la 约 5,585–5,650 m；k2 bc 约 5,150 m 级。 skardu / islamabad 住酒店；徒步全程团队露营，需持证向导、厨师、背夫/驮队；gondogoro la 常涉及绳索与冰雪安全。 中高：路线骨架可靠；实际营地、直升机/天气缓冲、gondogoro la 开放与绳索状况需当季确认。",
+      "lodging_tag": "茶馆/客栈",
+      "data_status": "已有 KML：K2BC + Gondogoro La 环线。；已生成 2D/3D 交互页。",
+      "links": [
+        {
+          "title": "2D 交互路书",
+          "url": "k2-base-camp-gondogoro-la/"
+        },
+        {
+          "title": "3D 地形版",
+          "url": "k2-base-camp-gondogoro-la/3d/"
+        }
+      ],
+      "route_check": "已有 K2BC 海拔纠偏 KML，可用于 Baltoro Glacier、Concordia、K2BC 支线、Gondogoro La 翻越和 Hushe 出山段的地形强度。",
+      "image": "route-images/k2-base-camp-gondogoro-la.jpg"
+    },
+    {
+      "number": 7,
+      "name": "贡嘎大环 / 贡嘎山脊线",
+      "where": "中国四川甘孜，康定老榆林 / 格西草原入山，经日乌且、勒多曼因、玉龙西、坐若湖、西二山脊至子梅垭口。",
+      "duration": "本 KML 适合按 5–6 天高海拔山脊线理解；完整贡嘎寺 / 巴王海版本需另行核实。",
+      "distance": "已有 KML 约 71 km。",
+      "ascent": "已有 KML 累计爬升约 1,172 m；该口径偏精简，完整转山可能更高。",
+      "high_point": "轨迹最高约 4,933 m，日乌且垭口 / 山脊线为关键高点。",
+      "lodging": "露营为主；下日乌且、上日乌且、勒多曼因、4500 营地、坐若湖营地等。",
+      "confidence": "中：已有 KML 标注非常细，但属于山脊线 / 精简贡嘎大环，不等同所有商业队完整口径。",
+      "lodging_tag": "露营为主",
+      "data_status": "已有 KML + 2D/3D 交互页。",
+      "route_check": "已上线 2D/3D 交互路书；该 KML 更像贡嘎山脊线 / 精简大环，传统贡嘎寺 / 巴王海方向只作为变体。",
+      "search_text": "贡嘎 大环 山脊线 日乌且 勒多曼因 子梅垭口 四川 甘孜 露营",
+      "links": [
+        {
+          "title": "2D 交互路书",
+          "url": "gongga-kora/"
+        },
+        {
+          "title": "3D 地形版",
+          "url": "gongga-kora/3d/"
+        }
+      ],
+      "sources": [],
+      "days": [
+        {
+          "day": "D1",
+          "route_text": "老榆林 / 电站 → 格西草原 → 两岔河 → 下日乌且 / 上日乌且",
+          "distance": "约 12–20 km，视起点和扎营点",
+          "ascent": "持续爬升，后段进入 4,000 m+",
+          "lodging": "露营"
+        },
+        {
+          "day": "D2",
+          "route_text": "上日乌且 → 勒多曼因营地 / 冰湖 / 冰川支线",
+          "distance": "高海拔缓爬 + 支线",
+          "ascent": "橙 + 紫，冰川支线折返",
+          "lodging": "露营"
+        },
+        {
+          "day": "D3",
+          "route_text": "勒多曼因 → 日乌且垭口 → 科西德 / 4500 营地",
+          "distance": "垭口长日",
+          "ascent": "主爬升 + 横切下降",
+          "lodging": "露营"
+        },
+        {
+          "day": "D4",
+          "route_text": "4500 营地 → 玉龙西垭口 → 坐若湖营地",
+          "distance": "山脊横切",
+          "ascent": "高海拔起伏",
+          "lodging": "露营"
+        },
+        {
+          "day": "D5",
+          "route_text": "坐若湖 → 隆且玛垭口 → 西二山脊 → 子梅垭口",
+          "distance": "后段山脊线",
+          "ascent": "碎石 / 山脊 / 天气风险",
+          "lodging": "出山/露营"
+        }
+      ],
+      "image": "route-images/gongga-kora.jpg"
+    }
+  ]
+}

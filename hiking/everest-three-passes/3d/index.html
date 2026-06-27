@@ -1,0 +1,38 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>路线 3D 轨迹</title>
+  <link rel="stylesheet" href="https://js.arcgis.com/4.30/esri/themes/light/main.css">
+  <link rel="stylesheet" href="../../assets/route-page.css">
+</head>
+<body class="route-3d-page">
+  <div id="viewDiv"></div>
+  <div id="loading" class="route-loading">加载 3D 地形与轨迹中...</div>
+  <section class="route-3d-panel" id="panel">
+    <div class="panel-head">
+      <div><div class="route-eyebrow">3D Route Preview</div><h1 data-route-title>路线</h1></div>
+      <button class="route-toggle" id="togglePanel" type="button">收起</button>
+    </div>
+    <div class="panel-body">
+      <div class="meta" data-route-meta></div>
+      <p>基于本地轨迹的 3D 地形预览。不替代离线导航、天气窗口或向导路书。</p>
+      <div class="route-actions">
+        <a href="../">返回 2D 路书</a>
+        <button id="flyRoute" type="button">飞到路线</button>
+        <button id="flyFinish" type="button">飞到终点</button>
+      </div>
+    </div>
+  </section>
+  <div class="route-3d-legend">
+    <div><i style="background:#dc2626"></i>主爬升 / 垭口</div>
+    <div><i style="background:#f97316"></i>高海拔横切</div>
+    <div><i style="background:#2563eb"></i>下降</div>
+    <div><i style="background:#7c3aed"></i>风险段</div>
+  </div>
+  <script src="https://js.arcgis.com/4.30/"></script>
+  <script src="../../assets/route-3d.js"></script>
+  <script>Route3D.init({ dataUrl: '../route.json' });</script>
+</body>
+</html>

@@ -1,0 +1,377 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <title>
+  GrepSeek: Training Search Agents for Direct Corpus Interaction · JXIN&#39;s Home
+</title>
+  <meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="color-scheme" content="light dark">
+
+
+
+
+<meta name="author" content="Jie Xin">
+<meta name="description" content="arXiv: 2605.29307 · PDF
+Authors: Alireza Salemi, Chang Zeng, Atharva Nijasure, Jui-Hui Chung, Razieh Rahimi, Fernando Diaz, Hamed Zamani
+Affiliations: University of Massachusetts Amherst, Princeton University, Carnegie Mellon University
+Primary category: cs.CL · all: cs.AI, cs.CL, cs.IR, cs.LG
+Matched keywords: large language model, llm, agent, retrieval, reasoning, serving
+
+TL;DR
+GrepSeek trains a compact LLM to search large text corpora by issuing shell commands (rg, grep) directly against raw text, bypassing pre-computed indices, using a cold-start SFT &#43; GRPO two-stage pipeline and a 7.6× sharded-parallel execution engine.">
+<meta name="keywords" content="blog,developer,personal">
+
+
+
+  <meta name="twitter:card" content="summary">
+  <meta name="twitter:title" content="GrepSeek: Training Search Agents for Direct Corpus Interaction">
+  <meta name="twitter:description" content="arXiv: 2605.29307 · PDF
+Authors: Alireza Salemi, Chang Zeng, Atharva Nijasure, Jui-Hui Chung, Razieh Rahimi, Fernando Diaz, Hamed Zamani
+Affiliations: University of Massachusetts Amherst, Princeton University, Carnegie Mellon University
+Primary category: cs.CL · all: cs.AI, cs.CL, cs.IR, cs.LG
+Matched keywords: large language model, llm, agent, retrieval, reasoning, serving
+TL;DR GrepSeek trains a compact LLM to search large text corpora by issuing shell commands (rg, grep) directly against raw text, bypassing pre-computed indices, using a cold-start SFT &#43; GRPO two-stage pipeline and a 7.6× sharded-parallel execution engine.">
+
+<meta property="og:url" content="https://ftxj.github.io/posts/2026-05-29/05-grepseek-training-search-agents-for-direct-corpus-interactio/">
+  <meta property="og:site_name" content="JXIN&#39;s Home">
+  <meta property="og:title" content="GrepSeek: Training Search Agents for Direct Corpus Interaction">
+  <meta property="og:description" content="arXiv: 2605.29307 · PDF
+Authors: Alireza Salemi, Chang Zeng, Atharva Nijasure, Jui-Hui Chung, Razieh Rahimi, Fernando Diaz, Hamed Zamani
+Affiliations: University of Massachusetts Amherst, Princeton University, Carnegie Mellon University
+Primary category: cs.CL · all: cs.AI, cs.CL, cs.IR, cs.LG
+Matched keywords: large language model, llm, agent, retrieval, reasoning, serving
+TL;DR GrepSeek trains a compact LLM to search large text corpora by issuing shell commands (rg, grep) directly against raw text, bypassing pre-computed indices, using a cold-start SFT &#43; GRPO two-stage pipeline and a 7.6× sharded-parallel execution engine.">
+  <meta property="og:locale" content="en">
+  <meta property="og:type" content="article">
+    <meta property="article:section" content="posts">
+    <meta property="article:published_time" content="2026-05-29T12:12:52+00:00">
+    <meta property="article:modified_time" content="2026-05-29T12:12:52+00:00">
+
+
+
+
+<link rel="canonical" href="https://ftxj.github.io/posts/2026-05-29/05-grepseek-training-search-agents-for-direct-corpus-interactio/">
+
+
+<link rel="preload" href="/fonts/fa-brands-400.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="/fonts/fa-regular-400.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="/fonts/fa-solid-900.woff2" as="font" type="font/woff2" crossorigin>
+
+
+  
+  
+  <link rel="stylesheet" href="/css/coder.min.5e94c1acf7aa2066035cf2764ae3e4fe39db101d68b870f919966100d51fb861.css" integrity="sha256-XpTBrPeqIGYDXPJ2SuPk/jnbEB1ouHD5GZZhANUfuGE=" crossorigin="anonymous" media="screen" />
+
+
+
+
+
+
+  
+    
+    
+    <link rel="stylesheet" href="/css/coder-dark.min.a00e6364bacbc8266ad1cc81230774a1397198f8cfb7bcba29b7d6fcb54ce57f.css" integrity="sha256-oA5jZLrLyCZq0cyBIwd0oTlxmPjPt7y6KbfW/LVM5X8=" crossorigin="anonymous" media="screen" />
+  
+
+
+
+ 
+
+
+
+
+<link rel="icon" type="image/svg+xml" href="/images/favicon.svg" sizes="any">
+<link rel="icon" type="image/png" href="/images/favicon-32x32.png" sizes="32x32">
+<link rel="icon" type="image/png" href="/images/favicon-16x16.png" sizes="16x16">
+
+<link rel="apple-touch-icon" href="/images/apple-touch-icon.png">
+<link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon.png">
+
+<link rel="manifest" href="/site.webmanifest">
+<link rel="mask-icon" href="/images/safari-pinned-tab.svg" color="#5bbad5">
+
+
+
+
+
+
+<style>
+.content article ul {
+  list-style: disc !important;
+  padding-left: 2.5rem !important;
+}
+
+.content article ul li {
+  display: list-item !important;
+}
+</style>
+
+
+
+
+  
+</head>
+
+
+
+
+
+
+<body class="preload-transitions colorscheme-auto">
+  
+<div class="float-container">
+    <a id="dark-mode-toggle" class="colorscheme-toggle">
+        <i class="fa-solid fa-adjust fa-fw" aria-hidden="true"></i>
+    </a>
+</div>
+
+
+  <main class="wrapper">
+    <nav class="navigation">
+  <section class="container">
+    
+    <a class="navigation-title" href="https://ftxj.github.io/">
+      JXIN&#39;s Home
+    </a>
+    
+    
+      <input type="checkbox" id="menu-toggle" />
+      <label class="menu-button float-right" for="menu-toggle">
+        <i class="fa-solid fa-bars fa-fw" aria-hidden="true"></i>
+      </label>
+      <ul class="navigation-list">
+        
+          
+            <li class="navigation-item">
+              <a class="navigation-link " href="/about/">About</a>
+            </li>
+          
+            <li class="navigation-item">
+              <a class="navigation-link " href="/travel/">Travel</a>
+            </li>
+          
+            <li class="navigation-item">
+              <a class="navigation-link " href="/hiking/">Hiking</a>
+            </li>
+          
+            <li class="navigation-item">
+              <a class="navigation-link " href="/posts/">Blog</a>
+            </li>
+          
+            <li class="navigation-item">
+              <a class="navigation-link " href="https://ftxj.github.io/cv/cv.pdf">CV</a>
+            </li>
+          
+        
+        
+          
+          
+          
+            
+              
+                <li class="navigation-item menu-separator">
+                  <span>|</span>
+                </li>
+                
+              
+              <li class="navigation-item">
+                <a href="/zh/posts/2026-05-29/05-grepseek-training-search-agents-for-direct-corpus-interactio/">中文</a>
+              </li>
+            
+          
+        
+      </ul>
+    
+  </section>
+</nav>
+
+
+    <div class="content">
+      
+  <section class="container post">
+    <article>
+      <header>
+        <div class="post-title">
+          <h1 class="title">
+            <a class="title-link" href="https://ftxj.github.io/posts/2026-05-29/05-grepseek-training-search-agents-for-direct-corpus-interactio/">
+              GrepSeek: Training Search Agents for Direct Corpus Interaction
+            </a>
+          </h1>
+        </div>
+        <div class="post-meta">
+          <div class="date">
+            <span class="posted-on">
+              <i class="fa-solid fa-calendar" aria-hidden="true"></i>
+              <time datetime="2026-05-29T12:12:52Z">
+                May 29, 2026
+              </time>
+            </span>
+            <span class="reading-time">
+              <i class="fa-solid fa-clock" aria-hidden="true"></i>
+              7-minute read
+            </span>
+          </div>
+          
+          <div class="categories">
+  <i class="fa-solid fa-folder" aria-hidden="true"></i>
+    <a href="/categories/paper-digest/">Paper-Digest</a>
+      <span class="separator">•</span>
+    <a href="/categories/2026-05-29/">2026-05-29</a></div>
+
+          
+        </div>
+      </header>
+
+      
+
+
+      <div class="post-content">
+        
+        <p><strong>arXiv:</strong> <a href="https://arxiv.org/abs/2605.29307">2605.29307</a> · <a href="https://arxiv.org/pdf/2605.29307">PDF</a></p>
+<p><strong>Authors:</strong> Alireza Salemi, Chang Zeng, Atharva Nijasure, Jui-Hui Chung, Razieh Rahimi, Fernando Diaz, Hamed Zamani</p>
+<p><strong>Affiliations:</strong> University of Massachusetts Amherst, Princeton University, Carnegie Mellon University</p>
+<p><strong>Primary category:</strong> <code>cs.CL</code> · all: cs.AI, cs.CL, cs.IR, cs.LG</p>
+<p><strong>Matched keywords:</strong> large language model, llm, agent, retrieval, reasoning, serving</p>
+<hr>
+<h2 id="tldr">TL;DR</h2>
+<p>GrepSeek trains a compact LLM to search large text corpora by issuing shell commands (<code>rg</code>, <code>grep</code>) directly against raw text, bypassing pre-computed indices, using a cold-start SFT + GRPO two-stage pipeline and a 7.6× sharded-parallel execution engine.</p>
+<h2 id="motivation">Motivation</h2>
+<p>Existing RAG systems retrieve from pre-built indices over fixed text chunks, constraining retrieval granularity and forcing all queries through the same pre-determined document boundaries. Multi-hop reasoning is especially hurt: retrievers conflate entity semantics across bridge documents, degrading precision. Contemporary DCI work (Li et al. 2026; Sen et al. 2026) showed shell-command-based corpus access can bypass these constraints, but those systems prompt large proprietary models like Claude at inference time, sometimes requiring <strong>over one hour per query</strong>—operationally infeasible. The gap is the absence of a <em>trained</em> compact model that has internalized DCI as a capability. A second blocker is training instability: the authors report that naive RL on a large raw corpus caused out-of-memory failures even on systems with up to 1,024 GB of RAM, because the agent learns to retrieve excessively large corpus segments. These two barriers—prohibitive inference cost and RL instability—motivate GrepSeek&rsquo;s two-stage pipeline and parallel execution engine.</p>
+<h2 id="key-ideas">Key Ideas</h2>
+<p>The figure below contrasts the two paradigms: left shows index-based RAG returning fixed document chunks; right shows GrepSeek issuing shell commands against the raw corpus and aggregating results through a parallel engine—no index required.</p>
+<p><img alt="Figure 1" src="/images/papers/2605.29307/fig1.png"></p>
+<p>This side-by-side makes concrete the key architectural claim: DCI eliminates index construction and RAM overhead entirely while enabling arbitrary-granularity retrieval via exact string matching.</p>
+<ul>
+<li><strong>DCI as a learned capability</strong>: trains a compact LLM on shell-command search rather than prompting a large proprietary model.</li>
+<li><strong>Two-stage training</strong>: cold-start SFT stabilizes initial behavior; GRPO RL refines task-oriented search strategy.</li>
+<li><strong>Answer-aware Tutor + answer-blind Planner</strong>: Tutor constructs verified backward evidence chains; Planner converts them into causally valid forward trajectories.</li>
+<li><strong>7.6× sharded-parallel engine</strong>: reduces average search latency from 5.39s to 0.71s with byte-exact output equivalence.</li>
+<li><strong>Best overall F1/EM</strong> across 7 QA benchmarks, with top F1 on 4 of 7 datasets.</li>
+</ul>
+<h2 id="method">Method</h2>
+<p>The DCI agent operates in the ReAct framework: each step emits a shell command (primarily <code>rg</code> and <code>head</code>) via <code>&lt;tool_call&gt;</code>, the execution engine returns corpus output via <code>&lt;tool_response&gt;</code>, and the loop runs for at most T steps before a final <code>&lt;answer&gt;</code> tag.</p>
+<p><strong>Cold-start (Algorithm 1)</strong>: For each training question, the answer-aware Tutor decomposes it into sub-queries and builds a <em>backward</em> chain from answer to question, verifying that each shell command retrieves supporting corpus evidence. The answer-blind Planner replays this chain forward, generating causal reasoning traces as if solving the task at inference time. Automatic quality filtering removes failed trajectories.</p>
+<p><strong>GRPO</strong>: The SFT-initialized policy is refined with Group Relative Policy Optimization using a combined correctness (token-level F1/EM) and format reward.</p>
+<p><strong>Efficient execution</strong>: The sharded-parallel engine partitions the corpus across shards, fans out compatible pipelines in parallel, and merges results deterministically. A persistent daemon eliminates per-query startup overhead.</p>
+<p><img alt="Figure 2" src="/images/papers/2605.29307/fig2.png"></p>
+<p>Figure 2 shows a representative trajectory: the agent iteratively refines <code>rg</code> commands, inspects partial results, and synthesizes a final answer—illustrating the multi-turn corpus interaction loop and how the Planner&rsquo;s forward reasoning structure plays out at inference time.</p>
+<h2 id="experiments">Experiments</h2>
+<p><strong>Datasets</strong>: 7 open-domain QA benchmarks — single-hop: NQ, TriviaQA, PopQA; multi-hop: HotpotQA, 2WikiMultihopQA, MuSiQue, Bamboogle.<br>
+<strong>Baselines</strong>: Search-R1 variants with E5, BM25, Qwen3-Emb-4B retrievers; untrained agentic frameworks; dense RAG (E5, Qwen3-4B).<br>
+<strong>Hardware</strong>: Single NVIDIA A100 80GB GPU, 32 CPU cores, 32GB RAM.<br>
+<strong>Metrics</strong>: Token-level F1 and Exact Match (EM).</p>
+<h2 id="results">Results</h2>
+<p>GrepSeek achieves best token-level F1 on 4 of 7 benchmarks (NQ, HotpotQA, 2WikiMultihopQA, MuSiQue) with statistically significant improvements on several datasets (Introduction). The sharded-parallel engine cuts average search latency from 5.39s → 0.71s (7.6×), bringing end-to-end per-query latency to ~8.6s on a single A100 (Introduction).</p>
+<p><img alt="Figure 3" src="/images/papers/2605.29307/fig3.png"></p>
+<p>Figure 3 (a–c) compares inference latency, RAM footprint, and offline indexing cost against E5 and Qwen3-4B dense baselines. GrepSeek eliminates index RAM and construction cost entirely; its latency disadvantage relative to dense retrieval is in LLM generation time, not tool execution—which the 7.6× engine already brings to 0.71s average.</p>
+<p>The ablation table (body text, near Figure 3 mention) shows removing GRPO yields F1 scores of ~0.39/0.64 on two datasets, and removing SFT drops further to ~0.29/0.55, confirming both training stages contribute.</p>
+<p><img alt="Figure 4" src="/images/papers/2605.29307/fig4.png"></p>
+<p>Figure 4 plots post-RL F1 as a function of SFT cold-start trajectory count. More cold-start data yields higher post-RL F1, meaning the quality of the GRPO starting point directly governs final performance—the two stages are interdependent, not independently additive.</p>
+<p><img alt="Figure 5" src="/images/papers/2605.29307/fig5.png"></p>
+<p>Figure 5 tracks 200 GRPO training steps: GrepSeek achieves higher mean reward throughout training than all Search-R1 variants (E5, BM25, Qwen3-Emb-4B). Response length and query count stabilize, confirming the two-stage pipeline suppresses the degenerate over-retrieval behavior that caused OOM failures under direct RL.</p>
+<p><img alt="Figure 6" src="/images/papers/2605.29307/fig6.png"></p>
+<p>Figure 6 (Appendix Figure 17) shows EM after RL as a function of SFT trajectory count, mirroring Figure 4&rsquo;s F1 trend. EM improves consistently with more cold-start data, confirming the trajectory-count sensitivity is not metric-specific.</p>
+<h2 id="conclusion">Conclusion</h2>
+<p>GrepSeek shows that a compact LLM can learn DCI as a trained skill—not an inference-time prompting strategy—and reach top F1/EM across 7 English open-domain QA benchmarks at ~8.6s/query on a single A100. The 7.6× parallel engine is the key enabler for practical latency. Limits: results are English-only decoder QA; performance degrades on queries with substantial surface-form variation (acknowledged, not quantified per dataset); the paper does not evaluate on non-English corpora, structured data, or multi-machine distributed corpora. The &ldquo;strongest overall&rdquo; claim holds in aggregate across 7 benchmarks but GrepSeek is not top on all three single-hop datasets.</p>
+<h2 id="novelty-check">Novelty Check</h2>
+<p><strong>From Related Work</strong>: The paper explicitly acknowledges Li et al. (2026) and Sen et al. (2026) as concurrent independent DCI work. GrepSeek&rsquo;s stated delta: (1) <em>training</em> a compact model vs. prompting a large proprietary one, and (2) the sharded-parallel execution engine. Search-R1 is the closest RL-for-search prior work, operating over dense/sparse indices rather than raw corpora.</p>
+<p><strong>Independent assessment</strong>: The Tutor/Planner backward-then-forward cold-start construction for shell-command agents appears genuinely novel. The acknowledgment of concurrent DCI work is appropriately explicit. The ReAct + GRPO combination is precedented (Search-R1, ToolRL), but the DCI-specific instability diagnosis and two-phase cold-start design are meaningful contributions within that template.</p>
+<h2 id="open-questions">Open Questions</h2>
+<ul>
+<li>How much does surface-form variation actually cost per benchmark? The paper acknowledges degradation but does not quantify it by dataset.</li>
+<li>Can a hybrid DCI + dense retrieval agent recover semantic recall while preserving lexical precision? The paper suggests complementarity but does not experiment.</li>
+<li>How does the sharded-parallel engine scale beyond single-machine RAM-resident corpora to distributed multi-node setups?</li>
+<li>How sensitive is final performance to the capability of the Tutor LLM used for cold-start generation?</li>
+</ul>
+<hr>
+<h2 id="original-abstract">Original abstract</h2>
+<p>arXiv:2605.29307v1 Announce Type: cross Abstract: Large Language Model (LLM) search agents have shown strong promise for knowledge-intensive language tasks through multiple rounds of reasoning and information retrieval. Most existing systems access information using a retriever that takes a keyword or natural language query and returns a ranked list of documents using an index of pre-computed document representations. In this work, we explore a complementary perspective in which the search agent treats the corpus itself as the search environment and finds evidence by issuing executable shell commands. We introduce GrepSeek, an optimized direct corpus interaction (DCI) search agent that trains a compact search agent to find, filter, and compose evidence from large text corpora. To address the instability of learning behavior directly with reinforcement learning on large corpora, we propose a two-stage training pipeline. First, we construct a cold-start dataset using an answer-aware Tutor and answer-blind Planner to generate verified, causally grounded search trajectories. Second, we refine the initialized policy with Group Relative Policy Optimization (GRPO), allowing the agent to improve its task-oriented search behavior through direct interaction with the corpus. To make DCI practical at scale, we further use a semantics-preserving sharded-parallel execution engine that accelerates shell-based retrieval by up to $7.6\times$ while preserving byte-exact equivalence with sequential execution of the shell command. Experiments across seven open-domain question answering benchmarks show that GrepSeek achieves the strongest overall token-level $F_1$ and Exact Match. Our analysis also highlights the limitations of purely lexical interaction on queries with substantial surface-form variation, suggesting DCI as a practical and competitive method for search agents that can complement existing retrieval paradigms in the real world.</p>
+
+      </div>
+
+
+      <footer>
+        
+
+
+        
+        
+        
+        
+        
+        
+        
+      </footer>
+    </article>
+
+    
+  </section>
+
+    </div>
+
+    <footer class="footer">
+  <section class="container">
+    ©
+    
+      2019 -
+    
+    2026
+     Jie Xin 
+    ·
+    
+    Powered by <a href="https://gohugo.io/" target="_blank" rel="noopener">Hugo</a> & <a href="https://github.com/luizdepra/hugo-coder/" target="_blank" rel="noopener">Coder</a>.
+    
+  </section>
+</footer>
+
+  </main>
+
+  
+
+  
+  
+  <script src="/js/coder.min.6ae284be93d2d19dad1f02b0039508d9aab3180a12a06dcc71b0b0ef7825a317.js" integrity="sha256-auKEvpPS0Z2tHwKwA5UI2aqzGAoSoG3McbCw73gloxc="></script>
+  
+
+  
+
+  
+
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+</body>
+</html>

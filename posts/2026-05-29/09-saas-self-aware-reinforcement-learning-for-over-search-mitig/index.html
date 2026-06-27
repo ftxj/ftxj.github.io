@@ -1,0 +1,386 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <title>
+  SAAS: Self-Aware Reinforcement Learning for Over-Search Mitigation in Agentic Search · JXIN&#39;s Home
+</title>
+  <meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="color-scheme" content="light dark">
+
+
+
+
+<meta name="author" content="Jie Xin">
+<meta name="description" content="arXiv: 2605.29796 · PDF
+Authors: Yunbo Tang, Chengyi Yang, Shiyu Liu, Zhishang Xiang, Zerui Chen, Qinggang Zhang, Jinsong Su
+Affiliations: School of Informatics, Xiamen University, Jilin University
+Primary category: cs.AI · all: cs.AI, cs.CL, cs.LG
+Matched keywords: llm, agent, agentic, rag, reasoning, inference, latency
+
+TL;DR
+SAAS is an RL framework that teaches agentic search models when not to search by dynamically tracking the agent&rsquo;s evolving knowledge boundary and converting that awareness into discriminative trajectory-level penalties, reducing over-search without accuracy loss.">
+<meta name="keywords" content="blog,developer,personal">
+
+
+
+  <meta name="twitter:card" content="summary">
+  <meta name="twitter:title" content="SAAS: Self-Aware Reinforcement Learning for Over-Search Mitigation in Agentic Search">
+  <meta name="twitter:description" content="arXiv: 2605.29796 · PDF
+Authors: Yunbo Tang, Chengyi Yang, Shiyu Liu, Zhishang Xiang, Zerui Chen, Qinggang Zhang, Jinsong Su
+Affiliations: School of Informatics, Xiamen University, Jilin University
+Primary category: cs.AI · all: cs.AI, cs.CL, cs.LG
+Matched keywords: llm, agent, agentic, rag, reasoning, inference, latency
+TL;DR SAAS is an RL framework that teaches agentic search models when not to search by dynamically tracking the agent’s evolving knowledge boundary and converting that awareness into discriminative trajectory-level penalties, reducing over-search without accuracy loss.">
+
+<meta property="og:url" content="https://ftxj.github.io/posts/2026-05-29/09-saas-self-aware-reinforcement-learning-for-over-search-mitig/">
+  <meta property="og:site_name" content="JXIN&#39;s Home">
+  <meta property="og:title" content="SAAS: Self-Aware Reinforcement Learning for Over-Search Mitigation in Agentic Search">
+  <meta property="og:description" content="arXiv: 2605.29796 · PDF
+Authors: Yunbo Tang, Chengyi Yang, Shiyu Liu, Zhishang Xiang, Zerui Chen, Qinggang Zhang, Jinsong Su
+Affiliations: School of Informatics, Xiamen University, Jilin University
+Primary category: cs.AI · all: cs.AI, cs.CL, cs.LG
+Matched keywords: llm, agent, agentic, rag, reasoning, inference, latency
+TL;DR SAAS is an RL framework that teaches agentic search models when not to search by dynamically tracking the agent’s evolving knowledge boundary and converting that awareness into discriminative trajectory-level penalties, reducing over-search without accuracy loss.">
+  <meta property="og:locale" content="en">
+  <meta property="og:type" content="article">
+    <meta property="article:section" content="posts">
+    <meta property="article:published_time" content="2026-05-29T12:30:14+00:00">
+    <meta property="article:modified_time" content="2026-05-29T12:30:14+00:00">
+
+
+
+
+<link rel="canonical" href="https://ftxj.github.io/posts/2026-05-29/09-saas-self-aware-reinforcement-learning-for-over-search-mitig/">
+
+
+<link rel="preload" href="/fonts/fa-brands-400.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="/fonts/fa-regular-400.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="/fonts/fa-solid-900.woff2" as="font" type="font/woff2" crossorigin>
+
+
+  
+  
+  <link rel="stylesheet" href="/css/coder.min.5e94c1acf7aa2066035cf2764ae3e4fe39db101d68b870f919966100d51fb861.css" integrity="sha256-XpTBrPeqIGYDXPJ2SuPk/jnbEB1ouHD5GZZhANUfuGE=" crossorigin="anonymous" media="screen" />
+
+
+
+
+
+
+  
+    
+    
+    <link rel="stylesheet" href="/css/coder-dark.min.a00e6364bacbc8266ad1cc81230774a1397198f8cfb7bcba29b7d6fcb54ce57f.css" integrity="sha256-oA5jZLrLyCZq0cyBIwd0oTlxmPjPt7y6KbfW/LVM5X8=" crossorigin="anonymous" media="screen" />
+  
+
+
+
+ 
+
+
+
+
+<link rel="icon" type="image/svg+xml" href="/images/favicon.svg" sizes="any">
+<link rel="icon" type="image/png" href="/images/favicon-32x32.png" sizes="32x32">
+<link rel="icon" type="image/png" href="/images/favicon-16x16.png" sizes="16x16">
+
+<link rel="apple-touch-icon" href="/images/apple-touch-icon.png">
+<link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon.png">
+
+<link rel="manifest" href="/site.webmanifest">
+<link rel="mask-icon" href="/images/safari-pinned-tab.svg" color="#5bbad5">
+
+
+
+
+
+
+<style>
+.content article ul {
+  list-style: disc !important;
+  padding-left: 2.5rem !important;
+}
+
+.content article ul li {
+  display: list-item !important;
+}
+</style>
+
+
+
+
+  
+</head>
+
+
+
+
+
+
+<body class="preload-transitions colorscheme-auto">
+  
+<div class="float-container">
+    <a id="dark-mode-toggle" class="colorscheme-toggle">
+        <i class="fa-solid fa-adjust fa-fw" aria-hidden="true"></i>
+    </a>
+</div>
+
+
+  <main class="wrapper">
+    <nav class="navigation">
+  <section class="container">
+    
+    <a class="navigation-title" href="https://ftxj.github.io/">
+      JXIN&#39;s Home
+    </a>
+    
+    
+      <input type="checkbox" id="menu-toggle" />
+      <label class="menu-button float-right" for="menu-toggle">
+        <i class="fa-solid fa-bars fa-fw" aria-hidden="true"></i>
+      </label>
+      <ul class="navigation-list">
+        
+          
+            <li class="navigation-item">
+              <a class="navigation-link " href="/about/">About</a>
+            </li>
+          
+            <li class="navigation-item">
+              <a class="navigation-link " href="/travel/">Travel</a>
+            </li>
+          
+            <li class="navigation-item">
+              <a class="navigation-link " href="/hiking/">Hiking</a>
+            </li>
+          
+            <li class="navigation-item">
+              <a class="navigation-link " href="/posts/">Blog</a>
+            </li>
+          
+            <li class="navigation-item">
+              <a class="navigation-link " href="https://ftxj.github.io/cv/cv.pdf">CV</a>
+            </li>
+          
+        
+        
+          
+          
+          
+            
+              
+                <li class="navigation-item menu-separator">
+                  <span>|</span>
+                </li>
+                
+              
+              <li class="navigation-item">
+                <a href="/zh/posts/2026-05-29/09-saas-self-aware-reinforcement-learning-for-over-search-mitig/">中文</a>
+              </li>
+            
+          
+        
+      </ul>
+    
+  </section>
+</nav>
+
+
+    <div class="content">
+      
+  <section class="container post">
+    <article>
+      <header>
+        <div class="post-title">
+          <h1 class="title">
+            <a class="title-link" href="https://ftxj.github.io/posts/2026-05-29/09-saas-self-aware-reinforcement-learning-for-over-search-mitig/">
+              SAAS: Self-Aware Reinforcement Learning for Over-Search Mitigation in Agentic Search
+            </a>
+          </h1>
+        </div>
+        <div class="post-meta">
+          <div class="date">
+            <span class="posted-on">
+              <i class="fa-solid fa-calendar" aria-hidden="true"></i>
+              <time datetime="2026-05-29T12:30:14Z">
+                May 29, 2026
+              </time>
+            </span>
+            <span class="reading-time">
+              <i class="fa-solid fa-clock" aria-hidden="true"></i>
+              8-minute read
+            </span>
+          </div>
+          
+          <div class="categories">
+  <i class="fa-solid fa-folder" aria-hidden="true"></i>
+    <a href="/categories/paper-digest/">Paper-Digest</a>
+      <span class="separator">•</span>
+    <a href="/categories/2026-05-29/">2026-05-29</a></div>
+
+          
+        </div>
+      </header>
+
+      
+
+
+      <div class="post-content">
+        
+        <p><strong>arXiv:</strong> <a href="https://arxiv.org/abs/2605.29796">2605.29796</a> · <a href="https://arxiv.org/pdf/2605.29796">PDF</a></p>
+<p><strong>Authors:</strong> Yunbo Tang, Chengyi Yang, Shiyu Liu, Zhishang Xiang, Zerui Chen, Qinggang Zhang, Jinsong Su</p>
+<p><strong>Affiliations:</strong> School of Informatics, Xiamen University, Jilin University</p>
+<p><strong>Primary category:</strong> <code>cs.AI</code> · all: cs.AI, cs.CL, cs.LG</p>
+<p><strong>Matched keywords:</strong> llm, agent, agentic, rag, reasoning, inference, latency</p>
+<hr>
+<h2 id="tldr">TL;DR</h2>
+<p>SAAS is an RL framework that teaches agentic search models <em>when not to search</em> by dynamically tracking the agent&rsquo;s evolving knowledge boundary and converting that awareness into discriminative trajectory-level penalties, reducing over-search without accuracy loss.</p>
+<hr>
+<h2 id="motivation">Motivation</h2>
+<p>LLMs coupled with iterative retrieval (agentic search) handle complex multi-hop questions well, but standard outcome-based RL training creates a structural incentive to search: external evidence reliably boosts final-answer accuracy, so the optimizer defaults to searching on every turn. The paper documents two concrete failure modes that result. First, &ldquo;unnecessary search&rdquo;: by training step 50, the ratio of no-search trajectories collapses to nearly zero—the model searches even when its parametric knowledge is sufficient. Second, &ldquo;redundant search&rdquo;: the redundant-search ratio (searches issued after adequate evidence is already collected) climbs throughout training and approaches ~50%, adding noise and latency without improving answers.</p>
+<p>The obvious fix—a fixed penalty on search calls—fails because the model&rsquo;s knowledge distribution shifts during training. The paper shows that the fraction of questions answerable without any search grows from 12.7% at step 100 to 24.3% at step 300. A static threshold therefore either penalizes genuinely necessary searches (reward hacking) or becomes stale. In the paper&rsquo;s preliminary experiment, a naive fixed penalty reduced search counts but caused a sharp accuracy collapse around training step 250. The core gap is that no prior method tracks the <em>boundary</em> in a policy-conditioned way; they all rely on fixed heuristics or trained classifiers that cannot follow the agent&rsquo;s evolving capability.</p>
+<hr>
+<h2 id="key-ideas">Key Ideas</h2>
+<p>The two over-search failure modes motivating SAAS—unnecessary search (parametric knowledge already sufficient) and redundant search (external evidence already collected)—are illustrated below.</p>
+<p><img alt="Figure 1" src="/images/papers/2605.29796/fig1.png"></p>
+<p>Figure 1 distinguishes the two regimes SAAS must handle simultaneously: a question-level decision (should search ever be triggered?) and a step-level decision (should search continue?). Both fall under SAAS&rsquo;s search boundary framework, but require different reward signals to suppress.</p>
+<p>Naive outcome-based RL drives the redundant-search ratio toward ~50% because there is no signal about evidence sufficiency, only final-answer correctness.</p>
+<p><img alt="Figure 3" src="/images/papers/2605.29796/fig3.png"></p>
+<p>Figure 3 shows why a fixed penalty is not the answer: the share of questions answerable without search rises from 12.7% to 24.3% between steps 100–300, meaning the search boundary is policy-conditioned, not static. Applying a uniform penalty anyway causes training collapse at ~step 250.</p>
+<ul>
+<li><strong>Dynamic search boundary modeling</strong>: contrast search-disabled vs. search-enabled rollouts under the <em>current</em> policy at each RL step to classify each question as <code>NoSearch</code>, <code>NeedSearch</code>, or <code>Undetermined</code>.</li>
+<li><strong>Boundary-aware reward</strong>: penalize search trajectories <em>only</em> when the boundary says search is unnecessary or evidence is already sufficient; leave <code>NeedSearch</code> questions unpenalized.</li>
+<li><strong>Stage-wise optimization</strong>: a two-stage curriculum—first optimize for correct reasoning, then introduce search regularization—prevents reward hacking from early search suppression.</li>
+<li><strong>On-policy boundary re-estimation</strong>: because the knowledge boundary shifts throughout training, the boundary is re-computed from live rollouts at each step rather than from fixed annotations.</li>
+</ul>
+<hr>
+<h2 id="method">Method</h2>
+<p><img alt="Figure 4" src="/images/papers/2605.29796/fig4.png"></p>
+<p>Figure 4 shows the three-stage SAAS pipeline. At each RL step the agent generates two rollout groups per question: a search-disabled group G_d (pure parametric reasoning) and a search-enabled group G_e (free search access). Comparing the number of correct trajectories in each group classifies the question: if G_d alone produces ≥δ correct answers, the question is <code>NoSearch</code>; if G_d yields zero correct answers but G_e yields at least one, it is <code>NeedSearch</code>; otherwise <code>Undetermined</code>. δ is a tunable threshold (sensitivity studied via Figure 6).</p>
+<p>The <strong>boundary-aware reward</strong> combines an accuracy term R_acc with a search penalty term R_search. The search penalty is applied only when the trajectory&rsquo;s final answer is correct <em>and</em> the question&rsquo;s boundary is <code>NoSearch</code> (penalizing unnecessary search) or when the model continues searching after sufficient evidence (penalizing redundant search). The indicator gating on answer correctness prevents the optimizer from learning to guess rather than reason.</p>
+<p><strong>Stage-wise optimization</strong> runs standard outcome-based GRPO in Stage 1 to build reasoning depth, then introduces the boundary-aware penalty in Stage 2. The sequential curriculum ensures the model can answer questions reliably before it is asked to do so without search.</p>
+<hr>
+<h2 id="experiments">Experiments</h2>
+<p><strong>Datasets</strong>: Seven QA benchmarks (specific dataset names not available in the extracted text due to truncation).</p>
+<p><strong>Baselines</strong>: Prompt-based methods including DRAGIN and Adaptive-RAG; RL-based methods including StepSearch and HiPRAG; and standard outcome-based GRPO training.</p>
+<p><strong>Metrics</strong>: Answer accuracy (ACC), F1 score, and a redundant-search ratio (proportion of searches issued after sufficient evidence has been collected).</p>
+<p><strong>Models</strong>: Qwen2.5-3B-Instruct used in sensitivity analysis (Figure 6); full model scale not stated in available text.</p>
+<p><strong>Hardware/scale</strong>: Not specified in the available extracted text.</p>
+<hr>
+<h2 id="results">Results</h2>
+<p>Main results table numbers are not available — the full paper text was truncated before Section 4.2. The abstract states SAAS &ldquo;substantially reduces over-search while maintaining accuracy&rdquo; across seven benchmarks, but no specific ACC or F1 deltas versus baselines appear in the available text.</p>
+<p>The clearest quantitative finding is in the preliminary analysis rather than the main results: standard outcome-based RL drives the redundant search ratio to ~50% by training end (Figure 2), while SAAS&rsquo;s two-stage training keeps this under control.</p>
+<p><img alt="Figure 2" src="/images/papers/2605.29796/fig2.png"></p>
+<p>Figure 2 shows two training curves: the no-search trajectory ratio (blue) collapses to near zero by step 50 under outcome-based RL, while the redundant search ratio (red) steadily climbs toward ~50%—the quantitative baseline that SAAS is designed to beat.</p>
+<p><img alt="Figure 5" src="/images/papers/2605.29796/fig5.png"></p>
+<p>Figure 5 shows F1 score and search count across both SAAS training stages. The two-stage design separates reasoning improvement (Stage 1) from search reduction (Stage 2); the paper states these are &ldquo;two distinct training stages&rdquo; with different dynamics, but specific F1 numbers at convergence are not in the available text.</p>
+<p><img alt="Figure 6" src="/images/papers/2605.29796/fig6.png"></p>
+<p>Figure 6 is a sensitivity analysis of the threshold δ (number of GRPO groups used for evidence-demand estimation), reporting average ACC and redundant-search recall across seven benchmarks on Qwen2.5-3B-Instruct. The figure confirms the method is not highly brittle to δ, but the exact number range is not quantified in the available text.</p>
+<hr>
+<h2 id="conclusion">Conclusion</h2>
+<p>The core takeaway is that agentic search over-search is an RL training artifact, not just a prompting or inference problem: outcome-based optimization systematically drives ~50% redundant search ratios, and fixed penalties produce reward hacking. SAAS addresses this by re-estimating the search boundary on-policy at every training step and gating penalties accordingly. The result is established on seven QA benchmarks with Qwen2.5-3B-Instruct explicitly mentioned; whether it holds at larger scales (7B+), on non-English tasks, or with different retrieval backends is not shown. The title implies general mitigation of over-search, but the experiments appear limited to short-form QA—longer-context or tool-heavy agent tasks are not evaluated. The main results table is not available in the extracted text, so the headline accuracy/efficiency tradeoff cannot be independently verified.</p>
+<hr>
+<h2 id="novelty-check">Novelty Check</h2>
+<p><strong>From the paper&rsquo;s Related Work (Appendix D)</strong>: The authors cite DRAGIN and Adaptive-RAG as prompt/routing baselines, and StepSearch and HiPRAG as the closest RL-based prior art. The framing against StepSearch is that StepSearch uses step-wise planning without policy-conditioned boundary modeling; against HiPRAG, that informativeness-based passage rewards are still static per passage, not conditioned on the evolving policy.</p>
+<p><strong>Independent assessment</strong>: The use of contrastive rollouts (search-disabled vs. search-enabled) to estimate a policy-conditioned &ldquo;knowledge boundary&rdquo; is the genuinely novel mechanism here. The two-stage RL curriculum has precedent in other RLHF work, but applying it specifically to decouple reasoning depth from search regularization is a reasonable contribution. This is not merely a relabeling of prior work; the on-policy boundary re-estimation addresses a real gap that static heuristics cannot cover. However, the paper&rsquo;s claims should be treated cautiously until the main results table is independently verified—the extracted text is truncated before the numbers appear.</p>
+<hr>
+<h2 id="open-questions">Open Questions</h2>
+<ul>
+<li><strong>Main results missing</strong>: The truncated text omits the primary results table; the magnitude of accuracy preservation vs. search reduction tradeoff is unquantified here.</li>
+<li><strong>Scale</strong>: All sensitivity analysis is on Qwen2.5-3B-Instruct; does the boundary estimation remain calibrated at 7B/70B where parametric knowledge is richer?</li>
+<li><strong>Retrieval quality interaction</strong>: If the search engine returns noisy or incorrect passages, does the evidence-sufficiency signal become unreliable, causing SAAS to mis-classify <code>NeedSearch</code> questions as <code>Undetermined</code>?</li>
+<li><strong>Computational overhead</strong>: Running two rollout groups (G_d and G_e) per question per step doubles sampling cost; the paper does not quantify the wall-clock training overhead of this design.</li>
+<li><strong>Multi-step evidence sufficiency</strong>: The redundant-search criterion measures searches after &ldquo;sufficient evidence is collected,&rdquo; but the paper does not define how sufficiency is operationalized at inference time when there is no oracle.</li>
+</ul>
+<hr>
+<h2 id="original-abstract">Original abstract</h2>
+<p>arXiv:2605.29796v1 Announce Type: new Abstract: Agentic search enables LLMs to solve complex multi-hop questions through iterative reasoning and external search. Despite the effectiveness, these systems often suffer from a critical limitation in practice: agents fail to recognize their own knowledge boundaries, blindly triggering searches when internal knowledge suffices and failing to terminate search even when adequate evidence has been collected. The lack of self-awareness leads to severe \textbf{over-search}, incurring substantial inference latency and prohibitive computational cost. To this end, we propose SAAS, a novel RL framework designed to cultivate dynamic self-awareness that precisely regulates search behavior without compromising accuracy. SAAS introduces three key components: (i) a search boundary modeling mechanism, which identifies the search boundary under the evolving policy by contrasting search-disabled and search-enabled rollouts; (ii) a boundary-aware reward module, which translates this boundary awareness into trajectory-level penalties, suppressing unnecessary and redundant searches; and (iii) a stage-wise optimization strategy, which leverages a sequential curriculum to prioritize reasoning over search regularization, thereby avoiding reward hacking. Extensive experiments demonstrate that SAAS substantially reduces over-search, while maintaining accuracy. Our code is anonymously released at <a href="https://github.com/XMUDeepLIT/SAAS">https://github.com/XMUDeepLIT/SAAS</a>.</p>
+
+      </div>
+
+
+      <footer>
+        
+
+
+        
+        
+        
+        
+        
+        
+        
+      </footer>
+    </article>
+
+    
+  </section>
+
+    </div>
+
+    <footer class="footer">
+  <section class="container">
+    ©
+    
+      2019 -
+    
+    2026
+     Jie Xin 
+    ·
+    
+    Powered by <a href="https://gohugo.io/" target="_blank" rel="noopener">Hugo</a> & <a href="https://github.com/luizdepra/hugo-coder/" target="_blank" rel="noopener">Coder</a>.
+    
+  </section>
+</footer>
+
+  </main>
+
+  
+
+  
+  
+  <script src="/js/coder.min.6ae284be93d2d19dad1f02b0039508d9aab3180a12a06dcc71b0b0ef7825a317.js" integrity="sha256-auKEvpPS0Z2tHwKwA5UI2aqzGAoSoG3McbCw73gloxc="></script>
+  
+
+  
+
+  
+
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+</body>
+</html>

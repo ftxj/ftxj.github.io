@@ -1,0 +1,396 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <title>
+  SPEED-Bench: A Unified and Diverse Benchmark for Speculative Decoding · JXIN&#39;s Home
+</title>
+  <meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="color-scheme" content="light dark">
+
+
+
+
+<meta name="author" content="Jie Xin">
+<meta name="description" content="arXiv: 2604.09557 · PDF
+Authors: Talor Abramovich, Maor Ashkenazi, Izzy Putterman, Benjamin Chislett, Tiyasa Mitra, Bita Darvish Rouhani, Ran Zilberstein, Yonatan Geifman
+Affiliations: Microsoft
+Primary category: cs.DC · all: cs.AI, cs.DC
+Matched keywords: large language model, llm, inference, serving, speculative decoding, throughput, latency
+
+TL;DR
+SPEED-Bench 是一个专为投机解码（Speculative Decoding）设计的综合评测套件，通过语义多样性驱动的数据策划与生产级引擎集成，解决现有基准在多样性、吞吐量评估和真实环境代表性上的系统性缺陷。
+Motivation
+SD 加速率本质上依赖数据域和输入熵，但现有评测工具无法准确反映这一特性。MT-Bench 每类别仅10个样本，SpecBench 约15%数据来自单一翻译模板（WMT14 DE-EN），多数类别平均输入长度不足100 tokens。研究社区普遍在 BS=1 下使用 HuggingFace 高层库评测，而生产部署中 vLLM/TensorRT-LLM 等引擎引入了额外优化，且真实多用户服务需以高并发最大化吞吐——高并发使系统从 memory-bound 切换为 compute-bound，SD 加速收益显著下降甚至变为减速。此外，随着长上下文应用普及，现有基准对长 ISL 场景几乎空白。这些缺陷导致不同论文的跨方法比较结论不具可比性。
+Key Ideas
+
+双分支数据集：Qualitative Split（18个公开数据集、11类别、80样本/类，880个总样本）最大化语义多样性；Throughput Split（ISL 1k–32k 固定桶、三档难度）支持批大小扩展至512
+贪心&#43;局部交换精炼算法（Algorithm 1），最小化样本间余弦相似度，以 NP-hard 问题的近似解实现高效代表性采样
+统一测量框架原生集成 vLLM、TensorRT-LLM、SGLang，文本处理在框架层完成，隔离算法效果与引擎差异
+实证揭示：合成输入高估真实吞吐量、最优 Draft Length（DL）随批大小变化、低多样性数据引入评测偏差、词汇表剪枝的跨域副作用、训练 ISL 不匹配导致精度崩溃
+
+Method
+Qualitative Split 使用 OpenAI text-embedding-3-large 将 prompt 映射为单位向量，通过最小化全对余弦相似度目标 $\mathcal{L}(S)$（公式2）选取80样本/类；约20%样本含多轮交互（2–5轮），难度字段偏向难题（~80%），GPT-4 验证平均输出约650 tokens。">
+<meta name="keywords" content="blog,developer,personal">
+
+
+
+  <meta name="twitter:card" content="summary">
+  <meta name="twitter:title" content="SPEED-Bench: A Unified and Diverse Benchmark for Speculative Decoding">
+  <meta name="twitter:description" content="arXiv: 2604.09557 · PDF
+Authors: Talor Abramovich, Maor Ashkenazi, Izzy Putterman, Benjamin Chislett, Tiyasa Mitra, Bita Darvish Rouhani, Ran Zilberstein, Yonatan Geifman
+Affiliations: Microsoft
+Primary category: cs.DC · all: cs.AI, cs.DC
+Matched keywords: large language model, llm, inference, serving, speculative decoding, throughput, latency
+TL;DR SPEED-Bench 是一个专为投机解码（Speculative Decoding）设计的综合评测套件，通过语义多样性驱动的数据策划与生产级引擎集成，解决现有基准在多样性、吞吐量评估和真实环境代表性上的系统性缺陷。
+Motivation SD 加速率本质上依赖数据域和输入熵，但现有评测工具无法准确反映这一特性。MT-Bench 每类别仅10个样本，SpecBench 约15%数据来自单一翻译模板（WMT14 DE-EN），多数类别平均输入长度不足100 tokens。研究社区普遍在 BS=1 下使用 HuggingFace 高层库评测，而生产部署中 vLLM/TensorRT-LLM 等引擎引入了额外优化，且真实多用户服务需以高并发最大化吞吐——高并发使系统从 memory-bound 切换为 compute-bound，SD 加速收益显著下降甚至变为减速。此外，随着长上下文应用普及，现有基准对长 ISL 场景几乎空白。这些缺陷导致不同论文的跨方法比较结论不具可比性。
+Key Ideas 双分支数据集：Qualitative Split（18个公开数据集、11类别、80样本/类，880个总样本）最大化语义多样性；Throughput Split（ISL 1k–32k 固定桶、三档难度）支持批大小扩展至512 贪心&#43;局部交换精炼算法（Algorithm 1），最小化样本间余弦相似度，以 NP-hard 问题的近似解实现高效代表性采样 统一测量框架原生集成 vLLM、TensorRT-LLM、SGLang，文本处理在框架层完成，隔离算法效果与引擎差异 实证揭示：合成输入高估真实吞吐量、最优 Draft Length（DL）随批大小变化、低多样性数据引入评测偏差、词汇表剪枝的跨域副作用、训练 ISL 不匹配导致精度崩溃 Method Qualitative Split 使用 OpenAI text-embedding-3-large 将 prompt 映射为单位向量，通过最小化全对余弦相似度目标 $\mathcal{L}(S)$（公式2）选取80样本/类；约20%样本含多轮交互（2–5轮），难度字段偏向难题（~80%），GPT-4 验证平均输出约650 tokens。">
+
+<meta property="og:url" content="https://ftxj.github.io/posts/2026-05-29/06-speed-bench-a-unified-and-diverse-benchmark-for-speculative/">
+  <meta property="og:site_name" content="JXIN&#39;s Home">
+  <meta property="og:title" content="SPEED-Bench: A Unified and Diverse Benchmark for Speculative Decoding">
+  <meta property="og:description" content="arXiv: 2604.09557 · PDF
+Authors: Talor Abramovich, Maor Ashkenazi, Izzy Putterman, Benjamin Chislett, Tiyasa Mitra, Bita Darvish Rouhani, Ran Zilberstein, Yonatan Geifman
+Affiliations: Microsoft
+Primary category: cs.DC · all: cs.AI, cs.DC
+Matched keywords: large language model, llm, inference, serving, speculative decoding, throughput, latency
+TL;DR SPEED-Bench 是一个专为投机解码（Speculative Decoding）设计的综合评测套件，通过语义多样性驱动的数据策划与生产级引擎集成，解决现有基准在多样性、吞吐量评估和真实环境代表性上的系统性缺陷。
+Motivation SD 加速率本质上依赖数据域和输入熵，但现有评测工具无法准确反映这一特性。MT-Bench 每类别仅10个样本，SpecBench 约15%数据来自单一翻译模板（WMT14 DE-EN），多数类别平均输入长度不足100 tokens。研究社区普遍在 BS=1 下使用 HuggingFace 高层库评测，而生产部署中 vLLM/TensorRT-LLM 等引擎引入了额外优化，且真实多用户服务需以高并发最大化吞吐——高并发使系统从 memory-bound 切换为 compute-bound，SD 加速收益显著下降甚至变为减速。此外，随着长上下文应用普及，现有基准对长 ISL 场景几乎空白。这些缺陷导致不同论文的跨方法比较结论不具可比性。
+Key Ideas 双分支数据集：Qualitative Split（18个公开数据集、11类别、80样本/类，880个总样本）最大化语义多样性；Throughput Split（ISL 1k–32k 固定桶、三档难度）支持批大小扩展至512 贪心&#43;局部交换精炼算法（Algorithm 1），最小化样本间余弦相似度，以 NP-hard 问题的近似解实现高效代表性采样 统一测量框架原生集成 vLLM、TensorRT-LLM、SGLang，文本处理在框架层完成，隔离算法效果与引擎差异 实证揭示：合成输入高估真实吞吐量、最优 Draft Length（DL）随批大小变化、低多样性数据引入评测偏差、词汇表剪枝的跨域副作用、训练 ISL 不匹配导致精度崩溃 Method Qualitative Split 使用 OpenAI text-embedding-3-large 将 prompt 映射为单位向量，通过最小化全对余弦相似度目标 $\mathcal{L}(S)$（公式2）选取80样本/类；约20%样本含多轮交互（2–5轮），难度字段偏向难题（~80%），GPT-4 验证平均输出约650 tokens。">
+  <meta property="og:locale" content="en">
+  <meta property="og:type" content="article">
+    <meta property="article:section" content="posts">
+    <meta property="article:published_time" content="2026-05-29T12:18:42+00:00">
+    <meta property="article:modified_time" content="2026-05-29T12:18:42+00:00">
+
+
+
+
+<link rel="canonical" href="https://ftxj.github.io/posts/2026-05-29/06-speed-bench-a-unified-and-diverse-benchmark-for-speculative/">
+
+
+<link rel="preload" href="/fonts/fa-brands-400.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="/fonts/fa-regular-400.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="/fonts/fa-solid-900.woff2" as="font" type="font/woff2" crossorigin>
+
+
+  
+  
+  <link rel="stylesheet" href="/css/coder.min.5e94c1acf7aa2066035cf2764ae3e4fe39db101d68b870f919966100d51fb861.css" integrity="sha256-XpTBrPeqIGYDXPJ2SuPk/jnbEB1ouHD5GZZhANUfuGE=" crossorigin="anonymous" media="screen" />
+
+
+
+
+
+
+  
+    
+    
+    <link rel="stylesheet" href="/css/coder-dark.min.a00e6364bacbc8266ad1cc81230774a1397198f8cfb7bcba29b7d6fcb54ce57f.css" integrity="sha256-oA5jZLrLyCZq0cyBIwd0oTlxmPjPt7y6KbfW/LVM5X8=" crossorigin="anonymous" media="screen" />
+  
+
+
+
+ 
+
+
+
+
+<link rel="icon" type="image/svg+xml" href="/images/favicon.svg" sizes="any">
+<link rel="icon" type="image/png" href="/images/favicon-32x32.png" sizes="32x32">
+<link rel="icon" type="image/png" href="/images/favicon-16x16.png" sizes="16x16">
+
+<link rel="apple-touch-icon" href="/images/apple-touch-icon.png">
+<link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon.png">
+
+<link rel="manifest" href="/site.webmanifest">
+<link rel="mask-icon" href="/images/safari-pinned-tab.svg" color="#5bbad5">
+
+
+
+
+
+
+<style>
+.content article ul {
+  list-style: disc !important;
+  padding-left: 2.5rem !important;
+}
+
+.content article ul li {
+  display: list-item !important;
+}
+</style>
+
+
+
+
+  
+</head>
+
+
+
+
+
+
+<body class="preload-transitions colorscheme-auto">
+  
+<div class="float-container">
+    <a id="dark-mode-toggle" class="colorscheme-toggle">
+        <i class="fa-solid fa-adjust fa-fw" aria-hidden="true"></i>
+    </a>
+</div>
+
+
+  <main class="wrapper">
+    <nav class="navigation">
+  <section class="container">
+    
+    <a class="navigation-title" href="https://ftxj.github.io/">
+      JXIN&#39;s Home
+    </a>
+    
+    
+      <input type="checkbox" id="menu-toggle" />
+      <label class="menu-button float-right" for="menu-toggle">
+        <i class="fa-solid fa-bars fa-fw" aria-hidden="true"></i>
+      </label>
+      <ul class="navigation-list">
+        
+          
+            <li class="navigation-item">
+              <a class="navigation-link " href="/about/">About</a>
+            </li>
+          
+            <li class="navigation-item">
+              <a class="navigation-link " href="/travel/">Travel</a>
+            </li>
+          
+            <li class="navigation-item">
+              <a class="navigation-link " href="/hiking/">Hiking</a>
+            </li>
+          
+            <li class="navigation-item">
+              <a class="navigation-link " href="/posts/">Blog</a>
+            </li>
+          
+            <li class="navigation-item">
+              <a class="navigation-link " href="https://ftxj.github.io/cv/cv.pdf">CV</a>
+            </li>
+          
+        
+        
+          
+          
+          
+            
+              
+                <li class="navigation-item menu-separator">
+                  <span>|</span>
+                </li>
+                
+              
+              <li class="navigation-item">
+                <a href="/zh/posts/2026-05-29/06-speed-bench-a-unified-and-diverse-benchmark-for-speculative/">中文</a>
+              </li>
+            
+          
+        
+      </ul>
+    
+  </section>
+</nav>
+
+
+    <div class="content">
+      
+  <section class="container post">
+    <article>
+      <header>
+        <div class="post-title">
+          <h1 class="title">
+            <a class="title-link" href="https://ftxj.github.io/posts/2026-05-29/06-speed-bench-a-unified-and-diverse-benchmark-for-speculative/">
+              SPEED-Bench: A Unified and Diverse Benchmark for Speculative Decoding
+            </a>
+          </h1>
+        </div>
+        <div class="post-meta">
+          <div class="date">
+            <span class="posted-on">
+              <i class="fa-solid fa-calendar" aria-hidden="true"></i>
+              <time datetime="2026-05-29T12:18:42Z">
+                May 29, 2026
+              </time>
+            </span>
+            <span class="reading-time">
+              <i class="fa-solid fa-clock" aria-hidden="true"></i>
+              3-minute read
+            </span>
+          </div>
+          
+          <div class="categories">
+  <i class="fa-solid fa-folder" aria-hidden="true"></i>
+    <a href="/categories/paper-digest/">Paper-Digest</a>
+      <span class="separator">•</span>
+    <a href="/categories/2026-05-29/">2026-05-29</a></div>
+
+          
+        </div>
+      </header>
+
+      
+
+
+      <div class="post-content">
+        
+        <p><strong>arXiv:</strong> <a href="https://arxiv.org/abs/2604.09557">2604.09557</a> · <a href="https://arxiv.org/pdf/2604.09557">PDF</a></p>
+<p><strong>Authors:</strong> Talor Abramovich, Maor Ashkenazi, Izzy Putterman, Benjamin Chislett, Tiyasa Mitra, Bita Darvish Rouhani, Ran Zilberstein, Yonatan Geifman</p>
+<p><strong>Affiliations:</strong> Microsoft</p>
+<p><strong>Primary category:</strong> <code>cs.DC</code> · all: cs.AI, cs.DC</p>
+<p><strong>Matched keywords:</strong> large language model, llm, inference, serving, speculative decoding, throughput, latency</p>
+<hr>
+<h2 id="tldr">TL;DR</h2>
+<p>SPEED-Bench 是一个专为投机解码（Speculative Decoding）设计的综合评测套件，通过语义多样性驱动的数据策划与生产级引擎集成，解决现有基准在多样性、吞吐量评估和真实环境代表性上的系统性缺陷。</p>
+<h2 id="motivation">Motivation</h2>
+<p>SD 加速率本质上依赖数据域和输入熵，但现有评测工具无法准确反映这一特性。MT-Bench 每类别仅10个样本，SpecBench 约15%数据来自单一翻译模板（WMT14 DE-EN），多数类别平均输入长度不足100 tokens。研究社区普遍在 BS=1 下使用 HuggingFace 高层库评测，而生产部署中 vLLM/TensorRT-LLM 等引擎引入了额外优化，且真实多用户服务需以高并发最大化吞吐——高并发使系统从 memory-bound 切换为 compute-bound，SD 加速收益显著下降甚至变为减速。此外，随着长上下文应用普及，现有基准对长 ISL 场景几乎空白。这些缺陷导致不同论文的跨方法比较结论不具可比性。</p>
+<h2 id="key-ideas">Key Ideas</h2>
+<ul>
+<li>双分支数据集：<strong>Qualitative Split</strong>（18个公开数据集、11类别、80样本/类，880个总样本）最大化语义多样性；<strong>Throughput Split</strong>（ISL 1k–32k 固定桶、三档难度）支持批大小扩展至512</li>
+<li>贪心+局部交换精炼算法（Algorithm 1），最小化样本间余弦相似度，以 NP-hard 问题的近似解实现高效代表性采样</li>
+<li>统一测量框架原生集成 vLLM、TensorRT-LLM、SGLang，文本处理在框架层完成，隔离算法效果与引擎差异</li>
+<li>实证揭示：合成输入高估真实吞吐量、最优 Draft Length（DL）随批大小变化、低多样性数据引入评测偏差、词汇表剪枝的跨域副作用、训练 ISL 不匹配导致精度崩溃</li>
+</ul>
+<h2 id="method">Method</h2>
+<p><strong>Qualitative Split</strong> 使用 OpenAI <code>text-embedding-3-large</code> 将 prompt 映射为单位向量，通过最小化全对余弦相似度目标 $\mathcal{L}(S)$（公式2）选取80样本/类；约20%样本含多轮交互（2–5轮），难度字段偏向难题（~80%），GPT-4 验证平均输出约650 tokens。</p>
+<p><strong>Throughput Split</strong> 将真实数据按 ISL 桶（1k/2k/4k/8k/16k/32k）和三档难度聚合，每桶最多512样本，用于绘制稳定的吞吐-延迟 Pareto 曲线。</p>
+<p><strong>测量框架</strong> 在框架层完成 tokenization，确保所有引擎处理完全相同的 token 序列，标准化跨引擎比较。</p>
+<p>SPEED-Bench 的整体 pipeline 如下图所示：左侧为 embedding 驱动的多样性策划算法，中间展示 Throughput Split 按 ISL 桶构建过程，右侧为统一指标报告框架，三组件共同支持从单请求延迟到高并发吞吐的完整评测场景。</p>
+<p><img alt="Figure 1" src="/images/papers/2604.09557/fig1.png"></p>
+<h2 id="experiments">Experiments</h2>
+<p><strong>目标模型</strong>：GPT-OSS 120B（MoE）、Llama 3.3 70B；<strong>草稿器</strong>：EAGLE3（全词汇/剪枝变体）、Vanilla SD、Qwen3-Next 原生 MTP；<strong>推理引擎</strong>：vLLM、TensorRT-LLM；<strong>评测场景</strong>：Qualitative Split（DL 1–7，BS=1）、Throughput Split（ISL 2k/8k，BS 2–256/1–128）；<strong>指标</strong>：Acceptance Length（AL）、Output TPS、User TPS。</p>
+<h2 id="results">Results</h2>
+<p><strong>语义多样性验证</strong>：SPEED-Bench 选择算法在所有类别上的平均样本间语义相似度均低于随机选择和 SpecBench（更低=更多样），Local Swap Refinement（LSR）进一步收窄相似度，确认算法有效性（Figure 2）。</p>
+<p><img alt="Figure 2" src="/images/papers/2604.09557/fig2.png"></p>
+<p>图2展示三种方法在各类别的平均相似度柱状图；SPEED-Bench（含LSR）在全部类别均最低，即使无LSR也优于随机选择，说明贪心初始化本身已筛选出更多样的子集。</p>
+<p><strong>草稿器精度与加速比</strong>：外部草稿器（如EAGLE3）随 DL 增加 AL 扩展性更好；Figure 3 对应数据行显示 Mean AL 范围 1.27–2.68，Mean Speedup 范围 0.27×–1.75×，部分高并发配置出现 &lt;1× 减速（最低 0.27×），直接说明 SD 并非总能加速。</p>
+<p><img alt="Figure 3" src="/images/papers/2604.09557/fig3.png"></p>
+<p>图3展示不同草稿方法在 Qualitative Split 上 AL 随 DL 的变化曲线；外部草稿器持续增长，原生 MTP 在较低 DL 趋于平稳；配合数据行中 0.85× 和 0.27× 的减速案例，强调了多 BS 覆盖的必要性。</p>
+<p><strong>词汇表剪枝跨域方差</strong>：GPT-OSS 120B + EAGLE3，DL=3 时，全词汇与剪枝词汇在不同类别的 AL 差异极大（Figure 4）；论文指出存在&quot;高方差&quot;，说明剪枝收益高度依赖数据域，在低多样性基准上得出的剪枝结论可能严重失真。</p>
+<p><img alt="Figure 4" src="/images/papers/2604.09557/fig4.png"></p>
+<p>图4对比各类别全/剪枝词汇的 AL 柱状图，某些类别剪枝几乎无损失，另一些类别 AL 显著下降，无法用单一数字描述剪枝代价。</p>
+<p><strong>SpecBench 评测偏差</strong>：SpecBench 的 Coding 和 Reasoning 各仅10个样本，统计噪声使轻量 EAGLE3 看似与 Vanilla SD 持平；在 SPEED-Bench 更大多样性数据上（Llama 3.3 70B，DL=7），两者差距清晰可见（Figure 5）。</p>
+<p><img alt="Figure 5" src="/images/papers/2604.09557/fig5.png"></p>
+<p>图5对比两个基准各类别 AL 柱状图；SpecBench 中轻量草稿器性能被夸大，SPEED-Bench 还原了方法间的真实相对排序，支持了&quot;小样本低多样性引入评测偏差&quot;这一核心论点。</p>
+<p><strong>合成输入高估真实吞吐量</strong>：GPT-OSS 120B + EAGLE3，TensorRT-LLM，DL=3，BS 1–128 时，随机输入与8k Throughput Split 的吞吐-User TPS 曲线存在明显偏离，合成输入系统性高估真实吞吐（Figure 6）。</p>
+<p><img alt="Figure 6" src="/images/papers/2604.09557/fig6.png"></p>
+<p>图6展示两条曲线在 BS 1–128 上的偏差；随机输入的 Pareto 前沿明显高于真实数据曲线，量化了依赖合成数据进行吞吐评测的核心误导风险。</p>
+<p><strong>批大小依赖的最优 DL</strong>：DL=1 在高并发下吞吐更高，DL=3 在低并发下更优，存在明确交叉点（GPT-OSS 120B + EAGLE3，vLLM，2k ISL，BS 2–256）；MoE 架构即使在高 BS 下仍受益于 SD（Figure 7）。</p>
+<p><img alt="Figure 7" src="/images/papers/2604.09557/fig7.png"></p>
+<p>图7给出 DL=1/3 在不同 BS 下的 Pareto 曲线；两线交叉点为部署中动态选择 DL 提供了直接依据，也验证了论文关于 MoE 模型 SD 收益持续性的论点。</p>
+<p><strong>训练 ISL 不匹配</strong>：推理 ISL 超过训练 ISL 时 AL 急剧下降；YaRN 缩放（虚线）部分缓解但无法消除该问题（GPT-OSS 120B + EAGLE3，vLLM，DL=3，训练 ISL 1k/2k/4k）（Figure 8）。</p>
+<p><img alt="Figure 8" src="/images/papers/2604.09557/fig8.png"></p>
+<p>图8量化了外推精度崩溃：训练于1k ISL 的草稿器在 2k+ 推理序列上 AL 大幅下降，训练于4k 的版本维持更高 AL；该发现揭示了现有 EAGLE3 模型的长上下文系统性缺陷。</p>
+<h2 id="conclusion">Conclusion</h2>
+<p>SPEED-Bench 的核心贡献是填补了 SD 评测在数据多样性、吞吐测量和生产环境代表性三方面的空白。最重要的实证发现是：合成输入会系统性高估真实吞吐量，而最优 DL 随批大小动态变化——这两点对生产部署决策有直接影响。结果建立在 GPT-OSS 120B 和 Llama 3.3 70B 上，硬件为 NVIDIA GPU；超过 32k ISL、非 NVIDIA 硬件及 dense 小模型（&lt;70B）场景未被覆盖。词汇表剪枝分析揭示了高方差现象，但未提供何时整体有益的定量判断标准。作者来自 NVIDIA（文中已披露），TensorRT-LLM 相关实验的独立性需读者注意。</p>
+<h2 id="novelty-check">Novelty Check</h2>
+<p><strong>论文自身 Related Work 定位</strong>：作者将 SpecBench（Xia et al., 2024）列为最接近的前驱，明确指出其继承 MT-Bench 的低多样性、缺乏吞吐导向评估的局限。SPEED-Bench 的 delta 是：算法驱动的多样性策划、Throughput Split、生产引擎集成三者的组合。</p>
+<p><strong>独立评估</strong>：这是一篇 benchmark 论文，核心贡献是工程性与实证性的，而非新 SD 算法。在该范畴内，多样性策划算法与生产引擎集成的组合具有实质区别，不属于简单重标签。主要限制在于整体规模仍相对有限（880 Qualitative 样本），且与 SpecBench 不同，SPEED-Bench 目前不含开放排行榜机制，其&quot;统一标准&quot;定位尚需社区采纳验证。</p>
+<h2 id="open-questions">Open Questions</h2>
+<ul>
+<li>最优 DL 随 BS 变化的交叉点能否在推理时动态预测，实现自适应 DL 调度？</li>
+<li>词汇表剪枝在何种域/模型配置下整体有益——是否存在可量化的判断标准？</li>
+<li>训练 ISL 与 YaRN 扩展的最优配比：对于目标推理 ISL X，何种训练 ISL + YaRN 组合最具性价比？</li>
+<li>SPEED-Bench ISL 桶上限为 32k，超长上下文（128k+）场景是否存在类似系统性评测偏差？</li>
+<li>对于 dense 小模型（7B–13B），Throughput Split 的最优 DL 模式是否与 MoE 120B 有显著差异？</li>
+</ul>
+<hr>
+<h2 id="original-abstract">Original abstract</h2>
+<p>arXiv:2604.09557v2 Announce Type: replace-cross Abstract: Speculative Decoding (SD) has emerged as a critical technique for accelerating Large Language Model (LLM) inference. Unlike deterministic system optimizations, SD performance is inherently data-dependent, meaning that diverse and representative workloads are essential for accurately measuring its effectiveness. Existing benchmarks suffer from limited task diversity, inadequate support for throughput-oriented evaluation, and a reliance on high-level implementations that fail to reflect production environments. To address this, we introduce SPEED-Bench, a comprehensive suite designed to standardize SD evaluation across diverse semantic domains and realistic serving regimes. SPEED-Bench offers a carefully curated Qualitative data split, selected by prioritizing semantic diversity across the data samples. Additionally, it includes a Throughput data split, allowing speedup evaluation across a range of concurrencies, from latency-sensitive low-batch settings to throughput-oriented high-load scenarios. By integrating with production engines like vLLM and TensorRT-LLM, SPEED-Bench allows practitioners to analyze system behaviors often masked by other benchmarks. We highlight this by quantifying how synthetic inputs overestimate real-world throughput, identifying batch-size dependent optimal draft lengths and biases in low-diversity data, and analyzing the caveats of vocabulary pruning in state-of-the-art drafters. We release SPEED-Bench to establish a unified evaluation standard for practical comparisons of SD algorithms.</p>
+
+      </div>
+
+
+      <footer>
+        
+
+
+        
+        
+        
+        
+        
+        
+        
+      </footer>
+    </article>
+
+    
+  </section>
+
+    </div>
+
+    <footer class="footer">
+  <section class="container">
+    ©
+    
+      2019 -
+    
+    2026
+     Jie Xin 
+    ·
+    
+    Powered by <a href="https://gohugo.io/" target="_blank" rel="noopener">Hugo</a> & <a href="https://github.com/luizdepra/hugo-coder/" target="_blank" rel="noopener">Coder</a>.
+    
+  </section>
+</footer>
+
+  </main>
+
+  
+
+  
+  
+  <script src="/js/coder.min.6ae284be93d2d19dad1f02b0039508d9aab3180a12a06dcc71b0b0ef7825a317.js" integrity="sha256-auKEvpPS0Z2tHwKwA5UI2aqzGAoSoG3McbCw73gloxc="></script>
+  
+
+  
+
+  
+
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+</body>
+</html>

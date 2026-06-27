@@ -1,0 +1,378 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <title>
+  RTP-LLM: High-Performance Alibaba LLM Inference Engine · JXIN&#39;s Home
+</title>
+  <meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="color-scheme" content="light dark">
+
+
+
+
+<meta name="author" content="Jie Xin">
+<meta name="description" content="arXiv: 2605.29639 · PDF
+Authors: Boyu Tan, Jiarui Guo, Zongwei Lv, Hanbo Sun, Tong Yang, Kan Liu, Xinfei Shi, Zetao Hu, Yaxin Yu, Chi Zhang, Jianning Zhang, Xi Yang, Wei Zhang, Bo Cai, Silu Zhou, Xiyu Wang, Na He, Yinghao Yu, Wending Bao, Guiyang Huang, Yuxing Yuan, Juncheng Yin, Nan Wang, Lin Yang, Zechao Zhang, Lu Chen, Guoding Li, Tao Lan, Lin Qu
+Affiliations: Alibaba Group, Peking University, Zhejiang University
+Primary category: cs.OS · all: cs.OS">
+<meta name="keywords" content="blog,developer,personal">
+
+
+
+  <meta name="twitter:card" content="summary">
+  <meta name="twitter:title" content="RTP-LLM: High-Performance Alibaba LLM Inference Engine">
+  <meta name="twitter:description" content="arXiv: 2605.29639 · PDF
+Authors: Boyu Tan, Jiarui Guo, Zongwei Lv, Hanbo Sun, Tong Yang, Kan Liu, Xinfei Shi, Zetao Hu, Yaxin Yu, Chi Zhang, Jianning Zhang, Xi Yang, Wei Zhang, Bo Cai, Silu Zhou, Xiyu Wang, Na He, Yinghao Yu, Wending Bao, Guiyang Huang, Yuxing Yuan, Juncheng Yin, Nan Wang, Lin Yang, Zechao Zhang, Lu Chen, Guoding Li, Tao Lan, Lin Qu
+Affiliations: Alibaba Group, Peking University, Zhejiang University
+Primary category: cs.OS · all: cs.OS">
+
+<meta property="og:url" content="https://ftxj.github.io/posts/2026-05-29/04-rtp-llm-high-performance-alibaba-llm-inference-engine/">
+  <meta property="og:site_name" content="JXIN&#39;s Home">
+  <meta property="og:title" content="RTP-LLM: High-Performance Alibaba LLM Inference Engine">
+  <meta property="og:description" content="arXiv: 2605.29639 · PDF
+Authors: Boyu Tan, Jiarui Guo, Zongwei Lv, Hanbo Sun, Tong Yang, Kan Liu, Xinfei Shi, Zetao Hu, Yaxin Yu, Chi Zhang, Jianning Zhang, Xi Yang, Wei Zhang, Bo Cai, Silu Zhou, Xiyu Wang, Na He, Yinghao Yu, Wending Bao, Guiyang Huang, Yuxing Yuan, Juncheng Yin, Nan Wang, Lin Yang, Zechao Zhang, Lu Chen, Guoding Li, Tao Lan, Lin Qu
+Affiliations: Alibaba Group, Peking University, Zhejiang University
+Primary category: cs.OS · all: cs.OS">
+  <meta property="og:locale" content="en">
+  <meta property="og:type" content="article">
+    <meta property="article:section" content="posts">
+    <meta property="article:published_time" content="2026-05-29T12:08:21+00:00">
+    <meta property="article:modified_time" content="2026-05-29T12:08:21+00:00">
+
+
+
+
+<link rel="canonical" href="https://ftxj.github.io/posts/2026-05-29/04-rtp-llm-high-performance-alibaba-llm-inference-engine/">
+
+
+<link rel="preload" href="/fonts/fa-brands-400.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="/fonts/fa-regular-400.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="/fonts/fa-solid-900.woff2" as="font" type="font/woff2" crossorigin>
+
+
+  
+  
+  <link rel="stylesheet" href="/css/coder.min.5e94c1acf7aa2066035cf2764ae3e4fe39db101d68b870f919966100d51fb861.css" integrity="sha256-XpTBrPeqIGYDXPJ2SuPk/jnbEB1ouHD5GZZhANUfuGE=" crossorigin="anonymous" media="screen" />
+
+
+
+
+
+
+  
+    
+    
+    <link rel="stylesheet" href="/css/coder-dark.min.a00e6364bacbc8266ad1cc81230774a1397198f8cfb7bcba29b7d6fcb54ce57f.css" integrity="sha256-oA5jZLrLyCZq0cyBIwd0oTlxmPjPt7y6KbfW/LVM5X8=" crossorigin="anonymous" media="screen" />
+  
+
+
+
+ 
+
+
+
+
+<link rel="icon" type="image/svg+xml" href="/images/favicon.svg" sizes="any">
+<link rel="icon" type="image/png" href="/images/favicon-32x32.png" sizes="32x32">
+<link rel="icon" type="image/png" href="/images/favicon-16x16.png" sizes="16x16">
+
+<link rel="apple-touch-icon" href="/images/apple-touch-icon.png">
+<link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon.png">
+
+<link rel="manifest" href="/site.webmanifest">
+<link rel="mask-icon" href="/images/safari-pinned-tab.svg" color="#5bbad5">
+
+
+
+
+
+
+<style>
+.content article ul {
+  list-style: disc !important;
+  padding-left: 2.5rem !important;
+}
+
+.content article ul li {
+  display: list-item !important;
+}
+</style>
+
+
+
+
+  
+</head>
+
+
+
+
+
+
+<body class="preload-transitions colorscheme-auto">
+  
+<div class="float-container">
+    <a id="dark-mode-toggle" class="colorscheme-toggle">
+        <i class="fa-solid fa-adjust fa-fw" aria-hidden="true"></i>
+    </a>
+</div>
+
+
+  <main class="wrapper">
+    <nav class="navigation">
+  <section class="container">
+    
+    <a class="navigation-title" href="https://ftxj.github.io/">
+      JXIN&#39;s Home
+    </a>
+    
+    
+      <input type="checkbox" id="menu-toggle" />
+      <label class="menu-button float-right" for="menu-toggle">
+        <i class="fa-solid fa-bars fa-fw" aria-hidden="true"></i>
+      </label>
+      <ul class="navigation-list">
+        
+          
+            <li class="navigation-item">
+              <a class="navigation-link " href="/about/">About</a>
+            </li>
+          
+            <li class="navigation-item">
+              <a class="navigation-link " href="/travel/">Travel</a>
+            </li>
+          
+            <li class="navigation-item">
+              <a class="navigation-link " href="/hiking/">Hiking</a>
+            </li>
+          
+            <li class="navigation-item">
+              <a class="navigation-link " href="/posts/">Blog</a>
+            </li>
+          
+            <li class="navigation-item">
+              <a class="navigation-link " href="https://ftxj.github.io/cv/cv.pdf">CV</a>
+            </li>
+          
+        
+        
+          
+          
+          
+            
+              
+                <li class="navigation-item menu-separator">
+                  <span>|</span>
+                </li>
+                
+              
+              <li class="navigation-item">
+                <a href="/zh/posts/2026-05-29/04-rtp-llm-high-performance-alibaba-llm-inference-engine/">中文</a>
+              </li>
+            
+          
+        
+      </ul>
+    
+  </section>
+</nav>
+
+
+    <div class="content">
+      
+  <section class="container post">
+    <article>
+      <header>
+        <div class="post-title">
+          <h1 class="title">
+            <a class="title-link" href="https://ftxj.github.io/posts/2026-05-29/04-rtp-llm-high-performance-alibaba-llm-inference-engine/">
+              RTP-LLM: High-Performance Alibaba LLM Inference Engine
+            </a>
+          </h1>
+        </div>
+        <div class="post-meta">
+          <div class="date">
+            <span class="posted-on">
+              <i class="fa-solid fa-calendar" aria-hidden="true"></i>
+              <time datetime="2026-05-29T12:08:21Z">
+                May 29, 2026
+              </time>
+            </span>
+            <span class="reading-time">
+              <i class="fa-solid fa-clock" aria-hidden="true"></i>
+              8-minute read
+            </span>
+          </div>
+          
+          <div class="categories">
+  <i class="fa-solid fa-folder" aria-hidden="true"></i>
+    <a href="/categories/paper-digest/">Paper-Digest</a>
+      <span class="separator">•</span>
+    <a href="/categories/2026-05-29/">2026-05-29</a></div>
+
+          
+        </div>
+      </header>
+
+      
+
+
+      <div class="post-content">
+        
+        <p><strong>arXiv:</strong> <a href="https://arxiv.org/abs/2605.29639">2605.29639</a> · <a href="https://arxiv.org/pdf/2605.29639">PDF</a></p>
+<p><strong>Authors:</strong> Boyu Tan, Jiarui Guo, Zongwei Lv, Hanbo Sun, Tong Yang, Kan Liu, Xinfei Shi, Zetao Hu, Yaxin Yu, Chi Zhang, Jianning Zhang, Xi Yang, Wei Zhang, Bo Cai, Silu Zhou, Xiyu Wang, Na He, Yinghao Yu, Wending Bao, Guiyang Huang, Yuxing Yuan, Juncheng Yin, Nan Wang, Lin Yang, Zechao Zhang, Lu Chen, Guoding Li, Tao Lan, Lin Qu</p>
+<p><strong>Affiliations:</strong> Alibaba Group, Peking University, Zhejiang University</p>
+<p><strong>Primary category:</strong> <code>cs.OS</code> · all: cs.OS</p>
+<p><strong>Matched keywords:</strong> large language model, llm, inference, serving, kv cache, parallelism, quantization, speculative decoding, throughput, latency</p>
+<hr>
+<h2 id="tldr">TL;DR</h2>
+<p>RTP-LLM is Alibaba&rsquo;s production LLM inference engine, serving 100M+ users, that integrates prefill-decode disaggregation, multi-tiered KV cache, speculative decoding, and model-loading optimizations to deliver 4.7×–6.3× faster loading, 35–40% latency reduction, and substantial throughput gains over vLLM and SGLang.</p>
+<h2 id="motivation">Motivation</h2>
+<p>Industrial LLM deployment at scale faces four concrete bottlenecks that no single existing system fully addresses. First, GPU utilization collapses under dynamic workloads: input lengths range from short queries to 128K+ tokens, and the memory-bound nature of autoregressive decode leaves compute idle. Second, KV cache grows linearly with sequence and batch size and quickly dominates VRAM, blocking concurrency. Third, architectural heterogeneity—dense models up to 235B, MoE models over 600B, and multimodal ViT+LLM combos—requires coordinated execution that frameworks like vLLM (single-node, homogeneous focus) were not designed for. Fourth, operational fragility: enterprises need minute-level 600B+ model reloading for continuous updates, but existing systems require hours. Teams operating Taobao, Tmall, and Cainiao-scale traffic currently must over-provision prefill machines and accept high tail latency because prefill and decode phases share resources and cannot scale independently. vLLM introduced PagedAttention and TensorRT-LLM delivered kernel optimizations, but both treat components in isolation. The authors argue the gap is systemic: no open production system integrates disaggregation, hierarchical cross-tier caching, multimodal decoupling, and fast model loading into a single coherent stack.</p>
+<h2 id="key-ideas">Key Ideas</h2>
+<ul>
+<li><strong>Optimized model loading</strong> via file-order-driven I/O, shared memory reuse, and parallel I/O–communication overlap, targeting minute-level deployment of 600B+ models.</li>
+<li><strong>Prefill-Decode (PD) Disaggregation</strong> decouples compute-intensive prefill from memory-bound decode onto dedicated nodes, enabling independent scaling.</li>
+<li><strong>Hierarchical multi-tiered KV cache</strong> spanning GPU → CPU → remote CPU (RDMA) → distributed storage, with hash-based prefix matching for cache reuse across requests.</li>
+<li><strong>Modular speculative decoding</strong> supporting Medusa, Eagle, and Prompt Lookup algorithms within a unified propose/score/verify framework.</li>
+<li><strong>EPD (Encode-Prefill-Decode) disaggregation</strong> for multimodal models, separating ViT encoding from LLM prefill and decode to match their different compute profiles.</li>
+<li><strong>Adaptive KV cache quantization</strong> (weight-only and KV cache quantization) reducing memory footprint while maintaining precision.</li>
+</ul>
+<h2 id="method">Method</h2>
+<p>RTP-LLM&rsquo;s architecture (Figure 1) comprises a Frontend Application, Master, Prefill Nodes, Decode Nodes, Multi-Tiered Cache, Name Service, and DP-Controller. The master orchestrates traffic scheduling with load balancing that continuously reprioritizes requests based on queue state, KV cache footprint, and latency targets.</p>
+<p>The overall system architecture shows how prefill and decode nodes are physically separated, with the multi-tiered cache connecting them. The master layer handles request routing between nodes, while the name service enables dynamic node discovery. This disaggregation is the core topology enabling independent scaling of the two computationally distinct phases.</p>
+<p><img alt="Figure 1" src="/images/papers/2605.29639/fig1.png"></p>
+<p><strong>Model Loading</strong> (Figure 2): Three techniques combine—file-order-driven I/O aligns disk reads to filesystem layout, parallel I/O-communication overlapping hides network transfer latency behind disk reads, and shared memory reuse avoids redundant allocation during hot updates.</p>
+<p>The model loading optimizations address the operational fragility challenge (Challenge IV). File-order I/O, overlapped parallel transfers, and shared memory reuse together reduce the serialized loading bottleneck that forces long cold-start times on 600B+ models.</p>
+<p><img alt="Figure 2" src="/images/papers/2605.29639/fig2.png"></p>
+<p><strong>KV Cache</strong>: A local manager handles GPU/CPU paging; prefix matching uses sampled prefix hashing to avoid full-key comparison overhead; a remote KV cache manager server handles RDMA-based cross-node transfers. Scheduling integrates cache match scores with load signals to co-route requests to nodes that already hold their prefix cache.</p>
+<p><strong>Speculative Decoding</strong>: A propose model $M_q$ generates $k$ candidate tokens; a score model $M_p$ evaluates all $k$ in parallel; a verification stage accepts tokens based on probability distributions. This transforms sequential decode into parallel verification.</p>
+<p><strong>EPD Disaggregation</strong> (Figure 3): For multimodal models, the ViT encoder runs on dedicated encode nodes, passing visual embeddings to prefill nodes, which then hand off KV cache to decode nodes. This separates the vision encoder&rsquo;s compute pattern from the LLM&rsquo;s.</p>
+<p>The EPD architecture physically separates ViT encoding, LLM prefill, and LLM decode onto distinct node pools. This prevents the bursty, compute-heavy vision encoding from blocking the latency-sensitive decode pipeline, which is the mechanism behind the reported 1.86×–2.52× multimodal throughput improvement.</p>
+<p><img alt="Figure 3" src="/images/papers/2605.29639/fig3.png"></p>
+<h2 id="experiments">Experiments</h2>
+<ul>
+<li><strong>Models</strong>: Qwen3-32B, Qwen3-8B, Qwen2.5-14B-Instruct, Moonlight-16B-A3B (medium-scale, 8B–32B), up to 235B (abstract); Qwen2.5-VL-7B-Instruct (multimodal).</li>
+<li><strong>Baselines</strong>: vLLM, SGLang.</li>
+<li><strong>Metrics</strong>: Model loading time, TTFT (P95), tokens/s, batch latency, GPU memory usage, cache reuse ratio, prefill machine count reduction.</li>
+<li><strong>Hardware</strong>: Multi-GPU (TP=1, 2, 4, 8 configurations); production traffic from Taobao/Tmall/Cainiao deployments.</li>
+<li><strong>Quantization configs tested</strong>: AWQ (FP8), FP8 KV Cache, BF16 baseline.</li>
+</ul>
+<h2 id="results">Results</h2>
+<p><strong>Model Loading</strong> (Figure 4): RTP-LLM achieves <strong>1.4×–4.2× speedup</strong> over baseline frameworks for medium-scale models (8B–32B), with the gap widening at higher TP configurations. The abstract reports 4.7×–6.3× speedup across the full model range tested.</p>
+<p>Figure 4 compares loading time in seconds for Qwen3-32B, Qwen3-8B, Qwen2.5-14B-Instruct, and Moonlight-16B-A3B across TP=1/2/4/8. RTP-LLM&rsquo;s file-order I/O and parallel overlap are the mechanism; the figure shows that at higher TP (more GPUs loading simultaneously), RTP-LLM&rsquo;s advantage grows, confirming that parallelism amplifies the I/O optimization.</p>
+<p><img alt="Figure 4" src="/images/papers/2605.29639/fig4.png"></p>
+<p><strong>Quantized Inference</strong> (Figures 5 &amp; 6): For Qwen3-32B, quantized configurations (AWQ FP8 and FP8 KV Cache) show <strong>35–40% batch latency reduction</strong> and <strong>1.9×–3.0× TTFT improvement</strong> versus BF16 baseline, with precision loss (PPL) remaining within acceptable bounds.</p>
+<p>Figure 5 shows batch latency (ms) and perplexity (PPL) for Qwen3-32B across AWQ(FP8), FP8 KV Cache, and BF16 baseline configurations. AWQ and FP8 KV Cache both reduce batch latency substantially while PPL degradation stays modest—validating that the adaptive quantization preserves output quality.</p>
+<p><img alt="Figure 5" src="/images/papers/2605.29639/fig5.png"></p>
+<p>Figure 6 shows TTFT and tokens/s for the same Qwen3-32B configurations. Quantized variants consistently improve TTFT (the first-token latency) and tokens/s throughput, with the gains corroborating the 1.9×–3.0× TTFT improvement reported in the abstract.</p>
+<p><img alt="Figure 6" src="/images/papers/2605.29639/fig6.png"></p>
+<p><strong>Multimodal</strong> (Figure 7): For Qwen2.5-VL-7B-Instruct on GQA with TP=2, RTP-LLM outperforms both SGLang and vLLM on batch latency, TTFT, and tokens/s, while GPU memory usage per GPU is also reported separately for GPU0 and GPU1.</p>
+<p>Figure 7 compares RTP-LLM, SGLang, and vLLM across four metrics (batch latency, TTFT, tokens/s, GPU memory) for the 7B VL model. The EPD disaggregation mechanism drives the improvement; the abstract quantifies the overall multimodal gain as <strong>1.86×–2.52× throughput improvement</strong>.</p>
+<p><img alt="Figure 7" src="/images/papers/2605.29639/fig7.png"></p>
+<p><strong>Production Traffic Scheduling</strong>: 35–37% TTFT P95 latency reduction, 215% cache reuse improvement, and 75% reduction in prefill machine count (abstract-only; full text describes mechanism but does not reproduce a table for these numbers).</p>
+<h2 id="conclusion">Conclusion</h2>
+<p>RTP-LLM demonstrates that integrating disaggregation, hierarchical caching, speculative decoding, and I/O optimization into a single coherent system yields compounding gains that isolated component optimizations miss. The most compelling single finding is the 75% reduction in prefill machine count from hierarchical prefix caching, which translates directly to infrastructure cost at Alibaba scale. Honest limits: the evaluations cover Alibaba&rsquo;s own hardware and traffic profiles (Taobao/Tmall/Cainiao); generalizability to other cloud providers or latency SLO regimes is untested. Model scale tops out at 235B in benchmarks; the 600B+ loading claims are stated but not benchmarked in the paper. Multimodal experiments cover only one model family (Qwen2.5-VL-7B). No ablation isolates the contribution of individual components (e.g., what fraction of TTFT gain comes from disaggregation alone versus prefix caching).</p>
+<h2 id="novelty-check">Novelty Check</h2>
+<p><strong>Authors&rsquo; own framing</strong>: The paper positions RTP-LLM as a systems integration contribution rather than an algorithmic novelty. Related work explicitly cites vLLM (PagedAttention), SGLang, TensorRT-LLM, Mooncake, and DistServe as closest prior work. The claimed delta is holistic production integration—no existing open system combines all five subsystems (PD disaggregation + multi-tier KV cache + speculative decoding + fast loading + multimodal EPD) with battle-tested reliability.</p>
+<p><strong>Independent assessment</strong>: Each individual component has clear prior art—PD disaggregation appears in Splitwise/DistServe/Mooncake; prefix caching in SGLang and vLLM; speculative decoding via Medusa/Eagle. The paper&rsquo;s real contribution is the engineering integration and production validation at scale, not novel algorithms. This is closer to a systems paper in the MLSys tradition (like the original vLLM paper) than an algorithmic advance. That framing is honest and the production scale (100M users, measured prefill machine savings) lends genuine credibility.</p>
+<h2 id="open-questions">Open Questions</h2>
+<ul>
+<li><strong>Component ablations</strong>: Which subsystem contributes most to the production TTFT reduction—disaggregation, prefix caching, or load balancing? No controlled ablation is provided.</li>
+<li><strong>Non-Alibaba hardware</strong>: All production numbers come from Alibaba&rsquo;s infrastructure; does the EPD design generalize to heterogeneous GPU clusters (e.g., mixed H100/A100)?</li>
+<li><strong>600B+ loading</strong>: The abstract and intro claim minute-level loading for 600B+ models, but no benchmark table covers this scale—only 8B–32B models appear in Figure 4.</li>
+<li><strong>Speculative decoding at high concurrency</strong>: The paper acknowledges speculative decoding benefits diminish as concurrency increases; the exact crossover point is not quantified.</li>
+<li><strong>Fault tolerance overhead</strong>: Enterprise-grade fault tolerance and rolling updates are mentioned but not evaluated for latency/throughput cost.</li>
+</ul>
+<hr>
+<h2 id="original-abstract">Original abstract</h2>
+<p>arXiv:2605.29639v1 Announce Type: new Abstract: Large Language Models (LLMs) have revolutionized AI applications, but deploying them at scale presents significant challenges. We present RTP-LLM, a high-performance inference engine for industrial-scale LLM deployment, successfully deployed across Alibaba Group serving over 100 million users. RTP-LLM addresses fundamental bottlenecks through integrated design. It optimizes model loading via file-order-driven I/O and parallel I/O-communication overlapping. The Prefill-Decode Disaggregation architecture decouples compute-intensive prefill from memory-bound decode phases, combined with hierarchical multi-tiered KV cache management enabling efficient cache reuse. In addition, RTP-LLM incorporates modular speculative decoding supporting multiple algorithms, adaptive KV cache quantization, and decoupled multimodal processing, with support for multi-level parallelism. Comprehensive evaluations across diverse model architectures (8B-235B parameters) have been conducted, where both controlled benchmarks and real production workloads are used. The results demonstrate RTP-LLM&rsquo;s superior performance against vLLM and SGLang: 4.7x-6.3x model loading speedup, 35-37% TTFT P95 latency reduction with 215% cache reuse improvement in production traffic scheduling, 1.12x-2.48x and 1.86x-2.52x throughput improvements in speculative decoding and multimodal inference, respectively, and 35-40% batch latency reduction with 1.9x-3.0x TTFT improvement in quantized inference. RTP-LLM&rsquo;s production-proven architecture and open-source availability make it a comprehensive solution for industrial LLM deployment.</p>
+
+      </div>
+
+
+      <footer>
+        
+
+
+        
+        
+        
+        
+        
+        
+        
+      </footer>
+    </article>
+
+    
+  </section>
+
+    </div>
+
+    <footer class="footer">
+  <section class="container">
+    ©
+    
+      2019 -
+    
+    2026
+     Jie Xin 
+    ·
+    
+    Powered by <a href="https://gohugo.io/" target="_blank" rel="noopener">Hugo</a> & <a href="https://github.com/luizdepra/hugo-coder/" target="_blank" rel="noopener">Coder</a>.
+    
+  </section>
+</footer>
+
+  </main>
+
+  
+
+  
+  
+  <script src="/js/coder.min.6ae284be93d2d19dad1f02b0039508d9aab3180a12a06dcc71b0b0ef7825a317.js" integrity="sha256-auKEvpPS0Z2tHwKwA5UI2aqzGAoSoG3McbCw73gloxc="></script>
+  
+
+  
+
+  
+
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+</body>
+</html>

@@ -1,0 +1,392 @@
+<!DOCTYPE html>
+<html lang="zh">
+
+<head>
+  <title>
+  SAAS: Self-Aware Reinforcement Learning for Over-Search Mitigation in Agentic Search · JXIN&#39;s Home
+</title>
+  <meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="color-scheme" content="light dark">
+
+
+
+
+<meta name="author" content="Jie Xin">
+<meta name="description" content="arXiv: 2605.29796 · PDF
+作者: Yunbo Tang, Chengyi Yang, Shiyu Liu, Zhishang Xiang, Zerui Chen, Qinggang Zhang, Jinsong Su
+单位: School of Informatics, Xiamen University, Jilin University
+主分类: cs.AI · 全部: cs.AI, cs.CL, cs.LG
+命中关键词: llm, agent, agentic, rag, reasoning, inference, latency
+
+TL;DR
+SAAS 提出三组件 RL 框架，通过动态建模&quot;搜索边界&quot;抑制 agentic search 中的过搜索问题，在 7 个 QA benchmark 上保持精度的同时大幅削减冗余检索。
+Motivation
+LLM agentic search 通过迭代推理&#43;外部检索处理复杂多跳问题效果显著，但存在严重的&quot;过搜索&quot;（over-search）痼疾：模型在参数知识已足够时仍触发搜索，或在已收集充分证据后仍持续检索。这两类浪费直接推高推理延迟和计算成本，同时引入噪声证据干扰最终答案——受影响的是任何在生产中部署 agentic RAG 系统的团队。
+现有方案分两类：提示/路由类（DRAGIN、Adaptive-RAG）依赖静态启发规则，RL 类（StepSearch、HiPRAG）依赖固定惩罚阈值。两者的共同缺陷是&quot;静态&quot;——都无法感知模型能力的动态变化。关键数据：随着训练推进，不需要搜索就能答对的问题比例从 step 100 的 12.7% 上升到 step 300 的 24.3%（Figure 3）。搜索边界本身在移动，固定惩罚在 step 250 附近会引发 reward hacking 和性能崩溃。">
+<meta name="keywords" content="blog,developer,personal">
+
+
+
+  <meta name="twitter:card" content="summary">
+  <meta name="twitter:title" content="SAAS: Self-Aware Reinforcement Learning for Over-Search Mitigation in Agentic Search">
+  <meta name="twitter:description" content="arXiv: 2605.29796 · PDF
+作者: Yunbo Tang, Chengyi Yang, Shiyu Liu, Zhishang Xiang, Zerui Chen, Qinggang Zhang, Jinsong Su
+单位: School of Informatics, Xiamen University, Jilin University
+主分类: cs.AI · 全部: cs.AI, cs.CL, cs.LG
+命中关键词: llm, agent, agentic, rag, reasoning, inference, latency
+TL;DR SAAS 提出三组件 RL 框架，通过动态建模&#34;搜索边界&#34;抑制 agentic search 中的过搜索问题，在 7 个 QA benchmark 上保持精度的同时大幅削减冗余检索。
+Motivation LLM agentic search 通过迭代推理&#43;外部检索处理复杂多跳问题效果显著，但存在严重的&#34;过搜索&#34;（over-search）痼疾：模型在参数知识已足够时仍触发搜索，或在已收集充分证据后仍持续检索。这两类浪费直接推高推理延迟和计算成本，同时引入噪声证据干扰最终答案——受影响的是任何在生产中部署 agentic RAG 系统的团队。
+现有方案分两类：提示/路由类（DRAGIN、Adaptive-RAG）依赖静态启发规则，RL 类（StepSearch、HiPRAG）依赖固定惩罚阈值。两者的共同缺陷是&#34;静态&#34;——都无法感知模型能力的动态变化。关键数据：随着训练推进，不需要搜索就能答对的问题比例从 step 100 的 12.7% 上升到 step 300 的 24.3%（Figure 3）。搜索边界本身在移动，固定惩罚在 step 250 附近会引发 reward hacking 和性能崩溃。">
+
+<meta property="og:url" content="https://ftxj.github.io/zh/posts/2026-05-29/09-saas-self-aware-reinforcement-learning-for-over-search-mitig/">
+  <meta property="og:site_name" content="JXIN&#39;s Home">
+  <meta property="og:title" content="SAAS: Self-Aware Reinforcement Learning for Over-Search Mitigation in Agentic Search">
+  <meta property="og:description" content="arXiv: 2605.29796 · PDF
+作者: Yunbo Tang, Chengyi Yang, Shiyu Liu, Zhishang Xiang, Zerui Chen, Qinggang Zhang, Jinsong Su
+单位: School of Informatics, Xiamen University, Jilin University
+主分类: cs.AI · 全部: cs.AI, cs.CL, cs.LG
+命中关键词: llm, agent, agentic, rag, reasoning, inference, latency
+TL;DR SAAS 提出三组件 RL 框架，通过动态建模&#34;搜索边界&#34;抑制 agentic search 中的过搜索问题，在 7 个 QA benchmark 上保持精度的同时大幅削减冗余检索。
+Motivation LLM agentic search 通过迭代推理&#43;外部检索处理复杂多跳问题效果显著，但存在严重的&#34;过搜索&#34;（over-search）痼疾：模型在参数知识已足够时仍触发搜索，或在已收集充分证据后仍持续检索。这两类浪费直接推高推理延迟和计算成本，同时引入噪声证据干扰最终答案——受影响的是任何在生产中部署 agentic RAG 系统的团队。
+现有方案分两类：提示/路由类（DRAGIN、Adaptive-RAG）依赖静态启发规则，RL 类（StepSearch、HiPRAG）依赖固定惩罚阈值。两者的共同缺陷是&#34;静态&#34;——都无法感知模型能力的动态变化。关键数据：随着训练推进，不需要搜索就能答对的问题比例从 step 100 的 12.7% 上升到 step 300 的 24.3%（Figure 3）。搜索边界本身在移动，固定惩罚在 step 250 附近会引发 reward hacking 和性能崩溃。">
+  <meta property="og:locale" content="zh">
+  <meta property="og:type" content="article">
+    <meta property="article:section" content="posts">
+    <meta property="article:published_time" content="2026-05-29T12:32:13+00:00">
+    <meta property="article:modified_time" content="2026-05-29T12:32:13+00:00">
+
+
+
+
+<link rel="canonical" href="https://ftxj.github.io/zh/posts/2026-05-29/09-saas-self-aware-reinforcement-learning-for-over-search-mitig/">
+
+
+<link rel="preload" href="/fonts/fa-brands-400.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="/fonts/fa-regular-400.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="/fonts/fa-solid-900.woff2" as="font" type="font/woff2" crossorigin>
+
+
+  
+  
+  <link rel="stylesheet" href="/css/coder.min.5e94c1acf7aa2066035cf2764ae3e4fe39db101d68b870f919966100d51fb861.css" integrity="sha256-XpTBrPeqIGYDXPJ2SuPk/jnbEB1ouHD5GZZhANUfuGE=" crossorigin="anonymous" media="screen" />
+
+
+
+
+
+
+  
+    
+    
+    <link rel="stylesheet" href="/css/coder-dark.min.a00e6364bacbc8266ad1cc81230774a1397198f8cfb7bcba29b7d6fcb54ce57f.css" integrity="sha256-oA5jZLrLyCZq0cyBIwd0oTlxmPjPt7y6KbfW/LVM5X8=" crossorigin="anonymous" media="screen" />
+  
+
+
+
+ 
+
+
+
+
+<link rel="icon" type="image/svg+xml" href="/images/favicon.svg" sizes="any">
+<link rel="icon" type="image/png" href="/images/favicon-32x32.png" sizes="32x32">
+<link rel="icon" type="image/png" href="/images/favicon-16x16.png" sizes="16x16">
+
+<link rel="apple-touch-icon" href="/images/apple-touch-icon.png">
+<link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon.png">
+
+<link rel="manifest" href="/site.webmanifest">
+<link rel="mask-icon" href="/images/safari-pinned-tab.svg" color="#5bbad5">
+
+
+
+
+
+
+<style>
+.content article ul {
+  list-style: disc !important;
+  padding-left: 2.5rem !important;
+}
+
+.content article ul li {
+  display: list-item !important;
+}
+</style>
+
+
+
+
+  
+</head>
+
+
+
+
+
+
+<body class="preload-transitions colorscheme-auto">
+  
+<div class="float-container">
+    <a id="dark-mode-toggle" class="colorscheme-toggle">
+        <i class="fa-solid fa-adjust fa-fw" aria-hidden="true"></i>
+    </a>
+</div>
+
+
+  <main class="wrapper">
+    <nav class="navigation">
+  <section class="container">
+    
+    <a class="navigation-title" href="https://ftxj.github.io/zh/">
+      JXIN&#39;s Home
+    </a>
+    
+    
+      <input type="checkbox" id="menu-toggle" />
+      <label class="menu-button float-right" for="menu-toggle">
+        <i class="fa-solid fa-bars fa-fw" aria-hidden="true"></i>
+      </label>
+      <ul class="navigation-list">
+        
+          
+            <li class="navigation-item">
+              <a class="navigation-link " href="/zh/about/">关于</a>
+            </li>
+          
+            <li class="navigation-item">
+              <a class="navigation-link " href="/zh/travel/">旅行</a>
+            </li>
+          
+            <li class="navigation-item">
+              <a class="navigation-link " href="/zh/hiking/">徒步</a>
+            </li>
+          
+            <li class="navigation-item">
+              <a class="navigation-link " href="/zh/posts/">博客</a>
+            </li>
+          
+            <li class="navigation-item">
+              <a class="navigation-link " href="https://ftxj.github.io/cv/cv_zh.pdf">简历</a>
+            </li>
+          
+        
+        
+          
+          
+          
+            
+              
+                <li class="navigation-item menu-separator">
+                  <span>|</span>
+                </li>
+                
+              
+              <li class="navigation-item">
+                <a href="/posts/2026-05-29/09-saas-self-aware-reinforcement-learning-for-over-search-mitig/">EN</a>
+              </li>
+            
+          
+        
+      </ul>
+    
+  </section>
+</nav>
+
+
+    <div class="content">
+      
+  <section class="container post">
+    <article>
+      <header>
+        <div class="post-title">
+          <h1 class="title">
+            <a class="title-link" href="https://ftxj.github.io/zh/posts/2026-05-29/09-saas-self-aware-reinforcement-learning-for-over-search-mitig/">
+              SAAS: Self-Aware Reinforcement Learning for Over-Search Mitigation in Agentic Search
+            </a>
+          </h1>
+        </div>
+        <div class="post-meta">
+          <div class="date">
+            <span class="posted-on">
+              <i class="fa-solid fa-calendar" aria-hidden="true"></i>
+              <time datetime="2026-05-29T12:32:13Z">
+                五月 29, 2026
+              </time>
+            </span>
+            <span class="reading-time">
+              <i class="fa-solid fa-clock" aria-hidden="true"></i>
+              2-minute read
+            </span>
+          </div>
+          
+          <div class="categories">
+  <i class="fa-solid fa-folder" aria-hidden="true"></i>
+    <a href="/zh/categories/paper-digest/">Paper-Digest</a>
+      <span class="separator">•</span>
+    <a href="/zh/categories/2026-05-29/">2026-05-29</a></div>
+
+          
+        </div>
+      </header>
+
+      
+
+
+      <div class="post-content">
+        
+        <p><strong>arXiv:</strong> <a href="https://arxiv.org/abs/2605.29796">2605.29796</a> · <a href="https://arxiv.org/pdf/2605.29796">PDF</a></p>
+<p><strong>作者:</strong> Yunbo Tang, Chengyi Yang, Shiyu Liu, Zhishang Xiang, Zerui Chen, Qinggang Zhang, Jinsong Su</p>
+<p><strong>单位:</strong> School of Informatics, Xiamen University, Jilin University</p>
+<p><strong>主分类:</strong> <code>cs.AI</code> · 全部: cs.AI, cs.CL, cs.LG</p>
+<p><strong>命中关键词:</strong> llm, agent, agentic, rag, reasoning, inference, latency</p>
+<hr>
+<h2 id="tldr">TL;DR</h2>
+<p>SAAS 提出三组件 RL 框架，通过动态建模&quot;搜索边界&quot;抑制 agentic search 中的过搜索问题，在 7 个 QA benchmark 上保持精度的同时大幅削减冗余检索。</p>
+<h2 id="motivation">Motivation</h2>
+<p>LLM agentic search 通过迭代推理+外部检索处理复杂多跳问题效果显著，但存在严重的&quot;过搜索&quot;（over-search）痼疾：模型在参数知识已足够时仍触发搜索，或在已收集充分证据后仍持续检索。这两类浪费直接推高推理延迟和计算成本，同时引入噪声证据干扰最终答案——受影响的是任何在生产中部署 agentic RAG 系统的团队。</p>
+<p>现有方案分两类：提示/路由类（DRAGIN、Adaptive-RAG）依赖静态启发规则，RL 类（StepSearch、HiPRAG）依赖固定惩罚阈值。两者的共同缺陷是&quot;静态&quot;——都无法感知模型能力的动态变化。关键数据：随着训练推进，不需要搜索就能答对的问题比例从 step 100 的 12.7% 上升到 step 300 的 24.3%（Figure 3）。搜索边界本身在移动，固定惩罚在 step 250 附近会引发 reward hacking 和性能崩溃。</p>
+<p>前提条件的变化：RL 训练动态本身是可测量的——可以在每个训练步在线对比有搜索/无搜索 rollout，从而动态识别当前策略的搜索边界，这正是 SAAS 的切入点。</p>
+<h2 id="核心观点">核心观点</h2>
+<p>下图展示了 SAAS 要解决的两类过搜索失效模式：左侧是&quot;不必要搜索&quot;（参数知识已足够却仍调用搜索工具），右侧是&quot;冗余搜索&quot;（外部证据已充分仍继续检索）。两者都造成推理成本浪费。</p>
+<p><img alt="图 1" src="/images/papers/2605.29796/fig1.png"></p>
+<p>Figure 3 量化了静态惩罚的局限：随着训练推进，可无搜索答对的问题比例从 12.7% 上升到 24.3%，说明搜索边界是随模型能力演化的动态量。朴素搜索惩罚虽能压低搜索次数，但导致 step 250 附近性能崩溃，说明固定阈值不能区分&quot;合理克制&quot;与&quot;放弃必要搜索&quot;。</p>
+<p><img alt="图 3" src="/images/papers/2605.29796/fig3.png"></p>
+<ul>
+<li>识别 agentic search 中过搜索的根因：outcome-based RL 缺乏对搜索必要性的显式信号</li>
+<li>提出 SAAS，动态建模随策略演化的搜索边界，而非依赖静态阈值</li>
+<li>设计 Boundary-Aware Reward，将边界感知转化为轨迹级自适应惩罚，区分必要与冗余搜索</li>
+<li>引入 Stage-wise Optimization，优先推理探索再施加搜索正则，防止 reward hacking</li>
+<li>在 7 个 benchmark 上验证，精度不损失的前提下显著减少过搜索</li>
+</ul>
+<h2 id="方法">方法</h2>
+<p>SAAS 的整体 pipeline 如下图所示，由三个相互配合的组件构成：Search Boundary Modeling 在线识别当前策略的搜索边界；Boundary-Aware Reward 将边界感知转化为轨迹级惩罚；Stage-wise Optimization 通过课程式两阶段训练防止 reward hacking。</p>
+<p><img alt="图 4" src="/images/papers/2605.29796/fig4.png"></p>
+<p><strong>Search Boundary Modeling</strong>：对每个问题 $q$，在当前策略下分别采样搜索禁用组 $G_d(q)$（纯参数知识推理）和搜索启用组 $G_e(q)$（允许调用搜索引擎）各 $N$ 条轨迹，统计各组答对数 $n_d, n_e$。若 $n_d \geq \delta$ 则标记为 NoSearch（参数知识已足够）；若 $n_d=0$ 且 $n_e&gt;0$ 则为 NeedSearch；否则为 Undetermined。此边界随每轮训练更新，追踪策略能力演化。</p>
+<p><strong>Boundary-Aware Reward</strong>：总奖励 $R_i = R_i^{\text{acc}} + \mathbb{I}[\text{F1}=1] \cdot R_i^{\text{search}}$，仅对答对的轨迹施加搜索惩罚，避免对答错轨迹的双重惩罚。对 NoSearch 问题惩罚任何搜索行为（抑制不必要搜索）；对 NeedSearch 问题惩罚证据已充分后的继续搜索（抑制冗余搜索）；Undetermined 问题不施加搜索惩罚。</p>
+<p><strong>Stage-wise Optimization</strong>：两阶段课程——第一阶段仅用 outcome reward 做充分推理探索，第二阶段再叠加 boundary-aware reward 做搜索正则化，防止过早施加搜索惩罚导致模型放弃必要搜索。</p>
+<h2 id="实验">实验</h2>
+<ul>
+<li><strong>数据集</strong>：7 个 QA benchmark（论文正文截断，具体名称未全部出现于可见文本）</li>
+<li><strong>Baselines</strong>：DRAGIN、Adaptive-RAG、StepSearch、HiPRAG 及 outcome-based GRPO</li>
+<li><strong>模型</strong>：Qwen2.5-3B-Instruct（参数敏感性分析）；主实验模型规模论文正文截断未见</li>
+<li><strong>指标</strong>：Accuracy（ACC）、Recall（RC）、冗余搜索比率（Redundant Search Ratio）、无搜索轨迹比率</li>
+</ul>
+<h2 id="结果">结果</h2>
+<p>Figure 2 支撑了 SAAS 的核心动机：标准 outcome-based RL 训练至 step 50 时无搜索轨迹比例接近零，冗余搜索比率持续攀升并接近 50%，证明朴素 RL 会系统性地催生过搜索。SAAS 正是针对这一训练动态设计的。</p>
+<p><img alt="图 2" src="/images/papers/2605.29796/fig2.png"></p>
+<p>Figure 5 展示了 SAAS 两阶段训练的动态曲线：第一阶段 F1 分数稳步提升（推理能力优先），第二阶段在 F1 保持稳定的同时搜索次数明显下降，两条曲线呈现出清晰的阶段性分离，支撑了 stage-wise 策略能在不损失精度的前提下压制过搜索的主张。论文正文截断，具体 baseline 对比数字未能获取。</p>
+<p><img alt="图 5" src="/images/papers/2605.29796/fig5.png"></p>
+<p>超参数 $\delta$（用于 evidence-demand 估计的 GRPO 分组数）的敏感性分析在 Qwen2.5-3B-Instruct 上跨 7 个 QA benchmark 对 ACC 和 RC 进行了评测，Figure 6 验证了默认设置能提供稳定的搜索必要性估计；论文未在可见文本中给出不同 $\delta$ 取值的具体数字。</p>
+<p><img alt="图 6" src="/images/papers/2605.29796/fig6.png"></p>
+<p><strong>注</strong>：论文正文在 Section 3.2 处被截断，Section 4（Main Results Table）的具体 baseline→SAAS delta 数字未拿到。Abstract 仅声称&quot;substantially reduces over-search, while maintaining accuracy&quot;，无具体数值。</p>
+<h2 id="结论">结论</h2>
+<p>SAAS 的核心 takeaway：搜索边界不是问题的固有属性，而是随模型能力动态变化的——在 RL 训练中在线追踪这一边界，并据此施加自适应惩罚，是抑制过搜索同时保持精度的关键。Figure 3 的量化支撑：无搜索可答比例从 12.7% 到 24.3% 的演化明确证明了静态阈值的失效。</p>
+<p>边界条件：实验在 7 个 QA benchmark 上进行，模型以 Qwen2.5-3B-Instruct 为主；大模型（如 70B+）、非英文场景、非检索类 agentic task 的泛化性未验证。Abstract 称&quot;substantially reduces over-search&quot;，但具体延迟或成本改善数字未在正文中给出（可见部分）。缺失的 ablation：搜索禁用/启用 rollout 的采样数量 $N_d, N_e$ 对边界识别精度的影响未见独立消融。</p>
+<h2 id="是否新瓶装旧酒">是否新瓶装旧酒</h2>
+<p><strong>论文自述最相近前人工作</strong>：</p>
+<ol>
+<li><strong>StepSearch</strong>（Wang et al., 2025）——步级规划+搜索调度，但用固定启发式，不追踪边界演化</li>
+<li><strong>HiPRAG</strong>（Wu et al., 2026）——基于检索段落信息量的细粒度 process reward，但奖励设计仍是静态的</li>
+<li><strong>Adaptive-RAG</strong>（Jeong et al., 2024）——轻量分类器动态路由，属于 prompt/routing 范式，不修改模型参数</li>
+</ol>
+<p>作者框架自己的 delta：现有方法均依赖静态阈值或固定分类器，无法感知训练中策略能力的演变；SAAS 的 on-policy 对比 rollout 是动态感知搜索边界的新机制。</p>
+<p><strong>独立判断</strong>：用对比 rollout 估计&quot;是否需要搜索&quot;在思路上与 RLVR 中的 process reward model（PRM）有相似之处，但聚焦于搜索决策而非推理步骤奖励，方向有差异。Stage-wise curriculum 与其他 RL 多阶段训练（如 DAPO、STILL-3）并无本质不同，属于工程常规。整体属于将&quot;动态边界感知&quot;引入 agentic search RL 训练的增量创新，而非范式颠覆。</p>
+<h2 id="尚未回答的问题">尚未回答的问题</h2>
+<ol>
+<li><strong>跨模型规模</strong>：实验主要在 3B 量级模型上验证，搜索边界建模对 7B/70B 模型能力跃迁是否同样有效？</li>
+<li><strong>搜索工具多样性</strong>：实验用单一搜索引擎；当 agentic system 混用多种工具（代码执行、计算器、API）时，边界建模是否可推广？</li>
+<li><strong>NoSearch/NeedSearch/Undetermined 的比例分布</strong>：论文未报告三类问题在不同 benchmark 上的分布，不清楚 Undetermined 占比高时框架的降级行为。</li>
+<li><strong>在线建模的计算开销</strong>：每步需要两组 rollout 对比，实际训练成本相比 standard GRPO 增加多少？论文提及 efficiency analysis（Appendix B.3）但正文截断未见数据。</li>
+<li><strong>与 chain-of-thought 压缩方法的结合</strong>：过搜索和&quot;过思考&quot;（over-thinking in CoT）是否可以统一框架处理，SAAS 能否扩展到非搜索工具的&quot;冗余动作&quot;抑制？</li>
+</ol>
+<h2 id="原始摘要中文翻译">原始摘要（中文翻译）</h2>
+<p>Agentic search 使 LLM 能够通过迭代推理和外部搜索来解决复杂的多跳问题。尽管效果显著，但这些系统在实践中往往存在一个关键限制：智能体无法识别自身的知识边界，在内部知识已足够时盲目触发搜索，并且即使已收集到充分证据也无法终止搜索。这种自我感知能力的缺失导致严重的<strong>过搜索</strong>现象，带来巨大的推理延迟和高昂的计算成本。为此，我们提出 SAAS——一种新颖的强化学习框架，旨在培养动态自我感知能力，在不损害准确性的前提下精确调控搜索行为。SAAS 引入三个关键组件：（i）搜索边界建模机制，通过对比禁用搜索和启用搜索的 rollout，在演化策略下识别搜索边界；（ii）边界感知奖励模块，将这种边界感知转化为轨迹级惩罚，抑制不必要和冗余的搜索；（iii）阶段式优化策略，利用顺序课程优先进行推理而非搜索正则化，从而避免奖励 hacking。大量实验表明，SAAS 在显著减少过搜索的同时保持了准确性。我们的代码已匿名发布于 <a href="https://github.com/XMUDeepLIT/SAAS">https://github.com/XMUDeepLIT/SAAS</a>。</p>
+
+      </div>
+
+
+      <footer>
+        
+
+
+        
+        
+        
+        
+        
+        
+        
+      </footer>
+    </article>
+
+    
+  </section>
+
+    </div>
+
+    <footer class="footer">
+  <section class="container">
+    ©
+    
+      2019 -
+    
+    2026
+     Jie Xin 
+    ·
+    
+    Powered by <a href="https://gohugo.io/" target="_blank" rel="noopener">Hugo</a> & <a href="https://github.com/luizdepra/hugo-coder/" target="_blank" rel="noopener">Coder</a>.
+    
+  </section>
+</footer>
+
+  </main>
+
+  
+
+  
+  
+  <script src="/js/coder.min.6ae284be93d2d19dad1f02b0039508d9aab3180a12a06dcc71b0b0ef7825a317.js" integrity="sha256-auKEvpPS0Z2tHwKwA5UI2aqzGAoSoG3McbCw73gloxc="></script>
+  
+
+  
+
+  
+
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+</body>
+</html>

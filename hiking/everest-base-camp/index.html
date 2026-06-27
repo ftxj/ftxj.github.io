@@ -1,0 +1,45 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>路线交互路书</title>
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" crossorigin="">
+  <link rel="stylesheet" href="../assets/route-page.css">
+</head>
+<body class="route-page">
+  <div class="route-shell">
+    <header class="route-hero">
+      <div class="route-eyebrow">Interactive Route Book</div>
+      <h1 data-route-title>路线</h1>
+      <p class="route-subtitle" data-route-subtitle>轨迹交互预览。</p>
+      <div class="route-actions">
+        <a class="primary" href="3d/">打开 3D 地形版</a>
+        <a href="../">返回路线库</a>
+      </div>
+      <div class="route-stats" data-route-stats></div>
+    </header>
+    <main class="route-grid">
+      <section class="route-card">
+        <div id="map" class="route-map"></div>
+        <canvas id="profile" class="route-profile" width="900" height="220"></canvas>
+        <div class="route-legend">
+          <span><i style="background:var(--red)"></i>主爬升 / 垭口</span>
+          <span><i style="background:var(--orange)"></i>高海拔横切</span>
+          <span><i style="background:var(--blue)"></i>下降</span>
+          <span><i style="background:var(--purple)"></i>风险段</span>
+        </div>
+      </section>
+      <aside class="route-card">
+        <h2>关键点</h2>
+        <div class="route-filters" id="filters"></div>
+        <div class="route-poi-list" id="poiList"></div>
+        <ul class="route-notes" id="notes"></ul>
+      </aside>
+    </main>
+  </div>
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" crossorigin=""></script>
+  <script src="../assets/route-2d.js"></script>
+  <script>Route2D.init({ dataUrl: 'route.json' });</script>
+</body>
+</html>

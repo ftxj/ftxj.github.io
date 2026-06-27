@@ -1,0 +1,109 @@
+\documentclass[11pt,a4paper]{article}
+
+\usepackage[margin=0.6in, top=0.55in, bottom=0.55in]{geometry}
+\usepackage{titlesec}
+\usepackage{enumitem}
+\usepackage{hyperref}
+\usepackage{xcolor}
+\usepackage{CJKutf8}
+
+\hypersetup{colorlinks=true, urlcolor=blue!70!black, linkcolor=blue!70!black}
+
+\titleformat{\section}{\large\bfseries\scshape}{}{0em}{}[\titlerule]
+\titlespacing{\section}{0pt}{12pt}{6pt}
+
+\pagenumbering{gobble}
+\setlist{nosep, leftmargin=1.5em, topsep=3pt, itemsep=2pt}
+
+\newcommand{\projectentry}[5]{%
+    \noindent\textbf{#1} \hfill #2 \\[2pt]
+    #4 \hfill {\small #3} \\[1pt]
+    #5\par\vspace{8pt}%
+}
+
+\newcommand{\projectentrysingle}[3]{%
+    \noindent\textbf{#1} \hfill #2 \\[2pt]
+    #3\par\vspace{8pt}%
+}
+
+\begin{document}
+\begin{CJK}{UTF8}{gbsn}
+
+% Header
+\begin{center}
+    {\Huge\bfseries Yijie Li} (李一杰) \\[8pt]
+    [\href{mailto:932141413@qq.com}{932141413@qq.com}] \quad
+    [+86 176-1274-6066]
+\end{center}
+
+\vspace{2pt}
+
+% Experience
+\section{Experience}
+
+\noindent\textbf{NVIDIA} \hfill Shanghai, China \\
+\textit{Senior Compute Architect} \hfill 2022 -- Present
+\begin{itemize}
+    \item Researching automated end-to-end model performance optimization on next-gen GPUs (Hopper, Blackwell, Rubin)
+    \item Developed deep learning compilers (CuTile, Triton-to-CuTile) and MLPerf benchmark optimization
+    \item Collaborating with PyG, Megatron-LM, and OpenAI Triton teams on compiler infrastructure
+\end{itemize}
+
+\vspace{4pt}
+
+% Education
+\section{Education}
+
+\noindent\textbf{Huazhong University of Science and Technology} \hfill Wuhan, China \\
+\textit{M.S. in Computer Science} \hfill 2019 -- 2022
+
+\vspace{6pt}
+
+\noindent\textbf{Huazhong University of Science and Technology} \hfill Wuhan, China \\
+\textit{B.S. in Computer Science} \hfill 2015 -- 2019
+
+\vspace{4pt}
+
+% Projects (sorted by end date, most recent first)
+\section{Projects}
+
+\projectentrysingle{Agent for Compiler}{2026 -- Present}
+{Designing a lightweight harness system specifically for compiler optimization.}
+
+\projectentry{CuTile}{2023 -- Present}{[\href{https://github.com/NVIDIA/cutile-python}{code}] [\href{https://developer.nvidia.com/blog/tag/cutile/}{blog}]}
+{CUDA Tile programming standard for NVIDIA GPUs.}
+{Designed and implemented optimization passes for deep learning workloads.}
+
+\projectentry{Triton-to-CuTile}{2024 -- 2025}{[\href{https://github.com/triton-lang/Triton-to-tile-IR}{code}]}
+{OpenAI incubation project; compiler bridge connecting Triton frontend to CuTile backend.}
+{Enabling Triton users to target NVIDIA's optimized tile programming infrastructure.}
+
+\projectentry{NvFuser}{2022 -- 2023}{[\href{https://github.com/csarofeen/pytorch/commits/devel/?author=ftxj}{code}] [\href{https://pytorch.org/blog/introducing-nvfuser-a-deep-learning-compiler-for-pytorch/}{blog}]}
+{PyTorch JIT compiler achieving 1.2x--2.5x speedup on GNN models.}
+{Enabled gather/scatter/index\_select graph operations for sparse workloads.}
+
+\projectentry{OpenFold2 Training}{2023 -- 2023}{[\href{https://github.com/mlcommons/hpc_results_v3.0/tree/main/NVIDIA/benchmarks/openfold}{code}] [\href{https://arxiv.org/abs/2404.11068}{paper}] [\href{https://developer.nvidia.com/blog/optimizing-openfold-training-for-drug-discovery/}{blog}]}
+{MLPerf HPC v3.1 \#1 submission with 7.5x e2e speedup.}
+{Optimized protein structure prediction training on large-scale GPU clusters.}
+
+\projectentry{GPT-3 Training}{2023 -- 2023}{[\href{https://github.com/NVIDIA/Megatron-LM}{code}]}
+{MLPerf Training v4.0; contributed 1.02x training speedup on 175B model.}
+{Optimized distributed training pipeline for large language models.}
+
+\projectentry{PyTorch Geometric TorchScript}{2022 -- 2022}{[\href{https://github.com/pyg-team/pytorch_geometric/commits/master/?author=ftxj}{code}]}
+{Added TorchScript support for PyG community, enabling JIT compilation for GNN models.}
+{Contributed core infrastructure for production deployment of graph neural networks.}
+
+\projectentry{SpMM on GPU -- Champion, MIT/IEEE Graph Challenge}{2021 -- 2021}{[\href{https://github.com/CGCL-codes/Graphchallenge21}{code}] [\href{https://ieeexplore.ieee.org/document/9622791}{paper}]}
+{High-performance sparse matrix multiplication; up to 652x speedup over cuSPARSE.}
+{Won 1st place in the 2021 MIT/IEEE/Amazon Graph Challenge competition.}
+
+\vspace{4pt}
+
+% Current Focus
+\section{Current Focus}
+
+\noindent My research interest has fully shifted to AI agents -- exploring how LLMs can autonomously optimize compilers, automate performance tuning, and transform traditional software development workflows.
+
+\end{CJK}
+\end{document}
